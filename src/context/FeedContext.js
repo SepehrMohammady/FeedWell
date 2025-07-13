@@ -11,6 +11,9 @@ const initialState = {
 };
 
 function feedReducer(state, action) {
+  console.log('FeedReducer called with action:', action.type, 'payload:', action.payload);
+  console.log('Current state feeds:', state.feeds.length);
+  
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
@@ -19,10 +22,16 @@ function feedReducer(state, action) {
     case 'ADD_FEED':
       return { ...state, feeds: [...state.feeds, action.payload] };
     case 'REMOVE_FEED':
+      const newFeeds = state.feeds.filter(feed => feed.url !== action.payload);
+      const newArticles = state.articles.filter(article => article.feedUrl !== action.payload);
+      console.log('REMOVE_FEED: Original feeds:', state.feeds.length);
+      console.log('REMOVE_FEED: New feeds after filter:', newFeeds.length);
+      console.log('REMOVE_FEED: URL to remove:', action.payload);
+      console.log('REMOVE_FEED: Feed URLs in state:', state.feeds.map(f => f.url));
       return { 
         ...state, 
-        feeds: state.feeds.filter(feed => feed.url !== action.payload),
-        articles: state.articles.filter(article => article.feedUrl !== action.payload)
+        feeds: newFeeds,
+        articles: newArticles
       };
     case 'SET_FEEDS':
       return { ...state, feeds: action.payload };
@@ -36,6 +45,7 @@ function feedReducer(state, action) {
         )
       };
     case 'CLEAR_ALL_DATA':
+      console.log('CLEAR_ALL_DATA: Clearing all feeds and articles');
       return { ...state, feeds: [], articles: [] };
     default:
       return state;
@@ -95,11 +105,19 @@ export function FeedProvider({ children }) {
   };
 
   const removeFeed = async (feedUrl) => {
+    console.log('FeedContext: removeFeed called with URL:', feedUrl);
+    console.log('Current feeds:', state.feeds.map(f => ({ title: f.title, url: f.url })));
+    
     dispatch({ type: 'REMOVE_FEED', payload: feedUrl });
     const updatedFeeds = state.feeds.filter(feed => feed.url !== feedUrl);
     const updatedArticles = state.articles.filter(article => article.feedUrl !== feedUrl);
+    
+    console.log('Updated feeds after filter:', updatedFeeds.map(f => ({ title: f.title, url: f.url })));
+    
     await saveFeeds(updatedFeeds);
     await saveArticles(updatedArticles);
+    
+    console.log('Feed removal completed');
   };
 
   const addArticles = async (articles) => {
@@ -111,9 +129,14 @@ export function FeedProvider({ children }) {
   };
 
   const clearAllData = async () => {
+    console.log('FeedContext: clearAllData called');
+    console.log('Current state before clearing:', { feeds: state.feeds.length, articles: state.articles.length });
+    
     dispatch({ type: 'CLEAR_ALL_DATA' });
     await saveFeeds([]);
     await saveArticles([]);
+    
+    console.log('FeedContext: clearAllData completed');
   };
 
   const value = {

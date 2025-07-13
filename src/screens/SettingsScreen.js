@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFeed } from '../context/FeedContext';
+import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, removeFeed, clearAllData } = useFeed();
@@ -21,7 +22,33 @@ export default function SettingsScreen({ navigation }) {
   const [darkMode, setDarkMode] = useState(false);
   const [showImages, setShowImages] = useState(true);
 
+  // Debug: Log feeds when component mounts or feeds change
+  React.useEffect(() => {
+    console.log('SettingsScreen: Current feeds:', feeds);
+    console.log('SettingsScreen: Feeds count:', feeds.length);
+    feeds.forEach((feed, index) => {
+      console.log(`SettingsScreen: Feed ${index}:`, {
+        id: feed.id,
+        title: feed.title,
+        url: feed.url,
+        addedAt: feed.addedAt
+      });
+    });
+  }, [feeds]);
+
   const handleClearAllData = () => {
+    console.log('Attempting to clear all data');
+    
+    // For web platform, use window.confirm for better compatibility
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Clear All Data?\n\nThis will remove all feeds and articles. This action cannot be undone.');
+      if (confirmed) {
+        performClearAllData();
+      }
+      return;
+    }
+    
+    // For mobile platforms, use Alert.alert
     Alert.alert(
       'Clear All Data',
       'This will remove all feeds and articles. This action cannot be undone.',
@@ -30,21 +57,48 @@ export default function SettingsScreen({ navigation }) {
         {
           text: 'Clear',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await clearAllData();
-              Alert.alert('Success', 'All data has been cleared');
-            } catch (error) {
-              console.error('Error clearing data:', error);
-              Alert.alert('Error', 'Failed to clear data');
-            }
-          },
+          onPress: () => performClearAllData(),
         },
       ]
     );
   };
 
+  const performClearAllData = async () => {
+    try {
+      console.log('Performing clear all data operation');
+      await clearAllData();
+      console.log('All data cleared successfully');
+      
+      // Show success message
+      if (Platform.OS === 'web') {
+        window.alert('All data has been cleared successfully!');
+      } else {
+        Alert.alert('Success', 'All data has been cleared');
+      }
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      
+      // Show error message
+      if (Platform.OS === 'web') {
+        window.alert('Failed to clear data. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to clear data');
+      }
+    }
+  };
+
   const handleRemoveFeed = (feed) => {
+    console.log('Attempting to remove feed:', feed.title, 'URL:', feed.url);
+    
+    // For web platform, use window.confirm for better compatibility
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(`Remove "${feed.title}"?\n\nThis will remove the feed and all its articles.`);
+      if (confirmed) {
+        performRemoveFeed(feed);
+      }
+      return;
+    }
+    
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
         {
@@ -54,9 +108,9 @@ export default function SettingsScreen({ navigation }) {
           title: `Remove "${feed.title}"?`,
           message: 'This will remove the feed and all its articles.',
         },
-        (buttonIndex) => {
+        async (buttonIndex) => {
           if (buttonIndex === 1) {
-            removeFeed(feed.url);
+            performRemoveFeed(feed);
           }
         }
       );
@@ -69,10 +123,34 @@ export default function SettingsScreen({ navigation }) {
           {
             text: 'Remove',
             style: 'destructive',
-            onPress: () => removeFeed(feed.url),
+            onPress: () => performRemoveFeed(feed),
           },
         ]
       );
+    }
+  };
+
+  const performRemoveFeed = async (feed) => {
+    try {
+      console.log('Performing feed removal for URL:', feed.url);
+      await removeFeed(feed.url);
+      console.log('Feed removed successfully');
+      
+      // Show success message
+      if (Platform.OS === 'web') {
+        window.alert('Feed removed successfully!');
+      } else {
+        Alert.alert('Success', 'Feed removed successfully');
+      }
+    } catch (error) {
+      console.error('Error removing feed:', error);
+      
+      // Show error message
+      if (Platform.OS === 'web') {
+        window.alert('Failed to remove feed. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to remove feed. Please try again.');
+      }
     }
   };
 
@@ -163,18 +241,21 @@ export default function SettingsScreen({ navigation }) {
           </View>
         ) : (
           <View style={styles.section}>
-            {feeds.map((feed) => (
+            {feeds.map((feed, index) => (
               <TouchableOpacity
-                key={feed.id}
+                key={feed.id || feed.url || index}
                 style={styles.feedItem}
-                onPress={() => handleRemoveFeed(feed)}
+                onPress={() => {
+                  console.log('Feed item pressed:', feed);
+                  handleRemoveFeed(feed);
+                }}
               >
                 <View style={styles.feedContent}>
                   <Text style={styles.feedTitle} numberOfLines={1}>
-                    {feed.title}
+                    {feed.title || feed.url || 'Unknown Feed'}
                   </Text>
                   <Text style={styles.feedUrl} numberOfLines={1}>
-                    {feed.url}
+                    {feed.url || 'No URL'}
                   </Text>
                   <Text style={styles.feedDate}>
                     Added {formatDate(feed.addedAt)}
@@ -193,6 +274,25 @@ export default function SettingsScreen({ navigation }) {
             description="Remove all feeds and articles"
             onPress={handleClearAllData}
             rightElement={<Ionicons name="trash-outline" size={20} color="#ff3b30" />}
+          />
+        </View>
+
+        <SectionHeader title="Debug" />
+        <View style={styles.section}>
+          <SettingItem
+            title="Add Demo Feed"
+            description="Add a demo feed for testing removal"
+            onPress={() => addDemoFeed()}
+          />
+          <SettingItem
+            title="Test Feed Removal"
+            description="Debug feed removal functionality"
+            onPress={() => testFeedRemoval()}
+          />
+          <SettingItem
+            title="Check Data Consistency"
+            description="Log current feeds data"
+            onPress={() => testDataConsistency()}
           />
         </View>
 
