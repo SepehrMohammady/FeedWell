@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article } = route.params;
+  const { theme } = useTheme();
 
   const handleOpenInBrowser = async () => {
     try {
@@ -57,6 +59,94 @@ export default function ArticleActionsScreen({ route, navigation }) {
       minute: '2-digit',
     });
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerButton: {
+      padding: 8,
+      width: 40,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    content: {
+      flex: 1,
+      padding: 16,
+    },
+    articleHeader: {
+      marginBottom: 16,
+    },
+    feedTitle: {
+      fontSize: 14,
+      color: theme.colors.primary,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    articleDate: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    articleTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      lineHeight: 32,
+      marginBottom: 16,
+    },
+    articleImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: 12,
+      marginBottom: 16,
+      backgroundColor: theme.colors.border,
+    },
+    articleDescription: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      lineHeight: 24,
+      marginBottom: 24,
+    },
+    actionsContainer: {
+      gap: 12,
+      paddingVertical: 16,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 16,
+      borderRadius: 12,
+      gap: 8,
+    },
+    browserButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    readerButton: {
+      backgroundColor: theme.colors.success,
+    },
+    shareButton: {
+      backgroundColor: theme.colors.warning,
+    },
+    actionButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -120,91 +210,3 @@ export default function ArticleActionsScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerButton: {
-    padding: 8,
-    width: 40,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  articleHeader: {
-    marginBottom: 16,
-  },
-  feedTitle: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  articleDate: {
-    fontSize: 12,
-    color: '#666',
-  },
-  articleTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    lineHeight: 32,
-    marginBottom: 16,
-  },
-  articleImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 16,
-    backgroundColor: '#f0f0f0',
-  },
-  articleDescription: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  actionsContainer: {
-    gap: 12,
-    paddingVertical: 16,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
-  },
-  browserButton: {
-    backgroundColor: '#007AFF',
-  },
-  readerButton: {
-    backgroundColor: '#34C759',
-  },
-  shareButton: {
-    backgroundColor: '#FF9500',
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

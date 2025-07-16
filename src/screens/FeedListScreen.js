@@ -14,10 +14,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
+import { useTheme } from '../context/ThemeContext';
 import { parseRSSFeed } from '../utils/rssParser';
 
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
+  const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -121,6 +123,141 @@ export default function FeedListScreen({ navigation }) {
     new Date(b.publishedDate) - new Date(a.publishedDate)
   );
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    addButton: {
+      padding: 8,
+    },
+    articleItem: {
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
+    },
+    articleContent: {
+      flex: 1,
+      marginRight: 12,
+    },
+    articleHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    feedTitle: {
+      fontSize: 12,
+      color: theme.colors.primary,
+      fontWeight: '600',
+      flex: 1,
+    },
+    articleDate: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    articleTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 6,
+      lineHeight: 22,
+    },
+    articleDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+    },
+    articleImage: {
+      width: 80,
+      height: 80,
+      borderRadius: 8,
+      backgroundColor: theme.colors.border,
+    },
+    emptyState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    emptyList: {
+      flex: 1,
+    },
+    emptyTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptyDescription: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: 24,
+    },
+    primaryButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 12,
+      marginBottom: 32,
+      gap: 8,
+    },
+    primaryButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    featuresContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+      paddingHorizontal: 20,
+    },
+    featureItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    featureText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 8,
+      textAlign: 'center',
+    },
+    loadingContainer: {
+      padding: 20,
+      alignItems: 'center',
+    },
+    loadingText: {
+      marginTop: 10,
+      color: theme.colors.textSecondary,
+    },
+  });
+
   if (feeds.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
@@ -209,146 +346,3 @@ export default function FeedListScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  addButton: {
-    padding: 8,
-  },
-  articleItem: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    ...(Platform.OS === 'web' ? {
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-    } : {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    }),
-  },
-  articleContent: {
-    flex: 1,
-    marginRight: 12,
-  },
-  articleHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  feedTitle: {
-    fontSize: 12,
-    color: '#007AFF',
-    fontWeight: '600',
-    flex: 1,
-  },
-  articleDate: {
-    fontSize: 12,
-    color: '#666',
-  },
-  articleTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 6,
-    lineHeight: 22,
-  },
-  articleDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-  },
-  articleImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  emptyList: {
-    flex: 1,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyDescription: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginBottom: 32,
-    gap: 8,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  featuresContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    paddingHorizontal: 20,
-  },
-  featureItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  featureText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  loadingContainer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#666',
-  },
-});

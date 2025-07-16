@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 import { cleanHtmlContent, extractCleanText } from '../utils/rssParser';
 
 export default function ArticleReaderScreen({ route, navigation }) {
   const { article } = route.params;
+  const { theme } = useTheme();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -84,6 +86,130 @@ export default function ArticleReaderScreen({ route, navigation }) {
       minute: '2-digit',
     });
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerButton: {
+      padding: 8,
+      width: 40,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    content: {
+      flex: 1,
+      padding: 20,
+    },
+    articleHeader: {
+      marginBottom: 16,
+    },
+    feedTitle: {
+      fontSize: 14,
+      color: theme.colors.primary,
+      fontWeight: '600',
+      marginBottom: 4,
+    },
+    articleDate: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    articleTitle: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      lineHeight: 36,
+      marginBottom: 8,
+    },
+    articleAuthor: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      fontStyle: 'italic',
+      marginBottom: 16,
+    },
+    articleImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: 12,
+      marginBottom: 20,
+      backgroundColor: theme.colors.border,
+    },
+    articleContent: {
+      marginBottom: 24,
+    },
+    articleText: {
+      fontSize: 18,
+      color: theme.colors.text,
+      lineHeight: 28,
+      fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    loadingText: {
+      marginTop: 16,
+      color: theme.colors.textSecondary,
+      fontSize: 16,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    errorTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.error,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    errorText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    retryButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    noContentContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    noContentTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.textSecondary,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    noContentText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -165,127 +291,3 @@ export default function ArticleReaderScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerButton: {
-    padding: 8,
-    width: 40,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  articleHeader: {
-    marginBottom: 16,
-  },
-  feedTitle: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  articleDate: {
-    fontSize: 12,
-    color: '#666',
-  },
-  articleTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    lineHeight: 36,
-    marginBottom: 8,
-  },
-  articleAuthor: {
-    fontSize: 14,
-    color: '#666',
-    fontStyle: 'italic',
-    marginBottom: 16,
-  },
-  articleImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  articleContent: {
-    marginBottom: 24,
-  },
-  articleText: {
-    fontSize: 18,
-    color: '#333',
-    lineHeight: 28,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    marginTop: 16,
-    color: '#666',
-    fontSize: 16,
-  },
-  errorContainer: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FF3B30',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  retryButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  noContentContainer: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  noContentTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  noContentText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
-});

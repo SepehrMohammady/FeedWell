@@ -14,12 +14,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFeed } from '../context/FeedContext';
+import { useTheme } from '../context/ThemeContext';
 import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, removeFeed, clearAllData } = useFeed();
+  const { theme, isDarkMode, toggleTheme } = useTheme();
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [showImages, setShowImages] = useState(true);
 
   // Debug: Log feeds when component mounts or feeds change
@@ -177,6 +178,156 @@ export default function SettingsScreen({ navigation }) {
     <Text style={styles.sectionHeader}>{title}</Text>
   );
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginLeft: 16,
+    },
+    content: {
+      flex: 1,
+    },
+    section: {
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: 16,
+      marginTop: 16,
+      borderRadius: 12,
+      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
+    },
+    sectionHeader: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.textTertiary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginTop: 24,
+      marginBottom: 8,
+      marginHorizontal: 16,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginLeft: 8,
+    },
+    settingItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    settingItemLast: {
+      borderBottomWidth: 0,
+    },
+    settingContent: {
+      flex: 1,
+    },
+    settingTitle: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    settingDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    feedItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    feedItemLast: {
+      borderBottomWidth: 0,
+    },
+    feedContent: {
+      flex: 1,
+    },
+    feedTitle: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    feedUrl: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginBottom: 2,
+    },
+    feedDate: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    removeButton: {
+      padding: 8,
+    },
+    actionButton: {
+      backgroundColor: theme.colors.primary,
+      marginHorizontal: 16,
+      marginTop: 16,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    actionButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    dangerButton: {
+      backgroundColor: theme.colors.error,
+    },
+    emptyState: {
+      alignItems: 'center',
+      padding: 24,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: theme.colors.textSecondary,
+      marginTop: 16,
+      marginBottom: 20,
+    },
+    addFirstFeedButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 8,
+    },
+    addFirstFeedText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    footer: {
+      paddingHorizontal: 16,
+      paddingVertical: 32,
+    },
+    footerText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -214,14 +365,13 @@ export default function SettingsScreen({ navigation }) {
           
           <SettingItem
             title="Dark Mode"
-            description="Coming soon in future updates"
+            description="Switch between light and dark themes"
             rightElement={
               <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
-                disabled={true}
+                value={isDarkMode}
+                onValueChange={toggleTheme}
                 trackColor={{ false: '#767577', true: '#007AFF' }}
-                thumbColor={darkMode ? '#fff' : '#f4f3f4'}
+                thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
               />
             }
           />
@@ -320,153 +470,4 @@ export default function SettingsScreen({ navigation }) {
       </ScrollView>
     </SafeAreaView>
   );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-  },
-  sectionHeader: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 24,
-    marginBottom: 8,
-    marginHorizontal: 16,
-  },
-  section: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      },
-    }),
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  settingContent: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 2,
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 18,
-  },
-  feedItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  feedContent: {
-    flex: 1,
-  },
-  feedTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  feedUrl: {
-    fontSize: 12,
-    color: '#007AFF',
-    marginBottom: 2,
-  },
-  feedDate: {
-    fontSize: 12,
-    color: '#666',
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 32,
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      },
-    }),
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  addFirstFeedButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  addFirstFeedText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingVertical: 32,
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
