@@ -4,7 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import FeedListScreen from '../screens/FeedListScreen';
-import ArticleScreen from '../screens/ArticleScreen';
+import ArticleActionsScreen from '../screens/ArticleActionsScreen';
+import ArticleReaderScreen from '../screens/ArticleReaderScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddFeedScreen from '../screens/AddFeedScreen';
 
@@ -13,21 +14,22 @@ const Stack = createStackNavigator();
 
 function FeedStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen 
         name="FeedList" 
         component={FeedListScreen} 
-        options={{ title: 'FeedWell' }}
       />
       <Stack.Screen 
-        name="Article" 
-        component={ArticleScreen} 
-        options={{ title: 'Article' }}
+        name="ArticleActions" 
+        component={ArticleActionsScreen} 
+      />
+      <Stack.Screen 
+        name="ArticleReader" 
+        component={ArticleReaderScreen} 
       />
       <Stack.Screen 
         name="AddFeed" 
         component={AddFeedScreen} 
-        options={{ title: 'Add Feed' }}
       />
     </Stack.Navigator>
   );

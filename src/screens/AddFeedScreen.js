@@ -22,15 +22,53 @@ export default function AddFeedScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const { addFeed, addArticles, feeds } = useFeed();
 
-  const popularFeeds = [
-    { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
-    { name: 'Dev.to', url: 'https://dev.to/feed' },
-    { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
-    { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
-    { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
-    { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
-    { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
-    { name: 'Reddit Frontend', url: 'https://www.reddit.com/r/webdev/.rss' },
+  const feedCategories = [
+    {
+      title: 'Technology',
+      feeds: [
+        { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
+        { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
+        { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
+        { name: 'Dev.to', url: 'https://dev.to/feed' },
+        { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
+      ]
+    },
+    {
+      title: 'News',
+      feeds: [
+        { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
+        { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
+        { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
+        { name: 'Associated Press', url: 'https://feeds.apnews.com/apnews/topnews' },
+      ]
+    },
+    {
+      title: 'Business',
+      feeds: [
+        { name: 'Harvard Business Review', url: 'https://feeds.hbr.org/harvardbusiness' },
+        { name: 'Forbes', url: 'https://www.forbes.com/real-time/feed2/' },
+        { name: 'Financial Times', url: 'https://www.ft.com/rss/home' },
+        { name: 'Wall Street Journal', url: 'https://feeds.wsj.com/wsj/xml/rss/3_7085.xml' },
+      ]
+    },
+    {
+      title: 'Science',
+      feeds: [
+        { name: 'Science Daily', url: 'https://www.sciencedaily.com/rss/all.xml' },
+        { name: 'NASA', url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss' },
+        { name: 'Scientific American', url: 'https://rss.sciam.com/ScientificAmerican-Global' },
+        { name: 'Nature', url: 'https://www.nature.com/nature.rss' },
+      ]
+    },
+    {
+      title: 'Lifestyle',
+      feeds: [
+        { name: 'Medium', url: 'https://medium.com/feed' },
+        { name: 'Lifehacker', url: 'https://lifehacker.com/rss' },
+        { name: 'The Guardian Culture', url: 'https://www.theguardian.com/culture/rss' },
+        { name: 'Mashable', url: 'https://mashable.com/feeds/rss/all' },
+      ]
+    }
   ];
 
   const handleAddFeed = async () => {
@@ -95,17 +133,12 @@ export default function AddFeedScreen({ navigation }) {
       // More detailed error message
       let errorMessage = 'Failed to add feed. ';
       
-      if (error.message.includes('CORS proxies failed')) {
-        errorMessage += 'This feed cannot be accessed from the web browser due to CORS restrictions. ';
-        if (typeof window !== 'undefined' && window.location) {
-          errorMessage += 'Try using the mobile app for better RSS feed support, or try one of the suggested feeds above.';
-        }
+      if (error.message.includes('CORS')) {
+        errorMessage += 'This feed may not be accessible from the web browser due to CORS restrictions. ';
       } else if (error.message.includes('Network')) {
         errorMessage += 'Please check your internet connection. ';
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage += 'The feed URL may be invalid or temporarily unavailable. ';
-      } else if (error.message.includes('parse')) {
-        errorMessage += 'The feed format may be invalid or corrupted. ';
       } else {
         errorMessage += error.message;
       }
@@ -185,27 +218,28 @@ export default function AddFeedScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.popularSection}>
-            <Text style={styles.sectionTitle}>Popular Feeds</Text>
+          <View style={styles.categoriesSection}>
+            <Text style={styles.sectionTitle}>Popular Categories</Text>
             <Text style={styles.sectionDescription}>
-              Try one of these popular news and tech feeds
+              Choose from curated feeds in different categories
             </Text>
-
-            {popularFeeds.map((feed, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.popularFeedItem}
-                onPress={() => handlePopularFeed(feed.url)}
-                disabled={loading}
-              >
-                <View style={styles.popularFeedContent}>
-                  <Text style={styles.popularFeedName}>{feed.name}</Text>
-                  <Text style={styles.popularFeedUrl} numberOfLines={1}>
-                    {feed.url}
-                  </Text>
+            
+            {feedCategories.map((category, index) => (
+              <View key={index} style={styles.categoryContainer}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <View style={styles.feedGrid}>
+                  {category.feeds.map((feed, feedIndex) => (
+                    <TouchableOpacity
+                      key={feedIndex}
+                      style={styles.feedChip}
+                      onPress={() => handlePopularFeed(feed.url)}
+                      disabled={loading}
+                    >
+                      <Text style={styles.feedChipText}>{feed.name}</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
-                <Ionicons name="add-circle-outline" size={24} color="#007AFF" />
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
 
@@ -229,14 +263,6 @@ export default function AddFeedScreen({ navigation }) {
                 All ads and tracking are automatically removed
               </Text>
             </View>
-            {typeof window !== 'undefined' && window.location && (
-              <View style={styles.helpItem}>
-                <Ionicons name="information-circle-outline" size={20} color="#007AFF" />
-                <Text style={styles.helpText}>
-                  <Text style={{ fontWeight: 'bold' }}>Web Browser:</Text> Some feeds may not work due to CORS restrictions. Try the suggested feeds above for better compatibility.
-                </Text>
-              </View>
-            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -342,7 +368,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
-  popularSection: {
+  categoriesSection: {
     backgroundColor: '#fff',
     margin: 16,
     marginTop: 0,
@@ -363,25 +389,32 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  popularFeedItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  categoryContainer: {
+    marginBottom: 20,
   },
-  popularFeedContent: {
-    flex: 1,
-  },
-  popularFeedName: {
+  categoryTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  popularFeedUrl: {
+  feedGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  feedChip: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  feedChipText: {
     fontSize: 12,
-    color: '#666',
+    color: '#007AFF',
+    fontWeight: '500',
   },
   helpSection: {
     backgroundColor: '#fff',

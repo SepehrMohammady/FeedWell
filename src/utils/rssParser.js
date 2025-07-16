@@ -36,7 +36,16 @@ const AD_PATTERNS = [
   /analytics/gi,
   /adsense/gi,
   /doubleclick/gi,
-  /googleadservices/gi
+  /googleadservices/gi,
+  /hero-ad-container/gi,
+  /ad-unit/gi,
+  /google_ads_iframe/gi,
+  /safeframe\.googlesyndication/gi,
+  /wp-block-tc-ads/gi,
+  /tc-ads/gi,
+  /us-tc-ros/gi,
+  /data-unitcode/gi,
+  /data-test.*ad/gi
 ];
 
 // Clean HTML content by removing ads and unnecessary elements
@@ -60,10 +69,19 @@ export function cleanHtmlContent(html) {
     cleanedHtml = cleanedHtml.replace(elementRegex, '');
   });
 
-  // Remove specific ad elements
+  // Remove specific ad elements and TechCrunch ad patterns
   cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
   cleanedHtml = cleanedHtml.replace(/<aside[^>]*>.*?<\/aside>/gi, '');
   cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
+  
+  // Specific TechCrunch ad patterns
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?hero-ad-container.*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?ad-unit.*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?wp-block-tc-ads.*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?google_ads_iframe.*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<iframe[^>]*src=['""].*?safeframe\.googlesyndication.*?['"][^>]*>.*?<\/iframe>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*data-unitcode=['""].*?us_tc_ros.*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*data-test=['""].*?ad.*?['"][^>]*>.*?<\/div>/gi, '');
 
   // Clean up empty paragraphs and divs
   cleanedHtml = cleanedHtml.replace(/<p>\s*<\/p>/gi, '');

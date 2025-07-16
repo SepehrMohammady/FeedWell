@@ -66,12 +66,7 @@ export default function ArticleScreen({ route, navigation }) {
       return;
     }
     
-    if (isWeb || !WebView) {
-      // On web, or if WebView is not available, open in browser
-      handleOpenInBrowser();
-      return;
-    }
-    
+    // This function should only be called on mobile platforms where WebView is available
     setShowWebView(!showWebView);
   };
 
@@ -217,9 +212,12 @@ export default function ArticleScreen({ route, navigation }) {
         </TouchableOpacity>
         
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
-            <Ionicons name="globe-outline" size={24} color="#007AFF" />
-          </TouchableOpacity>
+          {/* Only show WebView button on mobile platforms */}
+          {!isWeb && WebView && (
+            <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
+              <Ionicons name="globe-outline" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={24} color="#007AFF" />
           </TouchableOpacity>

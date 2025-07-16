@@ -15,7 +15,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { parseRSSFeed } from '../utils/rssParser';
-import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
@@ -36,21 +35,7 @@ export default function FeedListScreen({ navigation }) {
       
       for (const feed of feeds) {
         try {
-          let parsedFeed;
-          
-          // Try the regular parser first
-          try {
-            parsedFeed = await parseRSSFeed(feed.url);
-          } catch (error) {
-            console.log(`Regular parser failed for ${feed.url}, trying CORS proxy:`, error.message);
-            try {
-              parsedFeed = await parseRSSFeedWithProxy(feed.url);
-            } catch (proxyError) {
-              console.log(`CORS proxy also failed for ${feed.url}:`, proxyError.message);
-              throw error; // Keep the original error
-            }
-          }
-          
+          const parsedFeed = await parseRSSFeed(feed.url);
           allArticles.push(...parsedFeed.articles);
         } catch (error) {
           console.error(`Error parsing feed ${feed.url}:`, error);
@@ -92,10 +77,14 @@ export default function FeedListScreen({ navigation }) {
     }
   };
 
+  const handleArticlePress = (article) => {
+    navigation.navigate('ArticleActions', { article });
+  };
+
   const renderArticle = ({ item }) => (
     <TouchableOpacity
       style={styles.articleItem}
-      onPress={() => navigation.navigate('Article', { article: item })}
+      onPress={() => handleArticlePress(item)}
     >
       <View style={styles.articleContent}>
         <View style={styles.articleHeader}>
@@ -112,21 +101,19 @@ export default function FeedListScreen({ navigation }) {
         </Text>
         
         {item.description && (
-          <Text style={styles.articleDescription} numberOfLines={3}>
+          <Text style={styles.articleDescription} numberOfLines={2}>
             {item.description}
           </Text>
         )}
-        
-        {item.imageUrl && (
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={styles.articleImage}
-            resizeMode="cover"
-          />
-        )}
       </View>
       
-      <Ionicons name="chevron-forward" size={20} color="#ccc" />
+      {item.imageUrl && (
+        <Image
+          source={{ uri: item.imageUrl }}
+          style={styles.articleImage}
+          resizeMode="cover"
+        />
+      )}
     </TouchableOpacity>
   );
 
@@ -148,17 +135,33 @@ export default function FeedListScreen({ navigation }) {
         </View>
         
         <View style={styles.emptyState}>
-          <Ionicons name="newspaper-outline" size={80} color="#ccc" />
-          <Text style={styles.emptyTitle}>No Feeds Yet</Text>
+          <Ionicons name="newspaper-outline" size={100} color="#e0e0e0" />
+          <Text style={styles.emptyTitle}>Welcome to FeedWell</Text>
           <Text style={styles.emptyDescription}>
-            Add your first RSS feed to start reading articles
+            Your ad-free RSS reader. Start by adding your first feed to get clean, distraction-free articles.
           </Text>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
-            <Text style={styles.primaryButtonText}>Add Feed</Text>
+            <Ionicons name="add-circle-outline" size={20} color="#fff" />
+            <Text style={styles.primaryButtonText}>Add Your First Feed</Text>
           </TouchableOpacity>
+          
+          <View style={styles.featuresContainer}>
+            <View style={styles.featureItem}>
+              <Ionicons name="shield-checkmark" size={24} color="#34C759" />
+              <Text style={styles.featureText}>Ad-free reading</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Ionicons name="reader" size={24} color="#007AFF" />
+              <Text style={styles.featureText}>Clean reader mode</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Ionicons name="share" size={24} color="#FF9500" />
+              <Text style={styles.featureText}>Easy sharing</Text>
+            </View>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -233,12 +236,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 16,
     marginVertical: 8,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     ...(Platform.OS === 'web' ? {
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
     } : {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -249,6 +252,7 @@ const styles = StyleSheet.create({
   },
   articleContent: {
     flex: 1,
+    marginRight: 12,
   },
   articleHeader: {
     flexDirection: 'row',
@@ -270,20 +274,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: 6,
     lineHeight: 22,
   },
   articleDescription: {
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
-    marginBottom: 8,
   },
   articleImage: {
-    width: '100%',
-    height: 120,
-    borderRadius: 6,
-    marginTop: 8,
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
   },
   emptyState: {
     flex: 1,
@@ -309,15 +312,36 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#007AFF',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
+    marginBottom: 32,
+    gap: 8,
   },
   primaryButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  featuresContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  featureItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  featureText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'center',
   },
   loadingContainer: {
     padding: 20,
