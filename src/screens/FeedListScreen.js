@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { parseRSSFeed } from '../utils/rssParser';
+import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
@@ -35,7 +36,21 @@ export default function FeedListScreen({ navigation }) {
       
       for (const feed of feeds) {
         try {
-          const parsedFeed = await parseRSSFeed(feed.url);
+          let parsedFeed;
+          
+          // Try the regular parser first
+          try {
+            parsedFeed = await parseRSSFeed(feed.url);
+          } catch (error) {
+            console.log(`Regular parser failed for ${feed.url}, trying CORS proxy:`, error.message);
+            try {
+              parsedFeed = await parseRSSFeedWithProxy(feed.url);
+            } catch (proxyError) {
+              console.log(`CORS proxy also failed for ${feed.url}:`, proxyError.message);
+              throw error; // Keep the original error
+            }
+          }
+          
           allArticles.push(...parsedFeed.articles);
         } catch (error) {
           console.error(`Error parsing feed ${feed.url}:`, error);

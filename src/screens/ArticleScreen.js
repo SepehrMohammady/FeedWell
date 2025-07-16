@@ -9,10 +9,21 @@ import {
   Linking,
   Share,
   Image,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { WebView } from 'react-native-webview';
+
+// Conditional WebView import for web compatibility
+let WebView;
+try {
+  WebView = require('react-native-webview').WebView;
+} catch (error) {
+  WebView = null;
+}
+
+// Check if we're on web platform
+const isWeb = Platform.OS === 'web' || (typeof window !== 'undefined' && window.location);
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
@@ -54,6 +65,13 @@ export default function ArticleScreen({ route, navigation }) {
       Alert.alert('Error', 'No URL available for this article');
       return;
     }
+    
+    if (isWeb || !WebView) {
+      // On web, or if WebView is not available, open in browser
+      handleOpenInBrowser();
+      return;
+    }
+    
     setShowWebView(!showWebView);
   };
 
@@ -153,7 +171,7 @@ export default function ArticleScreen({ route, navigation }) {
     true;
   `;
 
-  if (showWebView) {
+  if (showWebView && WebView && !isWeb) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.webViewHeader}>
