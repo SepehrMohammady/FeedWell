@@ -16,7 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
-import { parseRSSFeedSafely, isWebPlatform } from '../utils/webRssParser';
 
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
@@ -24,7 +23,6 @@ export default function AddFeedScreen({ navigation }) {
   const { addFeed, addArticles, feeds } = useFeed();
 
   const popularFeeds = [
-    { name: 'Sample Feed (Demo)', url: 'https://example.com/demo-feed' },
     { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
     { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
     { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
@@ -57,16 +55,16 @@ export default function AddFeedScreen({ navigation }) {
       
       let feedData;
       
-      // For web platform, use the safer parser that includes fallback
-      if (isWebPlatform()) {
-        feedData = await parseRSSFeedSafely(url.trim());
-      } else {
-        // For mobile, try the regular parser first
+      // Try the regular parser first
+      try {
+        feedData = await parseRSSFeed(url.trim());
+      } catch (error) {
+        console.log('Regular parser failed, trying CORS proxy:', error.message);
         try {
-          feedData = await parseRSSFeed(url.trim());
-        } catch (error) {
-          console.log('Regular parser failed, trying CORS proxy:', error.message);
           feedData = await parseRSSFeedWithProxy(url.trim());
+        } catch (proxyError) {
+          console.log('CORS proxy also failed:', proxyError.message);
+          throw new Error(`Failed to parse RSS feed: ${error.message}`);
         }
       }
       

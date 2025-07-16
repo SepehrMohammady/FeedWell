@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearDemoContent } from '../utils/clearDemoContent';
 
 const FeedContext = createContext();
 
@@ -61,6 +62,9 @@ export function FeedProvider({ children }) {
 
   const loadData = async () => {
     try {
+      // First, clear any demo content that might exist
+      await clearDemoContent();
+      
       const feeds = await AsyncStorage.getItem('feeds');
       const articles = await AsyncStorage.getItem('articles');
       
