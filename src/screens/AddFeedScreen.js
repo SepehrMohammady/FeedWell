@@ -23,13 +23,14 @@ export default function AddFeedScreen({ navigation }) {
   const { addFeed, addArticles, feeds } = useFeed();
 
   const popularFeeds = [
+    { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
+    { name: 'Dev.to', url: 'https://dev.to/feed' },
     { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
     { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
     { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
-    { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
-    { name: 'Dev.to', url: 'https://dev.to/feed' },
     { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
     { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
+    { name: 'Reddit Frontend', url: 'https://www.reddit.com/r/webdev/.rss' },
   ];
 
   const handleAddFeed = async () => {
@@ -94,12 +95,17 @@ export default function AddFeedScreen({ navigation }) {
       // More detailed error message
       let errorMessage = 'Failed to add feed. ';
       
-      if (error.message.includes('CORS')) {
-        errorMessage += 'This feed may not be accessible from the web browser due to CORS restrictions. ';
+      if (error.message.includes('CORS proxies failed')) {
+        errorMessage += 'This feed cannot be accessed from the web browser due to CORS restrictions. ';
+        if (typeof window !== 'undefined' && window.location) {
+          errorMessage += 'Try using the mobile app for better RSS feed support, or try one of the suggested feeds above.';
+        }
       } else if (error.message.includes('Network')) {
         errorMessage += 'Please check your internet connection. ';
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage += 'The feed URL may be invalid or temporarily unavailable. ';
+      } else if (error.message.includes('parse')) {
+        errorMessage += 'The feed format may be invalid or corrupted. ';
       } else {
         errorMessage += error.message;
       }
@@ -223,6 +229,14 @@ export default function AddFeedScreen({ navigation }) {
                 All ads and tracking are automatically removed
               </Text>
             </View>
+            {typeof window !== 'undefined' && window.location && (
+              <View style={styles.helpItem}>
+                <Ionicons name="information-circle-outline" size={20} color="#007AFF" />
+                <Text style={styles.helpText}>
+                  <Text style={{ fontWeight: 'bold' }}>Web Browser:</Text> Some feeds may not work due to CORS restrictions. Try the suggested feeds above for better compatibility.
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

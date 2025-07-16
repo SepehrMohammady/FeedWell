@@ -4,17 +4,24 @@ import { parse } from 'react-native-rss-parser';
 // Simple RSS parser that works with CORS proxies
 export async function parseRSSFeedWithProxy(url) {
   const corsProxies = [
-    'https://api.allorigins.me/get?url=',
-    'https://cors-anywhere.herokuapp.com/',
+    'https://api.rss2json.com/v1/api.json?rss_url=',
+    'https://corsproxy.io/?',
+    'https://cors.sh/',
     'https://api.codetabs.com/v1/proxy?quest=',
+    'https://api.allorigins.me/get?url=',
   ];
 
   for (const proxy of corsProxies) {
     try {
       let fetchUrl;
       let isJsonResponse = false;
+      let isRss2JsonResponse = false;
 
-      if (proxy.includes('allorigins.me')) {
+      if (proxy.includes('rss2json.com')) {
+        fetchUrl = `${proxy}${encodeURIComponent(url)}`;
+        isJsonResponse = true;
+        isRss2JsonResponse = true;
+      } else if (proxy.includes('allorigins.me')) {
         fetchUrl = `${proxy}${encodeURIComponent(url)}`;
         isJsonResponse = true;
       } else if (proxy.includes('codetabs.com')) {
@@ -32,7 +39,35 @@ export async function parseRSSFeedWithProxy(url) {
       }
 
       let responseText;
-      if (isJsonResponse) {
+      let feedData;
+
+      if (isRss2JsonResponse) {
+        const jsonResponse = await response.json();
+        if (jsonResponse.status === 'ok') {
+          // Convert RSS2JSON format to our format
+          feedData = {
+            title: jsonResponse.feed.title || url,
+            description: jsonResponse.feed.description || '',
+            url: url,
+            articles: jsonResponse.items?.map((item, index) => ({
+              id: item.guid || `${url}_${index}_${Date.now()}`,
+              title: item.title || 'No Title',
+              description: item.description || '',
+              content: item.content || item.description || '',
+              url: item.link || '',
+              publishedDate: item.pubDate || new Date().toISOString(),
+              authors: item.author ? [{ name: item.author }] : [],
+              categories: item.categories || [],
+              feedUrl: url,
+              feedTitle: jsonResponse.feed.title || url,
+              imageUrl: item.enclosure?.link || item.thumbnail || null,
+            })) || [],
+          };
+          return feedData;
+        } else {
+          throw new Error('RSS2JSON API error');
+        }
+      } else if (isJsonResponse) {
         const jsonResponse = await response.json();
         responseText = jsonResponse.contents;
       } else {
