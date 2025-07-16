@@ -223,14 +223,6 @@ export default function AddFeedScreen({ navigation }) {
                 All ads and tracking are automatically removed
               </Text>
             </View>
-            {isWebPlatform() && (
-              <View style={styles.helpItem}>
-                <Ionicons name="information-circle-outline" size={20} color="#007AFF" />
-                <Text style={styles.helpText}>
-                  <Text style={{ fontWeight: 'bold' }}>Web Demo:</Text> Some feeds may not work due to browser security restrictions. Try the "Sample Feed" above for a demo.
-                </Text>
-              </View>
-            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
