@@ -9,21 +9,10 @@ import {
   Linking,
   Share,
   Image,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
-// Conditional WebView import for web compatibility
-let WebView;
-try {
-  WebView = require('react-native-webview').WebView;
-} catch (error) {
-  WebView = null;
-}
-
-// Check if we're on web platform
-const isWeb = Platform.OS === 'web' || (typeof window !== 'undefined' && window.location);
+import { WebView } from 'react-native-webview';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
@@ -65,8 +54,6 @@ export default function ArticleScreen({ route, navigation }) {
       Alert.alert('Error', 'No URL available for this article');
       return;
     }
-    
-    // This function should only be called on mobile platforms where WebView is available
     setShowWebView(!showWebView);
   };
 
@@ -166,7 +153,7 @@ export default function ArticleScreen({ route, navigation }) {
     true;
   `;
 
-  if (showWebView && WebView && !isWeb) {
+  if (showWebView) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.webViewHeader}>
@@ -212,12 +199,9 @@ export default function ArticleScreen({ route, navigation }) {
         </TouchableOpacity>
         
         <View style={styles.headerActions}>
-          {/* Only show WebView button on mobile platforms */}
-          {!isWeb && WebView && (
-            <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
-              <Ionicons name="globe-outline" size={24} color="#007AFF" />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
+            <Ionicons name="globe-outline" size={24} color="#007AFF" />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={24} color="#007AFF" />
           </TouchableOpacity>

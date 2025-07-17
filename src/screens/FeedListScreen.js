@@ -15,11 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
+import ArticleImage from '../components/ArticleImage';
 
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
   const { theme } = useTheme();
+  const { showImages } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -109,9 +112,9 @@ export default function FeedListScreen({ navigation }) {
         )}
       </View>
       
-      {item.imageUrl && (
-        <Image
-          source={{ uri: item.imageUrl }}
+      {showImages && (
+        <ArticleImage
+          uri={item.imageUrl}
           style={styles.articleImage}
           resizeMode="cover"
         />

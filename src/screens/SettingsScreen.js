@@ -15,13 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAppSettings } from '../context/AppSettingsContext';
 import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, removeFeed, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [showImages, setShowImages] = useState(true);
+  const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
 
   // Debug: Log feeds when component mounts or feeds change
   React.useEffect(() => {
@@ -343,7 +343,7 @@ export default function SettingsScreen({ navigation }) {
             rightElement={
               <Switch
                 value={autoRefresh}
-                onValueChange={setAutoRefresh}
+                onValueChange={updateAutoRefresh}
                 trackColor={{ false: '#767577', true: '#007AFF' }}
                 thumbColor={autoRefresh ? '#fff' : '#f4f3f4'}
               />
@@ -356,7 +356,7 @@ export default function SettingsScreen({ navigation }) {
             rightElement={
               <Switch
                 value={showImages}
-                onValueChange={setShowImages}
+                onValueChange={updateShowImages}
                 trackColor={{ false: '#767577', true: '#007AFF' }}
                 thumbColor={showImages ? '#fff' : '#f4f3f4'}
               />
@@ -470,4 +470,5 @@ export default function SettingsScreen({ navigation }) {
       </ScrollView>
     </SafeAreaView>
   );
+}
 

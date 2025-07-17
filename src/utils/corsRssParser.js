@@ -1,28 +1,86 @@
 // Alternative RSS parser for web platforms with CORS issues
 import { parse } from 'react-native-rss-parser';
-import { cleanHtmlContent, extractCleanText } from './rssParser';
+
+// Extract image URL from item (same as in rssParser.js)
+function extractImageUrl(item) {
+  // Try different fields where images might be stored
+  if (item.imageUrl) return item.imageUrl;
+  if (item.image?.url) return item.image.url;
+  
+  // Check for media:content or media:thumbnail (common in RSS feeds)
+  if (item['media:content']?.[0]?.attributes?.url) {
+    const mediaContent = item['media:content'][0].attributes;
+    if (mediaContent.medium === 'image' || mediaContent.type?.startsWith('image/')) {
+      return mediaContent.url;
+    }
+  }
+  
+  if (item['media:thumbnail']?.[0]?.attributes?.url) {
+    return item['media:thumbnail'][0].attributes.url;
+  }
+  
+  // Check enclosures for images
+  if (item.enclosures?.[0]?.url && item.enclosures[0].type?.startsWith('image/')) {
+    return item.enclosures[0].url;
+  }
+  
+  // Extract from content/description - try multiple patterns
+  const content = item.content || item.description || '';
+  
+  // Look for img tags with various patterns
+  const imgPatterns = [
+    /<img[^>]+src=['"]([^'"]+)['"][^>]*>/i,
+    /<img[^>]+data-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
+    /<img[^>]+data-original=['"]([^'"]+)['"][^>]*>/i, // lazy loading
+  ];
+  
+  for (const pattern of imgPatterns) {
+    const match = content.match(pattern);
+    if (match && match[1]) {
+      // Filter out common non-article images
+      const url = match[1];
+      if (!isAdOrTrackingImage(url)) {
+        return url;
+      }
+    }
+  }
+  
+  return null;
+}
+
+// Check if an image URL is likely an ad or tracking pixel
+function isAdOrTrackingImage(url) {
+  const adPatterns = [
+    /\/ads?\//i,
+    /\/tracking\//i,
+    /\/analytics\//i,
+    /\/pixel\//i,
+    /1x1\./i,
+    /\.gif$/i, // Many tracking pixels are 1x1 GIFs
+    /doubleclick/i,
+    /googleads/i,
+    /adsystem/i,
+    /facebook\.com\/tr/i,
+    /twitter\.com\/i\/adsct/i,
+  ];
+  
+  return adPatterns.some(pattern => pattern.test(url));
+}
 
 // Simple RSS parser that works with CORS proxies
 export async function parseRSSFeedWithProxy(url) {
   const corsProxies = [
-    'https://api.rss2json.com/v1/api.json?rss_url=',
-    'https://corsproxy.io/?',
-    'https://cors.sh/',
-    'https://api.codetabs.com/v1/proxy?quest=',
     'https://api.allorigins.me/get?url=',
+    'https://cors-anywhere.herokuapp.com/',
+    'https://api.codetabs.com/v1/proxy?quest=',
   ];
 
   for (const proxy of corsProxies) {
     try {
       let fetchUrl;
       let isJsonResponse = false;
-      let isRss2JsonResponse = false;
 
-      if (proxy.includes('rss2json.com')) {
-        fetchUrl = `${proxy}${encodeURIComponent(url)}`;
-        isJsonResponse = true;
-        isRss2JsonResponse = true;
-      } else if (proxy.includes('allorigins.me')) {
+      if (proxy.includes('allorigins.me')) {
         fetchUrl = `${proxy}${encodeURIComponent(url)}`;
         isJsonResponse = true;
       } else if (proxy.includes('codetabs.com')) {
@@ -40,41 +98,7 @@ export async function parseRSSFeedWithProxy(url) {
       }
 
       let responseText;
-      let feedData;
-
-      if (isRss2JsonResponse) {
-        const jsonResponse = await response.json();
-        if (jsonResponse.status === 'ok') {
-          // Convert RSS2JSON format to our format with ad-blocking
-          feedData = {
-            title: jsonResponse.feed.title || url,
-            description: jsonResponse.feed.description || '',
-            url: url,
-            articles: jsonResponse.items?.map((item, index) => {
-              const cleanDescription = cleanHtmlContent(item.description || '');
-              const cleanContent = cleanHtmlContent(item.content || item.description || '');
-              
-              return {
-                id: item.guid || `${url}_${index}_${Date.now()}`,
-                title: item.title || 'No Title',
-                description: extractCleanText(cleanDescription),
-                content: extractCleanText(cleanContent),
-                htmlContent: cleanDescription || cleanContent,
-                url: item.link || '',
-                publishedDate: item.pubDate || new Date().toISOString(),
-                authors: item.author ? [{ name: item.author }] : [],
-                categories: item.categories || [],
-                feedUrl: url,
-                feedTitle: jsonResponse.feed.title || url,
-                imageUrl: item.enclosure?.link || item.thumbnail || null,
-              };
-            }) || [],
-          };
-          return feedData;
-        } else {
-          throw new Error('RSS2JSON API error');
-        }
-      } else if (isJsonResponse) {
+      if (isJsonResponse) {
         const jsonResponse = await response.json();
         responseText = jsonResponse.contents;
       } else {
@@ -85,32 +109,26 @@ export async function parseRSSFeedWithProxy(url) {
         throw new Error('Empty response');
       }
 
-      // Parse the RSS with ad-blocking
+      // Parse the RSS
       const feed = await parse(responseText);
       
       return {
         title: feed.title || url,
         description: feed.description || '',
         url: url,
-        articles: feed.items?.map((item, index) => {
-          const cleanDescription = cleanHtmlContent(item.description || '');
-          const cleanContent = cleanHtmlContent(item.content || '');
-          
-          return {
-            id: item.id || `${url}_${index}_${Date.now()}`,
-            title: item.title || 'No Title',
-            description: extractCleanText(cleanDescription),
-            content: extractCleanText(cleanContent),
-            htmlContent: cleanDescription || cleanContent,
-            url: item.links?.[0]?.url || item.url || '',
-            publishedDate: item.published || item.pubDate || new Date().toISOString(),
-            authors: item.authors || [],
-            categories: item.categories || [],
-            feedUrl: url,
-            feedTitle: feed.title || url,
-            imageUrl: item.imageUrl || item.image?.url || null,
-          };
-        }) || [],
+        articles: feed.items?.map((item, index) => ({
+          id: item.id || `${url}_${index}_${Date.now()}`,
+          title: item.title || 'No Title',
+          description: item.description || '',
+          content: item.content || '',
+          url: item.links?.[0]?.url || item.url || '',
+          publishedDate: item.published || item.pubDate || new Date().toISOString(),
+          authors: item.authors || [],
+          categories: item.categories || [],
+          feedUrl: url,
+          feedTitle: feed.title || url,
+          imageUrl: extractImageUrl(item),
+        })) || [],
       };
     } catch (error) {
       console.error(`Proxy ${proxy} failed:`, error.message);

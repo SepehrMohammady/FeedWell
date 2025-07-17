@@ -14,13 +14,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
+import { useTheme } from '../context/ThemeContext';
 import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
+import { debugRSSFeed } from '../utils/debugRss';
 
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const { addFeed, addArticles, feeds } = useFeed();
+  const { theme } = useTheme();
 
   const feedCategories = [
     {
@@ -92,6 +95,10 @@ export default function AddFeedScreen({ navigation }) {
     try {
       console.log('Attempting to parse feed:', url.trim());
       
+      // First try with the debugging function to see image extraction
+      console.log('Debugging RSS feed for image extraction...');
+      await debugRSSFeed(url.trim());
+      
       let feedData;
       
       // Try the regular parser first
@@ -156,6 +163,149 @@ export default function AddFeedScreen({ navigation }) {
   const clearInput = () => {
     setUrl('');
   };
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    keyboardContainer: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: theme.colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerButton: {
+      padding: 8,
+      minWidth: 40,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    content: {
+      flex: 1,
+    },
+    inputSection: {
+      backgroundColor: theme.colors.surface,
+      margin: 16,
+      padding: 20,
+      borderRadius: 12,
+      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    sectionDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+      marginBottom: 20,
+    },
+    inputContainer: {
+      position: 'relative',
+      marginBottom: 20,
+    },
+    textInput: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      fontSize: 16,
+      backgroundColor: theme.colors.surface,
+      paddingRight: 40,
+      color: theme.colors.text,
+    },
+    clearButton: {
+      position: 'absolute',
+      right: 12,
+      top: 12,
+    },
+    addButton: {
+      backgroundColor: theme.colors.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 14,
+      borderRadius: 8,
+    },
+    addButtonDisabled: {
+      backgroundColor: theme.colors.textTertiary,
+    },
+    addButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    categoriesSection: {
+      backgroundColor: theme.colors.surface,
+      margin: 16,
+      marginTop: 0,
+      padding: 20,
+      borderRadius: 12,
+      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
+    },
+    categoryContainer: {
+      marginBottom: 20,
+    },
+    categoryTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 8,
+    },
+    feedGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    feedChip: {
+      backgroundColor: theme.colors.background,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 16,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    feedChipText: {
+      fontSize: 12,
+      color: theme.colors.primary,
+      fontWeight: '500',
+    },
+    helpSection: {
+      backgroundColor: theme.colors.surface,
+      margin: 16,
+      marginTop: 0,
+      padding: 20,
+      borderRadius: 12,
+      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
+    },
+    helpItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    helpText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      marginLeft: 12,
+      flex: 1,
+      lineHeight: 20,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -258,7 +408,7 @@ export default function AddFeedScreen({ navigation }) {
               </Text>
             </View>
             <View style={styles.helpItem}>
-              <Ionicons name="shield-checkmark-outline" size={20} color="#666" />
+              <Ionicons name="shield-checkmark-outline" size={20} color={theme.colors.textSecondary} />
               <Text style={styles.helpText}>
                 All ads and tracking are automatically removed
               </Text>
@@ -269,184 +419,3 @@ export default function AddFeedScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  keyboardContainer: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  headerButton: {
-    padding: 8,
-    minWidth: 40,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  content: {
-    flex: 1,
-  },
-  inputSection: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      },
-    }),
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 20,
-  },
-  inputContainer: {
-    position: 'relative',
-    marginBottom: 20,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-    paddingRight: 40,
-  },
-  clearButton: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: 8,
-  },
-  addButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  categoriesSection: {
-    backgroundColor: '#fff',
-    margin: 16,
-    marginTop: 0,
-    padding: 20,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      },
-    }),
-  },
-  categoryContainer: {
-    marginBottom: 20,
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  feedGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  feedChip: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  feedChipText: {
-    fontSize: 12,
-    color: '#007AFF',
-    fontWeight: '500',
-  },
-  helpSection: {
-    backgroundColor: '#fff',
-    margin: 16,
-    marginTop: 0,
-    padding: 20,
-    borderRadius: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-      web: {
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      },
-    }),
-  },
-  helpItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  helpText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 12,
-    flex: 1,
-    lineHeight: 20,
-  },
-});

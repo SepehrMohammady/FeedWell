@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FeedProvider } from './src/context/FeedContext';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { AppSettingsProvider } from './src/context/AppSettingsContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 
@@ -15,12 +16,14 @@ export default function App() {
     <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
-          <FeedProvider>
-            <NavigationContainer>
-              <AppNavigator />
-              <StatusBar style="auto" />
-            </NavigationContainer>
-          </FeedProvider>
+          <AppSettingsProvider>
+            <FeedProvider>
+              <NavigationContainer>
+                <AppNavigator />
+                <StatusBar style="auto" />
+              </NavigationContainer>
+            </FeedProvider>
+          </AppSettingsProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </ErrorBoundary>

@@ -36,16 +36,7 @@ const AD_PATTERNS = [
   /analytics/gi,
   /adsense/gi,
   /doubleclick/gi,
-  /googleadservices/gi,
-  /hero-ad-container/gi,
-  /ad-unit/gi,
-  /google_ads_iframe/gi,
-  /safeframe\.googlesyndication/gi,
-  /wp-block-tc-ads/gi,
-  /tc-ads/gi,
-  /us-tc-ros/gi,
-  /data-unitcode/gi,
-  /data-test.*ad/gi
+  /googleadservices/gi
 ];
 
 // Clean HTML content by removing ads and unnecessary elements
@@ -69,19 +60,10 @@ export function cleanHtmlContent(html) {
     cleanedHtml = cleanedHtml.replace(elementRegex, '');
   });
 
-  // Remove specific ad elements and TechCrunch ad patterns
+  // Remove specific ad elements
   cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
   cleanedHtml = cleanedHtml.replace(/<aside[^>]*>.*?<\/aside>/gi, '');
   cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
-  
-  // Specific TechCrunch ad patterns
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?hero-ad-container.*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?ad-unit.*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?wp-block-tc-ads.*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?google_ads_iframe.*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<iframe[^>]*src=['""].*?safeframe\.googlesyndication.*?['"][^>]*>.*?<\/iframe>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*data-unitcode=['""].*?us_tc_ros.*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*data-test=['""].*?ad.*?['"][^>]*>.*?<\/div>/gi, '');
 
   // Clean up empty paragraphs and divs
   cleanedHtml = cleanedHtml.replace(/<p>\s*<\/p>/gi, '');
@@ -183,21 +165,170 @@ export async function parseRSSFeed(url) {
 
 // Extract image URL from item
 function extractImageUrl(item) {
+  console.log('Extracting image for article:', item.title);
+  
   // Try different fields where images might be stored
-  if (item.imageUrl) return item.imageUrl;
-  if (item.image?.url) return item.image.url;
-  if (item.enclosures?.[0]?.url && item.enclosures[0].type?.startsWith('image/')) {
-    return item.enclosures[0].url;
+  if (item.imageUrl) {
+    console.log('Found imageUrl:', item.imageUrl);
+    return item.imageUrl;
   }
   
-  // Extract from content/description
+  if (item.image?.url) {
+    console.log('Found image.url:', item.image.url);
+    return item.image.url;
+  }
+  
+  // Check for media:content or media:thumbnail (common in RSS feeds)
+  if (item['media:content']?.[0]?.attributes?.url) {
+    const mediaContent = item['media:content'][0].attributes;
+    if (mediaContent.medium === 'image' || mediaContent.type?.startsWith('image/')) {
+      console.log('Found media:content:', mediaContent.url);
+      return mediaContent.url;
+    }
+  }
+  
+  if (item['media:thumbnail']?.[0]?.attributes?.url) {
+    console.log('Found media:thumbnail:', item['media:thumbnail'][0].attributes.url);
+    return item['media:thumbnail'][0].attributes.url;
+  }
+  
+  // Check for iTunes/podcast images
+  if (item['itunes:image']?.attributes?.href) {
+    console.log('Found itunes:image:', item['itunes:image'].attributes.href);
+    return item['itunes:image'].attributes.href;
+  }
+  
+  // Check enclosures for images
+  if (item.enclosures?.length > 0) {
+    for (const enclosure of item.enclosures) {
+      if (enclosure.type?.startsWith('image/') && enclosure.url) {
+        console.log('Found enclosure image:', enclosure.url);
+        return enclosure.url;
+      }
+    }
+  }
+  
+  // Extract from content/description - try multiple patterns
   const content = item.content || item.description || '';
-  const imgMatch = content.match(/<img[^>]+src=['"]([^'"]+)['"][^>]*>/i);
-  if (imgMatch) {
-    return imgMatch[1];
+  
+  if (content) {
+    // Look for img tags with various patterns
+    const imgPatterns = [
+      /<img[^>]+src=['"]([^'"]+)['"][^>]*>/i,
+      /<img[^>]+data-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
+      /<img[^>]+data-original=['"]([^'"]+)['"][^>]*>/i, // lazy loading
+      /<img[^>]+data-lazy-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
+      /<figure[^>]*>.*?<img[^>]+src=['"]([^'"]+)['"][^>]*>.*?<\/figure>/is,
+    ];
+    
+    for (const pattern of imgPatterns) {
+      const match = content.match(pattern);
+      if (match && match[1]) {
+        const url = match[1];
+        console.log('Found img tag:', url);
+        if (!isAdOrTrackingImage(url)) {
+          return url;
+        } else {
+          console.log('Rejected ad/tracking image:', url);
+        }
+      }
+    }
+    
+    // Look for Open Graph images in content
+    const ogImageMatch = content.match(/<meta[^>]+property=['"]og:image['"][^>]+content=['"]([^'"]+)['"][^>]*>/i);
+    if (ogImageMatch) {
+      console.log('Found og:image:', ogImageMatch[1]);
+      return ogImageMatch[1];
+    }
+    
+    // Look for WordPress featured images
+    const wpFeaturedMatch = content.match(/wp:featured_media.*?href=['"]([^'"]+)['"][^>]*>/i);
+    if (wpFeaturedMatch) {
+      console.log('Found wp:featured_media:', wpFeaturedMatch[1]);
+      return wpFeaturedMatch[1];
+    }
+    
+    // Look for any URL that ends with image extensions
+    const imageUrlMatch = content.match(/(https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|gif|webp|svg))/i);
+    if (imageUrlMatch) {
+      const url = imageUrlMatch[1];
+      console.log('Found image URL by extension:', url);
+      if (!isAdOrTrackingImage(url)) {
+        return url;
+      }
+    }
   }
   
+  // Check if item has other image-related fields
+  const otherImageFields = ['thumbnail', 'thumb', 'featured_image', 'image_url', 'img'];
+  for (const field of otherImageFields) {
+    if (item[field]) {
+      const value = typeof item[field] === 'string' ? item[field] : item[field].url || item[field].href;
+      if (value) {
+        console.log(`Found ${field}:`, value);
+        return value;
+      }
+    }
+  }
+  
+  console.log('No image found for article:', item.title);
   return null;
+}
+
+// Check if an image URL is likely an ad or tracking pixel
+function isAdOrTrackingImage(url) {
+  if (!url) return true;
+  
+  const adPatterns = [
+    /\/ads?\//i,
+    /\/tracking\//i,
+    /\/analytics\//i,
+    /\/pixel\//i,
+    /1x1\./i,
+    /\.gif$/i, // Many tracking pixels are 1x1 GIFs (but allow large gifs)
+    /doubleclick/i,
+    /googleads/i,
+    /adsystem/i,
+    /facebook\.com\/tr/i,
+    /twitter\.com\/i\/adsct/i,
+    /\/wp-content\/plugins\//i, // WordPress plugin images
+    /gravatar\.com/i, // Profile images
+    /avatar/i,
+    /comment/i,
+    /share/i,
+    /social/i,
+    /button/i,
+    /icon/i,
+    /logo/i,
+    /badge/i,
+  ];
+  
+  // Check for very small images (likely tracking pixels)
+  const sizeMatch = url.match(/(\d+)x(\d+)/);
+  if (sizeMatch) {
+    const width = parseInt(sizeMatch[1]);
+    const height = parseInt(sizeMatch[2]);
+    if (width <= 2 && height <= 2) {
+      return true; // Tracking pixel
+    }
+  }
+  
+  // Allow images that are clearly content-related
+  const contentPatterns = [
+    /wp-content\/uploads/i,
+    /media\//i,
+    /images\//i,
+    /img\//i,
+    /assets\//i,
+    /static\//i,
+    /content\//i,
+  ];
+  
+  if (contentPatterns.some(pattern => pattern.test(url))) {
+    return false; // Likely content image
+  }
+  
+  return adPatterns.some(pattern => pattern.test(url));
 }
 
 // Validate RSS URL

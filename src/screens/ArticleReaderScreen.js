@@ -13,11 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useAppSettings } from '../context/AppSettingsContext';
 import { cleanHtmlContent, extractCleanText } from '../utils/rssParser';
+import ArticleImage from '../components/ArticleImage';
 
 export default function ArticleReaderScreen({ route, navigation }) {
   const { article } = route.params;
   const { theme } = useTheme();
+  const { showImages } = useAppSettings();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -243,9 +246,9 @@ export default function ArticleReaderScreen({ route, navigation }) {
           </Text>
         )}
 
-        {article.imageUrl && (
-          <Image
-            source={{ uri: article.imageUrl }}
+        {showImages && (
+          <ArticleImage
+            uri={article.imageUrl}
             style={styles.articleImage}
             resizeMode="cover"
           />
