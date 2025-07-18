@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
-import { cleanHtmlContent, extractCleanText } from '../utils/rssParser';
+import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
 
 export default function ArticleReaderScreen({ route, navigation }) {
@@ -35,29 +35,49 @@ export default function ArticleReaderScreen({ route, navigation }) {
       setLoading(true);
       setError(null);
 
-      // Try to fetch the full article content
-      const response = await fetch(article.url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Start with RSS content
+      let content = article.content || article.description || '';
+      
+      // Always try to fetch full article content since RSS summaries are often short
+      try {
+        const response = await fetch(article.url);
+        if (response.ok) {
+          const html = await response.text();
+          
+          // Extract main article content using sophisticated extraction
+          const articleContent = extractArticleContent(html);
+          
+          // Check if extracted content looks like actual article text
+          const isValidContent = articleContent.length > 200 && 
+                                !articleContent.includes('contain-intrinsic-size') &&
+                                !articleContent.includes('background-color:var') &&
+                                !articleContent.includes('webkit-text-decoration') &&
+                                !articleContent.includes('z-index:') &&
+                                !articleContent.includes('position:relative') &&
+                                !articleContent.includes('display:block') &&
+                                !articleContent.includes('font-size:var') &&
+                                !articleContent.includes('padding:var');
+          
+          // Use fetched content if it's valid and longer than RSS content
+          if (isValidContent && articleContent.length > content.length) {
+            content = articleContent;
+            console.log('Using extracted article content, length:', articleContent.length);
+          } else {
+            console.log('Article extraction failed or content too short, using RSS content');
+          }
+        }
+      } catch (fetchError) {
+        console.log('Could not fetch full article, using RSS content:', fetchError.message);
       }
-
-      const html = await response.text();
       
-      // Extract main content using simple heuristics
-      const cleanedHtml = cleanHtmlContent(html);
-      const cleanText = extractCleanText(cleanedHtml);
-      
-      // Try to find article content
-      let content = cleanText;
-      
-      // If we have existing content from RSS, prefer that
-      if (article.content && article.content.length > article.description?.length) {
-        content = article.content;
+      // If we still have very short content, show a message
+      if (content.length < 50) {
+        content = content + '\n\n[Full article content may not be available in reader mode. Use the browser button (🌐) to view the complete article.]';
       }
       
       setFullContent(content);
     } catch (err) {
-      console.error('Error fetching article:', err);
+      console.error('Error loading article:', err);
       setError(err.message);
       // Fallback to RSS content
       setFullContent(article.content || article.description || '');

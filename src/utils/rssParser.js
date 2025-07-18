@@ -140,6 +140,89 @@ export function extractCleanText(html) {
   return text.trim();
 }
 
+// Extract main article content from full webpage HTML
+export function extractArticleContent(html) {
+  if (!html) return '';
+
+  // Try to find article content using common selectors
+  const articleSelectors = [
+    // Common article containers
+    'article',
+    '[role="main"]',
+    '.article-content',
+    '.post-content',
+    '.entry-content',
+    '.content',
+    '.article-body',
+    '.story-body',
+    '.article-text',
+    // TechCrunch specific
+    '.article-content',
+    '.wp-block-post-content',
+    '.entry-content',
+    // Generic content containers
+    '#content',
+    '.main-content',
+    '.post-body',
+    'main'
+  ];
+
+  // Try to extract content using regex patterns for common article structures
+  for (const selector of articleSelectors) {
+    const selectorPattern = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let regex;
+    
+    if (selector.startsWith('.')) {
+      // Class selector
+      const className = selector.substring(1);
+      regex = new RegExp(`<[^>]*class=['""][^'"]*${className}[^'"]*['"][^>]*>(.*?)</[^>]+>`, 'is');
+    } else if (selector.startsWith('#')) {
+      // ID selector
+      const id = selector.substring(1);
+      regex = new RegExp(`<[^>]*id=['""]${id}['"][^>]*>(.*?)</[^>]+>`, 'is');
+    } else if (selector.startsWith('[')) {
+      // Attribute selector like [role="main"]
+      const match = selector.match(/\[([^=]+)="([^"]+)"\]/);
+      if (match) {
+        const attr = match[1];
+        const value = match[2];
+        regex = new RegExp(`<[^>]*${attr}=['""]${value}['"][^>]*>(.*?)</[^>]+>`, 'is');
+      }
+    } else {
+      // Tag selector
+      regex = new RegExp(`<${selector}[^>]*>(.*?)</${selector}>`, 'is');
+    }
+    
+    if (regex) {
+      const match = html.match(regex);
+      if (match && match[1] && match[1].length > 500) {
+        console.log(`Found content using selector: ${selector}`);
+        return extractCleanText(match[1]);
+      }
+    }
+  }
+
+  // Fallback: try to find largest text block
+  const textBlocks = [];
+  const paragraphMatches = html.match(/<p[^>]*>.*?<\/p>/gi) || [];
+  
+  paragraphMatches.forEach(p => {
+    const text = extractCleanText(p);
+    if (text.length > 50) {
+      textBlocks.push(text);
+    }
+  });
+
+  if (textBlocks.length > 0) {
+    console.log('Using paragraph extraction fallback');
+    return textBlocks.join('\n\n');
+  }
+
+  // Last resort: clean the entire HTML
+  console.log('Using full HTML extraction as last resort');
+  return extractCleanText(html);
+}
+
 // Parse RSS feed and clean articles
 export async function parseRSSFeed(url) {
   try {
