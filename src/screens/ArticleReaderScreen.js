@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
+import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
 
 export default function ArticleReaderScreen({ route, navigation }) {
@@ -25,6 +26,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [languageInfo, setLanguageInfo] = useState(null);
 
   useEffect(() => {
     fetchFullArticle();
@@ -76,6 +78,18 @@ export default function ArticleReaderScreen({ route, navigation }) {
       }
       
       setFullContent(content);
+      
+      // Detect language and RTL for the content
+      if (content) {
+        const detection = detectLanguage(content);
+        setLanguageInfo(detection);
+        console.log('Language detection:', {
+          language: detection.code,
+          isRTL: detection.isRTL,
+          confidence: detection.confidence,
+          name: getLanguageName(detection.code)
+        });
+      }
     } catch (err) {
       console.error('Error loading article:', err);
       setError(err.message);
@@ -199,6 +213,22 @@ export default function ArticleReaderScreen({ route, navigation }) {
       lineHeight: 28,
       fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     },
+    languageInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      backgroundColor: theme.colors.border,
+      borderRadius: 16,
+      alignSelf: 'flex-start',
+    },
+    languageText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
+      marginLeft: 6,
+    },
     loadingContainer: {
       alignItems: 'center',
       padding: 40,
@@ -286,7 +316,17 @@ export default function ArticleReaderScreen({ route, navigation }) {
           <Text style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
         </View>
 
-        <Text style={styles.articleTitle}>{article.title}</Text>
+        <Text 
+          style={[
+            styles.articleTitle,
+            {
+              writingDirection: getTextDirection(article.title),
+              textAlign: getTextAlignment(article.title),
+            }
+          ]}
+        >
+          {article.title}
+        </Text>
 
         {article.authors && article.authors.length > 0 && (
           <Text style={styles.articleAuthor}>
@@ -325,7 +365,30 @@ export default function ArticleReaderScreen({ route, navigation }) {
 
         {fullContent && !loading && (
           <View style={styles.articleContent}>
-            <Text style={styles.articleText}>{fullContent}</Text>
+            {languageInfo && languageInfo.confidence > 0.6 && (
+              <View style={styles.languageInfo}>
+                <Ionicons 
+                  name="language-outline" 
+                  size={14} 
+                  color={theme.colors.textSecondary} 
+                />
+                <Text style={styles.languageText}>
+                  {getLanguageName(languageInfo.code)}
+                  {languageInfo.isRTL ? ' (RTL)' : ''}
+                </Text>
+              </View>
+            )}
+            <Text 
+              style={[
+                styles.articleText,
+                {
+                  writingDirection: languageInfo?.isRTL ? 'rtl' : 'ltr',
+                  textAlign: languageInfo?.isRTL ? 'right' : 'left',
+                }
+              ]}
+            >
+              {fullContent}
+            </Text>
           </View>
         )}
 
