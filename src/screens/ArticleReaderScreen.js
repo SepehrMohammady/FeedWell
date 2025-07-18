@@ -221,14 +221,14 @@ export default function ArticleReaderScreen({ route, navigation }) {
           style={styles.headerButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reader</Text>
         <TouchableOpacity
           style={styles.headerButton}
           onPress={handleShare}
         >
-          <Ionicons name="share-outline" size={24} color="#333" />
+          <Ionicons name="share-outline" size={24} color={theme.colors.text} />
         </TouchableOpacity>
       </View>
 

@@ -1,5 +1,6 @@
 // Alternative RSS parser for web platforms with CORS issues
 import { parse } from 'react-native-rss-parser';
+import { decodeHtmlEntities } from './rssParser';
 
 // Extract image URL from item (same as in rssParser.js)
 function extractImageUrl(item) {
@@ -113,12 +114,12 @@ export async function parseRSSFeedWithProxy(url) {
       const feed = await parse(responseText);
       
       return {
-        title: feed.title || url,
+        title: decodeHtmlEntities(feed.title || url),
         description: feed.description || '',
         url: url,
         articles: feed.items?.map((item, index) => ({
           id: item.id || `${url}_${index}_${Date.now()}`,
-          title: item.title || 'No Title',
+          title: decodeHtmlEntities(item.title || 'No Title'),
           description: item.description || '',
           content: item.content || '',
           url: item.links?.[0]?.url || item.url || '',
@@ -126,7 +127,7 @@ export async function parseRSSFeedWithProxy(url) {
           authors: item.authors || [],
           categories: item.categories || [],
           feedUrl: url,
-          feedTitle: feed.title || url,
+          feedTitle: decodeHtmlEntities(feed.title || url),
           imageUrl: extractImageUrl(item),
         })) || [],
       };
