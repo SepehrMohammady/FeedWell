@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Alert,
   Switch,
-  ActionSheetIOS,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,7 +18,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
 
 export default function SettingsScreen({ navigation }) {
-  const { feeds, removeFeed, clearAllData } = useFeed();
+  const { feeds, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
 
@@ -86,78 +85,6 @@ export default function SettingsScreen({ navigation }) {
         Alert.alert('Error', 'Failed to clear data');
       }
     }
-  };
-
-  const handleRemoveFeed = (feed) => {
-    console.log('Attempting to remove feed:', feed.title, 'URL:', feed.url);
-    
-    // For web platform, use window.confirm for better compatibility
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(`Remove "${feed.title}"?\n\nThis will remove the feed and all its articles.`);
-      if (confirmed) {
-        performRemoveFeed(feed);
-      }
-      return;
-    }
-    
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ['Cancel', 'Remove Feed'],
-          destructiveButtonIndex: 1,
-          cancelButtonIndex: 0,
-          title: `Remove "${feed.title}"?`,
-          message: 'This will remove the feed and all its articles.',
-        },
-        async (buttonIndex) => {
-          if (buttonIndex === 1) {
-            performRemoveFeed(feed);
-          }
-        }
-      );
-    } else {
-      Alert.alert(
-        'Remove Feed',
-        `Remove "${feed.title}"? This will remove the feed and all its articles.`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Remove',
-            style: 'destructive',
-            onPress: () => performRemoveFeed(feed),
-          },
-        ]
-      );
-    }
-  };
-
-  const performRemoveFeed = async (feed) => {
-    try {
-      console.log('Performing feed removal for URL:', feed.url);
-      await removeFeed(feed.url);
-      console.log('Feed removed successfully');
-      
-      // Show success message
-      if (Platform.OS === 'web') {
-        window.alert('Feed removed successfully!');
-      } else {
-        Alert.alert('Success', 'Feed removed successfully');
-      }
-    } catch (error) {
-      console.error('Error removing feed:', error);
-      
-      // Show error message
-      if (Platform.OS === 'web') {
-        window.alert('Failed to remove feed. Please try again.');
-      } else {
-        Alert.alert('Error', 'Failed to remove feed. Please try again.');
-      }
-    }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
   };
 
   const SettingItem = ({ title, description, onPress, rightElement, showArrow = false }) => (
@@ -247,38 +174,6 @@ export default function SettingsScreen({ navigation }) {
       fontSize: 14,
       color: theme.colors.textSecondary,
     },
-    feedItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    feedItemLast: {
-      borderBottomWidth: 0,
-    },
-    feedContent: {
-      flex: 1,
-    },
-    feedTitle: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: theme.colors.text,
-      marginBottom: 2,
-    },
-    feedUrl: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      marginBottom: 2,
-    },
-    feedDate: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-    },
-    removeButton: {
-      padding: 8,
-    },
     actionButton: {
       backgroundColor: theme.colors.primary,
       marginHorizontal: 16,
@@ -294,27 +189,6 @@ export default function SettingsScreen({ navigation }) {
     },
     dangerButton: {
       backgroundColor: theme.colors.error,
-    },
-    emptyState: {
-      alignItems: 'center',
-      padding: 24,
-    },
-    emptyText: {
-      fontSize: 16,
-      color: theme.colors.textSecondary,
-      marginTop: 16,
-      marginBottom: 20,
-    },
-    addFirstFeedButton: {
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderRadius: 8,
-    },
-    addFirstFeedText: {
-      color: '#fff',
-      fontSize: 14,
-      fontWeight: '600',
     },
     footer: {
       paddingHorizontal: 16,
@@ -376,46 +250,6 @@ export default function SettingsScreen({ navigation }) {
             }
           />
         </View>
-
-        <SectionHeader title={`Your Feeds (${feeds.length})`} />
-        {feeds.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="newspaper-outline" size={48} color="#ccc" />
-            <Text style={styles.emptyText}>No feeds added yet</Text>
-            <TouchableOpacity
-              style={styles.addFirstFeedButton}
-              onPress={() => navigation.navigate('Feeds', { screen: 'AddFeed' })}
-            >
-              <Text style={styles.addFirstFeedText}>Add Your First Feed</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.section}>
-            {feeds.map((feed, index) => (
-              <TouchableOpacity
-                key={feed.id || feed.url || index}
-                style={styles.feedItem}
-                onPress={() => {
-                  console.log('Feed item pressed:', feed);
-                  handleRemoveFeed(feed);
-                }}
-              >
-                <View style={styles.feedContent}>
-                  <Text style={styles.feedTitle} numberOfLines={1}>
-                    {feed.title || feed.url || 'Unknown Feed'}
-                  </Text>
-                  <Text style={styles.feedUrl} numberOfLines={1}>
-                    {feed.url || 'No URL'}
-                  </Text>
-                  <Text style={styles.feedDate}>
-                    Added {formatDate(feed.addedAt)}
-                  </Text>
-                </View>
-                <Ionicons name="trash-outline" size={20} color="#ff3b30" />
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
 
         <SectionHeader title="Data" />
         <View style={styles.section}>
