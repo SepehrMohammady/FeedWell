@@ -43,6 +43,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
         { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
         { name: 'Associated Press', url: 'https://feeds.apnews.com/apnews/topnews' },
+        { name: 'CNN News', url: 'http://rss.cnn.com/rss/edition.rss' },
       ]
     },
     {
@@ -52,6 +53,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'Forbes', url: 'https://www.forbes.com/real-time/feed2/' },
         { name: 'Financial Times', url: 'https://www.ft.com/rss/home' },
         { name: 'Wall Street Journal', url: 'https://feeds.wsj.com/wsj/xml/rss/3_7085.xml' },
+        { name: 'Bloomberg', url: 'https://feeds.bloomberg.com/markets/news.rss' },
       ]
     },
     {
@@ -61,6 +63,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'NASA', url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss' },
         { name: 'Scientific American', url: 'https://rss.sciam.com/ScientificAmerican-Global' },
         { name: 'Nature', url: 'https://www.nature.com/nature.rss' },
+        { name: 'New Scientist', url: 'https://www.newscientist.com/feed/home/' },
       ]
     },
     {
@@ -70,6 +73,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'Lifehacker', url: 'https://lifehacker.com/rss' },
         { name: 'The Guardian Culture', url: 'https://www.theguardian.com/culture/rss' },
         { name: 'Mashable', url: 'https://mashable.com/feeds/rss/all' },
+        { name: 'BuzzFeed', url: 'https://www.buzzfeed.com/index.xml' },
       ]
     }
   ];

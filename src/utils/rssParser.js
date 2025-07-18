@@ -39,6 +39,41 @@ const AD_PATTERNS = [
   /googleadservices/gi
 ];
 
+// Decode HTML entities
+export function decodeHtmlEntities(text) {
+  if (!text) return '';
+  
+  const entityMap = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&#8217;': "'",
+    '&#8216;': "'",
+    '&#8220;': '"',
+    '&#8221;': '"',
+    '&#8211;': '–',
+    '&#8212;': '—',
+    '&#8230;': '…',
+    '&nbsp;': ' ',
+    '&copy;': '©',
+    '&reg;': '®',
+    '&trade;': '™',
+    '&ldquo;': '"',
+    '&rdquo;': '"',
+    '&lsquo;': "'",
+    '&rsquo;': "'",
+    '&ndash;': '–',
+    '&mdash;': '—',
+    '&hellip;': '…'
+  };
+
+  return text.replace(/&[a-zA-Z0-9#]+;/g, (entity) => {
+    return entityMap[entity] || entity;
+  });
+}
+
 // Clean HTML content by removing ads and unnecessary elements
 export function cleanHtmlContent(html) {
   if (!html) return '';
@@ -48,22 +83,29 @@ export function cleanHtmlContent(html) {
   // Remove script tags
   cleanedHtml = cleanedHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   
-  // Remove iframe with ad domains
+  // Remove iframe with ad domains (be more specific)
   AD_DOMAINS.forEach(domain => {
     const iframeRegex = new RegExp(`<iframe[^>]*${domain}[^>]*>.*?</iframe>`, 'gi');
     cleanedHtml = cleanedHtml.replace(iframeRegex, '');
   });
 
-  // Remove elements with ad-related class names or IDs
-  AD_PATTERNS.forEach(pattern => {
+  // Only remove elements with very specific ad-related class names or IDs
+  const specificAdPatterns = [
+    /advertisement/gi,
+    /sponsored/gi,
+    /promo/gi,
+    /doubleclick/gi,
+    /googlead/gi,
+  ];
+  
+  specificAdPatterns.forEach(pattern => {
     const elementRegex = new RegExp(`<[^>]*(?:class|id)=['""][^'"]*${pattern.source}[^'"]*['"][^>]*>.*?</[^>]+>`, 'gi');
     cleanedHtml = cleanedHtml.replace(elementRegex, '');
   });
 
-  // Remove specific ad elements
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<aside[^>]*>.*?<\/aside>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(ad|advertisement|sponsored|promo).*?['"][^>]*>.*?<\/div>/gi, '');
+  // Remove specific ad elements but be more conservative
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(advertisement|sponsored|googlead).*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(advertisement|sponsored|googlead).*?['"][^>]*>.*?<\/div>/gi, '');
 
   // Clean up empty paragraphs and divs
   cleanedHtml = cleanedHtml.replace(/<p>\s*<\/p>/gi, '');
@@ -137,7 +179,7 @@ export async function parseRSSFeed(url) {
       
       return {
         id: item.id || `${url}_${index}_${Date.now()}`,
-        title: item.title || 'No Title',
+        title: decodeHtmlEntities(item.title || 'No Title'),
         description: extractCleanText(cleanDescription),
         content: extractCleanText(cleanContent),
         htmlContent: cleanDescription || cleanContent,
@@ -146,13 +188,13 @@ export async function parseRSSFeed(url) {
         authors: item.authors || [],
         categories: item.categories || [],
         feedUrl: url,
-        feedTitle: feed.title || url,
+        feedTitle: decodeHtmlEntities(feed.title || url),
         imageUrl: extractImageUrl(item),
       };
     });
 
     return {
-      title: feed.title || url,
+      title: decodeHtmlEntities(feed.title || url),
       description: feed.description || '',
       url: url,
       articles: cleanedArticles,
@@ -279,28 +321,21 @@ function extractImageUrl(item) {
 function isAdOrTrackingImage(url) {
   if (!url) return true;
   
+  // Very specific ad patterns - be conservative to avoid removing content images
   const adPatterns = [
     /\/ads?\//i,
     /\/tracking\//i,
     /\/analytics\//i,
     /\/pixel\//i,
-    /1x1\./i,
-    /\.gif$/i, // Many tracking pixels are 1x1 GIFs (but allow large gifs)
+    /1x1\.(gif|png|jpg)/i, // Only 1x1 tracking pixels
     /doubleclick/i,
     /googleads/i,
     /adsystem/i,
     /facebook\.com\/tr/i,
     /twitter\.com\/i\/adsct/i,
-    /\/wp-content\/plugins\//i, // WordPress plugin images
-    /gravatar\.com/i, // Profile images
-    /avatar/i,
-    /comment/i,
-    /share/i,
-    /social/i,
-    /button/i,
-    /icon/i,
-    /logo/i,
-    /badge/i,
+    /\/wp-content\/plugins\/.*\/(images|img)\//i, // Only plugin images folder
+    /gravatar\.com/i,
+    /avatar\.(gif|png|jpg)/i, // Only avatar image files
   ];
   
   // Check for very small images (likely tracking pixels)
@@ -322,8 +357,16 @@ function isAdOrTrackingImage(url) {
     /assets\//i,
     /static\//i,
     /content\//i,
+    /article/i,
+    /post/i,
+    /news/i,
+    /feature/i,
+    /gallery/i,
+    /photo/i,
+    /picture/i,
   ];
   
+  // If it matches content patterns, it's likely a content image
   if (contentPatterns.some(pattern => pattern.test(url))) {
     return false; // Likely content image
   }
