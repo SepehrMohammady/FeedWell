@@ -145,26 +145,94 @@ export async function parseRSSFeed(url) {
   try {
     let fetchUrl = url;
     
-    // For web platform, use CORS proxy to avoid CORS issues
+    // For web platform, use multiple CORS proxies to avoid CORS issues
     if (typeof window !== 'undefined' && window.location) {
-      // Use allorigins.me as a CORS proxy for web
-      fetchUrl = `https://api.allorigins.me/get?url=${encodeURIComponent(url)}`;
+      const corsProxies = [
+        'https://api.allorigins.me/get?url=',
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy?quest=',
+        'https://thingproxy.freeboard.io/fetch/',
+      ];
+      
+      for (const proxy of corsProxies) {
+        try {
+          let proxyUrl;
+          let isJsonResponse = false;
+          
+          if (proxy.includes('allorigins.me')) {
+            proxyUrl = `${proxy}${encodeURIComponent(url)}`;
+            isJsonResponse = true;
+          } else {
+            proxyUrl = `${proxy}${encodeURIComponent(url)}`;
+          }
+          
+          console.log('Trying CORS proxy:', proxy.replace(/\?.*$/, ''), 'for:', url);
+          
+          const response = await fetch(proxyUrl);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
+          let responseText;
+          if (isJsonResponse) {
+            const jsonResponse = await response.json();
+            responseText = jsonResponse.contents;
+          } else {
+            responseText = await response.text();
+          }
+          
+          if (!responseText || responseText.trim() === '') {
+            throw new Error('Empty response');
+          }
+          
+          // Successfully got content, parse it
+          const feed = await parse(responseText);
+          
+          // Process and clean articles
+          const cleanedArticles = feed.items.map((item, index) => {
+            const cleanDescription = cleanHtmlContent(item.description || '');
+            const cleanContent = cleanHtmlContent(item.content || '');
+            
+            return {
+              id: item.id || `${url}_${index}_${Date.now()}`,
+              title: decodeHtmlEntities(item.title || 'No Title'),
+              description: extractCleanText(cleanDescription),
+              content: extractCleanText(cleanContent),
+              htmlContent: cleanDescription || cleanContent,
+              url: item.links?.[0]?.url || item.url || '',
+              publishedDate: item.published || item.pubDate || new Date().toISOString(),
+              authors: item.authors || [],
+              categories: item.categories || [],
+              feedUrl: url,
+              feedTitle: decodeHtmlEntities(feed.title || url),
+              imageUrl: extractImageUrl(item),
+            };
+          });
+
+          return {
+            title: decodeHtmlEntities(feed.title || url),
+            description: feed.description || '',
+            url: url,
+            articles: cleanedArticles,
+          };
+        } catch (error) {
+          console.warn(`CORS proxy ${proxy.replace(/\?.*$/, '')} failed:`, error.message);
+          continue; // Try next proxy
+        }
+      }
+      
+      throw new Error('All CORS proxies failed. This feed may not be accessible from web browsers due to CORS restrictions.');
     }
     
+    // Direct fetch for mobile/native platforms
     const response = await fetch(fetchUrl);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch feed: ${response.status} - ${response.statusText}`);
     }
     
-    let responseText;
-    if (typeof window !== 'undefined' && window.location && fetchUrl.includes('allorigins.me')) {
-      // If using CORS proxy, extract the contents
-      const jsonResponse = await response.json();
-      responseText = jsonResponse.contents;
-    } else {
-      responseText = await response.text();
-    }
+    const responseText = await response.text();
     
     if (!responseText || responseText.trim() === '') {
       throw new Error('Empty response from feed URL');
