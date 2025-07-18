@@ -100,15 +100,28 @@ export function detectLanguage(text) {
   let confidence = 0.5;
   
   if (isRTL) {
-    // Arabic detection
-    if (/[\u0600-\u06FF]/.test(text)) {
-      detectedLang = 'ar';
-      confidence = 0.8;
-    }
-    // Persian detection (has some unique characters)
-    else if (/[\u067E\u0686\u0698\u06AF]/.test(text)) {
+    // Persian detection (check for Persian-specific characters first)
+    if (/[\u067E\u0686\u0698\u06AF\u06A9\u06CC]/.test(text)) {
       detectedLang = 'fa';
-      confidence = 0.8;
+      confidence = 0.9;
+    }
+    // Check for Persian words and patterns
+    else if (/[\u0627\u0628\u067E\u062A\u062B\u062C\u0686\u062D\u062E\u062F\u0630\u0631\u0632\u0698\u0633\u0634\u0635\u0636\u0637\u0638\u0639\u063A\u0641\u0642\u06A9\u06AF\u0644\u0645\u0646\u0647\u0648\u06CC]/.test(text)) {
+      // Count Persian vs Arabic indicators
+      const persianIndicators = (text.match(/[\u067E\u0686\u0698\u06AF\u06A9\u06CC]/g) || []).length;
+      const arabicIndicators = (text.match(/[\u0629\u0649\u064A\u0642\u0630\u0636\u0638]/g) || []).length;
+      
+      if (persianIndicators > 0 || text.includes('می') || text.includes('که') || text.includes('است')) {
+        detectedLang = 'fa';
+        confidence = 0.85;
+      } else if (arabicIndicators > persianIndicators) {
+        detectedLang = 'ar';
+        confidence = 0.8;
+      } else {
+        // Ambiguous case - just use RTL
+        detectedLang = 'rtl';
+        confidence = 0.7;
+      }
     }
     // Hebrew detection
     else if (/[\u0590-\u05FF]/.test(text)) {
@@ -120,9 +133,14 @@ export function detectLanguage(text) {
       detectedLang = 'ur';
       confidence = 0.7;
     }
+    // Arabic detection (more specific patterns)
+    else if (/[\u0600-\u06FF]/.test(text)) {
+      detectedLang = 'ar';
+      confidence = 0.75;
+    }
     // General RTL fallback
     else {
-      detectedLang = 'ar'; // Default to Arabic for RTL text
+      detectedLang = 'rtl'; // Use generic RTL instead of defaulting to Arabic
       confidence = 0.6;
     }
   }
@@ -159,6 +177,7 @@ export const LANGUAGE_NAMES = {
   'fa': 'فارسی',
   'he': 'עברית',
   'ur': 'اردو',
+  'rtl': 'RTL', // Generic RTL indicator
   'en': 'English',
   'es': 'Español',
   'fr': 'Français',
