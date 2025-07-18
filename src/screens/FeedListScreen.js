@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
+import BookmarkButton from '../components/BookmarkButton';
 
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
@@ -96,9 +97,16 @@ export default function FeedListScreen({ navigation }) {
           <Text style={styles.feedTitle} numberOfLines={1}>
             {item.feedTitle}
           </Text>
-          <Text style={styles.articleDate}>
-            {formatDate(item.publishedDate)}
-          </Text>
+          <View style={styles.articleMeta}>
+            <Text style={styles.articleDate}>
+              {formatDate(item.publishedDate)}
+            </Text>
+            <BookmarkButton 
+              article={item} 
+              size={20} 
+              style={styles.bookmarkButton}
+            />
+          </View>
         </View>
         
         <Text style={styles.articleTitle} numberOfLines={2}>
@@ -174,9 +182,19 @@ export default function FeedListScreen({ navigation }) {
       fontWeight: '600',
       flex: 1,
     },
+    articleMeta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
     articleDate: {
       fontSize: 12,
       color: theme.colors.textSecondary,
+    },
+    bookmarkButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
     },
     articleTitle: {
       fontSize: 16,

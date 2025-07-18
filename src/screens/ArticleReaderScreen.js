@@ -18,6 +18,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
+import BookmarkButton from '../components/BookmarkButton';
 
 export default function ArticleReaderScreen({ route, navigation }) {
   const { article } = route.params;
@@ -301,6 +302,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
           >
             <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
+          <BookmarkButton article={article} size={24} style={styles.headerButton} />
           <TouchableOpacity
             style={styles.headerButton}
             onPress={handleShare}

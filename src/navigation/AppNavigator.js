@@ -9,9 +9,25 @@ import ArticleActionsScreen from '../screens/ArticleActionsScreen';
 import ArticleReaderScreen from '../screens/ArticleReaderScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddFeedScreen from '../screens/AddFeedScreen';
+import ReadLaterScreen from '../screens/ReadLaterScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+function ReadLaterStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen 
+        name="ReadLaterList" 
+        component={ReadLaterScreen} 
+      />
+      <Stack.Screen 
+        name="ArticleReader" 
+        component={ArticleReaderScreen} 
+      />
+    </Stack.Navigator>
+  );
+}
 
 function FeedStack() {
   return (
@@ -47,6 +63,8 @@ export default function AppNavigator() {
 
           if (route.name === 'Feeds') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
+          } else if (route.name === 'ReadLater') {
+            iconName = focused ? 'bookmark' : 'bookmark-outline';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'settings' : 'settings-outline';
           }
@@ -63,6 +81,11 @@ export default function AppNavigator() {
       })}
     >
       <Tab.Screen name="Feeds" component={FeedStack} />
+      <Tab.Screen 
+        name="ReadLater" 
+        component={ReadLaterStack} 
+        options={{ title: 'Read Later' }}
+      />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );
