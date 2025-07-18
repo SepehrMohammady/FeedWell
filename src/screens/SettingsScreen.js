@@ -8,6 +8,7 @@ import {
   Alert,
   Switch,
   Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -84,6 +85,44 @@ export default function SettingsScreen({ navigation }) {
       } else {
         Alert.alert('Error', 'Failed to clear data');
       }
+    }
+  };
+
+  const handleOpenWebsite = async () => {
+    const url = 'https://SepehrMohammady.ir';
+    try {
+      if (Platform.OS === 'web') {
+        window.open(url, '_blank');
+      } else {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+        } else {
+          Alert.alert('Error', 'Cannot open URL');
+        }
+      }
+    } catch (error) {
+      console.error('Error opening website:', error);
+      Alert.alert('Error', 'Failed to open website');
+    }
+  };
+
+  const handleOpenGitHub = async () => {
+    const url = 'https://github.com/SepehrMohammady/FeedWell';
+    try {
+      if (Platform.OS === 'web') {
+        window.open(url, '_blank');
+      } else {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+        } else {
+          Alert.alert('Error', 'Cannot open URL');
+        }
+      }
+    } catch (error) {
+      console.error('Error opening GitHub:', error);
+      Alert.alert('Error', 'Failed to open GitHub repository');
     }
   };
 
@@ -300,10 +339,14 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title="Developer"
             description="Sepehr Mohammady"
+            onPress={handleOpenWebsite}
+            rightElement={<Ionicons name="open-outline" size={20} color="#007AFF" />}
           />
           <SettingItem
             title="Source Code"
             description="github.com/SepehrMohammady/FeedWell"
+            onPress={handleOpenGitHub}
+            rightElement={<Ionicons name="logo-github" size={20} color="#007AFF" />}
           />
           <SettingItem
             title="Privacy"

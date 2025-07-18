@@ -76,9 +76,7 @@ export function ReadLaterProvider({ children }) {
 
   // Save to storage whenever articles change
   useEffect(() => {
-    if (state.articles.length > 0) {
-      saveReadLaterArticles(state.articles);
-    }
+    saveReadLaterArticles(state.articles);
   }, [state.articles]);
 
   const loadReadLaterArticles = async () => {
