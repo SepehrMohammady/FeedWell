@@ -200,6 +200,13 @@ export default function SettingsScreen({ navigation }) {
       textAlign: 'center',
       lineHeight: 20,
     },
+    copyrightText: {
+      fontSize: 12,
+      color: theme.colors.textTertiary,
+      textAlign: 'center',
+      marginTop: 12,
+      lineHeight: 16,
+    },
   });
 
   return (
@@ -288,7 +295,15 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title="Version"
-            description="1.0.0"
+            description="0.1.0 (Beta)"
+          />
+          <SettingItem
+            title="Developer"
+            description="Sepehr Mohammady"
+          />
+          <SettingItem
+            title="Source Code"
+            description="github.com/SepehrMohammady/FeedWell"
           />
           <SettingItem
             title="Privacy"
@@ -299,6 +314,9 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.footer}>
           <Text style={styles.footerText}>
             FeedWell automatically blocks ads and tracking from RSS feeds to provide a clean reading experience.
+          </Text>
+          <Text style={styles.copyrightText}>
+            © 2025 Sepehr Mohammady. Open source under MIT License.
           </Text>
         </View>
       </ScrollView>
