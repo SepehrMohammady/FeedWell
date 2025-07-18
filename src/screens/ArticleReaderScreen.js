@@ -9,6 +9,7 @@ import {
   Share,
   Platform,
   Image,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,6 +80,19 @@ export default function ArticleReaderScreen({ route, navigation }) {
     }
   };
 
+  const handleOpenBrowser = async () => {
+    try {
+      const supported = await Linking.canOpenURL(article.url);
+      if (supported) {
+        await Linking.openURL(article.url);
+      } else {
+        console.error('Cannot open URL:', article.url);
+      }
+    } catch (error) {
+      console.error('Error opening browser:', error);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -108,10 +122,16 @@ export default function ArticleReaderScreen({ route, navigation }) {
       padding: 8,
       width: 40,
     },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     headerTitle: {
       fontSize: 18,
       fontWeight: '600',
       color: theme.colors.text,
+      flex: 1,
+      textAlign: 'center',
     },
     content: {
       flex: 1,
@@ -224,12 +244,20 @@ export default function ArticleReaderScreen({ route, navigation }) {
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reader</Text>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={handleShare}
-        >
-          <Ionicons name="share-outline" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleOpenBrowser}
+          >
+            <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleShare}
+          >
+            <Ionicons name="share-outline" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
