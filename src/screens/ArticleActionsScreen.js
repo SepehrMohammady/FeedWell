@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useFeed } from '../context/FeedContext';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article } = route.params;
   const { theme } = useTheme();
+  const { markArticleRead } = useFeed();
+
+  // Mark article as read when the actions screen is viewed
+  useEffect(() => {
+    if (article && article.id) {
+      console.log('ArticleActionsScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
+      markArticleRead(article.id);
+    }
+  }, [article, markArticleRead]);
 
   const handleOpenInBrowser = async () => {
     try {

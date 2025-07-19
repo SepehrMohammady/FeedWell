@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
+import { useFeed } from '../context/FeedContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
@@ -24,6 +25,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
   const { article } = route.params;
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
+  const { markArticleRead } = useFeed();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,6 +34,14 @@ export default function ArticleReaderScreen({ route, navigation }) {
   useEffect(() => {
     fetchFullArticle();
   }, []);
+
+  // Mark article as read when the screen is viewed
+  useEffect(() => {
+    if (article && article.id) {
+      console.log('ArticleReaderScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
+      markArticleRead(article.id);
+    }
+  }, [article, markArticleRead]);
 
   const fetchFullArticle = async () => {
     try {
