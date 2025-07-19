@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,34 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
+import { useFeed } from '../context/FeedContext';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Linking,
+  Share,
+  Image,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { WebView } from 'react-native-webview';
+import { useFeed } from '../contexts/FeedContext';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
   const [showWebView, setShowWebView] = useState(false);
+  const { markArticleRead } = useFeed();
+
+  // Mark article as read when the screen is viewed
+  useEffect(() => {
+    if (article && article.id) {
+      markArticleRead(article.id);
+    }
+  }, [article, markArticleRead]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

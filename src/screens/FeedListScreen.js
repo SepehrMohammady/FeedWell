@@ -21,7 +21,7 @@ import ArticleImage from '../components/ArticleImage';
 import BookmarkButton from '../components/BookmarkButton';
 
 export default function FeedListScreen({ navigation }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount } = useFeed();
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
@@ -65,6 +65,42 @@ export default function FeedListScreen({ navigation }) {
     refreshFeeds();
   };
 
+  const handleMarkAllRead = async () => {
+    const unreadCount = getUnreadCount();
+    if (unreadCount === 0) {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.confirm) {
+        window.alert('No unread articles to mark as read.');
+      } else {
+        Alert.alert('Info', 'No unread articles to mark as read.');
+      }
+      return;
+    }
+
+    const confirmAction = () => {
+      markAllRead();
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.alert) {
+        window.alert(`Marked ${unreadCount} articles as read.`);
+      } else {
+        Alert.alert('Success', `Marked ${unreadCount} articles as read.`);
+      }
+    };
+
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.confirm) {
+      if (window.confirm(`Mark all ${unreadCount} unread articles as read?`)) {
+        confirmAction();
+      }
+    } else {
+      Alert.alert(
+        'Mark All Read',
+        `Mark all ${unreadCount} unread articles as read?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
+        ]
+      );
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -94,9 +130,14 @@ export default function FeedListScreen({ navigation }) {
     >
       <View style={styles.articleContent}>
         <View style={styles.articleHeader}>
-          <Text style={styles.feedTitle} numberOfLines={1}>
-            {item.feedTitle}
-          </Text>
+          <View style={styles.titleRow}>
+            {!item.isRead && (
+              <View style={styles.unreadBullet} />
+            )}
+            <Text style={styles.feedTitle} numberOfLines={1}>
+              {item.feedTitle}
+            </Text>
+          </View>
           <View style={styles.articleMeta}>
             <Text style={styles.articleDate}>
               {formatDate(item.publishedDate)}
@@ -156,6 +197,14 @@ export default function FeedListScreen({ navigation }) {
     addButton: {
       padding: 8,
     },
+    headerButtons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerButton: {
+      padding: 8,
+      marginRight: 8,
+    },
     articleItem: {
       backgroundColor: theme.colors.surface,
       marginHorizontal: 16,
@@ -175,6 +224,18 @@ export default function FeedListScreen({ navigation }) {
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 8,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    unreadBullet: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#007AFF',
+      marginRight: 8,
     },
     feedTitle: {
       fontSize: 12,
@@ -329,12 +390,20 @@ export default function FeedListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>FeedWell</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddFeed')}
-        >
-          <Ionicons name="add" size={24} color="#007AFF" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleMarkAllRead}
+          >
+            <Ionicons name="checkmark-done" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('AddFeed')}
+          >
+            <Ionicons name="add" size={24} color="#007AFF" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {loading && !refreshing && (

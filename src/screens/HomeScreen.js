@@ -14,12 +14,13 @@ import { useReadLater } from '../context/ReadLaterContext';
 
 export default function HomeScreen({ navigation }) {
   const { theme } = useTheme();
-  const { feeds, articles } = useFeed();
+  const { feeds, articles, getUnreadCount } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
 
   // Calculate stats
   const totalFeeds = feeds.length;
   const totalArticles = articles.length;
+  const unreadCount = getUnreadCount();
   const readLaterCount = readLaterArticles.length;
   const recentArticles = articles.slice(0, 5); // Get 5 most recent articles
 
@@ -145,7 +146,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
           <View style={styles.overviewGrid}>
             {renderOverviewCard('Feeds', totalFeeds, 'list', theme.colors.primary)}
-            {renderOverviewCard('Articles', totalArticles, 'newspaper', theme.colors.success)}
+            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.warning)}
             {renderOverviewCard('Read Later', readLaterCount, 'bookmark', theme.colors.accent)}
           </View>
         </View>

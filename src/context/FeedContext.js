@@ -45,6 +45,34 @@ function feedReducer(state, action) {
           index === self.findIndex(a => a.id === article.id)
         )
       };
+    case 'MARK_ARTICLE_READ':
+      return {
+        ...state,
+        articles: state.articles.map(article =>
+          article.id === action.payload
+            ? { ...article, isRead: true, readAt: new Date().toISOString() }
+            : article
+        )
+      };
+    case 'MARK_ARTICLE_UNREAD':
+      return {
+        ...state,
+        articles: state.articles.map(article =>
+          article.id === action.payload
+            ? { ...article, isRead: false, readAt: null }
+            : article
+        )
+      };
+    case 'MARK_ALL_READ':
+      const readTimestamp = new Date().toISOString();
+      return {
+        ...state,
+        articles: state.articles.map(article => ({
+          ...article,
+          isRead: true,
+          readAt: readTimestamp
+        }))
+      };
     case 'CLEAR_ALL_DATA':
       console.log('CLEAR_ALL_DATA: Clearing all feeds and articles');
       return { ...state, feeds: [], articles: [] };
@@ -143,12 +171,56 @@ export function FeedProvider({ children }) {
     console.log('FeedContext: clearAllData completed');
   };
 
+  const markArticleRead = async (articleId) => {
+    dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
+    const updatedArticles = state.articles.map(article =>
+      article.id === articleId
+        ? { ...article, isRead: true, readAt: new Date().toISOString() }
+        : article
+    );
+    await saveArticles(updatedArticles);
+  };
+
+  const markArticleUnread = async (articleId) => {
+    dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
+    const updatedArticles = state.articles.map(article =>
+      article.id === articleId
+        ? { ...article, isRead: false, readAt: null }
+        : article
+    );
+    await saveArticles(updatedArticles);
+  };
+
+  const markAllRead = async () => {
+    dispatch({ type: 'MARK_ALL_READ' });
+    const readTimestamp = new Date().toISOString();
+    const updatedArticles = state.articles.map(article => ({
+      ...article,
+      isRead: true,
+      readAt: readTimestamp
+    }));
+    await saveArticles(updatedArticles);
+  };
+
+  const getUnreadArticles = () => {
+    return state.articles.filter(article => !article.isRead);
+  };
+
+  const getUnreadCount = () => {
+    return state.articles.filter(article => !article.isRead).length;
+  };
+
   const value = {
     ...state,
     addFeed,
     removeFeed,
     addArticles,
     clearAllData,
+    markArticleRead,
+    markArticleUnread,
+    markAllRead,
+    getUnreadArticles,
+    getUnreadCount,
     setLoading: (loading) => dispatch({ type: 'SET_LOADING', payload: loading }),
     setError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
   };

@@ -290,6 +290,8 @@ export async function parseRSSFeed(url) {
               feedUrl: url,
               feedTitle: decodeHtmlEntities(feed.title || url),
               imageUrl: extractImageUrl(item),
+              isRead: false, // New articles are unread by default
+              readAt: null,
             };
           });
 
@@ -341,6 +343,8 @@ export async function parseRSSFeed(url) {
         feedUrl: url,
         feedTitle: decodeHtmlEntities(feed.title || url),
         imageUrl: extractImageUrl(item),
+        isRead: false, // New articles are unread by default
+        readAt: null,
       };
     });
 
