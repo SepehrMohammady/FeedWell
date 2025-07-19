@@ -14,21 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 import { useFeed } from '../context/FeedContext';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Linking,
-  Share,
-  Image,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { WebView } from 'react-native-webview';
-import { useFeed } from '../contexts/FeedContext';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
@@ -38,6 +23,7 @@ export default function ArticleScreen({ route, navigation }) {
   // Mark article as read when the screen is viewed
   useEffect(() => {
     if (article && article.id) {
+      console.log('ArticleScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
       markArticleRead(article.id);
     }
   }, [article, markArticleRead]);

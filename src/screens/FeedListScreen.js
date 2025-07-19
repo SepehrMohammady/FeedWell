@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
@@ -25,12 +26,20 @@ export default function FeedListScreen({ navigation }) {
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
+  const [forceRender, setForceRender] = useState(0);
 
   useEffect(() => {
     if (feeds.length > 0) {
       refreshFeeds();
     }
   }, [feeds.length]);
+
+  // Force re-render when screen comes into focus to update read status
+  useFocusEffect(
+    React.useCallback(() => {
+      setForceRender(prev => prev + 1);
+    }, [])
+  );
 
   const refreshFeeds = async () => {
     if (feeds.length === 0) return;
@@ -417,6 +426,7 @@ export default function FeedListScreen({ navigation }) {
         data={sortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
+        extraData={articles}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

@@ -172,12 +172,14 @@ export function FeedProvider({ children }) {
   };
 
   const markArticleRead = async (articleId) => {
+    console.log('FeedContext: markArticleRead called for:', articleId);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
     const updatedArticles = state.articles.map(article =>
       article.id === articleId
         ? { ...article, isRead: true, readAt: new Date().toISOString() }
         : article
     );
+    console.log('FeedContext: Updated articles with read status');
     await saveArticles(updatedArticles);
   };
 
