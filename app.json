@@ -2,16 +2,18 @@
   "expo": {
     "name": "FeedWell",
     "slug": "feedwell",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.feedwell.app"
@@ -21,8 +23,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.feedwell.app",
+      "versionCode": 4,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
@@ -34,7 +36,10 @@
     },
     "extra": {
       "appName": "FeedWell",
-      "appDescription": "Ad-free RSS reader for all platforms"
+      "appDescription": "Ad-free RSS reader for all platforms",
+      "eas": {
+        "projectId": "828c0ad5-fd9a-436a-b2da-1b50fb4d4960"
+      }
     },
     "scheme": "feedwell"
   }

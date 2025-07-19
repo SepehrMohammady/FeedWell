@@ -9,9 +9,6 @@ import { ReadLaterProvider } from './src/context/ReadLaterContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 
-// Import test utility for debugging
-import './src/utils/testRss';
-
 export default function App() {
   return (
     <ErrorBoundary>
