@@ -10,6 +10,7 @@ import ArticleReaderScreen from '../screens/ArticleReaderScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AddFeedScreen from '../screens/AddFeedScreen';
 import ReadLaterScreen from '../screens/ReadLaterScreen';
+import HomeScreen from '../screens/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -61,7 +62,9 @@ export default function AppNavigator() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === 'Feeds') {
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Feeds') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === 'ReadLater') {
             iconName = focused ? 'bookmark' : 'bookmark-outline';
@@ -80,6 +83,7 @@ export default function AppNavigator() {
         headerShown: false,
       })}
     >
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Feeds" component={FeedStack} />
       <Tab.Screen 
         name="ReadLater" 
