@@ -25,33 +25,53 @@ export default function ReadLaterScreen({ navigation }) {
   const handleClearAll = () => {
     if (articles.length === 0) return;
     
-    Alert.alert(
-      'Clear All',
-      'Are you sure you want to remove all articles from Read Later?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Clear All', 
-          style: 'destructive',
-          onPress: clearReadLater
-        },
-      ]
-    );
+    // Use browser-compatible confirm dialog for web, Alert for mobile
+    if (typeof window !== 'undefined') {
+      // Web environment - use native confirm
+      const confirmed = window.confirm('Are you sure you want to remove all articles from Read Later?');
+      if (confirmed) {
+        clearReadLater();
+      }
+    } else {
+      // Mobile environment - use Alert
+      Alert.alert(
+        'Clear All',
+        'Are you sure you want to remove all articles from Read Later?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Clear All', 
+            style: 'destructive',
+            onPress: clearReadLater
+          },
+        ]
+      );
+    }
   };
 
   const handleRemoveArticle = (articleId) => {
-    Alert.alert(
-      'Remove Article',
-      'Remove this article from Read Later?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
-          style: 'destructive',
-          onPress: () => removeFromReadLater(articleId)
-        },
-      ]
-    );
+    // Use browser-compatible confirm dialog for web, Alert for mobile
+    if (typeof window !== 'undefined') {
+      // Web environment - use native confirm
+      const confirmed = window.confirm('Remove this article from Read Later?');
+      if (confirmed) {
+        removeFromReadLater(articleId);
+      }
+    } else {
+      // Mobile environment - use Alert
+      Alert.alert(
+        'Remove Article',
+        'Remove this article from Read Later?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Remove', 
+            style: 'destructive',
+            onPress: () => removeFromReadLater(articleId)
+          },
+        ]
+      );
+    }
   };
 
   const renderEmptyState = () => (
