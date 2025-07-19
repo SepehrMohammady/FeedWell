@@ -12,34 +12,58 @@ export default function BookmarkButton({ article, size = 24, style }) {
 
   const handlePress = () => {
     if (isBookmarked) {
-      // Remove from read later
-      Alert.alert(
-        'Remove Bookmark',
-        'Remove this article from Read Later?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Remove', 
-            style: 'destructive',
-            onPress: () => removeFromReadLater(article.id)
-          },
-        ]
-      );
+      // Remove from read later - use browser-compatible confirm dialog for web, Alert for mobile
+      if (typeof window !== 'undefined') {
+        // Web environment - use native confirm
+        const confirmed = window.confirm('Remove this article from Read Later?');
+        if (confirmed) {
+          removeFromReadLater(article.id);
+        }
+      } else {
+        // Mobile environment - use Alert
+        Alert.alert(
+          'Remove Bookmark',
+          'Remove this article from Read Later?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Remove', 
+              style: 'destructive',
+              onPress: () => removeFromReadLater(article.id)
+            },
+          ]
+        );
+      }
     } else {
       // Add to read later
       const success = addToReadLater(article);
       if (success) {
-        Alert.alert(
-          'Saved!',
-          'Article added to Read Later',
-          [{ text: 'OK' }]
-        );
+        // Use browser-compatible alert for web, Alert for mobile
+        if (typeof window !== 'undefined') {
+          // Web environment - use native alert (or just skip the confirmation)
+          // For better UX in web, we can skip the success message
+          console.log('Article added to Read Later');
+        } else {
+          // Mobile environment - use Alert
+          Alert.alert(
+            'Saved!',
+            'Article added to Read Later',
+            [{ text: 'OK' }]
+          );
+        }
       } else {
-        Alert.alert(
-          'Already Saved',
-          'This article is already in your Read Later list',
-          [{ text: 'OK' }]
-        );
+        // Use browser-compatible alert for web, Alert for mobile
+        if (typeof window !== 'undefined') {
+          // Web environment - use native alert
+          window.alert('This article is already in your Read Later list');
+        } else {
+          // Mobile environment - use Alert
+          Alert.alert(
+            'Already Saved',
+            'This article is already in your Read Later list',
+            [{ text: 'OK' }]
+          );
+        }
       }
     }
   };
