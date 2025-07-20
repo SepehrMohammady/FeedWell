@@ -13,7 +13,7 @@ export default function BookmarkButton({ article, size = 24, style }) {
   const handlePress = () => {
     if (isBookmarked) {
       // Remove from read later - use browser-compatible confirm dialog for web, Alert for mobile
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
         // Web environment - use native confirm
         const confirmed = window.confirm('Remove this article from Read Later?');
         if (confirmed) {

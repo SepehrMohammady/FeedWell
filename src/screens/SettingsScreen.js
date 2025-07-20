@@ -41,7 +41,7 @@ export default function SettingsScreen({ navigation }) {
     console.log('Attempting to clear all data');
     
     // For web platform, use window.confirm for better compatibility
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
       const confirmed = window.confirm('Clear All Data?\n\nThis will remove all feeds and articles. This action cannot be undone.');
       if (confirmed) {
         performClearAllData();

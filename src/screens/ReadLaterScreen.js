@@ -26,7 +26,7 @@ export default function ReadLaterScreen({ navigation }) {
     if (articles.length === 0) return;
     
     // Use browser-compatible confirm dialog for web, Alert for mobile
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
       const confirmed = window.confirm('Are you sure you want to remove all articles from Read Later?');
       if (confirmed) {
@@ -51,7 +51,7 @@ export default function ReadLaterScreen({ navigation }) {
 
   const handleRemoveArticle = (articleId) => {
     // Use browser-compatible confirm dialog for web, Alert for mobile
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
       const confirmed = window.confirm('Remove this article from Read Later?');
       if (confirmed) {

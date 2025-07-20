@@ -173,7 +173,7 @@ export default function AddFeedScreen({ navigation }) {
     console.log('Attempting to remove feed:', feed.title, 'URL:', feed.url);
     
     // For web platform, use window.confirm for better compatibility
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
       const confirmed = window.confirm(`Remove "${feed.title}"?\n\nThis will remove the feed and all its articles.`);
       if (confirmed) {
         performRemoveFeed(feed);

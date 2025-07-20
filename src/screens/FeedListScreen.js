@@ -77,37 +77,23 @@ export default function FeedListScreen({ navigation }) {
   const handleMarkAllRead = async () => {
     const unreadCount = getUnreadCount();
     if (unreadCount === 0) {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.confirm) {
-        window.alert('No unread articles to mark as read.');
-      } else {
-        Alert.alert('Info', 'No unread articles to mark as read.');
-      }
+      Alert.alert('Info', 'No unread articles to mark as read.');
       return;
     }
 
     const confirmAction = () => {
       markAllRead();
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.alert) {
-        window.alert(`Marked ${unreadCount} articles as read.`);
-      } else {
-        Alert.alert('Success', `Marked ${unreadCount} articles as read.`);
-      }
+      Alert.alert('Success', `Marked ${unreadCount} articles as read.`);
     };
 
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.confirm) {
-      if (window.confirm(`Mark all ${unreadCount} unread articles as read?`)) {
-        confirmAction();
-      }
-    } else {
-      Alert.alert(
-        'Mark All Read',
-        `Mark all ${unreadCount} unread articles as read?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
-        ]
-      );
-    }
+    Alert.alert(
+      'Mark All Read',
+      `Mark all ${unreadCount} unread articles as read?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
+      ]
+    );
   };
 
   const formatDate = (dateString) => {

@@ -36,7 +36,7 @@ export default function UnreadScreen({ navigation }) {
     if (unreadArticles.length === 0) return;
     
     // Use browser-compatible confirm dialog for web, Alert for mobile
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
       const confirmed = window.confirm('Mark all articles as read?');
       if (confirmed) {
