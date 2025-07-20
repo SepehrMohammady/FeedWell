@@ -18,7 +18,6 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
-import { debugRSSFeed } from '../utils/debugRss';
 
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
@@ -99,10 +98,6 @@ export default function AddFeedScreen({ navigation }) {
     setLoading(true);
     try {
       console.log('Attempting to parse feed:', url.trim());
-      
-      // First try with the debugging function to see image extraction
-      console.log('Debugging RSS feed for image extraction...');
-      await debugRSSFeed(url.trim());
       
       let feedData;
       

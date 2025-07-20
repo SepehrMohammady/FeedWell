@@ -23,6 +23,7 @@ export default function ArticleScreen({ route, navigation }) {
   // Mark article as read when the screen is viewed
   useEffect(() => {
     if (article && article.id) {
+      console.log('ArticleScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
       markArticleRead(article.id);
     }
   }, [article, markArticleRead]);
