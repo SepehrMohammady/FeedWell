@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearDemoContent } from '../utils/clearDemoContent';
 
@@ -171,17 +171,19 @@ export function FeedProvider({ children }) {
     console.log('FeedContext: clearAllData completed');
   };
 
-  const markArticleRead = async (articleId) => {
+  const markArticleRead = useCallback(async (articleId) => {
+    console.log('FeedContext: markArticleRead called for:', articleId);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
     const updatedArticles = state.articles.map(article =>
       article.id === articleId
         ? { ...article, isRead: true, readAt: new Date().toISOString() }
         : article
     );
+    console.log('FeedContext: Updated articles with read status');
     await saveArticles(updatedArticles);
-  };
+  }, [state.articles]);
 
-  const markArticleUnread = async (articleId) => {
+  const markArticleUnread = useCallback(async (articleId) => {
     dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
     const updatedArticles = state.articles.map(article =>
       article.id === articleId
@@ -189,9 +191,9 @@ export function FeedProvider({ children }) {
         : article
     );
     await saveArticles(updatedArticles);
-  };
+  }, [state.articles]);
 
-  const markAllRead = async () => {
+  const markAllRead = useCallback(async () => {
     dispatch({ type: 'MARK_ALL_READ' });
     const readTimestamp = new Date().toISOString();
     const updatedArticles = state.articles.map(article => ({
@@ -200,15 +202,15 @@ export function FeedProvider({ children }) {
       readAt: readTimestamp
     }));
     await saveArticles(updatedArticles);
-  };
+  }, [state.articles]);
 
-  const getUnreadArticles = () => {
+  const getUnreadArticles = useCallback(() => {
     return state.articles.filter(article => !article.isRead);
-  };
+  }, [state.articles]);
 
-  const getUnreadCount = () => {
+  const getUnreadCount = useCallback(() => {
     return state.articles.filter(article => !article.isRead).length;
-  };
+  }, [state.articles]);
 
   const value = {
     ...state,
