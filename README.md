@@ -2,15 +2,17 @@
 
 FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. It provides a clean reading experience across Android, iOS, and Windows platforms, automatically blocking ads and tracking scripts.
 
-## Features
+## ✨ Features
 
-🚫 **Ad-Free Reading** - Automatically removes ads, tracking scripts, and promotional content
-📱 **Cross-Platform** - Runs on Android, iOS, and Windows (via web)
-🎨 **Clean Interface** - Modern, intuitive design focused on content
-💾 **Offline Storage** - Feeds and articles stored locally for privacy
-🔄 **Auto-Refresh** - Keep your feeds updated automatically
-🖼️ **Media Support** - Images and media preserved in articles
-🌐 **WebView Reader** - Optional web view with ad-blocking for original articles
+🚫 **Ad-Free Reading** - Automatically removes ads, tracking scripts, and promotional content  
+📱 **Cross-Platform** - Runs on Android, iOS, and Windows (via web)  
+🎨 **Clean Interface** - Modern, intuitive design focused on content  
+💾 **Offline Storage** - Feeds and articles stored locally for privacy  
+🔄 **Auto-Refresh** - Keep your feeds updated automatically  
+🖼️ **Media Support** - Images and media preserved in articles  
+🌐 **WebView Reader** - Optional web view with ad-blocking for original articles  
+⚡ **Fast & Reliable** - Optimized performance with comprehensive error handling  
+🛡️ **Privacy First** - No tracking, no data collection, completely local storage
 
 ## Technology Stack
 
@@ -20,20 +22,20 @@ FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. 
 - **Custom RSS Parser** with advanced ad-blocking
 - **WebView** with JavaScript injection for ad-free browsing
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js (v16 or later)
-- npm or yarn
-- Expo CLI
+- npm or yarn  
+- Expo CLI (`npm install -g @expo/cli`)
 - For mobile development: Android Studio or Xcode
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/SepehrMohammady/FeedWell.git
    cd FeedWell
    ```
 
@@ -97,15 +99,34 @@ src/
 └── App.js             # Main app component
 ```
 
-## Building for Production
+## 📱 Building for Production
 
-### Android
+### Using EAS Build (Recommended)
+
+1. **Install EAS CLI**
+   ```bash
+   npm install -g eas-cli
+   ```
+
+2. **Build for Android**
+   ```bash
+   eas build --platform android --profile preview
+   ```
+
+3. **Build for iOS**
+   ```bash
+   eas build --platform ios --profile preview
+   ```
+
+4. **Build for both platforms**
+   ```bash
+   eas build --platform all --profile preview
+   ```
+
+### Legacy Build Commands (Deprecated)
 ```bash
+# These are no longer recommended
 expo build:android
-```
-
-### iOS
-```bash
 expo build:ios
 ```
 
@@ -113,6 +134,26 @@ expo build:ios
 ```bash
 expo build:web
 ```
+
+## 🔄 Recent Updates (v0.3.0)
+
+### ✅ Bug Fixes & Improvements
+- **Fixed feed removal functionality** - Feeds now properly delete when requested
+- **Fixed UI layout issues** - Overview cards display correctly with icons above text
+- **Resolved app crashes** - Proper gesture handler integration for standalone builds
+- **Fixed data persistence** - User feeds no longer get deleted on app restart
+- **Version synchronization** - Consistent versioning across all configuration files
+
+### 🧹 Code Quality
+- **Project cleanup** - Removed unused debug files and outdated build scripts
+- **Enhanced error handling** - Better error messages and recovery mechanisms
+- **Improved performance** - Optimized feed parsing and storage operations
+- **Cleaner codebase** - Removed development artifacts and streamlined architecture
+
+### 🛠️ Development Improvements
+- **EAS Build integration** - Modern build system for reliable APK/IPA generation
+- **Enhanced debugging** - Comprehensive logging and debugging utilities
+- **Better git workflow** - Improved .gitignore and commit practices
 
 ## Contributing
 
