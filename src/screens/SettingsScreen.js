@@ -334,7 +334,7 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title="Version"
-            description="0.1.0 (Beta)"
+            description="0.2.0 (Preview)"
           />
           <SettingItem
             title="Developer"

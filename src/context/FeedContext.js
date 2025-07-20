@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { clearDemoContent } from '../utils/clearDemoContent';
 
 const FeedContext = createContext();
 
@@ -90,17 +89,26 @@ export function FeedProvider({ children }) {
 
   const loadData = async () => {
     try {
-      // First, clear any demo content that might exist
-      await clearDemoContent();
+      console.log('Loading data from AsyncStorage...');
       
       const feeds = await AsyncStorage.getItem('feeds');
       const articles = await AsyncStorage.getItem('articles');
       
+      console.log('Raw feeds data:', feeds);
+      console.log('Raw articles data:', articles ? 'Found' : 'None');
+      
       if (feeds) {
-        dispatch({ type: 'SET_FEEDS', payload: JSON.parse(feeds) });
+        const parsedFeeds = JSON.parse(feeds);
+        console.log('Parsed feeds:', parsedFeeds);
+        dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+      } else {
+        console.log('No feeds found in storage');
       }
+      
       if (articles) {
-        dispatch({ type: 'SET_ARTICLES', payload: JSON.parse(articles) });
+        const parsedArticles = JSON.parse(articles);
+        console.log('Parsed articles count:', parsedArticles.length);
+        dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
       }
     } catch (error) {
       console.error('Error loading data:', error);

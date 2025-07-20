@@ -46,20 +46,28 @@ export const testDataConsistency = async () => {
     const feedsStr = await AsyncStorage.getItem('feeds');
     const feeds = feedsStr ? JSON.parse(feedsStr) : [];
     
-    console.log('Total feeds:', feeds.length);
+    console.log('=== STORAGE DEBUGGING ===');
+    console.log('Total feeds in storage:', feeds.length);
+    console.log('Feeds data:', JSON.stringify(feeds, null, 2));
+    
     feeds.forEach((feed, index) => {
-      console.log(`Feed ${index}:`, {
-        id: feed.id,
+      console.log(`Feed ${index + 1}:`, {
         title: feed.title,
         url: feed.url,
+        id: feed.id,
         addedAt: feed.addedAt
       });
     });
     
-    alert(`Data consistency check completed. Found ${feeds.length} feeds. Check console for details.`);
+    const articlesStr = await AsyncStorage.getItem('articles');
+    const articles = articlesStr ? JSON.parse(articlesStr) : [];
+    console.log('Total articles in storage:', articles.length);
+    
+    alert(`Storage Debug:\nFeeds: ${feeds.length}\nArticles: ${articles.length}\nCheck console for details`);
+    
   } catch (error) {
-    console.error('Error during data consistency check:', error);
-    alert('Error during data consistency check: ' + error.message);
+    console.error('Error checking data consistency:', error);
+    alert('Error checking data: ' + error.message);
   }
 };
 
@@ -68,21 +76,23 @@ export const addDemoFeed = async () => {
   console.log('=== Adding Demo Feed ===');
   
   try {
-    const feedsStr = await AsyncStorage.getItem('feeds');
-    const feeds = feedsStr ? JSON.parse(feedsStr) : [];
-    
     const demoFeed = {
       id: Date.now().toString(),
-      url: 'https://example.com/demo-feed',
-      title: 'Demo Feed for Testing',
+      title: 'Test Feed',
+      url: 'https://feeds.bbci.co.uk/news/rss.xml',
       addedAt: new Date().toISOString(),
     };
     
+    const feedsStr = await AsyncStorage.getItem('feeds');
+    const feeds = feedsStr ? JSON.parse(feedsStr) : [];
+    
+    // Add the demo feed
     const updatedFeeds = [...feeds, demoFeed];
     await AsyncStorage.setItem('feeds', JSON.stringify(updatedFeeds));
     
     console.log('Demo feed added:', demoFeed);
     alert('Demo feed added successfully!');
+    
   } catch (error) {
     console.error('Error adding demo feed:', error);
     alert('Error adding demo feed: ' + error.message);

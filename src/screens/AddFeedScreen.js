@@ -215,7 +215,10 @@ export default function AddFeedScreen({ navigation }) {
   const performRemoveFeed = async (feed) => {
     try {
       console.log('Performing remove for feed:', feed.title);
-      await removeFeed(feed.id || feed.url);
+      console.log('Feed data:', { id: feed.id, url: feed.url });
+      
+      // Always use URL for removal since FeedContext filters by URL
+      await removeFeed(feed.url);
       
       // For web platform, use window.alert for better compatibility
       if (Platform.OS === 'web') {

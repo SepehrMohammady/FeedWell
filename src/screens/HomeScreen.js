@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   overviewCard: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     padding: 16,
     borderRadius: 12,
@@ -250,10 +250,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginBottom: 8,
   },
   overviewContent: {
-    flex: 1,
+    alignItems: 'center',
   },
   overviewValue: {
     fontSize: 24,
@@ -262,6 +262,7 @@ const styles = StyleSheet.create({
   overviewTitle: {
     fontSize: 12,
     marginTop: 2,
+    textAlign: 'center',
   },
   quickActionsGrid: {
     flexDirection: 'row',
