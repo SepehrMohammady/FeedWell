@@ -174,35 +174,59 @@ export function FeedProvider({ children }) {
   const markArticleRead = useCallback(async (articleId) => {
     console.log('FeedContext: markArticleRead called for:', articleId);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
-    const updatedArticles = state.articles.map(article =>
-      article.id === articleId
-        ? { ...article, isRead: true, readAt: new Date().toISOString() }
-        : article
-    );
-    console.log('FeedContext: Updated articles with read status');
-    await saveArticles(updatedArticles);
-  }, [state.articles]);
+    // Get updated articles from storage after dispatch
+    try {
+      const storedArticles = await AsyncStorage.getItem('articles');
+      if (storedArticles) {
+        const articles = JSON.parse(storedArticles);
+        const updatedArticles = articles.map(article =>
+          article.id === articleId
+            ? { ...article, isRead: true, readAt: new Date().toISOString() }
+            : article
+        );
+        await saveArticles(updatedArticles);
+      }
+    } catch (error) {
+      console.error('Error updating article read status in storage:', error);
+    }
+  }, []);
 
   const markArticleUnread = useCallback(async (articleId) => {
     dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
-    const updatedArticles = state.articles.map(article =>
-      article.id === articleId
-        ? { ...article, isRead: false, readAt: null }
-        : article
-    );
-    await saveArticles(updatedArticles);
-  }, [state.articles]);
+    try {
+      const storedArticles = await AsyncStorage.getItem('articles');
+      if (storedArticles) {
+        const articles = JSON.parse(storedArticles);
+        const updatedArticles = articles.map(article =>
+          article.id === articleId
+            ? { ...article, isRead: false, readAt: null }
+            : article
+        );
+        await saveArticles(updatedArticles);
+      }
+    } catch (error) {
+      console.error('Error updating article unread status in storage:', error);
+    }
+  }, []);
 
   const markAllRead = useCallback(async () => {
     dispatch({ type: 'MARK_ALL_READ' });
-    const readTimestamp = new Date().toISOString();
-    const updatedArticles = state.articles.map(article => ({
-      ...article,
-      isRead: true,
-      readAt: readTimestamp
-    }));
-    await saveArticles(updatedArticles);
-  }, [state.articles]);
+    try {
+      const storedArticles = await AsyncStorage.getItem('articles');
+      if (storedArticles) {
+        const articles = JSON.parse(storedArticles);
+        const readTimestamp = new Date().toISOString();
+        const updatedArticles = articles.map(article => ({
+          ...article,
+          isRead: true,
+          readAt: readTimestamp
+        }));
+        await saveArticles(updatedArticles);
+      }
+    } catch (error) {
+      console.error('Error marking all articles as read in storage:', error);
+    }
+  }, []);
 
   const getUnreadArticles = useCallback(() => {
     return state.articles.filter(article => !article.isRead);
