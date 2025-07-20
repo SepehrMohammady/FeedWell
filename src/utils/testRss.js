@@ -38,5 +38,7 @@ export async function testRSSFeed(url) {
   return { success: false, error: 'All methods failed' };
 }
 
-// Quick test function you can call from browser console
-window.testFeed = testRSSFeed;
+// Quick test function you can call from browser console (web only)
+if (typeof window !== 'undefined') {
+  window.testFeed = testRSSFeed;
+}
