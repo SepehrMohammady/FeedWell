@@ -17,6 +17,7 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
+import { DataDiagnostics } from '../utils/DataDiagnostics';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, clearAllData } = useFeed();
@@ -38,25 +39,25 @@ export default function SettingsScreen({ navigation }) {
   }, [feeds]);
 
   const handleClearAllData = () => {
-    console.log('Attempting to clear all data');
+    console.log('⚠️ CRITICAL: User attempting to clear all data');
     
-    // For web platform, use window.confirm for better compatibility
+    // Extra warning for all platforms since this is permanent
     if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
-      const confirmed = window.confirm('Clear All Data?\n\nThis will remove all feeds and articles. This action cannot be undone.');
+      const confirmed = window.confirm('⚠️ PERMANENT DATA LOSS WARNING ⚠️\n\nThis will PERMANENTLY DELETE:\n• All your RSS feeds\n• All saved articles\n• All read/unread status\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?');
       if (confirmed) {
         performClearAllData();
       }
       return;
     }
     
-    // For mobile platforms, use Alert.alert
+    // For mobile platforms, use Alert.alert with stronger warning
     Alert.alert(
-      'Clear All Data',
-      'This will remove all feeds and articles. This action cannot be undone.',
+      '⚠️ PERMANENT DATA LOSS WARNING',
+      '⚠️ This will PERMANENTLY DELETE:\n\n• All your RSS feeds\n• All saved articles\n• All read/unread status\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to continue?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Clear',
+          text: '⚠️ DELETE EVERYTHING',
           style: 'destructive',
           onPress: () => performClearAllData(),
         },
@@ -123,6 +124,42 @@ export default function SettingsScreen({ navigation }) {
     } catch (error) {
       console.error('Error opening GitHub:', error);
       Alert.alert('Error', 'Failed to open GitHub repository');
+    }
+  };
+
+  const handleRunDiagnostics = async () => {
+    try {
+      console.log('🚀 User requested data diagnostics');
+      
+      if (Platform.OS === 'web') {
+        window.alert('Running diagnostics... Check the browser console for detailed results.');
+      } else {
+        Alert.alert('Running Diagnostics', 'Check the console for detailed results. This will help diagnose any data loss issues.');
+      }
+      
+      const results = await DataDiagnostics.runFullDiagnostics();
+      
+      // Also run our existing debug functions
+      console.log('🔧 Running additional debug checks...');
+      await testDataConsistency();
+      
+      if (Platform.OS === 'web') {
+        window.alert(`Diagnostics completed! Found ${results.storageInfo.keys.length} storage keys. Check console for full details.`);
+      } else {
+        Alert.alert(
+          'Diagnostics Complete', 
+          `Found ${results.storageInfo.keys.length} storage keys. Check console for detailed results.`
+        );
+      }
+      
+    } catch (error) {
+      console.error('❌ Error running diagnostics:', error);
+      
+      if (Platform.OS === 'web') {
+        window.alert('Error running diagnostics: ' + error.message);
+      } else {
+        Alert.alert('Error', 'Failed to run diagnostics: ' + error.message);
+      }
     }
   };
 
@@ -309,6 +346,12 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Debug" />
         <View style={styles.section}>
+          <SettingItem
+            title="Run Data Diagnostics"
+            description="Analyze storage and check for data loss issues"
+            onPress={handleRunDiagnostics}
+            rightElement={<Ionicons name="bug-outline" size={20} color="#007AFF" />}
+          />
           <SettingItem
             title="Add Demo Feed"
             description="Add a demo feed for testing removal"

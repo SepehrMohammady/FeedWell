@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: YoungSerif-Regular
+font link: https://github.com/uplaod/YoungSerif
+font author: Bastien Sozeau
+font author site: http://sozoo.fr/
+Slogan Font: Neuton-Extralight.ttf
+
+icon designer: Vladimir
+icon designer link: /creator/onmercury/
+        
+{"bg":"#004A66","icon":"#0EA7FF","font":"#ffffff","slogan":"#ffffff"}
+      

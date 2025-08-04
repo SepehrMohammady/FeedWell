@@ -87,47 +87,134 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
+  // Data integrity monitoring - check for data loss every 5 minutes when app is active
+  useEffect(() => {
+    const monitorDataIntegrity = async () => {
+      try {
+        const feeds = await AsyncStorage.getItem('feeds');
+        const articles = await AsyncStorage.getItem('articles');
+        
+        if (!feeds && state.feeds.length > 0) {
+          console.error('🚨 DATA LOSS DETECTED: Feeds in memory but not in storage!');
+          console.error('🚨 Feeds in memory:', state.feeds.length);
+          console.error('🚨 This suggests AsyncStorage was cleared or corrupted');
+        }
+        
+        if (!articles && state.articles.length > 0) {
+          console.error('🚨 DATA LOSS DETECTED: Articles in memory but not in storage!');
+          console.error('🚨 Articles in memory:', state.articles.length);
+        }
+        
+        if (feeds) {
+          const storedFeeds = JSON.parse(feeds);
+          if (storedFeeds.length !== state.feeds.length) {
+            console.warn('⚠️ Feed count mismatch between memory and storage');
+            console.warn('⚠️ Memory:', state.feeds.length, 'Storage:', storedFeeds.length);
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Error during data integrity check:', error);
+      }
+    };
+
+    // Run immediately and then every 5 minutes
+    monitorDataIntegrity();
+    const interval = setInterval(monitorDataIntegrity, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [state.feeds.length, state.articles.length]);
+
   const loadData = async () => {
     try {
-      console.log('Loading data from AsyncStorage...');
+      console.log('🔄 Loading data from AsyncStorage...');
+      console.log('🔄 Timestamp:', new Date().toISOString());
+      
+      // Get all keys first to see what's in storage
+      const allKeys = await AsyncStorage.getAllKeys();
+      console.log('🔑 All AsyncStorage keys:', allKeys);
       
       const feeds = await AsyncStorage.getItem('feeds');
       const articles = await AsyncStorage.getItem('articles');
       
-      console.log('Raw feeds data:', feeds);
-      console.log('Raw articles data:', articles ? 'Found' : 'None');
+      console.log('📦 Raw feeds data:', feeds ? `Found (${feeds.length} chars)` : 'NULL');
+      console.log('📦 Raw articles data:', articles ? `Found (${articles.length} chars)` : 'NULL');
       
       if (feeds) {
-        const parsedFeeds = JSON.parse(feeds);
-        console.log('Parsed feeds:', parsedFeeds);
-        dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+        try {
+          const parsedFeeds = JSON.parse(feeds);
+          console.log('✅ Parsed feeds successfully:', parsedFeeds.length, 'feeds');
+          console.log('📋 Feed URLs:', parsedFeeds.map(f => f.url));
+          dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+        } catch (parseError) {
+          console.error('❌ Error parsing feeds JSON:', parseError);
+          console.log('🔍 Corrupted feeds data:', feeds.substring(0, 200));
+        }
       } else {
-        console.log('No feeds found in storage');
+        console.log('⚠️ No feeds found in storage - this could indicate data loss!');
       }
       
       if (articles) {
-        const parsedArticles = JSON.parse(articles);
-        console.log('Parsed articles count:', parsedArticles.length);
-        dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+        try {
+          const parsedArticles = JSON.parse(articles);
+          console.log('✅ Parsed articles successfully:', parsedArticles.length, 'articles');
+          dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+        } catch (parseError) {
+          console.error('❌ Error parsing articles JSON:', parseError);
+          console.log('🔍 Corrupted articles data:', articles.substring(0, 200));
+        }
+      } else {
+        console.log('⚠️ No articles found in storage');
       }
+      
+      console.log('✅ Data loading completed');
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('❌ Critical error loading data:', error);
+      console.error('❌ Error stack:', error.stack);
     }
   };
 
   const saveFeeds = async (feeds) => {
     try {
-      await AsyncStorage.setItem('feeds', JSON.stringify(feeds));
+      console.log('💾 Saving feeds to AsyncStorage:', feeds.length, 'feeds');
+      const feedsJson = JSON.stringify(feeds);
+      console.log('💾 Feeds JSON size:', feedsJson.length, 'characters');
+      
+      await AsyncStorage.setItem('feeds', feedsJson);
+      
+      // Verify the save by reading it back
+      const verification = await AsyncStorage.getItem('feeds');
+      if (verification) {
+        const verifiedFeeds = JSON.parse(verification);
+        console.log('✅ Feeds save verified:', verifiedFeeds.length, 'feeds');
+      } else {
+        console.error('❌ Feed save verification failed - data is null!');
+      }
     } catch (error) {
-      console.error('Error saving feeds:', error);
+      console.error('❌ Error saving feeds:', error);
+      console.error('❌ Feeds data that failed to save:', feeds);
     }
   };
 
   const saveArticles = async (articles) => {
     try {
-      await AsyncStorage.setItem('articles', JSON.stringify(articles));
+      console.log('💾 Saving articles to AsyncStorage:', articles.length, 'articles');
+      const articlesJson = JSON.stringify(articles);
+      console.log('💾 Articles JSON size:', articlesJson.length, 'characters');
+      
+      await AsyncStorage.setItem('articles', articlesJson);
+      
+      // Verify the save by reading it back
+      const verification = await AsyncStorage.getItem('articles');
+      if (verification) {
+        const verifiedArticles = JSON.parse(verification);
+        console.log('✅ Articles save verified:', verifiedArticles.length, 'articles');
+      } else {
+        console.error('❌ Articles save verification failed - data is null!');
+      }
     } catch (error) {
-      console.error('Error saving articles:', error);
+      console.error('❌ Error saving articles:', error);
+      console.error('❌ Articles data that failed to save:', articles.length, 'items');
     }
   };
 
