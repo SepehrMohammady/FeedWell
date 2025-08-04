@@ -21,7 +21,8 @@ export const DataDiagnostics = {
       for (const key of keys) {
         try {
           const value = await AsyncStorage.getItem(key);
-          const size = value ? new Blob([value]).size : 0;
+          // Calculate size in bytes (each character is roughly 1 byte in UTF-8)
+          const size = value ? value.length : 0;
           const preview = value ? (value.length > 100 ? value.substring(0, 100) + '...' : value) : null;
           
           result.data[key] = {
