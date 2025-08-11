@@ -17,7 +17,6 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
-import { DataDiagnostics } from '../utils/DataDiagnostics';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, clearAllData } = useFeed();
@@ -39,25 +38,25 @@ export default function SettingsScreen({ navigation }) {
   }, [feeds]);
 
   const handleClearAllData = () => {
-    console.log('⚠️ CRITICAL: User attempting to clear all data');
+    console.log('Attempting to clear all data');
     
-    // Extra warning for all platforms since this is permanent
+    // For web platform, use window.confirm for better compatibility
     if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
-      const confirmed = window.confirm('⚠️ PERMANENT DATA LOSS WARNING ⚠️\n\nThis will PERMANENTLY DELETE:\n• All your RSS feeds\n• All saved articles\n• All read/unread status\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?');
+      const confirmed = window.confirm('Clear All Data?\n\nThis will remove all feeds and articles. This action cannot be undone.');
       if (confirmed) {
         performClearAllData();
       }
       return;
     }
     
-    // For mobile platforms, use Alert.alert with stronger warning
+    // For mobile platforms, use Alert.alert
     Alert.alert(
-      '⚠️ PERMANENT DATA LOSS WARNING',
-      '⚠️ This will PERMANENTLY DELETE:\n\n• All your RSS feeds\n• All saved articles\n• All read/unread status\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to continue?',
+      'Clear All Data',
+      'This will remove all feeds and articles. This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: '⚠️ DELETE EVERYTHING',
+          text: 'Clear',
           style: 'destructive',
           onPress: () => performClearAllData(),
         },
@@ -127,42 +126,6 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const handleRunDiagnostics = async () => {
-    try {
-      console.log('🚀 User requested data diagnostics');
-      
-      if (Platform.OS === 'web') {
-        window.alert('Running diagnostics... Check the browser console for detailed results.');
-      } else {
-        Alert.alert('Running Diagnostics', 'Check the console for detailed results. This will help diagnose any data loss issues.');
-      }
-      
-      const results = await DataDiagnostics.runFullDiagnostics();
-      
-      // Also run our existing debug functions
-      console.log('🔧 Running additional debug checks...');
-      await testDataConsistency();
-      
-      if (Platform.OS === 'web') {
-        window.alert(`Diagnostics completed! Found ${results.storageInfo.keys.length} storage keys. Check console for full details.`);
-      } else {
-        Alert.alert(
-          'Diagnostics Complete', 
-          `Found ${results.storageInfo.keys.length} storage keys. Check console for detailed results.`
-        );
-      }
-      
-    } catch (error) {
-      console.error('❌ Error running diagnostics:', error);
-      
-      if (Platform.OS === 'web') {
-        window.alert('Error running diagnostics: ' + error.message);
-      } else {
-        Alert.alert('Error', 'Failed to run diagnostics: ' + error.message);
-      }
-    }
-  };
-
   const SettingItem = ({ title, description, onPress, rightElement, showArrow = false }) => (
     <TouchableOpacity
       style={styles.settingItem}
@@ -179,6 +142,14 @@ export default function SettingsScreen({ navigation }) {
 
   const SectionHeader = ({ title }) => (
     <Text style={styles.sectionHeader}>{title}</Text>
+  );
+
+  const TesterItem = ({ children, isNote = false }) => (
+    <View style={styles.settingItem}>
+      <View style={styles.settingContent}>
+        <Text style={isNote ? styles.thanksNote : styles.testerName}>{children}</Text>
+      </View>
+    </View>
   );
 
   const styles = StyleSheet.create({
@@ -283,6 +254,18 @@ export default function SettingsScreen({ navigation }) {
       marginTop: 12,
       lineHeight: 16,
     },
+    thanksNote: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 2,
+    },
+    testerName: {
+      fontSize: 14,
+      fontWeight: '400',
+      color: theme.colors.textSecondary,
+      marginBottom: 2,
+    },
   });
 
   return (
@@ -347,12 +330,6 @@ export default function SettingsScreen({ navigation }) {
         <SectionHeader title="Debug" />
         <View style={styles.section}>
           <SettingItem
-            title="Run Data Diagnostics"
-            description="Analyze storage and check for data loss issues"
-            onPress={handleRunDiagnostics}
-            rightElement={<Ionicons name="bug-outline" size={20} color="#007AFF" />}
-          />
-          <SettingItem
             title="Add Demo Feed"
             description="Add a demo feed for testing removal"
             onPress={() => addDemoFeed()}
@@ -367,6 +344,13 @@ export default function SettingsScreen({ navigation }) {
             description="Log current feeds data"
             onPress={() => testDataConsistency()}
           />
+        </View>
+
+        <SectionHeader title="Thanks to Testers" />
+        <View style={styles.section}>
+          <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
+          <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
+          <TesterItem>Mohammad Torabi</TesterItem>
         </View>
 
         <SectionHeader title="About" />
