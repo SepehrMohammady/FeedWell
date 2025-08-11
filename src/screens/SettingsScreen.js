@@ -17,26 +17,11 @@ import { APP_VERSION } from '../config/version';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
-import { testFeedRemoval, testDataConsistency, addDemoFeed } from '../utils/debugFeedRemoval';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
-
-  // Debug: Log feeds when component mounts or feeds change
-  React.useEffect(() => {
-    console.log('SettingsScreen: Current feeds:', feeds);
-    console.log('SettingsScreen: Feeds count:', feeds.length);
-    feeds.forEach((feed, index) => {
-      console.log(`SettingsScreen: Feed ${index}:`, {
-        id: feed.id,
-        title: feed.title,
-        url: feed.url,
-        addedAt: feed.addedAt
-      });
-    });
-  }, [feeds]);
 
   const handleClearAllData = () => {
     console.log('Attempting to clear all data');
@@ -146,10 +131,8 @@ export default function SettingsScreen({ navigation }) {
   );
 
   const TesterItem = ({ children, isNote = false, isLast = false }) => (
-    <View style={[styles.settingItem, isLast && styles.settingItemLast]}>
-      <View style={styles.settingContent}>
-        <Text style={isNote ? styles.thanksNote : styles.testerName}>{children}</Text>
-      </View>
+    <View style={styles.testerItem}>
+      <Text style={isNote ? styles.thanksNote : styles.testerName}>{children}</Text>
     </View>
   );
 
@@ -255,17 +238,21 @@ export default function SettingsScreen({ navigation }) {
       marginTop: 12,
       lineHeight: 16,
     },
+    testerItem: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
     thanksNote: {
       fontSize: 18,
       fontWeight: '600',
       color: theme.colors.text,
-      marginBottom: 2,
+      marginBottom: 8,
     },
     testerName: {
       fontSize: 14,
       fontWeight: '400',
       color: theme.colors.textSecondary,
-      marginBottom: 2,
+      marginBottom: 4,
     },
   });
 
@@ -330,27 +317,7 @@ export default function SettingsScreen({ navigation }) {
           />
         </View>
 
-        <SectionHeader title="Debug" />
-        <View style={styles.section}>
-          <SettingItem
-            title="Add Demo Feed"
-            description="Add a demo feed for testing removal"
-            onPress={() => addDemoFeed()}
-          />
-          <SettingItem
-            title="Test Feed Removal"
-            description="Debug feed removal functionality"
-            onPress={() => testFeedRemoval()}
-          />
-          <SettingItem
-            title="Check Data Consistency"
-            description="Log current feeds data"
-            onPress={() => testDataConsistency()}
-            isLast={true}
-          />
-        </View>
-
-        <SectionHeader title="Thanks to Testers" />
+        <SectionHeader title="TESTERS" />
         <View style={styles.section}>
           <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
