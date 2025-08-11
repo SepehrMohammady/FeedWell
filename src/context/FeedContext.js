@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { autoBackup } from '../utils/CloudBackup';
 
 const FeedContext = createContext();
 
@@ -88,20 +87,6 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
-  // Auto-backup every 30 minutes
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        await autoBackup();
-        console.log('Periodic auto-backup completed');
-      } catch (error) {
-        console.log('Periodic auto-backup failed:', error.message);
-      }
-    }, 30 * 60 * 1000); // 30 minutes
-
-    return () => clearInterval(interval);
-  }, []);
-
   const loadData = async () => {
     try {
       console.log('Loading data from AsyncStorage...');
@@ -157,13 +142,6 @@ export function FeedProvider({ children }) {
     dispatch({ type: 'ADD_FEED', payload: newFeed });
     const updatedFeeds = [...state.feeds, newFeed];
     await saveFeeds(updatedFeeds);
-    
-    // Auto-backup after adding a feed
-    try {
-      await autoBackup();
-    } catch (error) {
-      console.log('Auto-backup failed after adding feed:', error.message);
-    }
   };
 
   const removeFeed = async (feedUrl) => {
@@ -179,13 +157,6 @@ export function FeedProvider({ children }) {
     await saveFeeds(updatedFeeds);
     await saveArticles(updatedArticles);
     
-    // Auto-backup after removing a feed
-    try {
-      await autoBackup();
-    } catch (error) {
-      console.log('Auto-backup failed after removing feed:', error.message);
-    }
-    
     console.log('Feed removal completed');
   };
 
@@ -195,15 +166,6 @@ export function FeedProvider({ children }) {
       index === self.findIndex(a => a.id === article.id)
     );
     await saveArticles(updatedArticles);
-    
-    // Auto-backup after adding articles (but only if significant number added)
-    try {
-      if (articles.length >= 5) {
-        await autoBackup();
-      }
-    } catch (error) {
-      console.log('Auto-backup failed after adding articles:', error.message);
-    }
   };
 
   const clearAllData = async () => {

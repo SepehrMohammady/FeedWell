@@ -160,114 +160,6 @@ export default function AddFeedScreen({ navigation }) {
     setUrl(feedUrl);
   };
 
-  const handleDirectAddFeed = async (feed) => {
-    // Check if feed already exists
-    if (feeds.some(existingFeed => existingFeed.url === feed.url)) {
-      Alert.alert('Already Added', `"${feed.name}" is already in your feeds`);
-      return;
-    }
-
-    // Show confirmation popup
-    Alert.alert(
-      'Add Feed',
-      `Add "${feed.name}" to your feeds?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Add', 
-          onPress: async () => {
-            setLoading(true);
-            try {
-              console.log('Adding categorized feed directly:', feed.name, feed.url);
-              
-              // Try primary parser first
-              let parsedFeed = null;
-              let articles = [];
-              
-              try {
-                const result = await parseRSSFeed(feed.url);
-                parsedFeed = result.feed;
-                articles = result.articles;
-              } catch (primaryError) {
-                console.log('Primary parser failed, trying CORS proxy:', primaryError.message);
-                try {
-                  const result = await parseRSSFeedWithProxy(feed.url);
-                  parsedFeed = result.feed;
-                  articles = result.articles;
-                } catch (proxyError) {
-                  console.log('CORS proxy parser also failed:', proxyError.message);
-                  throw proxyError;
-                }
-              }
-
-              if (parsedFeed) {
-                console.log('Successfully parsed feed, adding to context...');
-                await addFeed(parsedFeed);
-                
-                if (articles && articles.length > 0) {
-                  console.log(`Adding ${articles.length} articles...`);
-                  await addArticles(articles);
-                }
-
-                Alert.alert(
-                  'Success',
-                  `"${feed.name}" has been added successfully!${articles.length > 0 ? ` Found ${articles.length} articles.` : ''}`,
-                  [{ text: 'OK' }]
-                );
-              } else {
-                throw new Error('Failed to parse feed data');
-              }
-            } catch (error) {
-              console.error('Error adding categorized feed:', error);
-              console.error('Error details:', {
-                name: error.name,
-                message: error.message,
-                stack: error.stack
-              });
-              
-              let errorMessage = `Failed to add "${feed.name}". `;
-              
-              // More specific error handling
-              if (error.message.includes('Network request failed') || error.message.includes('fetch')) {
-                errorMessage += 'Network connection error. Please check your internet connection.';
-              } else if (error.message.includes('CORS')) {
-                errorMessage += 'This feed cannot be accessed due to browser security restrictions.';
-              } else if (error.message.includes('404') || error.message.includes('Not found')) {
-                errorMessage += 'The feed URL is not accessible (404 error).';
-              } else if (error.message.includes('Invalid') || error.message.includes('parse')) {
-                errorMessage += 'The feed format is invalid or unsupported.';
-              } else if (error.message.includes('timeout')) {
-                errorMessage += 'Request timed out. The feed server may be slow or unavailable.';
-              } else {
-                errorMessage += `${error.message}`;
-              }
-              
-              // Add troubleshooting tip
-              errorMessage += '\n\nTip: You can try adding the feed manually using the URL input above.';
-              
-              Alert.alert(
-                'Error', 
-                errorMessage,
-                [
-                  { text: 'Cancel', style: 'cancel' },
-                  { 
-                    text: 'Try Manual Add', 
-                    onPress: () => {
-                      setUrl(feed.url);
-                      console.log('Populated URL field for manual add:', feed.url);
-                    }
-                  }
-                ]
-              );
-            } finally {
-              setLoading(false);
-            }
-          }
-        }
-      ]
-    );
-  };
-
   const clearInput = () => {
     setUrl('');
   };
@@ -666,7 +558,7 @@ export default function AddFeedScreen({ navigation }) {
                     <TouchableOpacity
                       key={feedIndex}
                       style={styles.feedChip}
-                      onPress={() => handleDirectAddFeed(feed)}
+                      onPress={() => handlePopularFeed(feed.url)}
                       disabled={loading}
                     >
                       <Text style={styles.feedChipText}>{feed.name}</Text>
