@@ -40,3 +40,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# GitHub Copilot instructions (local development only)
+.github/copilot-instructions.md
