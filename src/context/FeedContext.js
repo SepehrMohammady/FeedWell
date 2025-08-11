@@ -87,6 +87,14 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
+  // Auto refresh on app start
+  useEffect(() => {
+    if (state.feeds.length > 0) {
+      console.log('Auto-refreshing feeds on app start...');
+      autoRefreshFeeds();
+    }
+  }, [state.feeds.length]);
+
   const loadData = async () => {
     try {
       console.log('Loading data from AsyncStorage...');
@@ -168,6 +176,33 @@ export function FeedProvider({ children }) {
     await saveArticles(updatedArticles);
   };
 
+  // Auto refresh function for app start
+  const autoRefreshFeeds = async () => {
+    if (state.feeds.length === 0) return;
+    
+    try {
+      console.log('Auto-refreshing feeds...');
+      const { parseRSSFeed } = require('../utils/rssParser');
+      const allArticles = [];
+      
+      for (const feed of state.feeds) {
+        try {
+          const parsedFeed = await parseRSSFeed(feed.url);
+          allArticles.push(...parsedFeed.articles);
+        } catch (error) {
+          console.error(`Error parsing feed ${feed.url} during auto-refresh:`, error);
+        }
+      }
+      
+      if (allArticles.length > 0) {
+        await addArticles(allArticles);
+        console.log(`Auto-refresh completed: ${allArticles.length} articles processed`);
+      }
+    } catch (error) {
+      console.error('Error during auto-refresh:', error);
+    }
+  };
+
   const clearAllData = async () => {
     console.log('FeedContext: clearAllData called');
     console.log('Current state before clearing:', { feeds: state.feeds.length, articles: state.articles.length });
@@ -244,6 +279,14 @@ export function FeedProvider({ children }) {
     return state.articles.filter(article => !article.isRead).length;
   }, [state.articles]);
 
+  const getReadArticles = useCallback(() => {
+    return state.articles.filter(article => article.isRead);
+  }, [state.articles]);
+
+  const getReadCount = useCallback(() => {
+    return state.articles.filter(article => article.isRead).length;
+  }, [state.articles]);
+
   const value = {
     ...state,
     addFeed,
@@ -255,6 +298,9 @@ export function FeedProvider({ children }) {
     markAllRead,
     getUnreadArticles,
     getUnreadCount,
+    getReadArticles,
+    getReadCount,
+    autoRefreshFeeds,
     setLoading: (loading) => dispatch({ type: 'SET_LOADING', payload: loading }),
     setError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
   };

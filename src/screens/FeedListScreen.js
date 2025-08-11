@@ -22,11 +22,13 @@ import ArticleImage from '../components/ArticleImage';
 import BookmarkButton from '../components/BookmarkButton';
 
 export default function FeedListScreen({ navigation }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount, getReadCount } = useFeed();
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
+  const [filter, setFilter] = useState('all'); // 'all', 'unread', 'read'
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
 
   useEffect(() => {
     if (feeds.length > 0) {
@@ -166,9 +168,59 @@ export default function FeedListScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const sortedArticles = articles.sort((a, b) => 
-    new Date(b.publishedDate) - new Date(a.publishedDate)
-  );
+  // Filter articles based on read status
+  const getFilteredArticles = () => {
+    let filtered = articles;
+    
+    switch (filter) {
+      case 'unread':
+        filtered = articles.filter(article => !article.isRead);
+        break;
+      case 'read':
+        filtered = articles.filter(article => article.isRead);
+        break;
+      default:
+        filtered = articles;
+    }
+
+    // Sort articles
+    if (sortOrder === 'newest') {
+      return filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+    } else {
+      return filtered.sort((a, b) => new Date(a.publishedDate) - new Date(b.publishedDate));
+    }
+  };
+
+  const filteredAndSortedArticles = getFilteredArticles();
+
+  const toggleFilter = () => {
+    if (filter === 'all') {
+      setFilter('unread');
+    } else if (filter === 'unread') {
+      setFilter('read');
+    } else {
+      setFilter('all');
+    }
+  };
+
+  const toggleSort = () => {
+    setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
+  };
+
+  const getFilterButtonText = () => {
+    switch (filter) {
+      case 'unread':
+        return `Unread (${getUnreadCount()})`;
+      case 'read':
+        return `Read (${getReadCount()})`;
+      default:
+        return 'All';
+    }
+  };
+
+  const getSortButtonIcon = () => {
+    return sortOrder === 'newest' ? 'arrow-down' : 'arrow-up';
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -199,6 +251,17 @@ export default function FeedListScreen({ navigation }) {
     headerButton: {
       padding: 8,
       marginRight: 8,
+    },
+    filterButtonText: {
+      fontSize: 12,
+      color: '#007AFF',
+      fontWeight: '600',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      backgroundColor: theme.colors.background,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#007AFF',
     },
     articleItem: {
       backgroundColor: theme.colors.surface,
@@ -388,6 +451,18 @@ export default function FeedListScreen({ navigation }) {
         <View style={styles.headerButtons}>
           <TouchableOpacity
             style={styles.headerButton}
+            onPress={toggleFilter}
+          >
+            <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={toggleSort}
+          >
+            <Ionicons name={getSortButtonIcon()} size={20} color="#007AFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
             onPress={handleMarkAllRead}
           >
             <Ionicons name="checkmark-done" size={24} color="#007AFF" />
@@ -409,21 +484,26 @@ export default function FeedListScreen({ navigation }) {
       )}
 
       <FlatList
-        data={sortedArticles}
+        data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
-        extraData={articles}
+        extraData={[articles, filter, sortOrder]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={articles.length === 0 ? styles.emptyList : null}
+        contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : null}
         ListEmptyComponent={
           !loading && (
             <View style={styles.emptyState}>
               <Ionicons name="refresh-outline" size={60} color="#ccc" />
-              <Text style={styles.emptyTitle}>No Articles</Text>
+              <Text style={styles.emptyTitle}>
+                {filter === 'unread' ? 'No Unread Articles' : 
+                 filter === 'read' ? 'No Read Articles' : 'No Articles'}
+              </Text>
               <Text style={styles.emptyDescription}>
-                Pull down to refresh your feeds
+                {filter === 'unread' ? 'All articles have been read' :
+                 filter === 'read' ? 'No articles have been read yet' :
+                 'Pull down to refresh your feeds'}
               </Text>
             </View>
           )
