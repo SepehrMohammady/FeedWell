@@ -8,6 +8,7 @@ const initialState = {
   articles: [],
   loading: false,
   error: null,
+  readingPosition: null, // { articleId: string, timestamp: string, position: number }
 };
 
 function feedReducer(state, action) {
@@ -75,6 +76,10 @@ function feedReducer(state, action) {
     case 'CLEAR_ALL_DATA':
       console.log('CLEAR_ALL_DATA: Clearing all feeds and articles');
       return { ...state, feeds: [], articles: [] };
+    case 'SET_READING_POSITION':
+      return { ...state, readingPosition: action.payload };
+    case 'CLEAR_READING_POSITION':
+      return { ...state, readingPosition: null };
     default:
       return state;
   }
@@ -101,9 +106,11 @@ export function FeedProvider({ children }) {
       
       const feeds = await AsyncStorage.getItem('feeds');
       const articles = await AsyncStorage.getItem('articles');
+      const readingPosition = await AsyncStorage.getItem('readingPosition');
       
       console.log('Raw feeds data:', feeds);
       console.log('Raw articles data:', articles ? 'Found' : 'None');
+      console.log('Raw reading position data:', readingPosition ? 'Found' : 'None');
       
       if (feeds) {
         const parsedFeeds = JSON.parse(feeds);
@@ -117,6 +124,12 @@ export function FeedProvider({ children }) {
         const parsedArticles = JSON.parse(articles);
         console.log('Parsed articles count:', parsedArticles.length);
         dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+      }
+
+      if (readingPosition) {
+        const parsedPosition = JSON.parse(readingPosition);
+        console.log('Parsed reading position:', parsedPosition);
+        dispatch({ type: 'SET_READING_POSITION', payload: parsedPosition });
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -287,6 +300,44 @@ export function FeedProvider({ children }) {
     return state.articles.filter(article => article.isRead).length;
   }, [state.articles]);
 
+  const setReadingPosition = useCallback(async (articleId, position = 0) => {
+    try {
+      const readingPosition = {
+        articleId,
+        timestamp: new Date().toISOString(),
+        position
+      };
+      dispatch({ type: 'SET_READING_POSITION', payload: readingPosition });
+      await AsyncStorage.setItem('readingPosition', JSON.stringify(readingPosition));
+      console.log('Reading position set:', readingPosition);
+    } catch (error) {
+      console.error('Error setting reading position:', error);
+    }
+  }, []);
+
+  const clearReadingPosition = useCallback(async () => {
+    try {
+      dispatch({ type: 'CLEAR_READING_POSITION' });
+      await AsyncStorage.removeItem('readingPosition');
+      console.log('Reading position cleared');
+    } catch (error) {
+      console.error('Error clearing reading position:', error);
+    }
+  }, []);
+
+  const loadReadingPosition = useCallback(async () => {
+    try {
+      const readingPosition = await AsyncStorage.getItem('readingPosition');
+      if (readingPosition) {
+        const parsedPosition = JSON.parse(readingPosition);
+        dispatch({ type: 'SET_READING_POSITION', payload: parsedPosition });
+        console.log('Reading position loaded:', parsedPosition);
+      }
+    } catch (error) {
+      console.error('Error loading reading position:', error);
+    }
+  }, []);
+
   const value = {
     ...state,
     addFeed,
@@ -301,6 +352,9 @@ export function FeedProvider({ children }) {
     getReadArticles,
     getReadCount,
     autoRefreshFeeds,
+    setReadingPosition,
+    clearReadingPosition,
+    loadReadingPosition,
     setLoading: (loading) => dispatch({ type: 'SET_LOADING', payload: loading }),
     setError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
   };

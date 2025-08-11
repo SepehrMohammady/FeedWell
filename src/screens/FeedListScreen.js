@@ -20,9 +20,10 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
 import BookmarkButton from '../components/BookmarkButton';
+import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 
 export default function FeedListScreen({ navigation }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount, getReadCount } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
@@ -120,53 +121,119 @@ export default function FeedListScreen({ navigation }) {
     navigation.navigate('ArticleActions', { article });
   };
 
-  const renderArticle = ({ item }) => (
-    <TouchableOpacity
-      style={styles.articleItem}
-      onPress={() => handleArticlePress(item)}
-    >
-      <View style={styles.articleContent}>
-        <View style={styles.articleHeader}>
-          <View style={styles.titleRow}>
-            {!item.isRead && (
-              <View style={styles.unreadBullet} />
+  const handleSetReadingPosition = (article, index) => {
+    setReadingPosition(article.id, index);
+    Alert.alert(
+      'Reading Position Set',
+      'You can now continue reading from this point by tapping the bookmark indicator.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleGoToReadingPosition = () => {
+    if (readingPosition && readingPosition.articleId) {
+      const article = articles.find(a => a.id === readingPosition.articleId);
+      if (article) {
+        // Navigate to the article or scroll to it
+        handleArticlePress(article);
+      } else {
+        // Article might have been deleted, clear the position
+        clearReadingPosition();
+        Alert.alert('Article Not Found', 'The bookmarked article is no longer available.');
+      }
+    }
+  };
+
+  const handleClearReadingPosition = () => {
+    Alert.alert(
+      'Clear Reading Position',
+      'Are you sure you want to remove the reading position bookmark?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Clear', 
+          style: 'destructive',
+          onPress: clearReadingPosition
+        }
+      ]
+    );
+  };
+
+  const renderArticle = ({ item, index }) => {
+    const isBookmarkedPosition = readingPosition && readingPosition.articleId === item.id;
+    
+    return (
+      <View>
+        <TouchableOpacity
+          style={[
+            styles.articleItem,
+            isBookmarkedPosition && styles.bookmarkedArticle
+          ]}
+          onPress={() => handleArticlePress(item)}
+        >
+          <View style={styles.articleContent}>
+            <View style={styles.articleHeader}>
+              <View style={styles.titleRow}>
+                {!item.isRead && (
+                  <View style={styles.unreadBullet} />
+                )}
+                {isBookmarkedPosition && (
+                  <Ionicons 
+                    name="bookmark" 
+                    size={16} 
+                    color={theme.colors.accent} 
+                    style={styles.bookmarkIcon}
+                  />
+                )}
+                <Text style={styles.feedTitle} numberOfLines={1}>
+                  {item.feedTitle}
+                </Text>
+              </View>
+              <View style={styles.articleMeta}>
+                <TouchableOpacity
+                  onPress={() => handleSetReadingPosition(item, index)}
+                  style={styles.positionButton}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Ionicons 
+                    name="bookmark-outline" 
+                    size={16} 
+                    color={theme.colors.textSecondary} 
+                  />
+                </TouchableOpacity>
+                <Text style={styles.articleDate}>
+                  {formatDate(item.publishedDate)}
+                </Text>
+                <BookmarkButton 
+                  article={item} 
+                  size={20} 
+                  style={styles.bookmarkButton}
+                />
+              </View>
+            </View>
+            
+            <Text style={styles.articleTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
+            
+            {item.description && (
+              <Text style={styles.articleDescription} numberOfLines={2}>
+                {item.description}
+              </Text>
             )}
-            <Text style={styles.feedTitle} numberOfLines={1}>
-              {item.feedTitle}
-            </Text>
           </View>
-          <View style={styles.articleMeta}>
-            <Text style={styles.articleDate}>
-              {formatDate(item.publishedDate)}
-            </Text>
-            <BookmarkButton 
-              article={item} 
-              size={20} 
-              style={styles.bookmarkButton}
+          
+          {showImages && (
+            <ArticleImage
+              uri={item.imageUrl}
+              style={styles.articleImage}
+              resizeMode="cover"
             />
-          </View>
-        </View>
-        
-        <Text style={styles.articleTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
-        
-        {item.description && (
-          <Text style={styles.articleDescription} numberOfLines={2}>
-            {item.description}
-          </Text>
-        )}
+          )}
+        </TouchableOpacity>
       </View>
-      
-      {showImages && (
-        <ArticleImage
-          uri={item.imageUrl}
-          style={styles.articleImage}
-          resizeMode="cover"
-        />
-      )}
-    </TouchableOpacity>
-  );
+    );
+  };
 
   // Filter articles based on read status
   const getFilteredArticles = () => {
@@ -314,6 +381,17 @@ export default function FeedListScreen({ navigation }) {
       width: 32,
       height: 32,
       borderRadius: 16,
+    },
+    positionButton: {
+      padding: 4,
+      marginRight: 8,
+    },
+    bookmarkedArticle: {
+      borderLeftWidth: 4,
+      borderLeftColor: theme.colors.accent,
+    },
+    bookmarkIcon: {
+      marginRight: 6,
     },
     articleTitle: {
       fontSize: 16,
@@ -483,11 +561,18 @@ export default function FeedListScreen({ navigation }) {
         </View>
       )}
 
+      {readingPosition && readingPosition.articleId && (
+        <ReadingPositionIndicator
+          onPress={handleGoToReadingPosition}
+          onClear={handleClearReadingPosition}
+        />
+      )}
+
       <FlatList
         data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
-        extraData={[articles, filter, sortOrder]}
+        extraData={[articles, filter, sortOrder, readingPosition]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
