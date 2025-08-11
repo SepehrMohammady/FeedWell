@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { APP_VERSION } from '../config/version';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
@@ -364,7 +365,7 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title="Version"
-            description="0.3.1 (Stable)"
+            description={APP_VERSION.fullVersion}
           />
           <SettingItem
             title="Developer"

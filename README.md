@@ -135,25 +135,39 @@ expo build:ios
 expo build:web
 ```
 
-## 🔄 Recent Updates (v0.3.0)
+## 🔄 Recent Updates (v0.6.3)
+
+### ✨ New Features
+- **Reading Position Bookmarks** - Visual markers to track your reading progress between articles
+- **Auto-scroll functionality** - Automatically scrolls to your last reading position when opening Feeds tab
+- **Centralized version management** - Consistent versioning across all app files and configurations
 
 ### ✅ Bug Fixes & Improvements
-- **Fixed feed removal functionality** - Feeds now properly delete when requested
-- **Fixed UI layout issues** - Overview cards display correctly with icons above text
-- **Resolved app crashes** - Proper gesture handler integration for standalone builds
-- **Fixed data persistence** - User feeds no longer get deleted on app restart
-- **Version synchronization** - Consistent versioning across all configuration files
+- **Fixed navigation bug** - Adding feeds now properly navigates to Feeds tab without requiring app restart
+- **Improved reading experience** - Narrow bullet design for reading position indicators
+- **Enhanced stability** - Fixed crashes related to undefined array access in auto-scroll functionality
+- **Better UX flow** - Smooth navigation transitions after feed operations
+
+### 🛠️ Development Improvements
+- **Version Management System** - Automated script for updating versions across all files
+- **Enhanced build process** - Proper versionCode setup for Android APK builds
+- **Better documentation** - Comprehensive version management guide in `/docs/`
 
 ### 🧹 Code Quality
 - **Project cleanup** - Removed unused debug files and outdated build scripts
 - **Enhanced error handling** - Better error messages and recovery mechanisms
 - **Improved performance** - Optimized feed parsing and storage operations
-- **Cleaner codebase** - Removed development artifacts and streamlined architecture
 
-### 🛠️ Development Improvements
-- **EAS Build integration** - Modern build system for reliable APK/IPA generation
-- **Enhanced debugging** - Comprehensive logging and debugging utilities
-- **Better git workflow** - Improved .gitignore and commit practices
+## 📋 Version Management
+
+This project uses a centralized version management system. To update the version:
+
+```bash
+# Update to a new version (automatically updates all files)
+npm run update-version 0.7.0
+```
+
+For detailed information, see [Version Management Guide](docs/VERSION_MANAGEMENT.md).
 
 ## Contributing
 

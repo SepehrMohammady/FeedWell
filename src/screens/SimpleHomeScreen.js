@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { APP_VERSION } from '../config/version';
 
 export default function SimpleHomeScreen({ navigation }) {
   const handleAddFeed = () => {
@@ -48,7 +49,7 @@ export default function SimpleHomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         
-        <Text style={styles.version}>Version 0.1.0 (Beta)</Text>
+        <Text style={styles.version}>Version {APP_VERSION.fullVersion}</Text>
       </View>
     </SafeAreaView>
   );
