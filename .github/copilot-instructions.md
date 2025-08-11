@@ -47,3 +47,6 @@ FeedWell is a cross-platform RSS feed reader built with React Native and Expo. T
 - Supports both RSS and Atom feeds
 - Graceful error handling for network issues
 - Responsive design for different screen sizes
+
+## Custom Instruction
+- Everytime that you updating the app, please update the version number based on standard rules of version updating system.
