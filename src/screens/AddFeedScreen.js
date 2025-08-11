@@ -565,7 +565,10 @@ export default function AddFeedScreen({ navigation }) {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.reset({
+              index: 0,
+              routes: [{ name: 'FeedList' }],
+            })}
           >
             <Ionicons name="close" size={24} color="#007AFF" />
           </TouchableOpacity>
