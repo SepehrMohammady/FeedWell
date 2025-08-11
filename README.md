@@ -1,6 +1,14 @@
 # FeedWell - Cross-Platform RSS Reader
+- **Error Handling**: Comprehensive error handling and └── config/         # App configuration and version management
+```
 
-FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. It provides a clean reading experience across Android, iOS, and Windows platforms, automatically blocking ads and tracking scripts.
+## 🛠️ Development
+
+### Version Managementry
+
+## 🚀 Getting Started
+
+### PrerequisitesWell is a modern, ad-free RSS feed reader built with React Native and Expo. It provides a clean reading experience across Android, iOS, and Windows platforms, automatically blocking ads and tracking scripts.
 
 ## ✨ Key Features
 
