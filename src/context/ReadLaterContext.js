@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { autoBackup } from '../utils/CloudBackup';
 
 const ReadLaterContext = createContext();
 
@@ -104,7 +105,7 @@ export function ReadLaterProvider({ children }) {
     }
   };
 
-  const addToReadLater = (article) => {
+  const addToReadLater = async (article) => {
     // Check if article is already in read later
     const exists = state.articles.some(existingArticle => existingArticle.id === article.id);
     if (!exists) {
@@ -113,13 +114,28 @@ export function ReadLaterProvider({ children }) {
         addedToReadLater: new Date().toISOString(),
       };
       dispatch({ type: ADD_TO_READ_LATER, payload: articleWithTimestamp });
+      
+      // Auto-backup after adding to read later
+      try {
+        await autoBackup();
+      } catch (error) {
+        console.log('Auto-backup failed after adding to read later:', error.message);
+      }
+      
       return true; // Successfully added
     }
     return false; // Already exists
   };
 
-  const removeFromReadLater = (articleId) => {
+  const removeFromReadLater = async (articleId) => {
     dispatch({ type: REMOVE_FROM_READ_LATER, payload: articleId });
+    
+    // Auto-backup after removing from read later
+    try {
+      await autoBackup();
+    } catch (error) {
+      console.log('Auto-backup failed after removing from read later:', error.message);
+    }
   };
 
   const clearReadLater = async () => {

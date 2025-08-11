@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { autoBackup } from '../utils/CloudBackup';
 
 const FeedContext = createContext();
 
@@ -87,134 +88,61 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
-  // Data integrity monitoring - check for data loss every 5 minutes when app is active
+  // Auto-backup every 30 minutes
   useEffect(() => {
-    const monitorDataIntegrity = async () => {
+    const interval = setInterval(async () => {
       try {
-        const feeds = await AsyncStorage.getItem('feeds');
-        const articles = await AsyncStorage.getItem('articles');
-        
-        if (!feeds && state.feeds.length > 0) {
-          console.error('🚨 DATA LOSS DETECTED: Feeds in memory but not in storage!');
-          console.error('🚨 Feeds in memory:', state.feeds.length);
-          console.error('🚨 This suggests AsyncStorage was cleared or corrupted');
-        }
-        
-        if (!articles && state.articles.length > 0) {
-          console.error('🚨 DATA LOSS DETECTED: Articles in memory but not in storage!');
-          console.error('🚨 Articles in memory:', state.articles.length);
-        }
-        
-        if (feeds) {
-          const storedFeeds = JSON.parse(feeds);
-          if (storedFeeds.length !== state.feeds.length) {
-            console.warn('⚠️ Feed count mismatch between memory and storage');
-            console.warn('⚠️ Memory:', state.feeds.length, 'Storage:', storedFeeds.length);
-          }
-        }
-        
+        await autoBackup();
+        console.log('Periodic auto-backup completed');
       } catch (error) {
-        console.error('❌ Error during data integrity check:', error);
+        console.log('Periodic auto-backup failed:', error.message);
       }
-    };
+    }, 30 * 60 * 1000); // 30 minutes
 
-    // Run immediately and then every 5 minutes
-    monitorDataIntegrity();
-    const interval = setInterval(monitorDataIntegrity, 5 * 60 * 1000);
-    
     return () => clearInterval(interval);
-  }, [state.feeds.length, state.articles.length]);
+  }, []);
 
   const loadData = async () => {
     try {
-      console.log('🔄 Loading data from AsyncStorage...');
-      console.log('🔄 Timestamp:', new Date().toISOString());
-      
-      // Get all keys first to see what's in storage
-      const allKeys = await AsyncStorage.getAllKeys();
-      console.log('🔑 All AsyncStorage keys:', allKeys);
+      console.log('Loading data from AsyncStorage...');
       
       const feeds = await AsyncStorage.getItem('feeds');
       const articles = await AsyncStorage.getItem('articles');
       
-      console.log('📦 Raw feeds data:', feeds ? `Found (${feeds.length} chars)` : 'NULL');
-      console.log('📦 Raw articles data:', articles ? `Found (${articles.length} chars)` : 'NULL');
+      console.log('Raw feeds data:', feeds);
+      console.log('Raw articles data:', articles ? 'Found' : 'None');
       
       if (feeds) {
-        try {
-          const parsedFeeds = JSON.parse(feeds);
-          console.log('✅ Parsed feeds successfully:', parsedFeeds.length, 'feeds');
-          console.log('📋 Feed URLs:', parsedFeeds.map(f => f.url));
-          dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
-        } catch (parseError) {
-          console.error('❌ Error parsing feeds JSON:', parseError);
-          console.log('🔍 Corrupted feeds data:', feeds.substring(0, 200));
-        }
+        const parsedFeeds = JSON.parse(feeds);
+        console.log('Parsed feeds:', parsedFeeds);
+        dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
       } else {
-        console.log('⚠️ No feeds found in storage - this could indicate data loss!');
+        console.log('No feeds found in storage');
       }
       
       if (articles) {
-        try {
-          const parsedArticles = JSON.parse(articles);
-          console.log('✅ Parsed articles successfully:', parsedArticles.length, 'articles');
-          dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
-        } catch (parseError) {
-          console.error('❌ Error parsing articles JSON:', parseError);
-          console.log('🔍 Corrupted articles data:', articles.substring(0, 200));
-        }
-      } else {
-        console.log('⚠️ No articles found in storage');
+        const parsedArticles = JSON.parse(articles);
+        console.log('Parsed articles count:', parsedArticles.length);
+        dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
       }
-      
-      console.log('✅ Data loading completed');
     } catch (error) {
-      console.error('❌ Critical error loading data:', error);
-      console.error('❌ Error stack:', error.stack);
+      console.error('Error loading data:', error);
     }
   };
 
   const saveFeeds = async (feeds) => {
     try {
-      console.log('💾 Saving feeds to AsyncStorage:', feeds.length, 'feeds');
-      const feedsJson = JSON.stringify(feeds);
-      console.log('💾 Feeds JSON size:', feedsJson.length, 'characters');
-      
-      await AsyncStorage.setItem('feeds', feedsJson);
-      
-      // Verify the save by reading it back
-      const verification = await AsyncStorage.getItem('feeds');
-      if (verification) {
-        const verifiedFeeds = JSON.parse(verification);
-        console.log('✅ Feeds save verified:', verifiedFeeds.length, 'feeds');
-      } else {
-        console.error('❌ Feed save verification failed - data is null!');
-      }
+      await AsyncStorage.setItem('feeds', JSON.stringify(feeds));
     } catch (error) {
-      console.error('❌ Error saving feeds:', error);
-      console.error('❌ Feeds data that failed to save:', feeds);
+      console.error('Error saving feeds:', error);
     }
   };
 
   const saveArticles = async (articles) => {
     try {
-      console.log('💾 Saving articles to AsyncStorage:', articles.length, 'articles');
-      const articlesJson = JSON.stringify(articles);
-      console.log('💾 Articles JSON size:', articlesJson.length, 'characters');
-      
-      await AsyncStorage.setItem('articles', articlesJson);
-      
-      // Verify the save by reading it back
-      const verification = await AsyncStorage.getItem('articles');
-      if (verification) {
-        const verifiedArticles = JSON.parse(verification);
-        console.log('✅ Articles save verified:', verifiedArticles.length, 'articles');
-      } else {
-        console.error('❌ Articles save verification failed - data is null!');
-      }
+      await AsyncStorage.setItem('articles', JSON.stringify(articles));
     } catch (error) {
-      console.error('❌ Error saving articles:', error);
-      console.error('❌ Articles data that failed to save:', articles.length, 'items');
+      console.error('Error saving articles:', error);
     }
   };
 
@@ -229,6 +157,13 @@ export function FeedProvider({ children }) {
     dispatch({ type: 'ADD_FEED', payload: newFeed });
     const updatedFeeds = [...state.feeds, newFeed];
     await saveFeeds(updatedFeeds);
+    
+    // Auto-backup after adding a feed
+    try {
+      await autoBackup();
+    } catch (error) {
+      console.log('Auto-backup failed after adding feed:', error.message);
+    }
   };
 
   const removeFeed = async (feedUrl) => {
@@ -244,6 +179,13 @@ export function FeedProvider({ children }) {
     await saveFeeds(updatedFeeds);
     await saveArticles(updatedArticles);
     
+    // Auto-backup after removing a feed
+    try {
+      await autoBackup();
+    } catch (error) {
+      console.log('Auto-backup failed after removing feed:', error.message);
+    }
+    
     console.log('Feed removal completed');
   };
 
@@ -253,6 +195,15 @@ export function FeedProvider({ children }) {
       index === self.findIndex(a => a.id === article.id)
     );
     await saveArticles(updatedArticles);
+    
+    // Auto-backup after adding articles (but only if significant number added)
+    try {
+      if (articles.length >= 5) {
+        await autoBackup();
+      }
+    } catch (error) {
+      console.log('Auto-backup failed after adding articles:', error.message);
+    }
   };
 
   const clearAllData = async () => {

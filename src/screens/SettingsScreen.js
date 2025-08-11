@@ -126,9 +126,9 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const SettingItem = ({ title, description, onPress, rightElement, showArrow = false }) => (
+  const SettingItem = ({ title, description, onPress, rightElement, showArrow = false, isLast = false }) => (
     <TouchableOpacity
-      style={styles.settingItem}
+      style={[styles.settingItem, isLast && styles.settingItemLast]}
       onPress={onPress}
       disabled={!onPress && !showArrow}
     >
@@ -144,8 +144,8 @@ export default function SettingsScreen({ navigation }) {
     <Text style={styles.sectionHeader}>{title}</Text>
   );
 
-  const TesterItem = ({ children, isNote = false }) => (
-    <View style={styles.settingItem}>
+  const TesterItem = ({ children, isNote = false, isLast = false }) => (
+    <View style={[styles.settingItem, isLast && styles.settingItemLast]}>
       <View style={styles.settingContent}>
         <Text style={isNote ? styles.thanksNote : styles.testerName}>{children}</Text>
       </View>
@@ -306,6 +306,7 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title="Dark Mode"
             description="Switch between light and dark themes"
+            isLast={true}
             rightElement={
               <Switch
                 value={isDarkMode}
@@ -323,6 +324,7 @@ export default function SettingsScreen({ navigation }) {
             title="Clear All Data"
             description="Remove all feeds and articles"
             onPress={handleClearAllData}
+            isLast={true}
             rightElement={<Ionicons name="trash-outline" size={20} color="#ff3b30" />}
           />
         </View>
@@ -343,6 +345,7 @@ export default function SettingsScreen({ navigation }) {
             title="Check Data Consistency"
             description="Log current feeds data"
             onPress={() => testDataConsistency()}
+            isLast={true}
           />
         </View>
 
@@ -350,7 +353,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
-          <TesterItem>Mohammad Torabi</TesterItem>
+          <TesterItem isLast={true}>Mohammad Torabi</TesterItem>
         </View>
 
         <SectionHeader title="About" />
@@ -361,7 +364,7 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title="Version"
-            description="0.3.0 (Stable)"
+            description="0.3.1 (Stable)"
           />
           <SettingItem
             title="Developer"
@@ -378,6 +381,7 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title="Privacy"
             description="No data is collected or shared"
+            isLast={true}
           />
         </View>
 
