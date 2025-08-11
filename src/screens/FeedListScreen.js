@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ export default function FeedListScreen({ navigation }) {
   const [forceRender, setForceRender] = useState(0);
   const [filter, setFilter] = useState('all'); // 'all', 'unread', 'read'
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     if (feeds.length > 0) {
@@ -41,7 +42,26 @@ export default function FeedListScreen({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       setForceRender(prev => prev + 1);
-    }, [])
+      
+      // Auto-scroll to reading position when tab becomes active
+      if (readingPosition && readingPosition.position !== undefined && flatListRef.current && filteredAndSortedArticles && filteredAndSortedArticles.length > 0) {
+        // Wait a bit for the FlatList to render
+        setTimeout(() => {
+          try {
+            // Use simple offset calculation instead of scrollToIndex
+            const itemHeight = 150; // Approximate height per article item
+            const targetOffset = readingPosition.position * itemHeight;
+            
+            flatListRef.current.scrollToOffset({
+              offset: targetOffset,
+              animated: true,
+            });
+          } catch (error) {
+            console.log('Auto-scroll failed:', error);
+          }
+        }, 500);
+      }
+    }, [readingPosition, filteredAndSortedArticles])
   );
 
   const refreshFeeds = async () => {
@@ -121,33 +141,26 @@ export default function FeedListScreen({ navigation }) {
     navigation.navigate('ArticleActions', { article });
   };
 
-  const handleSetReadingPosition = (article, index) => {
-    setReadingPosition(article.id, index);
+  const handleSetReadingPosition = (afterIndex) => {
+    setReadingPosition(`after_article_${afterIndex}`, afterIndex);
     Alert.alert(
       'Reading Position Set',
-      'You can now continue reading from this point by tapping the bookmark indicator.',
+      'You can now continue reading from this position. The line will help you remember where you left off.',
       [{ text: 'OK' }]
     );
   };
 
   const handleGoToReadingPosition = () => {
-    if (readingPosition && readingPosition.articleId) {
-      const article = articles.find(a => a.id === readingPosition.articleId);
-      if (article) {
-        // Navigate to the article or scroll to it
-        handleArticlePress(article);
-      } else {
-        // Article might have been deleted, clear the position
-        clearReadingPosition();
-        Alert.alert('Article Not Found', 'The bookmarked article is no longer available.');
-      }
+    if (readingPosition && readingPosition.position !== undefined) {
+      // The position is already visible in the list, no need to navigate
+      Alert.alert('Reading Position', 'You can see your reading position marked in the list below.');
     }
   };
 
   const handleClearReadingPosition = () => {
     Alert.alert(
       'Clear Reading Position',
-      'Are you sure you want to remove the reading position bookmark?',
+      'Are you sure you want to remove the reading position line?',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
@@ -160,14 +173,16 @@ export default function FeedListScreen({ navigation }) {
   };
 
   const renderArticle = ({ item, index }) => {
-    const isBookmarkedPosition = readingPosition && readingPosition.articleId === item.id;
+    const isBeforeReadingPosition = readingPosition && 
+      readingPosition.position !== undefined && 
+      index <= readingPosition.position;
     
     return (
       <View>
         <TouchableOpacity
           style={[
             styles.articleItem,
-            isBookmarkedPosition && styles.bookmarkedArticle
+            isBeforeReadingPosition && styles.readPositionArticle
           ]}
           onPress={() => handleArticlePress(item)}
         >
@@ -177,30 +192,11 @@ export default function FeedListScreen({ navigation }) {
                 {!item.isRead && (
                   <View style={styles.unreadBullet} />
                 )}
-                {isBookmarkedPosition && (
-                  <Ionicons 
-                    name="bookmark" 
-                    size={16} 
-                    color={theme.colors.accent} 
-                    style={styles.bookmarkIcon}
-                  />
-                )}
                 <Text style={styles.feedTitle} numberOfLines={1}>
                   {item.feedTitle}
                 </Text>
               </View>
               <View style={styles.articleMeta}>
-                <TouchableOpacity
-                  onPress={() => handleSetReadingPosition(item, index)}
-                  style={styles.positionButton}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Ionicons 
-                    name="bookmark-outline" 
-                    size={16} 
-                    color={theme.colors.textSecondary} 
-                  />
-                </TouchableOpacity>
                 <Text style={styles.articleDate}>
                   {formatDate(item.publishedDate)}
                 </Text>
@@ -231,12 +227,34 @@ export default function FeedListScreen({ navigation }) {
             />
           )}
         </TouchableOpacity>
+
+        {/* Show reading position line after this article if it matches */}
+        {readingPosition && readingPosition.position === index && (
+          <ReadingPositionIndicator
+            onPress={handleGoToReadingPosition}
+            onClear={handleClearReadingPosition}
+            isActive={true}
+          />
+        )}
+
+        {/* Show potential reading position lines between articles */}
+        {(!readingPosition || readingPosition.position !== index) && (
+          <ReadingPositionIndicator
+            onPress={() => handleSetReadingPosition(index)}
+            onClear={() => {}}
+            isActive={false}
+          />
+        )}
       </View>
     );
   };
 
   // Filter articles based on read status
   const getFilteredArticles = () => {
+    if (!articles || !Array.isArray(articles)) {
+      return [];
+    }
+    
     let filtered = articles;
     
     switch (filter) {
@@ -382,16 +400,10 @@ export default function FeedListScreen({ navigation }) {
       height: 32,
       borderRadius: 16,
     },
-    positionButton: {
-      padding: 4,
-      marginRight: 8,
-    },
-    bookmarkedArticle: {
-      borderLeftWidth: 4,
+    readPositionArticle: {
+      opacity: 0.7,
+      borderLeftWidth: 3,
       borderLeftColor: theme.colors.accent,
-    },
-    bookmarkIcon: {
-      marginRight: 6,
     },
     articleTitle: {
       fontSize: 16,
@@ -561,14 +573,8 @@ export default function FeedListScreen({ navigation }) {
         </View>
       )}
 
-      {readingPosition && readingPosition.articleId && (
-        <ReadingPositionIndicator
-          onPress={handleGoToReadingPosition}
-          onClear={handleClearReadingPosition}
-        />
-      )}
-
       <FlatList
+        ref={flatListRef}
         data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}

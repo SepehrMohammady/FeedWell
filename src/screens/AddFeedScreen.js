@@ -132,7 +132,16 @@ export default function AddFeedScreen({ navigation }) {
       Alert.alert(
         'Success',
         `Added "${feedData.title}" with ${feedData.articles?.length || 0} articles`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ 
+          text: 'OK', 
+          onPress: () => {
+            // Reset to FeedList screen in the Feeds tab
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'FeedList' }],
+            });
+          }
+        }]
       );
     } catch (error) {
       console.error('Error adding feed:', error);

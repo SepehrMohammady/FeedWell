@@ -1,87 +1,52 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
-export default function ReadingPositionIndicator({ onPress, onClear, style }) {
+export default function ReadingPositionIndicator({ onPress, onClear, isActive = false, style }) {
   const { theme } = useTheme();
 
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.accent + '20',
-      borderColor: theme.colors.accent,
-      borderWidth: 2,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      marginHorizontal: 16,
-      marginVertical: 4,
+      marginHorizontal: 20,
+      marginVertical: 2,
+      paddingVertical: 4,
       ...style,
     },
-    icon: {
-      marginRight: 8,
-    },
-    textContainer: {
+    line: {
       flex: 1,
+      height: 1,
+      backgroundColor: isActive ? theme.colors.accent : theme.colors.border,
     },
-    title: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: theme.colors.accent,
-      marginBottom: 2,
-    },
-    subtitle: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-    },
-    actions: {
-      flexDirection: 'row',
+    bullet: {
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      backgroundColor: isActive ? theme.colors.accent : theme.colors.textSecondary,
+      marginHorizontal: 6,
+      justifyContent: 'center',
       alignItems: 'center',
-      gap: 8,
     },
-    actionButton: {
-      padding: 4,
+    bulletDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: '#fff',
     },
   });
 
   return (
     <View style={styles.container}>
-      <Ionicons 
-        name="bookmark" 
-        size={20} 
-        color={theme.colors.accent} 
-        style={styles.icon}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>Reading Position</Text>
-        <Text style={styles.subtitle}>Tap to continue reading from here</Text>
-      </View>
-      <View style={styles.actions}>
-        <TouchableOpacity 
-          style={styles.actionButton} 
-          onPress={onPress}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons 
-            name="chevron-down" 
-            size={16} 
-            color={theme.colors.accent} 
-          />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.actionButton} 
-          onPress={onClear}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons 
-            name="close" 
-            size={16} 
-            color={theme.colors.textSecondary} 
-          />
-        </TouchableOpacity>
-      </View>
+      <View style={styles.line} />
+      <TouchableOpacity 
+        style={styles.bullet}
+        onPress={isActive ? onClear : onPress}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <View style={styles.bulletDot} />
+      </TouchableOpacity>
+      <View style={styles.line} />
     </View>
   );
 }
