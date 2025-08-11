@@ -120,9 +120,12 @@ export function extractCleanText(html) {
 
   let text = cleanHtmlContent(html);
   
-  // Remove all HTML tags but keep line breaks
+  // Remove all HTML tags but keep line breaks and paragraph structure
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/p>/gi, '\n\n');
+  text = text.replace(/<\/div>/gi, '\n');
+  text = text.replace(/<\/h[1-6]>/gi, '\n\n');
+  text = text.replace(/<\/li>/gi, '\n');
   text = text.replace(/<[^>]+>/g, '');
   
   // Decode HTML entities
@@ -133,9 +136,13 @@ export function extractCleanText(html) {
   text = text.replace(/&#39;/g, "'");
   text = text.replace(/&nbsp;/g, ' ');
   
-  // Clean up multiple spaces and newlines
-  text = text.replace(/\s+/g, ' ');
-  text = text.replace(/\n\s*\n/g, '\n\n');
+  // Clean up spacing while preserving line breaks
+  // Replace multiple spaces on the same line with single space
+  text = text.replace(/[ \t]+/g, ' ');
+  // Clean up excessive newlines (more than 2 consecutive)
+  text = text.replace(/\n{3,}/g, '\n\n');
+  // Remove spaces at the beginning and end of lines
+  text = text.replace(/[ \t]*\n[ \t]*/g, '\n');
   
   return text.trim();
 }
