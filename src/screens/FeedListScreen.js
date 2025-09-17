@@ -25,11 +25,9 @@ import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 export default function FeedListScreen({ navigation }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
-  const { showImages } = useAppSettings();
+  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
-  const [filter, setFilter] = useState('all'); // 'all', 'unread', 'read'
-  const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -257,7 +255,7 @@ export default function FeedListScreen({ navigation }) {
     
     let filtered = articles;
     
-    switch (filter) {
+    switch (articleFilter) {
       case 'unread':
         filtered = articles.filter(article => !article.isRead);
         break;
@@ -279,21 +277,21 @@ export default function FeedListScreen({ navigation }) {
   const filteredAndSortedArticles = getFilteredArticles();
 
   const toggleFilter = () => {
-    if (filter === 'all') {
-      setFilter('unread');
-    } else if (filter === 'unread') {
-      setFilter('read');
+    if (articleFilter === 'all') {
+      updateArticleFilter('unread');
+    } else if (articleFilter === 'unread') {
+      updateArticleFilter('read');
     } else {
-      setFilter('all');
+      updateArticleFilter('all');
     }
   };
 
   const toggleSort = () => {
-    setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
+    updateSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
   };
 
   const getFilterButtonText = () => {
-    switch (filter) {
+    switch (articleFilter) {
       case 'unread':
         return `Unread (${getUnreadCount()})`;
       case 'read':
@@ -578,7 +576,7 @@ export default function FeedListScreen({ navigation }) {
         data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
-        extraData={[articles, filter, sortOrder, readingPosition]}
+        extraData={[articles, articleFilter, sortOrder, readingPosition]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -588,12 +586,12 @@ export default function FeedListScreen({ navigation }) {
             <View style={styles.emptyState}>
               <Ionicons name="refresh-outline" size={60} color="#ccc" />
               <Text style={styles.emptyTitle}>
-                {filter === 'unread' ? 'No Unread Articles' : 
-                 filter === 'read' ? 'No Read Articles' : 'No Articles'}
+                {articleFilter === 'unread' ? 'No Unread Articles' : 
+                 articleFilter === 'read' ? 'No Read Articles' : 'No Articles'}
               </Text>
               <Text style={styles.emptyDescription}>
-                {filter === 'unread' ? 'All articles have been read' :
-                 filter === 'read' ? 'No articles have been read yet' :
+                {articleFilter === 'unread' ? 'All articles have been read' :
+                 articleFilter === 'read' ? 'No articles have been read yet' :
                  'Pull down to refresh your feeds'}
               </Text>
             </View>
