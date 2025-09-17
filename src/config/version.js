@@ -8,7 +8,7 @@ export const APP_VERSION = {
   version: '0.7.1',
   
   // Build/version code for app stores (increment for each release)
-  buildNumber: 69,
+  buildNumber: 71,
   
   // Release stage
   stage: 'Beta', // 'Alpha', 'Beta', 'RC', 'Stable'
