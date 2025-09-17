@@ -42,22 +42,32 @@ export default function FeedListScreen({ navigation }) {
       setForceRender(prev => prev + 1);
       
       // Auto-scroll to reading position when tab becomes active
-      if (readingPosition && readingPosition.position !== undefined && flatListRef.current && filteredAndSortedArticles && filteredAndSortedArticles.length > 0) {
-        // Wait a bit for the FlatList to render
-        setTimeout(() => {
-          try {
-            // Use simple offset calculation instead of scrollToIndex
-            const itemHeight = 150; // Approximate height per article item
-            const targetOffset = readingPosition.position * itemHeight;
-            
-            flatListRef.current.scrollToOffset({
-              offset: targetOffset,
-              animated: true,
-            });
-          } catch (error) {
-            console.log('Auto-scroll failed:', error);
-          }
-        }, 500);
+      if (readingPosition && readingPosition.afterArticleId && flatListRef.current && filteredAndSortedArticles && filteredAndSortedArticles.length > 0) {
+        // Find the index of the article after which the reading position is set
+        const targetIndex = filteredAndSortedArticles.findIndex(article => article.id === readingPosition.afterArticleId);
+        if (targetIndex !== -1) {
+          // Wait a bit for the FlatList to render
+          setTimeout(() => {
+            try {
+              // Scroll to the article after the reading position (or the reading position line)
+              const scrollToIndex = Math.min(targetIndex + 1, filteredAndSortedArticles.length - 1);
+              flatListRef.current.scrollToIndex({
+                index: scrollToIndex,
+                animated: true,
+                viewPosition: 0.3, // Show the target item at 30% from the top
+              });
+            } catch (error) {
+              console.log('Auto-scroll failed, using offset method:', error);
+              // Fallback to offset calculation
+              const itemHeight = 150;
+              const targetOffset = (targetIndex + 1) * itemHeight;
+              flatListRef.current.scrollToOffset({
+                offset: targetOffset,
+                animated: true,
+              });
+            }
+          }, 500);
+        }
       }
     }, [readingPosition, filteredAndSortedArticles])
   );
@@ -139,19 +149,35 @@ export default function FeedListScreen({ navigation }) {
     navigation.navigate('ArticleActions', { article });
   };
 
-  const handleSetReadingPosition = (afterIndex) => {
-    setReadingPosition(`after_article_${afterIndex}`, afterIndex);
-    Alert.alert(
-      'Reading Position Set',
-      'You can now continue reading from this position. The line will help you remember where you left off.',
-      [{ text: 'OK' }]
-    );
+  const handleSetReadingPosition = (articleIndex) => {
+    const article = filteredAndSortedArticles[articleIndex];
+    if (article) {
+      setReadingPosition(`after_article_${article.id}`, article.id);
+      Alert.alert(
+        'Reading Position Set',
+        'You can now continue reading from this position. The line will help you remember where you left off.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleGoToReadingPosition = () => {
-    if (readingPosition && readingPosition.position !== undefined) {
-      // The position is already visible in the list, no need to navigate
-      Alert.alert('Reading Position', 'You can see your reading position marked in the list below.');
+    if (readingPosition && readingPosition.afterArticleId) {
+      // Find the article in the current filtered list
+      const articleIndex = filteredAndSortedArticles.findIndex(article => article.id === readingPosition.afterArticleId);
+      if (articleIndex !== -1 && flatListRef.current) {
+        try {
+          flatListRef.current.scrollToIndex({
+            index: Math.min(articleIndex + 1, filteredAndSortedArticles.length - 1),
+            animated: true,
+            viewPosition: 0.3,
+          });
+        } catch (error) {
+          Alert.alert('Reading Position', 'You can see your reading position marked in the list below.');
+        }
+      } else {
+        Alert.alert('Reading Position', 'The reading position article is not visible in the current filter/sort view.');
+      }
     }
   };
 
@@ -171,9 +197,17 @@ export default function FeedListScreen({ navigation }) {
   };
 
   const renderArticle = ({ item, index }) => {
+    // Check if this article is before the reading position
     const isBeforeReadingPosition = readingPosition && 
-      readingPosition.position !== undefined && 
-      index <= readingPosition.position;
+      readingPosition.afterArticleId && 
+      (() => {
+        const readingPositionIndex = filteredAndSortedArticles.findIndex(article => article.id === readingPosition.afterArticleId);
+        return readingPositionIndex !== -1 && index <= readingPositionIndex;
+      })();
+    
+    // Check if reading position line should appear after this article
+    const showReadingPositionAfter = readingPosition && 
+      readingPosition.afterArticleId === item.id;
     
     return (
       <View>
@@ -227,7 +261,7 @@ export default function FeedListScreen({ navigation }) {
         </TouchableOpacity>
 
         {/* Show reading position line after this article if it matches */}
-        {readingPosition && readingPosition.position === index && (
+        {showReadingPositionAfter && (
           <ReadingPositionIndicator
             onPress={handleGoToReadingPosition}
             onClear={handleClearReadingPosition}
@@ -236,7 +270,7 @@ export default function FeedListScreen({ navigation }) {
         )}
 
         {/* Show potential reading position lines between articles */}
-        {(!readingPosition || readingPosition.position !== index) && (
+        {!showReadingPositionAfter && (
           <ReadingPositionIndicator
             onPress={() => handleSetReadingPosition(index)}
             onClear={() => {}}
@@ -576,7 +610,7 @@ export default function FeedListScreen({ navigation }) {
         data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
-        extraData={[articles, articleFilter, sortOrder, readingPosition]}
+        extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

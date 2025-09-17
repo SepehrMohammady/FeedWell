@@ -8,7 +8,7 @@ const initialState = {
   articles: [],
   loading: false,
   error: null,
-  readingPosition: null, // { positionId: string, position: number, timestamp: string }
+  readingPosition: null, // { positionId: string, afterArticleId: string, timestamp: string }
 };
 
 function feedReducer(state, action) {
@@ -300,11 +300,11 @@ export function FeedProvider({ children }) {
     return state.articles.filter(article => article.isRead).length;
   }, [state.articles]);
 
-  const setReadingPosition = useCallback(async (positionId, position = 0) => {
+  const setReadingPosition = useCallback(async (positionId, afterArticleId = null) => {
     try {
       const readingPosition = {
         positionId,
-        position,
+        afterArticleId,
         timestamp: new Date().toISOString()
       };
       dispatch({ type: 'SET_READING_POSITION', payload: readingPosition });
