@@ -8,7 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "windows": "expo start --web",
-    "update-version": "node scripts/update-version.js"
+    "update-version": "node scripts/update-version.js",
+    "sync-version": "node scripts/update-version.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

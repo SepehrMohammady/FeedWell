@@ -4,8 +4,11 @@
  * Version Update Script for FeedWell
  * 
  * This script updates version numbers across all files in the project
+ * It reads the version from src/config/version.js and syncs it to all other files
  * Usage: node scripts/update-version.js [new-version]
- * Example: node scripts/update-version.js 0.7.0
+ * Example: node scripts/update-version.js 0.7.1
+ * 
+ * Or just run: node scripts/update-version.js (to sync current version.js to other files)
  */
 
 const fs = require('fs');
@@ -24,6 +27,37 @@ const colors = {
 
 function log(message, color = 'reset') {
   console.log(`${colors[color]}${message}${colors.reset}`);
+}
+
+function getCurrentVersionFromConfig() {
+  try {
+    const configPath = path.join(__dirname, '..', 'src', 'config', 'version.js');
+    const content = fs.readFileSync(configPath, 'utf8');
+    const versionMatch = content.match(/version:\s*['"`](\d+\.\d+\.\d+)['"`]/);
+    return versionMatch ? versionMatch[1] : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function syncVersionsFromConfig() {
+  const currentVersion = getCurrentVersionFromConfig();
+  if (!currentVersion) {
+    log('❌ Could not read version from src/config/version.js', 'red');
+    return false;
+  }
+  
+  log(`📋 Syncing version ${currentVersion} from version.js to other files...`, 'cyan');
+  
+  try {
+    updatePackageJson(currentVersion);
+    updateAppJson(currentVersion);
+    updatePackageLock(currentVersion);
+    return currentVersion;
+  } catch (error) {
+    log(`❌ Error syncing versions: ${error.message}`, 'red');
+    return false;
+  }
 }
 
 function validateVersion(version) {
@@ -120,16 +154,26 @@ function main() {
   const args = process.argv.slice(2);
   
   if (args.length === 0) {
-    log('❌ Please provide a version number', 'red');
-    log('Usage: node scripts/update-version.js [version]', 'yellow');
-    log('Example: node scripts/update-version.js 0.7.0', 'yellow');
-    process.exit(1);
+    // No arguments - sync from version.js
+    log('🔄 No version provided. Syncing from src/config/version.js...', 'yellow');
+    const syncedVersion = syncVersionsFromConfig();
+    if (syncedVersion) {
+      log(`\n🎉 Successfully synced all files to version ${syncedVersion}!`, 'green');
+      log('📋 Updated files:', 'blue');
+      log('  - package.json', 'blue');
+      log('  - app.json', 'blue');
+      log('  - package-lock.json', 'blue');
+      log('\n💡 All versions are now synchronized!', 'yellow');
+    } else {
+      process.exit(1);
+    }
+    return;
   }
   
   const newVersion = args[0];
   
   if (!validateVersion(newVersion)) {
-    log('❌ Invalid version format. Use semantic versioning (e.g., 0.7.0)', 'red');
+    log('❌ Invalid version format. Use semantic versioning (e.g., 0.7.1)', 'red');
     process.exit(1);
   }
   

@@ -96,10 +96,21 @@ src/
 ## 🛠️ Development
 
 ### Version Management
-Update app version across all files:
+FeedWell uses a centralized version management system with a single source of truth.
+
+**Update to new version:**
 ```bash
 npm run update-version 1.0.0
 ```
+
+**Sync all files to current version:**
+```bash
+npm run sync-version
+```
+
+The main version is stored in `src/config/version.js` and automatically synchronized to `package.json`, `app.json`, and `package-lock.json`.
+
+📖 See [Version Management Guide](docs/VERSION_MANAGEMENT.md) for detailed usage.
 
 ### Contributing
 1. Fork the repository
