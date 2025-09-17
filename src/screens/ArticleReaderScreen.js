@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,8 @@ export default function ArticleReaderScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [languageInfo, setLanguageInfo] = useState(null);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const scrollViewRef = useRef(null);
 
   useEffect(() => {
     fetchFullArticle();
@@ -136,6 +138,16 @@ export default function ArticleReaderScreen({ route, navigation }) {
     } catch (error) {
       console.error('Error opening browser:', error);
     }
+  };
+
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    // Show button when user scrolls down more than 200 pixels
+    setShowScrollToTop(offsetY > 200);
+  };
+
+  const handleScrollToTop = () => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const formatDate = (dateString) => {
@@ -293,6 +305,25 @@ export default function ArticleReaderScreen({ route, navigation }) {
       color: theme.colors.textSecondary,
       textAlign: 'center',
     },
+    scrollToTopButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      backgroundColor: theme.colors.primary || '#007AFF',
+      borderRadius: 25,
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
   });
 
   return (
@@ -322,7 +353,13 @@ export default function ArticleReaderScreen({ route, navigation }) {
         </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         <View style={styles.articleHeader}>
           <Text style={styles.feedTitle}>{article.feedTitle}</Text>
           <Text style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
@@ -414,6 +451,15 @@ export default function ArticleReaderScreen({ route, navigation }) {
           </View>
         )}
       </ScrollView>
+
+      {showScrollToTop && (
+        <TouchableOpacity
+          style={styles.scrollToTopButton}
+          onPress={handleScrollToTop}
+        >
+          <Ionicons name="chevron-up" size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
     </SafeAreaView>
   );
 }
