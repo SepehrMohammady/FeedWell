@@ -39,6 +39,24 @@ const AD_PATTERNS = [
   /googleadservices/gi
 ];
 
+// Generate a stable ID for articles that don't have one
+function generateStableId(item, url, index) {
+  // Try to use the article's own ID first
+  if (item.id) return item.id;
+  
+  // Try to use the article URL as a unique identifier
+  if (item.links?.[0]?.url) return item.links[0].url;
+  if (item.url) return item.url;
+  
+  // Fallback: use title + published date + feed URL for uniqueness
+  const title = (item.title || '').trim();
+  const published = item.published || item.pubDate || '';
+  const baseId = `${url}_${title}_${published}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+  
+  // If we still don't have enough info, use index as last resort (but this is less stable)
+  return baseId || `${url}_${index}_fallback`;
+}
+
 // Decode HTML entities
 export function decodeHtmlEntities(text) {
   if (!text) return '';
@@ -285,7 +303,7 @@ export async function parseRSSFeed(url) {
             const cleanContent = cleanHtmlContent(item.content || '');
             
             return {
-              id: item.id || `${url}_${index}_${Date.now()}`,
+              id: generateStableId(item, url, index),
               title: decodeHtmlEntities(item.title || 'No Title'),
               description: extractCleanText(cleanDescription),
               content: extractCleanText(cleanContent),
@@ -338,7 +356,7 @@ export async function parseRSSFeed(url) {
       const cleanContent = cleanHtmlContent(item.content || '');
       
       return {
-        id: item.id || `${url}_${index}_${Date.now()}`,
+        id: generateStableId(item, url, index),
         title: decodeHtmlEntities(item.title || 'No Title'),
         description: extractCleanText(cleanDescription),
         content: extractCleanText(cleanContent),

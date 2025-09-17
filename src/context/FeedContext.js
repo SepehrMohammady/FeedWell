@@ -39,12 +39,44 @@ function feedReducer(state, action) {
     case 'SET_ARTICLES':
       return { ...state, articles: action.payload };
     case 'ADD_ARTICLES':
-      return { 
+      console.log('=== REDUCER ADD_ARTICLES DEBUG ===');
+      console.log('State articles before:', state.articles.length);
+      console.log('State unread before:', state.articles.filter(a => !a.isRead).length);
+      console.log('Payload articles:', action.payload.length);
+      
+      const result = { 
         ...state, 
-        articles: [...state.articles, ...action.payload].filter((article, index, self) =>
-          index === self.findIndex(a => a.id === article.id)
-        )
+        articles: (() => {
+          const existingArticles = state.articles;
+          const newArticles = action.payload;
+          const mergedArticles = [];
+          const existingIds = new Set();
+
+          // First, add all existing articles
+          existingArticles.forEach(article => {
+            mergedArticles.push(article);
+            existingIds.add(article.id);
+          });
+
+          // Then, add only new articles that don't exist yet
+          let newCount = 0;
+          newArticles.forEach(newArticle => {
+            if (!existingIds.has(newArticle.id)) {
+              mergedArticles.push(newArticle);
+              newCount++;
+            }
+          });
+
+          console.log('Reducer - actually new articles:', newCount);
+          console.log('Reducer - final count:', mergedArticles.length);
+          console.log('Reducer - final unread:', mergedArticles.filter(a => !a.isRead).length);
+
+          return mergedArticles;
+        })()
       };
+      
+      console.log('=== REDUCER ADD_ARTICLES END ===');
+      return result;
     case 'MARK_ARTICLE_READ':
       return {
         ...state,
@@ -182,11 +214,45 @@ export function FeedProvider({ children }) {
   };
 
   const addArticles = async (articles) => {
+    console.log('=== ADD_ARTICLES DEBUG START ===');
+    console.log('Incoming articles count:', articles.length);
+    console.log('Current state articles count:', state.articles.length);
+    console.log('Current unread count:', state.articles.filter(a => !a.isRead).length);
+    console.log('Incoming article IDs:', articles.map(a => a.id).slice(0, 5));
+    console.log('Current article IDs (first 5):', state.articles.map(a => a.id).slice(0, 5));
+    
     dispatch({ type: 'ADD_ARTICLES', payload: articles });
-    const updatedArticles = [...state.articles, ...articles].filter((article, index, self) =>
-      index === self.findIndex(a => a.id === article.id)
-    );
-    await saveArticles(updatedArticles);
+    
+    // Use the same merge logic as the reducer for storage
+    const existingArticles = state.articles;
+    const newArticles = articles;
+    const mergedArticles = [];
+    const existingIds = new Set();
+
+    console.log('Before merge - existing articles:', existingArticles.length);
+    console.log('Before merge - existing unread:', existingArticles.filter(a => !a.isRead).length);
+
+    // First, add all existing articles (preserving read status)
+    existingArticles.forEach(article => {
+      mergedArticles.push(article);
+      existingIds.add(article.id);
+    });
+
+    // Then, add only new articles that don't exist yet
+    let actuallyNewCount = 0;
+    newArticles.forEach(newArticle => {
+      if (!existingIds.has(newArticle.id)) {
+        mergedArticles.push(newArticle);
+        actuallyNewCount++;
+      }
+    });
+
+    console.log('Actually new articles added:', actuallyNewCount);
+    console.log('Final merged articles count:', mergedArticles.length);
+    console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
+    console.log('=== ADD_ARTICLES DEBUG END ===');
+
+    await saveArticles(mergedArticles);
   };
 
   // Auto refresh function for app start
@@ -241,6 +307,14 @@ export function FeedProvider({ children }) {
             : article
         );
         await saveArticles(updatedArticles);
+
+        // Check if all articles are now read and clear reading position if so
+        const allRead = updatedArticles.every(article => article.isRead);
+        if (allRead && updatedArticles.length > 0) {
+          console.log('All articles are read, clearing reading position');
+          dispatch({ type: 'CLEAR_READING_POSITION' });
+          await AsyncStorage.removeItem('readingPosition');
+        }
       }
     } catch (error) {
       console.error('Error updating article read status in storage:', error);
@@ -278,6 +352,11 @@ export function FeedProvider({ children }) {
           readAt: readTimestamp
         }));
         await saveArticles(updatedArticles);
+
+        // Clear reading position since all articles are now read
+        console.log('All articles marked as read, clearing reading position');
+        dispatch({ type: 'CLEAR_READING_POSITION' });
+        await AsyncStorage.removeItem('readingPosition');
       }
     } catch (error) {
       console.error('Error marking all articles as read in storage:', error);

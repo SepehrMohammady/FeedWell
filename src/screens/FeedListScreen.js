@@ -75,6 +75,10 @@ export default function FeedListScreen({ navigation }) {
   const refreshFeeds = async () => {
     if (feeds.length === 0) return;
     
+    console.log('=== REFRESH FEEDS DEBUG START ===');
+    console.log('Articles before refresh:', articles.length);
+    console.log('Unread before refresh:', getUnreadCount());
+    
     setLoading(true);
     try {
       const allArticles = [];
@@ -82,15 +86,23 @@ export default function FeedListScreen({ navigation }) {
       for (const feed of feeds) {
         try {
           const parsedFeed = await parseRSSFeed(feed.url);
+          console.log(`Feed ${feed.title} returned ${parsedFeed.articles.length} articles`);
           allArticles.push(...parsedFeed.articles);
         } catch (error) {
           console.error(`Error parsing feed ${feed.url}:`, error);
         }
       }
       
+      console.log('Total articles from all feeds:', allArticles.length);
+      console.log('Sample article IDs:', allArticles.slice(0, 3).map(a => ({ id: a.id, title: a.title?.substring(0, 50) })));
+      
       if (allArticles.length > 0) {
         await addArticles(allArticles);
       }
+      
+      console.log('Articles after refresh:', articles.length);
+      console.log('Unread after refresh:', getUnreadCount());
+      console.log('=== REFRESH FEEDS DEBUG END ===');
     } catch (error) {
       setError('Failed to refresh feeds');
       Alert.alert('Error', 'Failed to refresh feeds. Please check your internet connection.');
