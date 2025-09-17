@@ -98,8 +98,12 @@ export function cleanHtmlContent(html) {
 
   let cleanedHtml = html;
 
-  // Remove script tags
+  // Remove script tags and noscript
   cleanedHtml = cleanedHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '');
+  
+  // Remove style tags
+  cleanedHtml = cleanedHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
   
   // Remove iframe with ad domains (be more specific)
   AD_DOMAINS.forEach(domain => {
@@ -107,27 +111,51 @@ export function cleanHtmlContent(html) {
     cleanedHtml = cleanedHtml.replace(iframeRegex, '');
   });
 
-  // Only remove elements with very specific ad-related class names or IDs
-  const specificAdPatterns = [
+  // Remove all iframes and embeds that might be ads or tracking
+  cleanedHtml = cleanedHtml.replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<embed[^>]*\/?>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<object[^>]*>.*?<\/object>/gi, '');
+
+  // Remove elements with ad-related class names or IDs
+  const adPatterns = [
     /advertisement/gi,
     /sponsored/gi,
     /promo/gi,
     /doubleclick/gi,
     /googlead/gi,
+    /banner/gi,
+    /sidebar/gi,
+    /widget/gi,
+    /social/gi,
+    /share/gi,
+    /related/gi,
+    /recommended/gi,
+    /newsletter/gi,
+    /subscribe/gi
   ];
   
-  specificAdPatterns.forEach(pattern => {
+  adPatterns.forEach(pattern => {
     const elementRegex = new RegExp(`<[^>]*(?:class|id)=['""][^'"]*${pattern.source}[^'"]*['"][^>]*>.*?</[^>]+>`, 'gi');
     cleanedHtml = cleanedHtml.replace(elementRegex, '');
   });
 
-  // Remove specific ad elements but be more conservative
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(advertisement|sponsored|googlead).*?['"][^>]*>.*?<\/div>/gi, '');
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(advertisement|sponsored|googlead).*?['"][^>]*>.*?<\/div>/gi, '');
+  // Remove specific ad and social elements
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*class=['""].*?(advertisement|sponsored|googlead|social|sidebar|widget).*?['"][^>]*>.*?<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*id=['""].*?(advertisement|sponsored|googlead|social|sidebar|widget).*?['"][^>]*>.*?<\/div>/gi, '');
 
-  // Clean up empty paragraphs and divs
+  // Remove image placeholders and alt text that might be showing
+  cleanedHtml = cleanedHtml.replace(/<img[^>]*alt=['""][^'"]*advertisement[^'"]*['"][^>]*>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<img[^>]*alt=['""][^'"]*sponsored[^'"]*['"][^>]*>/gi, '');
+  
+  // Remove empty elements that might be causing spacing
   cleanedHtml = cleanedHtml.replace(/<p>\s*<\/p>/gi, '');
   cleanedHtml = cleanedHtml.replace(/<div>\s*<\/div>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<span>\s*<\/span>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<li>\s*<\/li>/gi, '');
+  
+  // Remove elements that only contain whitespace or non-breaking spaces
+  cleanedHtml = cleanedHtml.replace(/<p[^>]*>[\s&nbsp;]*<\/p>/gi, '');
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*>[\s&nbsp;]*<\/div>/gi, '');
 
   return cleanedHtml.trim();
 }
@@ -138,12 +166,17 @@ export function extractCleanText(html) {
 
   let text = cleanHtmlContent(html);
   
-  // Remove all HTML tags but keep line breaks and paragraph structure
-  text = text.replace(/<br\s*\/?>/gi, '\n');
+  // Convert HTML structure to text while preserving logical breaks
   text = text.replace(/<\/p>/gi, '\n\n');
+  text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/div>/gi, '\n');
   text = text.replace(/<\/h[1-6]>/gi, '\n\n');
   text = text.replace(/<\/li>/gi, '\n');
+  text = text.replace(/<\/blockquote>/gi, '\n\n');
+  text = text.replace(/<\/article>/gi, '\n\n');
+  text = text.replace(/<\/section>/gi, '\n\n');
+  
+  // Remove all remaining HTML tags
   text = text.replace(/<[^>]+>/g, '');
   
   // Decode HTML entities
@@ -152,15 +185,59 @@ export function extractCleanText(html) {
   text = text.replace(/&gt;/g, '>');
   text = text.replace(/&quot;/g, '"');
   text = text.replace(/&#39;/g, "'");
+  text = text.replace(/&apos;/g, "'");
   text = text.replace(/&nbsp;/g, ' ');
+  text = text.replace(/&#8217;/g, "'");
+  text = text.replace(/&#8220;/g, '"');
+  text = text.replace(/&#8221;/g, '"');
+  text = text.replace(/&#8211;/g, '-');
+  text = text.replace(/&#8212;/g, '—');
   
-  // Clean up spacing while preserving line breaks
-  // Replace multiple spaces on the same line with single space
+  // Clean up problematic phrases and leftovers from media/ads
+  const problemPhrases = [
+    /\b(click here to|read more|advertisement|sponsored by|follow us|subscribe|newsletter)\b/gi,
+    /\b(image|photo|video):\s*/gi,
+    /\b(source|credit):\s*[^\n]*/gi,
+    /\[.*?(advertisement|sponsored|image|photo|video).*?\]/gi,
+    /\(.*?(advertisement|sponsored|image|photo|video).*?\)/gi,
+    /\s*\|\s*[^\n]*\s*$/gm, // Lines ending with | (often navigation/metadata)
+    /^\s*\|\s*/gm, // Lines starting with |
+    /\s*>>\s*/g, // Navigation arrows
+    /\s*<<\s*/g,
+    /\s*→\s*/g,
+    /\s*←\s*/g
+  ];
+  
+  problemPhrases.forEach(pattern => {
+    text = text.replace(pattern, '');
+  });
+  
+  // Clean up spacing and normalize line breaks
+  // Replace multiple spaces with single space
   text = text.replace(/[ \t]+/g, ' ');
+  
   // Clean up excessive newlines (more than 2 consecutive)
   text = text.replace(/\n{3,}/g, '\n\n');
+  
   // Remove spaces at the beginning and end of lines
   text = text.replace(/[ \t]*\n[ \t]*/g, '\n');
+  
+  // Remove lines that are too short and likely fragments
+  text = text.split('\n').filter(line => {
+    const trimmed = line.trim();
+    // Keep empty lines for paragraph breaks
+    if (trimmed === '') return true;
+    // Remove very short lines that are likely fragments, but keep numbered lists
+    if (trimmed.length < 10 && !/^\d+\./.test(trimmed) && !/^[•\-\*]/.test(trimmed)) {
+      return false;
+    }
+    // Remove lines that are just symbols or numbers
+    if (/^[\s\d\.\-\|\>]+$/.test(trimmed)) return false;
+    return true;
+  }).join('\n');
+  
+  // Final cleanup - ensure proper paragraph spacing
+  text = text.replace(/\n{3,}/g, '\n\n');
   
   return text.trim();
 }
@@ -227,25 +304,56 @@ export function extractArticleContent(html) {
     }
   }
 
-  // Fallback: try to find largest text block
+  // Fallback: try to find largest meaningful text block
   const textBlocks = [];
   const paragraphMatches = html.match(/<p[^>]*>.*?<\/p>/gi) || [];
   
   paragraphMatches.forEach(p => {
     const text = extractCleanText(p);
-    if (text.length > 50) {
+    // Only include paragraphs that are substantial and meaningful
+    if (text.length > 80 && !isLowQualityContent(text)) {
       textBlocks.push(text);
     }
   });
 
   if (textBlocks.length > 0) {
     console.log('Using paragraph extraction fallback');
-    return textBlocks.join('\n\n');
+    // Filter out blocks that are likely navigation or metadata
+    const qualityBlocks = textBlocks.filter(block => 
+      block.length > 100 && 
+      !block.toLowerCase().includes('newsletter') &&
+      !block.toLowerCase().includes('subscribe') &&
+      !block.toLowerCase().includes('follow us')
+    );
+    
+    return qualityBlocks.join('\n\n');
   }
 
   // Last resort: clean the entire HTML
   console.log('Using full HTML extraction as last resort');
-  return extractCleanText(html);
+  const fullText = extractCleanText(html);
+  
+  // If the full text is too short or low quality, return empty
+  if (fullText.length < 200 || isLowQualityContent(fullText)) {
+    console.log('Content quality too low, returning empty');
+    return '';
+  }
+  
+  return fullText;
+}
+
+// Helper function to detect low-quality content
+function isLowQualityContent(text) {
+  const lowQualityIndicators = [
+    /^[\s\d\.\-\|\>]+$/,
+    /^(click|read|more|subscribe|follow|newsletter|advertisement)[\s\w]*$/i,
+    /^[\w\s]*\|\s*[\w\s]*$/,
+    /^[\w\s]*>>\s*[\w\s]*$/,
+    /^\s*\d+\s*$/,
+    /^\s*[•\-\*]\s*$/
+  ];
+  
+  return lowQualityIndicators.some(pattern => pattern.test(text.trim()));
 }
 
 // Parse RSS feed and clean articles
