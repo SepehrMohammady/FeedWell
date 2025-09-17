@@ -19,7 +19,7 @@ import { useFeed } from '../context/FeedContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
-import BookmarkButton from '../components/BookmarkButton';
+import SaveButton from '../components/SaveButton';
 
 export default function ArticleReaderScreen({ route, navigation }) {
   const { article } = route.params;
@@ -50,7 +50,27 @@ export default function ArticleReaderScreen({ route, navigation }) {
       setLoading(true);
       setError(null);
 
-      // Start with RSS content
+      // Check if we have offline content available
+      if (article.offlineCached && article.offlineContent) {
+        console.log('Using cached offline content');
+        setFullContent(article.offlineContent);
+        
+        // Detect language for offline content
+        if (article.offlineContent) {
+          const detection = detectLanguage(article.offlineContent);
+          setLanguageInfo({
+            code: detection.code,
+            language: detection.code,
+            isRTL: detection.isRTL,
+            confidence: detection.confidence,
+            name: getLanguageName(detection.code)
+          });
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Start with RSS content for non-cached articles
       let content = article.content || article.description || '';
       
       // Always try to fetch full article content since RSS summaries are often short
@@ -343,7 +363,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
           >
             <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <BookmarkButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} style={styles.headerButton} />
           <TouchableOpacity
             style={styles.headerButton}
             onPress={handleShare}
@@ -361,11 +381,12 @@ export default function ArticleReaderScreen({ route, navigation }) {
         scrollEventThrottle={16}
       >
         <View style={styles.articleHeader}>
-          <Text style={styles.feedTitle}>{article.feedTitle}</Text>
-          <Text style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
+          <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
+          <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
         </View>
 
         <Text 
+          selectable={true}
           style={[
             styles.articleTitle,
             {
@@ -378,7 +399,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
         </Text>
 
         {article.authors && article.authors.length > 0 && (
-          <Text style={styles.articleAuthor}>
+          <Text selectable={true} style={styles.articleAuthor}>
             By {article.authors.map(author => author.name).join(', ')}
           </Text>
         )}
@@ -421,13 +442,14 @@ export default function ArticleReaderScreen({ route, navigation }) {
                   size={14} 
                   color={theme.colors.textSecondary} 
                 />
-                <Text style={styles.languageText}>
+                <Text selectable={true} style={styles.languageText}>
                   {getLanguageName(languageInfo.code)}
                   {languageInfo.isRTL ? ' (RTL)' : ''}
                 </Text>
               </View>
             )}
             <Text 
+              selectable={true}
               style={[
                 styles.articleText,
                 {

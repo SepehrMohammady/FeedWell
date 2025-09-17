@@ -28,7 +28,7 @@ export default function ReadLaterScreen({ navigation }) {
     // Use browser-compatible confirm dialog for web, Alert for mobile
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
-      const confirmed = window.confirm('Are you sure you want to remove all articles from Read Later?');
+      const confirmed = window.confirm('Are you sure you want to remove all saved articles?');
       if (confirmed) {
         clearReadLater();
       }
@@ -36,7 +36,7 @@ export default function ReadLaterScreen({ navigation }) {
       // Mobile environment - use Alert
       Alert.alert(
         'Clear All',
-        'Are you sure you want to remove all articles from Read Later?',
+        'Are you sure you want to remove all saved articles?',
         [
           { text: 'Cancel', style: 'cancel' },
           { 
@@ -53,7 +53,7 @@ export default function ReadLaterScreen({ navigation }) {
     // Use browser-compatible confirm dialog for web, Alert for mobile
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
-      const confirmed = window.confirm('Remove this article from Read Later?');
+      const confirmed = window.confirm('Remove this article from saved articles?');
       if (confirmed) {
         removeFromReadLater(articleId);
       }
@@ -61,7 +61,7 @@ export default function ReadLaterScreen({ navigation }) {
       // Mobile environment - use Alert
       Alert.alert(
         'Remove Article',
-        'Remove this article from Read Later?',
+        'Remove this article from saved articles?',
         [
           { text: 'Cancel', style: 'cancel' },
           { 
@@ -77,7 +77,7 @@ export default function ReadLaterScreen({ navigation }) {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Ionicons 
-        name="bookmark-outline" 
+        name="save-outline" 
         size={64} 
         color={theme.colors.textSecondary} 
       />
@@ -110,7 +110,7 @@ export default function ReadLaterScreen({ navigation }) {
     <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
       <View style={styles.headerContent}>
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-          Read Later
+          Saved Articles
         </Text>
         <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
           {articles.length} {articles.length === 1 ? 'article' : 'articles'} saved

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ReadingPositionIndicator({ onPress, onClear, isActive = false, style }) {
@@ -20,19 +21,13 @@ export default function ReadingPositionIndicator({ onPress, onClear, isActive = 
       backgroundColor: isActive ? theme.colors.accent : theme.colors.border,
     },
     bullet: {
-      width: 16,
-      height: 16,
-      borderRadius: 8,
+      width: 20,
+      height: 20,
+      borderRadius: 10,
       backgroundColor: isActive ? theme.colors.accent : theme.colors.textSecondary,
       marginHorizontal: 6,
       justifyContent: 'center',
       alignItems: 'center',
-    },
-    bulletDot: {
-      width: 6,
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: '#fff',
     },
   });
 
@@ -44,7 +39,11 @@ export default function ReadingPositionIndicator({ onPress, onClear, isActive = 
         onPress={isActive ? onClear : onPress}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
-        <View style={styles.bulletDot} />
+        <Ionicons 
+          name="bookmark" 
+          size={12} 
+          color="#fff" 
+        />
       </TouchableOpacity>
       <View style={styles.line} />
     </View>

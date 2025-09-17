@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
-import BookmarkButton from '../components/BookmarkButton';
+import SaveButton from '../components/SaveButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article } = route.params;
@@ -176,7 +176,7 @@ export default function ArticleActionsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
             <Ionicons name="globe-outline" size={24} color="#fff" />
           </TouchableOpacity>
-          <BookmarkButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} style={styles.headerButton} />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={24} color="#fff" />
           </TouchableOpacity>
@@ -185,11 +185,11 @@ export default function ArticleActionsScreen({ route, navigation }) {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.articleHeader}>
-          <Text style={styles.feedTitle}>{article.feedTitle}</Text>
-          <Text style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
+          <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
+          <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
         </View>
 
-        <Text style={styles.articleTitle}>{article.title}</Text>
+        <Text selectable={true} style={styles.articleTitle}>{article.title}</Text>
 
         {article.imageUrl && (
           <Image
@@ -200,7 +200,7 @@ export default function ArticleActionsScreen({ route, navigation }) {
         )}
 
         {article.description && (
-          <Text style={styles.articleDescription}>{article.description}</Text>
+          <Text selectable={true} style={styles.articleDescription}>{article.description}</Text>
         )}
 
         <View style={styles.actionsContainer}>

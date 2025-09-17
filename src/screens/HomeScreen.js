@@ -32,8 +32,8 @@ export default function HomeScreen({ navigation }) {
       onPress: () => navigation.navigate('Feeds', { screen: 'AddFeed' }),
     },
     {
-      title: 'Read Later',
-      icon: 'bookmark',
+      title: 'Saved Articles',
+      icon: 'save',
       color: theme.colors.accent,
       onPress: () => navigation.navigate('ReadLater'),
     },
@@ -147,7 +147,7 @@ export default function HomeScreen({ navigation }) {
           <View style={styles.overviewGrid}>
             {renderOverviewCard('Feeds', totalFeeds, 'list', theme.colors.primary)}
             {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.warning)}
-            {renderOverviewCard('Read Later', readLaterCount, 'bookmark', theme.colors.accent)}
+            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.accent)}
           </View>
         </View>
 

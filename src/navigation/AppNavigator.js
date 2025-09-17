@@ -67,7 +67,7 @@ export default function AppNavigator() {
           } else if (route.name === 'Feeds') {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === 'ReadLater') {
-            iconName = focused ? 'bookmark' : 'bookmark-outline';
+            iconName = focused ? 'save' : 'save-outline';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'settings' : 'settings-outline';
           }
@@ -88,7 +88,7 @@ export default function AppNavigator() {
       <Tab.Screen 
         name="ReadLater" 
         component={ReadLaterStack} 
-        options={{ title: 'Read Later' }}
+        options={{ title: 'Saved' }}
       />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>

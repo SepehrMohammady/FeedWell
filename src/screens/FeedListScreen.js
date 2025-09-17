@@ -19,7 +19,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
-import BookmarkButton from '../components/BookmarkButton';
+import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 
 export default function FeedListScreen({ navigation }) {
@@ -244,10 +244,10 @@ export default function FeedListScreen({ navigation }) {
                 <Text style={styles.articleDate}>
                   {formatDate(item.publishedDate)}
                 </Text>
-                <BookmarkButton 
+                <SaveButton 
                   article={item} 
                   size={20} 
-                  style={styles.bookmarkButton}
+                  style={styles.saveButton}
                 />
               </View>
             </View>
@@ -439,7 +439,7 @@ export default function FeedListScreen({ navigation }) {
       fontSize: 12,
       color: theme.colors.textSecondary,
     },
-    bookmarkButton: {
+    saveButton: {
       width: 32,
       height: 32,
       borderRadius: 16,

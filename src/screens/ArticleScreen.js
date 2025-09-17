@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 import { useFeed } from '../context/FeedContext';
-import BookmarkButton from '../components/BookmarkButton';
+import SaveButton from '../components/SaveButton';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
@@ -213,7 +213,7 @@ export default function ArticleScreen({ route, navigation }) {
           <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
             <Ionicons name="globe-outline" size={24} color="#007AFF" />
           </TouchableOpacity>
-          <BookmarkButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} style={styles.headerButton} />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={24} color="#007AFF" />
           </TouchableOpacity>
@@ -222,14 +222,14 @@ export default function ArticleScreen({ route, navigation }) {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.articleHeader}>
-          <Text style={styles.feedTitle}>{article.feedTitle}</Text>
+          <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
           <Text style={styles.publishDate}>{formatDate(article.publishedDate)}</Text>
         </View>
 
-        <Text style={styles.title}>{article.title}</Text>
+        <Text selectable={true} style={styles.title}>{article.title}</Text>
 
         {article.authors && article.authors.length > 0 && (
-          <Text style={styles.author}>
+          <Text selectable={true} style={styles.author}>
             By {article.authors.map(author => author.name || author).join(', ')}
           </Text>
         )}
@@ -243,11 +243,11 @@ export default function ArticleScreen({ route, navigation }) {
         )}
 
         {article.description && (
-          <Text style={styles.description}>{article.description}</Text>
+          <Text selectable={true} style={styles.description}>{article.description}</Text>
         )}
 
         {article.content && article.content !== article.description && (
-          <Text style={styles.content}>{article.content}</Text>
+          <Text selectable={true} style={styles.content}>{article.content}</Text>
         )}
 
         {article.categories && article.categories.length > 0 && (
@@ -256,7 +256,7 @@ export default function ArticleScreen({ route, navigation }) {
             <View style={styles.categories}>
               {article.categories.map((category, index) => (
                 <View key={index} style={styles.categoryTag}>
-                  <Text style={styles.categoryText}>
+                  <Text selectable={true} style={styles.categoryText}>
                     {category.name || category}
                   </Text>
                 </View>

@@ -5,7 +5,7 @@
 
 export const APP_VERSION = {
   // Main version number (semantic versioning: major.minor.patch)
-  version: '0.6.9',
+  version: '0.7.0',
   
   // Build/version code for app stores (increment for each release)
   buildNumber: 69,
