@@ -110,8 +110,6 @@ npm run sync-version
 
 The main version is stored in `src/config/version.js` and automatically synchronized to `package.json`, `app.json`, and `package-lock.json`.
 
-📖 See [Version Management Guide](docs/VERSION_MANAGEMENT.md) for detailed usage.
-
 ### Contributing
 1. Fork the repository
 2. Create a feature branch
