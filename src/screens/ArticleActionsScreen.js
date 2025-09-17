@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
+import BookmarkButton from '../components/BookmarkButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article } = route.params;
@@ -87,6 +88,9 @@ export default function ArticleActionsScreen({ route, navigation }) {
     headerButton: {
       padding: 8,
       width: 40,
+    },
+    headerActions: {
+      flexDirection: 'row',
     },
     headerTitle: {
       fontSize: 18,
@@ -168,7 +172,15 @@ export default function ArticleActionsScreen({ route, navigation }) {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Article</Text>
-        <View style={styles.headerButton} />
+        <View style={styles.headerActions}>
+          <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
+            <Ionicons name="globe-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+          <BookmarkButton article={article} size={24} style={styles.headerButton} />
+          <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
+            <Ionicons name="share-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>

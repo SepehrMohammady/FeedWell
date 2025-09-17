@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 import { useFeed } from '../context/FeedContext';
+import BookmarkButton from '../components/BookmarkButton';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
@@ -212,11 +213,9 @@ export default function ArticleScreen({ route, navigation }) {
           <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
             <Ionicons name="globe-outline" size={24} color="#007AFF" />
           </TouchableOpacity>
+          <BookmarkButton article={article} size={24} style={styles.headerButton} />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={24} color="#007AFF" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
-            <Ionicons name="open-outline" size={24} color="#007AFF" />
           </TouchableOpacity>
         </View>
       </View>

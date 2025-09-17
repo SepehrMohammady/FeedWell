@@ -320,6 +320,7 @@ export default function SettingsScreen({ navigation }) {
         <SectionHeader title="TESTERS" />
         <View style={styles.section}>
           <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
+          <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem isLast={true}>Mohammad Torabi</TesterItem>
         </View>
