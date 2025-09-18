@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -98,12 +99,21 @@ export default function HomeScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.welcomeText, { color: theme.colors.text }]}>
-            Welcome to FeedWell
-          </Text>
-          <Text style={[styles.subtitleText, { color: theme.colors.textSecondary }]}>
-            Your RSS reading dashboard
-          </Text>
+          <View style={styles.headerContent}>
+            <Image 
+              source={require('../../assets/logo.png')} 
+              style={styles.logoIcon}
+              resizeMode="contain"
+            />
+            <View style={styles.headerText}>
+              <Text style={[styles.welcomeText, { color: theme.colors.text }]}>
+                Welcome to FeedWell
+              </Text>
+              <Text style={[styles.subtitleText, { color: theme.colors.textSecondary }]}>
+                Your RSS reading dashboard
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* Overview Cards */}
@@ -167,6 +177,18 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 24,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoIcon: {
+    width: 56,
+    height: 56,
+    marginRight: 8,
+  },
+  headerText: {
+    flex: 1,
   },
   welcomeText: {
     fontSize: 28,
