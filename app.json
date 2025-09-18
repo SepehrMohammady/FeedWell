@@ -2,7 +2,7 @@
   "expo": {
     "name": "FeedWell",
     "slug": "feedwell",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,7 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.feedwell.app",
-      "versionCode": 73,
+      "versionCode": 74,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
@@ -44,6 +44,9 @@
         "projectId": "828c0ad5-fd9a-436a-b2da-1b50fb4d4960"
       }
     },
-    "scheme": "feedwell"
+    "scheme": "feedwell",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
