@@ -24,8 +24,12 @@ export default function HomeScreen({ navigation }) {
   const readLaterCount = readLaterArticles.length;
   const recentArticles = articles.slice(0, 5); // Get 5 most recent articles
 
-  const renderOverviewCard = (title, value, icon, color) => (
-    <View style={[styles.overviewCard, { backgroundColor: theme.colors.surface }]}>
+  const renderOverviewCard = (title, value, icon, color, onPress) => (
+    <TouchableOpacity 
+      style={[styles.overviewCard, { backgroundColor: theme.colors.surface }]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <View style={[styles.overviewIcon, { backgroundColor: color + '20' }]}>
         <Ionicons name={icon} size={24} color={color} />
       </View>
@@ -37,7 +41,7 @@ export default function HomeScreen({ navigation }) {
           {title}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderRecentArticle = (article) => (
@@ -108,9 +112,9 @@ export default function HomeScreen({ navigation }) {
             Overview
           </Text>
           <View style={styles.overviewGrid}>
-            {renderOverviewCard('Feeds', totalFeeds, 'newspaper', theme.colors.primary)}
-            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary)}
-            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.primary)}
+            {renderOverviewCard('Feeds', totalFeeds, 'newspaper', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'AddFeed' }))}
+            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList' }))}
+            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
           </View>
         </View>
 
