@@ -24,27 +24,6 @@ export default function HomeScreen({ navigation }) {
   const readLaterCount = readLaterArticles.length;
   const recentArticles = articles.slice(0, 5); // Get 5 most recent articles
 
-  const quickActions = [
-    {
-      title: 'Add Feed',
-      icon: 'add-circle',
-      color: theme.colors.primary,
-      onPress: () => navigation.navigate('Feeds', { screen: 'AddFeed' }),
-    },
-    {
-      title: 'Saved Articles',
-      icon: 'save',
-      color: theme.colors.accent,
-      onPress: () => navigation.navigate('ReadLater'),
-    },
-    {
-      title: 'Settings',
-      icon: 'settings',
-      color: theme.colors.textSecondary,
-      onPress: () => navigation.navigate('Settings'),
-    },
-  ];
-
   const renderOverviewCard = (title, value, icon, color) => (
     <View style={[styles.overviewCard, { backgroundColor: theme.colors.surface }]}>
       <View style={[styles.overviewIcon, { backgroundColor: color + '20' }]}>
@@ -59,22 +38,6 @@ export default function HomeScreen({ navigation }) {
         </Text>
       </View>
     </View>
-  );
-
-  const renderQuickAction = (action) => (
-    <TouchableOpacity
-      key={action.title}
-      style={[styles.quickAction, { backgroundColor: theme.colors.surface }]}
-      onPress={action.onPress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.quickActionIcon, { backgroundColor: action.color + '20' }]}>
-        <Ionicons name={action.icon} size={24} color={action.color} />
-      </View>
-      <Text style={[styles.quickActionTitle, { color: theme.colors.text }]}>
-        {action.title}
-      </Text>
-    </TouchableOpacity>
   );
 
   const renderRecentArticle = (article) => (
@@ -145,19 +108,9 @@ export default function HomeScreen({ navigation }) {
             Overview
           </Text>
           <View style={styles.overviewGrid}>
-            {renderOverviewCard('Feeds', totalFeeds, 'list', theme.colors.primary)}
-            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.warning)}
-            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.accent)}
-          </View>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            Quick Actions
-          </Text>
-          <View style={styles.quickActionsGrid}>
-            {quickActions.map(renderQuickAction)}
+            {renderOverviewCard('Feeds', totalFeeds, 'newspaper', theme.colors.primary)}
+            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary)}
+            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.primary)}
           </View>
         </View>
 
@@ -262,35 +215,6 @@ const styles = StyleSheet.create({
   overviewTitle: {
     fontSize: 12,
     marginTop: 2,
-    textAlign: 'center',
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  quickAction: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  quickActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  quickActionTitle: {
-    fontSize: 14,
-    fontWeight: '500',
     textAlign: 'center',
   },
   recentArticlesContainer: {
