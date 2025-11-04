@@ -152,7 +152,7 @@ export default function AddFeedScreen({ navigation }) {
       if (error.message.includes('CORS')) {
         errorMessage += 'This feed may not be accessible from the web browser due to CORS restrictions. ';
       } else if (error.message.includes('Network')) {
-        errorMessage += 'Please check your internet connection. ';
+        errorMessage += 'Please check the feed URL and your internet connection. ';
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage += 'The feed URL may be invalid or temporarily unavailable. ';
       } else {
@@ -229,7 +229,7 @@ export default function AddFeedScreen({ navigation }) {
 
               // More specific error handling
               if (error.message.includes('Network request failed') || error.message.includes('fetch')) {
-                errorMessage += 'Network connection error. Please check your internet connection.';
+                errorMessage += 'Network connection error. Please check the feed URL and your internet connection.';
               } else if (error.message.includes('CORS')) {
                 errorMessage += 'This feed cannot be accessed due to browser security restrictions.';
               } else if (error.message.includes('404') || error.message.includes('Not found')) {
