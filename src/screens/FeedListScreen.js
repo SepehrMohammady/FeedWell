@@ -23,11 +23,13 @@ import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 
 export default function FeedListScreen({ navigation }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedArticles, setSelectedArticles] = useState(new Set());
   const flatListRef = useRef(null);
 
   useEffect(() => {
@@ -204,6 +206,48 @@ export default function FeedListScreen({ navigation }) {
     );
   };
 
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedArticles(new Set());
+  };
+
+  const toggleArticleSelection = (articleId) => {
+    const newSelection = new Set(selectedArticles);
+    if (newSelection.has(articleId)) {
+      newSelection.delete(articleId);
+    } else {
+      newSelection.add(articleId);
+    }
+    setSelectedArticles(newSelection);
+  };
+
+  const selectAllArticles = () => {
+    const allIds = new Set(filteredAndSortedArticles.map(a => a.id));
+    setSelectedArticles(allIds);
+  };
+
+  const deselectAllArticles = () => {
+    setSelectedArticles(new Set());
+  };
+
+  const markSelectedAsRead = async () => {
+    for (const articleId of selectedArticles) {
+      await markArticleRead(articleId);
+    }
+    setSelectedArticles(new Set());
+    setSelectionMode(false);
+    setForceRender(prev => prev + 1);
+  };
+
+  const markSelectedAsUnread = async () => {
+    for (const articleId of selectedArticles) {
+      await markArticleUnread(articleId);
+    }
+    setSelectedArticles(new Set());
+    setSelectionMode(false);
+    setForceRender(prev => prev + 1);
+  };
+
   const renderArticle = ({ item, index }) => {
     // Check if this article is before the reading position
     const isBeforeReadingPosition = readingPosition && 
@@ -217,15 +261,34 @@ export default function FeedListScreen({ navigation }) {
     const showReadingPositionAfter = readingPosition && 
       readingPosition.afterArticleId === item.id;
     
+    const isSelected = selectedArticles.has(item.id);
+    
     return (
       <View>
         <TouchableOpacity
           style={[
             styles.articleItem,
-            isBeforeReadingPosition && styles.readPositionArticle
+            isBeforeReadingPosition && styles.readPositionArticle,
+            isSelected && styles.selectedArticle
           ]}
-          onPress={() => handleArticlePress(item)}
+          onPress={() => selectionMode ? toggleArticleSelection(item.id) : handleArticlePress(item)}
+          onLongPress={() => {
+            if (!selectionMode) {
+              setSelectionMode(true);
+              toggleArticleSelection(item.id);
+            }
+          }}
+          delayLongPress={300}
         >
+          {selectionMode && (
+            <View style={styles.selectionCheckbox}>
+              <Ionicons 
+                name={isSelected ? "checkmark-circle" : "ellipse-outline"} 
+                size={28} 
+                color={isSelected ? theme.colors.primary : theme.colors.textSecondary} 
+              />
+            </View>
+          )}
           <View style={styles.articleContent}>
             <View style={styles.articleHeader}>
               <View style={styles.titleRow}>
@@ -240,11 +303,13 @@ export default function FeedListScreen({ navigation }) {
                 <Text style={styles.articleDate}>
                   {formatDate(item.publishedDate)}
                 </Text>
-                <SaveButton 
-                  article={item} 
-                  size={20} 
-                  style={styles.saveButton}
-                />
+                {!selectionMode && (
+                  <SaveButton 
+                    article={item} 
+                    size={20} 
+                    style={styles.saveButton}
+                  />
+                )}
               </View>
             </View>
             
@@ -259,7 +324,7 @@ export default function FeedListScreen({ navigation }) {
             )}
           </View>
           
-          {showImages && (
+          {showImages && !selectionMode && (
             <ArticleImage
               uri={item.imageUrl}
               style={styles.articleImage}
@@ -269,7 +334,7 @@ export default function FeedListScreen({ navigation }) {
         </TouchableOpacity>
 
         {/* Show reading position line after this article if it matches */}
-        {showReadingPositionAfter && (
+        {showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
             onPress={handleGoToReadingPosition}
             onClear={handleClearReadingPosition}
@@ -278,7 +343,7 @@ export default function FeedListScreen({ navigation }) {
         )}
 
         {/* Show potential reading position lines between articles */}
-        {!showReadingPositionAfter && (
+        {!showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
             onPress={() => handleSetReadingPosition(index)}
             onClear={() => {}}
@@ -526,6 +591,18 @@ export default function FeedListScreen({ navigation }) {
       marginTop: 10,
       color: theme.colors.textSecondary,
     },
+    selectionCheckbox: {
+      width: 28,
+      height: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    selectedArticle: {
+      backgroundColor: theme.colors.primary + '20',
+      borderLeftWidth: 4,
+      borderLeftColor: theme.colors.primary,
+    },
   });
 
   if (feeds.length === 0) {
@@ -578,32 +655,90 @@ export default function FeedListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>FeedWell</Text>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={toggleFilter}
-          >
-            <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={toggleSort}
-          >
-            <Ionicons name={getSortButtonIcon()} size={20} color="#007AFF" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={handleMarkAllRead}
-          >
-            <Ionicons name="checkmark-done" size={24} color="#007AFF" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('AddFeed')}
-          >
-            <Ionicons name="add" size={24} color="#007AFF" />
-          </TouchableOpacity>
-        </View>
+        {selectionMode ? (
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={selectAllArticles}
+            >
+              <Ionicons name="checkbox" size={20} color={theme.colors.text} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={deselectAllArticles}
+            >
+              <Ionicons name="square-outline" size={20} color={theme.colors.text} />
+            </TouchableOpacity>
+            {(() => {
+              // Check if selection contains any unread articles
+              const hasUnread = Array.from(selectedArticles).some(id => {
+                const article = filteredAndSortedArticles.find(a => a.id === id);
+                return article && !article.isRead;
+              });
+              // Check if selection contains any read articles
+              const hasRead = Array.from(selectedArticles).some(id => {
+                const article = filteredAndSortedArticles.find(a => a.id === id);
+                return article && article.isRead;
+              });
+              
+              return (
+                <>
+                  {hasUnread && (
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={markSelectedAsRead}
+                      disabled={selectedArticles.size === 0}
+                    >
+                      <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.text} />
+                    </TouchableOpacity>
+                  )}
+                  {hasRead && (
+                    <TouchableOpacity
+                      style={styles.headerButton}
+                      onPress={markSelectedAsUnread}
+                      disabled={selectedArticles.size === 0}
+                    >
+                      <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.text} />
+                    </TouchableOpacity>
+                  )}
+                </>
+              );
+            })()}
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={toggleSelectionMode}
+            >
+              <Ionicons name="close" size={24} color={theme.colors.text} />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={toggleFilter}
+            >
+              <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={toggleSort}
+            >
+              <Ionicons name={getSortButtonIcon()} size={20} color="#007AFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={handleMarkAllRead}
+            >
+              <Ionicons name="checkmark-done" size={24} color="#007AFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate('AddFeed')}
+            >
+              <Ionicons name="add" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {loading && !refreshing && (
