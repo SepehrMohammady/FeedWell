@@ -6,14 +6,6 @@ import { useTheme } from '../context/ThemeContext';
 export default function ReadingPositionIndicator({ onPress, onClear, isActive = false, style }) {
   const { theme } = useTheme();
 
-  // Determine icon color based on background:
-  // When active: accent color background, when inactive: textSecondary background
-  // In dark mode: textSecondary is light (#EBEBF5), accent might be bright, so use dark icon
-  // In light mode: textSecondary is dark (#666), so use light icon
-  const iconColor = isActive 
-    ? (theme.dark ? '#fff' : '#000')  // Active state: opposite of theme
-    : (theme.dark ? '#000' : '#fff'); // Inactive state: textSecondary is light in dark mode
-
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
@@ -50,7 +42,7 @@ export default function ReadingPositionIndicator({ onPress, onClear, isActive = 
         <Ionicons 
           name="bookmark" 
           size={12} 
-          color={iconColor} 
+          color={isActive ? '#fff' : theme.colors.surface}
         />
       </TouchableOpacity>
       <View style={styles.line} />
