@@ -165,11 +165,7 @@ export default function FeedListScreen({ navigation }) {
     const article = filteredAndSortedArticles[articleIndex];
     if (article) {
       setReadingPosition(`after_article_${article.id}`, article.id);
-      Alert.alert(
-        'Reading Position Set',
-        'You can now continue reading from this position. The line will help you remember where you left off.',
-        [{ text: 'OK' }]
-      );
+      // No alert needed - the visual line indicator is sufficient
     }
   };
 

@@ -100,38 +100,18 @@ export default function SaveButton({ article, size = 24, style }) {
         const success = addToReadLater(enhancedArticle);
         
         if (success) {
-          // Use browser-compatible alert for web, Alert for mobile
-          if (typeof window !== 'undefined') {
-            // Web environment - use native alert (or just skip the confirmation)
-            // For better UX in web, we can skip the success message
-            console.log('Article saved for offline reading');
-          } else {
-            // Mobile environment - use Alert
-            const message = enhancedArticle.offlineCached 
-              ? 'Article downloaded and saved for offline reading!' 
-              : 'Article saved (limited offline content available)';
-            Alert.alert(
-              'Saved!',
-              message,
-              [{ text: 'OK' }]
-            );
-          }
+          // Just log success, no popup message
+          const message = enhancedArticle.offlineCached 
+            ? 'Article downloaded and saved for offline reading!' 
+            : 'Article saved (limited offline content available)';
+          console.log(message);
         } else {
-          // Use browser-compatible alert for web, Alert for mobile
-          if (typeof window !== 'undefined') {
-            // Web environment - use native alert
-            window.alert('This article is already saved');
-          } else {
-            // Mobile environment - use Alert
-            Alert.alert(
-              'Already Saved',
-              'This article is already saved',
-              [{ text: 'OK' }]
-            );
-          }
+          // Already saved - just log, no popup
+          console.log('This article is already saved');
         }
       } catch (error) {
         console.error('Error saving article:', error);
+        // Only show error messages
         const errorMessage = error.message.includes('fetch') 
           ? 'Failed to download article content. Saved with limited offline content.'
           : 'Failed to save article. Please try again.';
