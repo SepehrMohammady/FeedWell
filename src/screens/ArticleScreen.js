@@ -43,7 +43,7 @@ export default function ArticleScreen({ route, navigation }) {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `${article.title}\n\n${article.url}`,
+        message: `📰 Shared via FeedWell\n\n${article.title}\n\n${article.url}`,
         url: article.url,
         title: article.title,
       });

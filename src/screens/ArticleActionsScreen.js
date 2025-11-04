@@ -49,7 +49,7 @@ export default function ArticleActionsScreen({ route, navigation }) {
   const handleShare = async () => {
     try {
       const shareOptions = {
-        message: Platform.OS === 'ios' ? article.title : `${article.title}\n\n${article.url}`,
+        message: Platform.OS === 'ios' ? `📰 Shared via FeedWell\n\n${article.title}` : `📰 Shared via FeedWell\n\n${article.title}\n\n${article.url}`,
         url: Platform.OS === 'ios' ? article.url : undefined,
         title: article.title,
       };
