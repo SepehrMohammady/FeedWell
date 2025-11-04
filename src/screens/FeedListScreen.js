@@ -617,33 +617,33 @@ export default function FeedListScreen({ navigation }) {
         </View>
       )}
 
-      <FlatList
-        ref={flatListRef}
-        data={filteredAndSortedArticles}
-        renderItem={renderArticle}
-        keyExtractor={(item) => item.id}
-        extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : null}
-        ListEmptyComponent={
-          !loading && (
-            <View style={styles.emptyState}>
-              <Ionicons name="refresh-outline" size={60} color="#ccc" />
-              <Text style={styles.emptyTitle}>
-                {articleFilter === 'unread' ? 'No Unread Articles' : 
-                 articleFilter === 'read' ? 'No Read Articles' : 'No Articles'}
-              </Text>
-              <Text style={styles.emptyDescription}>
-                {articleFilter === 'unread' ? 'All articles have been read' :
-                 articleFilter === 'read' ? 'No articles have been read yet' :
-                 'Pull down to refresh your feeds'}
-              </Text>
-            </View>
-          )
-        }
-      />
+      {filteredAndSortedArticles.length === 0 && !loading ? (
+        <View style={styles.emptyList}>
+          <View style={styles.emptyState}>
+            <Ionicons name="refresh-outline" size={60} color="#ccc" />
+            <Text style={styles.emptyTitle}>
+              {articleFilter === 'unread' ? 'No Unread Articles' : 
+               articleFilter === 'read' ? 'No Read Articles' : 'No Articles'}
+            </Text>
+            <Text style={styles.emptyDescription}>
+              {articleFilter === 'unread' ? 'All articles have been read' :
+               articleFilter === 'read' ? 'No articles have been read yet' :
+               'Pull down to refresh your feeds'}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={filteredAndSortedArticles}
+          renderItem={renderArticle}
+          keyExtractor={(item) => item.id}
+          extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }
