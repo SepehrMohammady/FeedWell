@@ -148,8 +148,8 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
   return (
     <TouchableOpacity
       style={[
-        variant === 'header' ? styles.headerButton : styles.button,
-        variant === 'header' ? {} : { backgroundColor: theme.colors.surface },
+        variant === 'header' || variant === 'simple' ? styles.headerButton : styles.button,
+        variant === 'header' || variant === 'simple' ? {} : { backgroundColor: theme.colors.surface },
         style
       ]}
       onPress={handlePress}

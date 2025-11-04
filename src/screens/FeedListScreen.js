@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Image,
   Platform,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -139,6 +140,22 @@ export default function FeedListScreen({ navigation }) {
         { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
       ]
     );
+  };
+
+  const handleShare = async (article) => {
+    try {
+      const shareOptions = {
+        message: Platform.OS === 'ios' 
+          ? `📰 Shared via FeedWell\n\n${article.title}` 
+          : `📰 Shared via FeedWell\n\n${article.title}\n\n${article.url}`,
+        url: Platform.OS === 'ios' ? article.url : undefined,
+        title: article.title,
+      };
+      
+      await Share.share(shareOptions);
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -303,13 +320,6 @@ export default function FeedListScreen({ navigation }) {
                 <Text style={styles.articleDate}>
                   {formatDate(item.publishedDate)}
                 </Text>
-                {!selectionMode && (
-                  <SaveButton 
-                    article={item} 
-                    size={20} 
-                    style={styles.saveButton}
-                  />
-                )}
               </View>
             </View>
             
@@ -325,11 +335,36 @@ export default function FeedListScreen({ navigation }) {
           </View>
           
           {showImages && !selectionMode && (
-            <ArticleImage
-              uri={item.imageUrl}
-              style={styles.articleImage}
-              resizeMode="cover"
-            />
+            <View style={styles.imageContainer}>
+              {item.imageUrl ? (
+                <ArticleImage
+                  uri={item.imageUrl}
+                  style={styles.articleImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={[styles.articleImage, styles.placeholderImage, { backgroundColor: theme.colors.border }]}>
+                  <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
+                </View>
+              )}
+              <View style={styles.imageActions}>
+                <TouchableOpacity
+                  style={styles.imageActionButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleShare(item);
+                  }}
+                >
+                  <Ionicons name="share-outline" size={20} color={theme.colors.text} />
+                </TouchableOpacity>
+                <SaveButton 
+                  article={item} 
+                  size={20}
+                  variant="simple"
+                  style={styles.imageActionButton}
+                />
+              </View>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -500,11 +535,6 @@ export default function FeedListScreen({ navigation }) {
       fontSize: 12,
       color: theme.colors.textSecondary,
     },
-    saveButton: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-    },
     readPositionArticle: {
       opacity: 0.7,
       borderLeftWidth: 3,
@@ -522,11 +552,30 @@ export default function FeedListScreen({ navigation }) {
       color: theme.colors.textSecondary,
       lineHeight: 20,
     },
+    imageContainer: {
+      marginLeft: 12,
+    },
     articleImage: {
       width: 80,
       height: 80,
       borderRadius: 8,
       backgroundColor: theme.colors.border,
+    },
+    placeholderImage: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    imageActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      marginTop: 4,
+      gap: 4,
+    },
+    imageActionButton: {
+      padding: 4,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     emptyState: {
       flex: 1,
