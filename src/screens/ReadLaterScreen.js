@@ -132,26 +132,21 @@ export default function ReadLaterScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {renderHeader()}
-      {articles.length === 0 ? (
-        <View style={styles.emptyList}>
-          {renderEmptyState()}
-        </View>
-      ) : (
-        <FlatList
-          data={articles}
-          keyExtractor={(item) => item.id}
-          renderItem={renderArticleItem}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl
-              refreshing={loading}
-              onRefresh={() => {}} // Read Later doesn't need refresh
-              tintColor={theme.colors.primary}
-            />
-          }
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      <FlatList
+        data={articles}
+        keyExtractor={(item) => item.id}
+        renderItem={renderArticleItem}
+        ListEmptyComponent={renderEmptyState}
+        contentContainerStyle={articles.length === 0 ? styles.emptyList : styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => {}} // Read Later doesn't need refresh
+            tintColor={theme.colors.primary}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 }
@@ -194,7 +189,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   emptyList: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
