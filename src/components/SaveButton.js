@@ -163,7 +163,7 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
         />
       ) : (
         <Ionicons
-          name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+          name={isBookmarked ? 'save' : 'save-outline'}
           size={size}
           color={theme.colors.text}
         />
