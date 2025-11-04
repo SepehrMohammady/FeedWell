@@ -125,7 +125,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
       }
     } catch (err) {
       console.error('Error loading article:', err);
-      setError(err.message);
+      setError('Unable to load article content. Please try using the browser button to view the full article.');
       // Fallback to RSS content
       setFullContent(article.content || article.description || '');
     } finally {

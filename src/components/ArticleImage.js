@@ -11,12 +11,16 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
   if (!uri || loadError) {
     if (!showPlaceholder) return null;
     
+    // Use FeedWell logo as default image with lighter background in dark mode
+    const placeholderBg = theme.dark ? '#3A3A3C' : theme.colors.border;
+    const logoTint = theme.dark ? '#FFFFFF' : undefined;
+    
     return (
-      <View style={[styles.placeholder, style, { backgroundColor: theme.colors.border }]}>
-        <Ionicons 
-          name="image-outline" 
-          size={24} 
-          color={theme.colors.textTertiary} 
+      <View style={[styles.placeholder, style, { backgroundColor: placeholderBg }]}>
+        <Image
+          source={require('../../assets/logo.png')}
+          style={[styles.defaultLogo, logoTint && { tintColor: logoTint }]}
+          resizeMode="contain"
         />
       </View>
     );
@@ -41,5 +45,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
+  },
+  defaultLogo: {
+    width: '60%',
+    height: '60%',
+    opacity: 0.4,
   },
 });

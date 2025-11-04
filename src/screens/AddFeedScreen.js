@@ -110,7 +110,7 @@ export default function AddFeedScreen({ navigation }) {
           feedData = await parseRSSFeedWithProxy(url.trim());
         } catch (proxyError) {
           console.log('CORS proxy also failed:', proxyError.message);
-          throw new Error(`Failed to parse RSS feed: ${error.message}`);
+          throw new Error('Unable to access this feed. Please check the URL or try a different feed.');
         }
       }
       
@@ -155,8 +155,10 @@ export default function AddFeedScreen({ navigation }) {
         errorMessage += 'Please check the feed URL and your internet connection. ';
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage += 'The feed URL may be invalid or temporarily unavailable. ';
+      } else if (error.message.includes('Unable to access')) {
+        errorMessage += error.message.replace('Error: ', '');
       } else {
-        errorMessage += error.message;
+        errorMessage += 'Please verify the feed URL is correct and accessible.';
       }
       
       Alert.alert('Error', errorMessage);
@@ -215,7 +217,7 @@ export default function AddFeedScreen({ navigation }) {
                   [{ text: 'OK' }]
                 );
               } else {
-                throw new Error('Failed to parse feed data');
+                throw new Error('Unable to load feed content. Please check the feed URL and try again.');
               }
             } catch (error) {
               console.error('Error adding categorized feed:', error);
@@ -238,8 +240,10 @@ export default function AddFeedScreen({ navigation }) {
                 errorMessage += 'The feed format is invalid or unsupported.';
               } else if (error.message.includes('timeout')) {
                 errorMessage += 'Request timed out. The feed server may be slow or unavailable.';
+              } else if (error.message.includes('Unable to access')) {
+                errorMessage += error.message.replace('Error: ', '');
               } else {
-                errorMessage += `${error.message}`;
+                errorMessage += 'Please verify the feed URL is correct and try again.';
               }
 
               // Add troubleshooting tip
