@@ -299,6 +299,8 @@ export function FeedProvider({ children }) {
     // Get updated articles from storage after dispatch
     try {
       const storedArticles = await AsyncStorage.getItem('articles');
+      const readingPositionData = await AsyncStorage.getItem('readingPosition');
+      
       if (storedArticles) {
         const articles = JSON.parse(storedArticles);
         const updatedArticles = articles.map(article =>
@@ -308,12 +310,54 @@ export function FeedProvider({ children }) {
         );
         await saveArticles(updatedArticles);
 
-        // Check if all articles are now read and clear reading position if so
-        const allRead = updatedArticles.every(article => article.isRead);
-        if (allRead && updatedArticles.length > 0) {
-          console.log('All articles are read, clearing reading position');
-          dispatch({ type: 'CLEAR_READING_POSITION' });
-          await AsyncStorage.removeItem('readingPosition');
+        // If there's a reading position, check if we need to move it back
+        if (readingPositionData) {
+          const currentPosition = JSON.parse(readingPositionData);
+          
+          // Check if the article that was just read was before or at the reading position
+          if (currentPosition.afterArticleId === articleId || 
+              updatedArticles.find(a => a.id === articleId)) {
+            
+            // Find unread articles before the current position
+            const sortedArticles = [...updatedArticles].sort((a, b) => 
+              new Date(b.pubDate) - new Date(a.pubDate)
+            );
+            
+            const currentPosIndex = sortedArticles.findIndex(a => a.id === currentPosition.afterArticleId);
+            
+            // Find the last unread article before the current position
+            let newPositionIndex = -1;
+            for (let i = currentPosIndex - 1; i >= 0; i--) {
+              if (!sortedArticles[i].isRead) {
+                newPositionIndex = i;
+                break;
+              }
+            }
+            
+            // If no unread articles before current position, find the last read article
+            if (newPositionIndex === -1 && currentPosIndex >= 0) {
+              // Move to the previous article (even if read)
+              newPositionIndex = currentPosIndex - 1;
+            }
+            
+            // Update or clear the reading position
+            if (newPositionIndex >= 0) {
+              const newPositionArticle = sortedArticles[newPositionIndex];
+              const newReadingPosition = {
+                positionId: `after_article_${newPositionArticle.id}`,
+                afterArticleId: newPositionArticle.id,
+                timestamp: new Date().toISOString()
+              };
+              dispatch({ type: 'SET_READING_POSITION', payload: newReadingPosition });
+              await AsyncStorage.setItem('readingPosition', JSON.stringify(newReadingPosition));
+              console.log('Reading position moved back to:', newPositionArticle.id);
+            } else {
+              // Only clear if we're at the very first article
+              console.log('At first article, clearing reading position');
+              dispatch({ type: 'CLEAR_READING_POSITION' });
+              await AsyncStorage.removeItem('readingPosition');
+            }
+          }
         }
       }
     } catch (error) {
