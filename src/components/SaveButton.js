@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
 
-export default function SaveButton({ article, size = 24, style }) {
+export default function SaveButton({ article, size = 24, style, variant = 'default' }) {
   const { theme } = useTheme();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const [isLoading, setIsLoading] = useState(false);
@@ -100,18 +100,38 @@ export default function SaveButton({ article, size = 24, style }) {
         const success = addToReadLater(enhancedArticle);
         
         if (success) {
-          // Just log success, no popup message
-          const message = enhancedArticle.offlineCached 
-            ? 'Article downloaded and saved for offline reading!' 
-            : 'Article saved (limited offline content available)';
-          console.log(message);
+          // Use browser-compatible alert for web, Alert for mobile
+          if (typeof window !== 'undefined') {
+            // Web environment - use native alert (or just skip the confirmation)
+            // For better UX in web, we can skip the success message
+            console.log('Article saved for offline reading');
+          } else {
+            // Mobile environment - use Alert
+            const message = enhancedArticle.offlineCached 
+              ? 'Article downloaded and saved for offline reading!' 
+              : 'Article saved (limited offline content available)';
+            Alert.alert(
+              'Saved!',
+              message,
+              [{ text: 'OK' }]
+            );
+          }
         } else {
-          // Already saved - just log, no popup
-          console.log('This article is already saved');
+          // Use browser-compatible alert for web, Alert for mobile
+          if (typeof window !== 'undefined') {
+            // Web environment - use native alert
+            window.alert('This article is already saved');
+          } else {
+            // Mobile environment - use Alert
+            Alert.alert(
+              'Already Saved',
+              'This article is already saved',
+              [{ text: 'OK' }]
+            );
+          }
         }
       } catch (error) {
         console.error('Error saving article:', error);
-        // Only show error messages
         const errorMessage = error.message.includes('fetch') 
           ? 'Failed to download article content. Saved with limited offline content.'
           : 'Failed to save article. Please try again.';
@@ -128,8 +148,8 @@ export default function SaveButton({ article, size = 24, style }) {
   return (
     <TouchableOpacity
       style={[
-        styles.button,
-        { backgroundColor: theme.colors.surface },
+        variant === 'header' ? styles.headerButton : styles.button,
+        variant === 'header' ? {} : { backgroundColor: theme.colors.surface },
         style
       ]}
       onPress={handlePress}
@@ -143,9 +163,9 @@ export default function SaveButton({ article, size = 24, style }) {
         />
       ) : (
         <Ionicons
-          name={isBookmarked ? 'save' : 'save-outline'}
+          name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
           size={size}
-          color={isBookmarked ? theme.colors.primary : theme.colors.textSecondary}
+          color={theme.colors.text}
         />
       )}
     </TouchableOpacity>
@@ -153,6 +173,11 @@ export default function SaveButton({ article, size = 24, style }) {
 }
 
 const styles = StyleSheet.create({
+  headerButton: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   button: {
     width: 44,
     height: 44,

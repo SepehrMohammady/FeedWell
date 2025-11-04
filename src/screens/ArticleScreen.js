@@ -13,12 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
+import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleScreen({ route, navigation }) {
   const { article } = route.params;
   const [showWebView, setShowWebView] = useState(false);
+  const { theme } = useTheme();
   const { markArticleRead } = useFeed();
 
   // Mark article as read when the screen is viewed
@@ -206,16 +208,16 @@ export default function ArticleScreen({ route, navigation }) {
           style={styles.headerButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerButton} onPress={handleToggleWebView}>
-            <Ionicons name="globe-outline" size={24} color="#007AFF" />
+            <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <SaveButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} variant="header" />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-            <Ionicons name="share-outline" size={24} color="#007AFF" />
+            <Ionicons name="share-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
       </View>

@@ -363,7 +363,7 @@ export default function ArticleReaderScreen({ route, navigation }) {
           >
             <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <SaveButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} variant="header" />
           <TouchableOpacity
             style={styles.headerButton}
             onPress={handleShare}

@@ -166,19 +166,19 @@ export default function ArticleActionsScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.headerButton}
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Article</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
-            <Ionicons name="globe-outline" size={24} color="#fff" />
+            <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <SaveButton article={article} size={24} style={styles.headerButton} />
+          <SaveButton article={article} size={24} variant="header" />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-            <Ionicons name="share-outline" size={24} color="#fff" />
+            <Ionicons name="share-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
       </View>
