@@ -536,6 +536,10 @@ export default function AddFeedScreen({ navigation }) {
       fontSize: 12,
       color: theme.colors.textTertiary,
     },
+    trashButton: {
+      padding: 8,
+      marginLeft: 8,
+    },
     emptyState: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -591,13 +595,9 @@ export default function AddFeedScreen({ navigation }) {
           ) : (
             <View style={styles.section}>
               {feeds.map((feed, index) => (
-                <TouchableOpacity
+                <View
                   key={feed.id || feed.url || index}
                   style={styles.feedItem}
-                  onPress={() => {
-                    console.log('Feed item pressed:', feed);
-                    handleRemoveFeed(feed);
-                  }}
                 >
                   <View style={styles.feedContent}>
                     <Text style={styles.feedTitle} numberOfLines={1}>
@@ -610,8 +610,16 @@ export default function AddFeedScreen({ navigation }) {
                       Added {formatDate(feed.addedAt)}
                     </Text>
                   </View>
-                  <Ionicons name="trash-outline" size={20} color="#ff3b30" />
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      console.log('Trash icon pressed for feed:', feed);
+                      handleRemoveFeed(feed);
+                    }}
+                    style={styles.trashButton}
+                  >
+                    <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+                  </TouchableOpacity>
+                </View>
               ))}
             </View>
           )}
