@@ -47,7 +47,11 @@ export default function ArticleCard({ article, onPress, showFeedTitle = false })
     },
     content: {
       flex: 1,
-      marginRight: showImages && article.imageUrl ? 12 : 0,
+      marginRight: 12,
+    },
+    rightSection: {
+      alignItems: 'center',
+      justifyContent: 'flex-start',
     },
     header: {
       flexDirection: 'row',
@@ -81,6 +85,7 @@ export default function ArticleCard({ article, onPress, showFeedTitle = false })
       width: 80,
       height: 80,
       borderRadius: 8,
+      marginBottom: 8,
     },
     offlineIndicator: {
       flexDirection: 'row',
@@ -89,7 +94,6 @@ export default function ArticleCard({ article, onPress, showFeedTitle = false })
       paddingHorizontal: 6,
       paddingVertical: 2,
       borderRadius: 4,
-      marginLeft: 8,
     },
     offlineText: {
       fontSize: 10,
@@ -115,12 +119,6 @@ export default function ArticleCard({ article, onPress, showFeedTitle = false })
           <Text style={styles.date}>
             {formatDate(article.publishedDate)}
           </Text>
-          {article.offlineCached && (
-            <View style={styles.offlineIndicator}>
-              <Ionicons name="download" size={10} color="#fff" />
-              <Text style={styles.offlineText}>OFFLINE</Text>
-            </View>
-          )}
         </View>
         
         <Text style={styles.title} numberOfLines={2}>
@@ -134,13 +132,21 @@ export default function ArticleCard({ article, onPress, showFeedTitle = false })
         )}
       </View>
       
-      {showImages && article.imageUrl && (
-        <ArticleImage
-          uri={article.imageUrl}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
+      <View style={styles.rightSection}>
+        {showImages && article.imageUrl && (
+          <ArticleImage
+            uri={article.imageUrl}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        )}
+        {article.offlineCached && (
+          <View style={styles.offlineIndicator}>
+            <Ionicons name="download" size={10} color="#fff" />
+            <Text style={styles.offlineText}>OFFLINE</Text>
+          </View>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }

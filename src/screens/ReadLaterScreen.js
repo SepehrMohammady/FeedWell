@@ -11,11 +11,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
-import ArticleCard from '../components/ArticleCard';
+import ArticleImage from '../components/ArticleImage';
 
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
+  const { showImages } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
 
   const handleArticlePress = (article) => {
@@ -92,19 +94,78 @@ export default function ReadLaterScreen({ navigation }) {
 
   const renderArticleItem = ({ item }) => (
     <View style={styles.articleContainer}>
-      <ArticleCard
-        article={item}
-        onPress={() => handleArticlePress(item)}
-        showFeedTitle={true}
-      />
       <TouchableOpacity
-        style={[styles.removeButton, { backgroundColor: theme.colors.error }]}
-        onPress={() => handleRemoveArticle(item.id)}
+        style={[styles.articleCard, { backgroundColor: theme.colors.surface }]}
+        onPress={() => handleArticlePress(item)}
+        activeOpacity={0.7}
       >
-        <Ionicons name="trash-outline" size={16} color="#fff" />
+        <View style={styles.articleContent}>
+          <View style={styles.articleHeader}>
+            <Text style={[styles.feedTitle, { color: theme.colors.primary }]} numberOfLines={1}>
+              {item.feedTitle}
+            </Text>
+            <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
+              {formatDate(item.publishedDate)}
+            </Text>
+          </View>
+          
+          <Text style={[styles.title, { color: theme.colors.text }]} numberOfLines={2}>
+            {item.title}
+          </Text>
+          
+          {item.description && (
+            <Text style={[styles.description, { color: theme.colors.textSecondary }]} numberOfLines={2}>
+              {item.description}
+            </Text>
+          )}
+
+          <View style={styles.footer}>
+            {item.offlineCached && (
+              <View style={[styles.offlineIndicator, { backgroundColor: theme.colors.success || '#28a745' }]}>
+                <Ionicons name="download" size={10} color="#fff" />
+                <Text style={styles.offlineText}>OFFLINE</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              style={[styles.trashButton, { backgroundColor: theme.colors.error }]}
+              onPress={() => handleRemoveArticle(item.id)}
+            >
+              <Ionicons name="trash-outline" size={14} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        
+        {showImages ? (
+          item.imageUrl ? (
+            <ArticleImage
+              uri={item.imageUrl}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.image, styles.placeholderImage, { backgroundColor: theme.colors.border }]}>
+              <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
+            </View>
+          )
+        ) : null}
       </TouchableOpacity>
     </View>
   );
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      return '';
+    }
+  };
 
   const renderHeader = () => (
     <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
@@ -209,25 +270,84 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   articleContainer: {
-    position: 'relative',
     marginBottom: 16,
   },
-  removeButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
+  articleCard: {
+    borderRadius: 12,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    flexDirection: 'row',
+  },
+  articleContent: {
+    flex: 1,
+  },
+  articleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  feedTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
+    marginRight: 8,
+  },
+  date: {
+    fontSize: 12,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 6,
+    lineHeight: 22,
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  offlineIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  offlineText: {
+    fontSize: 10,
+    color: '#fff',
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  trashButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginLeft: 12,
+  },
+  placeholderImage: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
