@@ -18,7 +18,7 @@ import { useFeed } from '../context/FeedContext';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleScreen({ route, navigation }) {
-  const { article } = route.params;
+  const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const [showWebView, setShowWebView] = useState(false);
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
@@ -26,10 +26,10 @@ export default function ArticleScreen({ route, navigation }) {
   // Mark article as read when the screen is viewed
   useEffect(() => {
     if (article && article.id) {
-      console.log('ArticleScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
-      markArticleRead(article.id);
+      console.log('ArticleScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead, 'Filter:', currentFilter, 'Sort:', currentSortOrder);
+      markArticleRead(article.id, currentFilter, currentSortOrder);
     }
-  }, [article, markArticleRead]);
+  }, [article, markArticleRead, currentFilter, currentSortOrder]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

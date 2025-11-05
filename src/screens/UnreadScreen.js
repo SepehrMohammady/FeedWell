@@ -20,8 +20,8 @@ export default function UnreadScreen({ navigation }) {
   const unreadArticles = getUnreadArticles();
 
   const handleArticlePress = (article) => {
-    // Mark as read when opening
-    markArticleRead(article.id);
+    // Mark as read when opening (always in unread filter context)
+    markArticleRead(article.id, 'unread', 'newest');
     navigation.navigate('Feeds', { 
       screen: 'ArticleReader', 
       params: { article } 
@@ -29,7 +29,7 @@ export default function UnreadScreen({ navigation }) {
   };
 
   const handleMarkAsRead = (articleId) => {
-    markArticleRead(articleId);
+    markArticleRead(articleId, 'unread', 'newest');
   };
 
   const handleMarkAllRead = () => {

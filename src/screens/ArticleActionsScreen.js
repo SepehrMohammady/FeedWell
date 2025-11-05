@@ -17,17 +17,17 @@ import { useFeed } from '../context/FeedContext';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
-  const { article } = route.params;
+  const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
 
   // Mark article as read when the actions screen is viewed
   useEffect(() => {
     if (article && article.id) {
-      console.log('ArticleActionsScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead);
-      markArticleRead(article.id);
+      console.log('ArticleActionsScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead, 'Filter:', currentFilter, 'Sort:', currentSortOrder);
+      markArticleRead(article.id, currentFilter, currentSortOrder);
     }
-  }, [article, markArticleRead]);
+  }, [article, markArticleRead, currentFilter, currentSortOrder]);
 
   const handleOpenInBrowser = async () => {
     try {
@@ -43,7 +43,11 @@ export default function ArticleActionsScreen({ route, navigation }) {
   };
 
   const handleReadInApp = () => {
-    navigation.navigate('ArticleReader', { article });
+    navigation.navigate('ArticleReader', { 
+      article,
+      currentFilter,
+      currentSortOrder
+    });
   };
 
   const handleShare = async () => {

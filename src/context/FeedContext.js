@@ -293,8 +293,8 @@ export function FeedProvider({ children }) {
     console.log('FeedContext: clearAllData completed');
   };
 
-  const markArticleRead = useCallback(async (articleId) => {
-    console.log('FeedContext: markArticleRead called for:', articleId);
+  const markArticleRead = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
+    console.log('FeedContext: markArticleRead called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
     // Get updated articles from storage after dispatch
     try {
@@ -310,52 +310,70 @@ export function FeedProvider({ children }) {
         );
         await saveArticles(updatedArticles);
 
-        // If there's a reading position, check if we need to move it back
+        // If there's a reading position, check if we need to adjust it
         if (readingPositionData) {
           const currentPosition = JSON.parse(readingPositionData);
           
-          // Check if the article that was just read was before or at the reading position
-          if (currentPosition.afterArticleId === articleId || 
-              updatedArticles.find(a => a.id === articleId)) {
+          // Only adjust if the article at the bookmark position was just marked read
+          if (currentPosition.afterArticleId === articleId) {
             
-            // Find unread articles before the current position
-            const sortedArticles = [...updatedArticles].sort((a, b) => 
-              new Date(b.pubDate) - new Date(a.pubDate)
-            );
+            // For 'all' filter: Bookmark stays (no adjustment needed)
+            if (currentFilter === 'all') {
+              console.log('All filter: Bookmark stays at current position');
+              return; // Don't move the bookmark
+            }
             
-            const currentPosIndex = sortedArticles.findIndex(a => a.id === currentPosition.afterArticleId);
-            
-            // Find the last unread article before the current position
-            let newPositionIndex = -1;
-            for (let i = currentPosIndex - 1; i >= 0; i--) {
-              if (!sortedArticles[i].isRead) {
-                newPositionIndex = i;
-                break;
+            // For 'unread' filter: Move bookmark back to previous unread article
+            if (currentFilter === 'unread') {
+              // Get unread articles after the update
+              const unreadArticles = updatedArticles.filter(a => !a.isRead);
+              
+              // Apply sorting
+              const sortedArticles = [...unreadArticles].sort((a, b) => 
+                sortOrder === 'newest' 
+                  ? new Date(b.publishedDate) - new Date(a.publishedDate)
+                  : new Date(a.publishedDate) - new Date(b.publishedDate)
+              );
+              
+              // Since the article at bookmark was just read, it's no longer in the unread list
+              // Find where it would have been and move to the previous one
+              const allSortedForReference = [...updatedArticles].sort((a, b) => 
+                sortOrder === 'newest' 
+                  ? new Date(b.publishedDate) - new Date(a.publishedDate)
+                  : new Date(a.publishedDate) - new Date(b.publishedDate)
+              );
+              
+              const readArticleIndex = allSortedForReference.findIndex(a => a.id === articleId);
+              
+              // Find the previous unread article before this position
+              let newPositionArticle = null;
+              for (let i = readArticleIndex - 1; i >= 0; i--) {
+                if (!allSortedForReference[i].isRead) {
+                  newPositionArticle = allSortedForReference[i];
+                  break;
+                }
+              }
+              
+              if (newPositionArticle) {
+                const newReadingPosition = {
+                  positionId: `after_article_${newPositionArticle.id}`,
+                  afterArticleId: newPositionArticle.id,
+                  timestamp: new Date().toISOString()
+                };
+                dispatch({ type: 'SET_READING_POSITION', payload: newReadingPosition });
+                await AsyncStorage.setItem('readingPosition', JSON.stringify(newReadingPosition));
+                console.log('Unread filter: Reading position moved back to:', newPositionArticle.id);
+              } else {
+                console.log('Unread filter: No previous unread article, clearing bookmark');
+                dispatch({ type: 'CLEAR_READING_POSITION' });
+                await AsyncStorage.removeItem('readingPosition');
               }
             }
             
-            // If no unread articles before current position, find the last read article
-            if (newPositionIndex === -1 && currentPosIndex >= 0) {
-              // Move to the previous article (even if read)
-              newPositionIndex = currentPosIndex - 1;
-            }
-            
-            // Update or clear the reading position
-            if (newPositionIndex >= 0) {
-              const newPositionArticle = sortedArticles[newPositionIndex];
-              const newReadingPosition = {
-                positionId: `after_article_${newPositionArticle.id}`,
-                afterArticleId: newPositionArticle.id,
-                timestamp: new Date().toISOString()
-              };
-              dispatch({ type: 'SET_READING_POSITION', payload: newReadingPosition });
-              await AsyncStorage.setItem('readingPosition', JSON.stringify(newReadingPosition));
-              console.log('Reading position moved back to:', newPositionArticle.id);
-            } else {
-              // Only clear if we're at the very first article
-              console.log('At first article, clearing reading position');
-              dispatch({ type: 'CLEAR_READING_POSITION' });
-              await AsyncStorage.removeItem('readingPosition');
+            // For 'read' filter: Bookmark stays (article is still in the read list)
+            if (currentFilter === 'read') {
+              console.log('Read filter: Bookmark stays (article still in read list)');
+              return; // Don't move the bookmark
             }
           }
         }
@@ -365,10 +383,13 @@ export function FeedProvider({ children }) {
     }
   }, []);
 
-  const markArticleUnread = useCallback(async (articleId) => {
+  const markArticleUnread = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
+    console.log('FeedContext: markArticleUnread called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
     try {
       const storedArticles = await AsyncStorage.getItem('articles');
+      const readingPositionData = await AsyncStorage.getItem('readingPosition');
+      
       if (storedArticles) {
         const articles = JSON.parse(storedArticles);
         const updatedArticles = articles.map(article =>
@@ -377,6 +398,66 @@ export function FeedProvider({ children }) {
             : article
         );
         await saveArticles(updatedArticles);
+        
+        // If there's a reading position, check if we need to adjust it
+        if (readingPositionData) {
+          const currentPosition = JSON.parse(readingPositionData);
+          
+          // Only adjust if the article at the bookmark position was just marked unread
+          if (currentPosition.afterArticleId === articleId) {
+            
+            // For 'all' filter: Bookmark stays (article still in the list)
+            if (currentFilter === 'all') {
+              console.log('All filter: Bookmark stays at current position');
+              return; // Don't move the bookmark
+            }
+            
+            // For 'unread' filter: Bookmark stays (article still in unread list)
+            if (currentFilter === 'unread') {
+              console.log('Unread filter: Bookmark stays (article still in unread list)');
+              return; // Don't move the bookmark
+            }
+            
+            // For 'read' filter: Move bookmark back to previous read article
+            if (currentFilter === 'read') {
+              // Get read articles after the update
+              const readArticles = updatedArticles.filter(a => a.isRead);
+              
+              // Apply sorting
+              const allSortedForReference = [...updatedArticles].sort((a, b) => 
+                sortOrder === 'newest' 
+                  ? new Date(b.publishedDate) - new Date(a.publishedDate)
+                  : new Date(a.publishedDate) - new Date(b.publishedDate)
+              );
+              
+              const unreadArticleIndex = allSortedForReference.findIndex(a => a.id === articleId);
+              
+              // Find the previous read article before this position
+              let newPositionArticle = null;
+              for (let i = unreadArticleIndex - 1; i >= 0; i--) {
+                if (allSortedForReference[i].isRead) {
+                  newPositionArticle = allSortedForReference[i];
+                  break;
+                }
+              }
+              
+              if (newPositionArticle) {
+                const newReadingPosition = {
+                  positionId: `after_article_${newPositionArticle.id}`,
+                  afterArticleId: newPositionArticle.id,
+                  timestamp: new Date().toISOString()
+                };
+                dispatch({ type: 'SET_READING_POSITION', payload: newReadingPosition });
+                await AsyncStorage.setItem('readingPosition', JSON.stringify(newReadingPosition));
+                console.log('Read filter: Reading position moved back to:', newPositionArticle.id);
+              } else {
+                console.log('Read filter: No previous read article, clearing bookmark');
+                dispatch({ type: 'CLEAR_READING_POSITION' });
+                await AsyncStorage.removeItem('readingPosition');
+              }
+            }
+          }
+        }
       }
     } catch (error) {
       console.error('Error updating article unread status in storage:', error);

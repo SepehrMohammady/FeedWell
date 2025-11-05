@@ -177,7 +177,11 @@ export default function FeedListScreen({ navigation }) {
   };
 
   const handleArticlePress = (article) => {
-    navigation.navigate('ArticleActions', { article });
+    navigation.navigate('ArticleActions', { 
+      article,
+      currentFilter: articleFilter,
+      currentSortOrder: sortOrder
+    });
   };
 
   const handleSetReadingPosition = (articleIndex) => {
@@ -249,7 +253,7 @@ export default function FeedListScreen({ navigation }) {
 
   const markSelectedAsRead = async () => {
     for (const articleId of selectedArticles) {
-      await markArticleRead(articleId);
+      await markArticleRead(articleId, articleFilter, sortOrder);
     }
     setSelectedArticles(new Set());
     setSelectionMode(false);
@@ -258,7 +262,7 @@ export default function FeedListScreen({ navigation }) {
 
   const markSelectedAsUnread = async () => {
     for (const articleId of selectedArticles) {
-      await markArticleUnread(articleId);
+      await markArticleUnread(articleId, articleFilter, sortOrder);
     }
     setSelectedArticles(new Set());
     setSelectionMode(false);
