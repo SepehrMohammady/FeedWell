@@ -272,7 +272,7 @@ export default function SettingsScreen({ navigation }) {
               <Switch
                 value={autoRefresh}
                 onValueChange={updateAutoRefresh}
-                trackColor={{ false: '#767577', true: '#007AFF' }}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={autoRefresh ? '#fff' : '#f4f3f4'}
               />
             }
@@ -285,7 +285,7 @@ export default function SettingsScreen({ navigation }) {
               <Switch
                 value={showImages}
                 onValueChange={updateShowImages}
-                trackColor={{ false: '#767577', true: '#007AFF' }}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={showImages ? '#fff' : '#f4f3f4'}
               />
             }
@@ -299,7 +299,7 @@ export default function SettingsScreen({ navigation }) {
               <Switch
                 value={isDarkMode}
                 onValueChange={toggleTheme}
-                trackColor={{ false: '#767577', true: '#007AFF' }}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
               />
             }
@@ -313,7 +313,7 @@ export default function SettingsScreen({ navigation }) {
             description="Remove all feeds and articles"
             onPress={handleClearAllData}
             isLast={true}
-            rightElement={<Ionicons name="trash-outline" size={20} color="#ff3b30" />}
+            rightElement={<Ionicons name="trash-outline" size={20} color={theme.colors.error} />}
           />
         </View>
 
@@ -340,13 +340,13 @@ export default function SettingsScreen({ navigation }) {
             title="Developer"
             description="Sepehr Mohammady"
             onPress={handleOpenWebsite}
-            rightElement={<Ionicons name="open-outline" size={20} color="#007AFF" />}
+            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Source Code"
             description="github.com/SepehrMohammady/FeedWell"
             onPress={handleOpenGitHub}
-            rightElement={<Ionicons name="logo-github" size={20} color="#007AFF" />}
+            rightElement={<Ionicons name="logo-github" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Privacy"

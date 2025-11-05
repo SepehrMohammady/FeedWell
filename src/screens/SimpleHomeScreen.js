@@ -29,22 +29,22 @@ export default function SimpleHomeScreen({ navigation }) {
         
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleAddFeed}>
-            <Ionicons name="add" size={24} color="#007AFF" />
+            <Ionicons name="add" size={24} color="theme.colors.primary" />
             <Text style={styles.buttonText}>Add Feed</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.button} onPress={handleMyFeeds}>
-            <Ionicons name="list" size={24} color="#007AFF" />
+            <Ionicons name="list" size={24} color="theme.colors.primary" />
             <Text style={styles.buttonText}>My Feeds</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.button} onPress={handleReadLater}>
-            <Ionicons name="bookmark" size={24} color="#007AFF" />
+            <Ionicons name="bookmark" size={24} color="theme.colors.primary" />
             <Text style={styles.buttonText}>Read Later</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.button} onPress={handleSettings}>
-            <Ionicons name="settings" size={24} color="#007AFF" />
+            <Ionicons name="settings" size={24} color="theme.colors.primary" />
             <Text style={styles.buttonText}>Settings</Text>
           </TouchableOpacity>
         </View>

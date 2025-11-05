@@ -414,14 +414,14 @@ export default function ArticleReaderScreen({ route, navigation }) {
 
         {loading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>Loading article...</Text>
           </View>
         )}
 
         {error && (
           <View style={styles.errorContainer}>
-            <Ionicons name="alert-circle-outline" size={48} color="#FF3B30" />
+            <Ionicons name="alert-circle-outline" size={48} color={theme.colors.error} />
             <Text style={styles.errorTitle}>Failed to load article</Text>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity

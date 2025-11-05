@@ -5,18 +5,19 @@ const ThemeContext = createContext();
 
 export const lightTheme = {
   colors: {
-    primary: '#007AFF',
-    background: '#f5f5f5',
+    primary: '#A17F66',      // Neutral brown from palette
+    background: '#F0F0F0',    // Light neutral gray
     surface: '#ffffff',
     text: '#333333',
     textSecondary: '#666666',
     textTertiary: '#999999',
-    border: '#e0e0e0',
+    border: '#E7E7E7',        // Very light neutral gray from palette
     card: '#ffffff',
-    success: '#34C759',
-    warning: '#FF9500',
-    error: '#FF3B30',
-    accent: '#007AFF',
+    success: '#A2A9A3',       // Muted sage green from palette
+    warning: '#CB936A',       // Warm neutral brown from palette
+    error: '#CD9C8B',         // Muted rose from palette
+    accent: '#5F758E',        // Muted blue-gray from palette
+    disabled: '#C2C9CD',      // Light gray-blue from palette
   },
   shadows: {
     card: {
@@ -34,18 +35,19 @@ export const lightTheme = {
 
 export const darkTheme = {
   colors: {
-    primary: '#0A84FF',
+    primary: '#CDADA0',       // Light neutral beige from palette
     background: '#000000',
     surface: '#1C1C1E',
     text: '#FFFFFF',
-    textSecondary: '#EBEBF5',
-    textTertiary: '#8E8E93',
+    textSecondary: '#DACCBD',  // Warm light neutral from palette
+    textTertiary: '#B6BCBE',   // Cool light neutral from palette
     border: '#38383A',
     card: '#1C1C1E',
-    success: '#30D158',
-    warning: '#FF9F0A',
-    error: '#FF453A',
-    accent: '#0A84FF',
+    success: '#A6B4B2',        // Muted sage from palette
+    warning: '#CD9E7A',        // Warm neutral from palette
+    error: '#D6AD9D',          // Muted rose from palette
+    accent: '#758793',         // Muted blue-gray from palette
+    disabled: '#5E6D74',       // Dark gray-blue from palette
   },
   shadows: {
     card: {

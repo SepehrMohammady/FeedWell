@@ -25,7 +25,7 @@ export default function SimpleSettingsScreen({ navigation }) {
             <Switch
               value={darkModeEnabled}
               onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#e0e0e0', true: '#007AFF' }}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
             />
           </View>
         </View>
@@ -41,7 +41,7 @@ export default function SimpleSettingsScreen({ navigation }) {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#e0e0e0', true: '#007AFF' }}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
             />
           </View>
         </View>

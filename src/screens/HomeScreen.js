@@ -29,7 +29,7 @@ export default function HomeScreen({ navigation }) {
   const lastFiveFeedUrls = lastFiveFeeds.map(feed => feed.url);
   const recentArticles = articles
     .filter(article => lastFiveFeedUrls.includes(article.feedUrl))
-    .slice(0, 10); // Get up to 10 articles from these feeds
+    .slice(0, 5); // Get up to 5 articles from these feeds
 
   const renderOverviewCard = (title, value, icon, color, onPress) => (
     <TouchableOpacity 

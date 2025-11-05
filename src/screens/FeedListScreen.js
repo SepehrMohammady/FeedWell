@@ -479,14 +479,14 @@ export default function FeedListScreen({ navigation }) {
     },
     filterButtonText: {
       fontSize: 12,
-      color: '#007AFF',
+      color: theme.colors.primary,
       fontWeight: '600',
       paddingHorizontal: 8,
       paddingVertical: 4,
       backgroundColor: theme.colors.background,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: '#007AFF',
+      borderColor: theme.colors.primary,
     },
     articleItem: {
       backgroundColor: theme.colors.surface,
@@ -517,7 +517,7 @@ export default function FeedListScreen({ navigation }) {
       width: 8,
       height: 8,
       borderRadius: 4,
-      backgroundColor: '#007AFF',
+      backgroundColor: theme.colors.primary,
       marginRight: 8,
     },
     feedTitle: {
@@ -663,12 +663,12 @@ export default function FeedListScreen({ navigation }) {
             style={styles.addButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
-            <Ionicons name="add" size={24} color="#007AFF" />
+            <Ionicons name="add" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
         
         <View style={styles.emptyState}>
-          <Ionicons name="newspaper-outline" size={100} color="#e0e0e0" />
+          <Ionicons name="newspaper-outline" size={100} color={theme.colors.border} />
           <Text style={styles.emptyTitle}>Welcome to FeedWell</Text>
           <Text style={styles.emptyDescription}>
             Your ad-free RSS reader. Start by adding your first feed to get clean, distraction-free articles.
@@ -683,15 +683,15 @@ export default function FeedListScreen({ navigation }) {
           
           <View style={styles.featuresContainer}>
             <View style={styles.featureItem}>
-              <Ionicons name="shield-checkmark" size={24} color="#34C759" />
+              <Ionicons name="shield-checkmark" size={24} color={theme.colors.success} />
               <Text style={styles.featureText}>Ad-free reading</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="reader" size={24} color="#007AFF" />
+              <Ionicons name="reader" size={24} color={theme.colors.primary} />
               <Text style={styles.featureText}>Clean reader mode</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="share" size={24} color="#FF9500" />
+              <Ionicons name="share" size={24} color={theme.colors.warning} />
               <Text style={styles.featureText}>Easy sharing</Text>
             </View>
           </View>
@@ -772,19 +772,19 @@ export default function FeedListScreen({ navigation }) {
               style={styles.headerButton}
               onPress={toggleSort}
             >
-              <Ionicons name={getSortButtonIcon()} size={20} color="#007AFF" />
+              <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={handleMarkAllRead}
             >
-              <Ionicons name="checkmark-done" size={24} color="#007AFF" />
+              <Ionicons name="checkmark-done" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate('AddFeed')}
             >
-              <Ionicons name="add" size={24} color="#007AFF" />
+              <Ionicons name="add" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>
         )}
@@ -792,7 +792,7 @@ export default function FeedListScreen({ navigation }) {
 
       {loading && !refreshing && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={styles.loadingText}>Loading articles...</Text>
         </View>
       )}

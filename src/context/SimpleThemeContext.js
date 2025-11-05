@@ -5,18 +5,19 @@ const ThemeContext = createContext();
 
 export const lightTheme = {
   colors: {
-    primary: '#007AFF',
-    background: '#f5f5f5',
-    surface: '#ffffff',
+    primary: '#A17F66',
+    background: '#F0F0F0',
+    surface: '#FFFFFF',
     text: '#333333',
     textSecondary: '#666666',
     textTertiary: '#999999',
-    border: '#e0e0e0',
-    card: '#ffffff',
-    success: '#34C759',
-    warning: '#FF9500',
-    error: '#FF3B30',
-    accent: '#007AFF',
+    border: '#E7E7E7',
+    card: '#FFFFFF',
+    success: '#A2A9A3',
+    warning: '#CB936A',
+    error: '#CD9C8B',
+    accent: '#5F758E',
+    disabled: '#C2C9CD',
   },
   shadows: {
     card: {
@@ -31,18 +32,19 @@ export const lightTheme = {
 
 export const darkTheme = {
   colors: {
-    primary: '#0A84FF',
+    primary: '#CDADA0',
     background: '#000000',
     surface: '#1C1C1E',
     text: '#FFFFFF',
-    textSecondary: '#EBEBF5',
-    textTertiary: '#8E8E93',
+    textSecondary: '#DACCBD',
+    textTertiary: '#B6BCBE',
     border: '#38383A',
     card: '#1C1C1E',
-    success: '#30D158',
-    warning: '#FF9F0A',
-    error: '#FF453A',
-    accent: '#0A84FF',
+    success: '#A6B4B2',
+    warning: '#CD9E7A',
+    error: '#D6AD9D',
+    accent: '#758793',
+    disabled: '#5E6D74',
   },
   shadows: {
     card: {

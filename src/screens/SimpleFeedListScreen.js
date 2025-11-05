@@ -14,13 +14,13 @@ export default function SimpleFeedListScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Feeds</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleAddFeed}>
-          <Ionicons name="add" size={24} color="#007AFF" />
+          <Ionicons name="add" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
       
       <ScrollView style={styles.content}>
         <View style={styles.emptyState}>
-          <Ionicons name="list-outline" size={80} color="#ccc" />
+          <Ionicons name="list-outline" size={80} color={theme.colors.border} />
           <Text style={styles.emptyTitle}>No Feeds Yet</Text>
           <Text style={styles.emptySubtitle}>
             Tap the + button to add your first RSS feed
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#007AFF',
+    backgroundColor: theme.colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,

@@ -578,7 +578,7 @@ export default function AddFeedScreen({ navigation }) {
               routes: [{ name: 'FeedList' }],
             })}
           >
-            <Ionicons name="close" size={24} color="#007AFF" />
+            <Ionicons name="close" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Add Feed</Text>
           <View style={styles.headerButton} />
@@ -617,7 +617,7 @@ export default function AddFeedScreen({ navigation }) {
                     }}
                     style={styles.trashButton}
                   >
-                    <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+                    <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
                   </TouchableOpacity>
                 </View>
               ))}

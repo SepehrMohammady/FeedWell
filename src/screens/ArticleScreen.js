@@ -121,12 +121,12 @@ export default function ArticleScreen({ route, navigation }) {
       }
       
       a {
-        color: #007AFF;
+        color: ${theme.colors.primary};
         text-decoration: none;
       }
       
       blockquote {
-        border-left: 4px solid #007AFF;
+        border-left: 4px solid ${theme.colors.primary};
         padding-left: 16px;
         margin: 16px 0;
         font-style: italic;
@@ -174,13 +174,13 @@ export default function ArticleScreen({ route, navigation }) {
             style={styles.headerButton}
             onPress={() => setShowWebView(false)}
           >
-            <Ionicons name="arrow-back" size={24} color="#007AFF" />
+            <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
           <Text style={styles.webViewTitle} numberOfLines={1}>
             {article.title}
           </Text>
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-            <Ionicons name="share-outline" size={24} color="#007AFF" />
+            <Ionicons name="share-outline" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
         
@@ -269,7 +269,7 @@ export default function ArticleScreen({ route, navigation }) {
 
         <View style={styles.footer}>
           <TouchableOpacity style={styles.readOriginalButton} onPress={handleOpenInBrowser}>
-            <Ionicons name="open-outline" size={16} color="#007AFF" />
+            <Ionicons name="open-outline" size={16} color={theme.colors.primary} />
             <Text style={styles.readOriginalText}>Read Original Article</Text>
           </TouchableOpacity>
         </View>
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   feedTitle: {
     fontSize: 14,
-    color: '#007AFF',
+    color: theme.colors.primary,
     fontWeight: '600',
   },
   publishDate: {
@@ -407,16 +407,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.colors.background,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: theme.colors.primary,
   },
   readOriginalText: {
     fontSize: 16,
-    color: '#007AFF',
+    color: theme.colors.primary,
     fontWeight: '600',
     marginLeft: 8,
   },

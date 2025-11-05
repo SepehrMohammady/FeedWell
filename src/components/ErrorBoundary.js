@@ -24,7 +24,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Ionicons name="warning-outline" size={64} color="#ff3b30" />
+          <Ionicons name="warning-outline" size={64} color="#CD9C8B" />
           <Text style={styles.title}>Something went wrong</Text>
           <Text style={styles.message}>
             The app encountered an unexpected error. Please try again.
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   retryButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: 'theme.colors.primary',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
