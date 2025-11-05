@@ -23,7 +23,13 @@ export default function HomeScreen({ navigation }) {
   const totalArticles = articles.length;
   const unreadCount = getUnreadCount();
   const readLaterCount = readLaterArticles.length;
-  const recentArticles = articles.slice(0, 5); // Get 5 most recent articles
+  
+  // Get articles from the last 5 feeds (most recently added feeds)
+  const lastFiveFeeds = feeds.slice(-5).reverse(); // Get last 5 feeds, most recent first
+  const lastFiveFeedUrls = lastFiveFeeds.map(feed => feed.url);
+  const recentArticles = articles
+    .filter(article => lastFiveFeedUrls.includes(article.feedUrl))
+    .slice(0, 10); // Get up to 10 articles from these feeds
 
   const renderOverviewCard = (title, value, icon, color, onPress) => (
     <TouchableOpacity 
