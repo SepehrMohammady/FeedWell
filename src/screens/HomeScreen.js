@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,21 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
 import { useReadLater } from '../context/ReadLaterContext';
+import { parseRSSFeed } from '../utils/rssParser';
 
 export default function HomeScreen({ navigation }) {
   const { theme } = useTheme();
-  const { feeds, articles, getUnreadCount } = useFeed();
+  const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
+  const [refreshing, setRefreshing] = useState(false);
 
   // Calculate stats
   const totalFeeds = feeds.length;
@@ -24,12 +28,50 @@ export default function HomeScreen({ navigation }) {
   const unreadCount = getUnreadCount();
   const readLaterCount = readLaterArticles.length;
   
-  // Get articles from the last 5 feeds (most recently added feeds)
-  const lastFiveFeeds = feeds.slice(-5).reverse(); // Get last 5 feeds, most recent first
-  const lastFiveFeedUrls = lastFiveFeeds.map(feed => feed.url);
-  const recentArticles = articles
-    .filter(article => lastFiveFeedUrls.includes(article.feedUrl))
-    .slice(0, 5); // Get up to 5 articles from these feeds
+  // Get the last 5 articles sorted by publish date (most recent first)
+  const recentArticles = [...articles]
+    .sort((a, b) => new Date(b.pubDate || b.publishedDate) - new Date(a.pubDate || a.publishedDate))
+    .slice(0, 5);
+
+  // Auto-refresh on mount
+  useEffect(() => {
+    if (feeds.length > 0) {
+      refreshFeeds();
+    }
+  }, [feeds.length]);
+
+  const refreshFeeds = async () => {
+    if (feeds.length === 0) return;
+    
+    setLoading(true);
+    try {
+      const allArticles = [];
+      
+      for (const feed of feeds) {
+        try {
+          const parsedFeed = await parseRSSFeed(feed.url);
+          allArticles.push(...parsedFeed.articles);
+        } catch (error) {
+          console.error(`Error parsing feed ${feed.url}:`, error);
+        }
+      }
+      
+      if (allArticles.length > 0) {
+        await addArticles(allArticles);
+      }
+    } catch (error) {
+      setError('Failed to refresh feeds');
+      Alert.alert('Error', 'Failed to refresh feeds. Please check your internet connection.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    refreshFeeds();
+  };
 
   const renderOverviewCard = (title, value, icon, color, onPress) => (
     <TouchableOpacity 
@@ -102,6 +144,14 @@ export default function HomeScreen({ navigation }) {
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
+        }
       >
         {/* Header */}
         <View style={styles.header}>
