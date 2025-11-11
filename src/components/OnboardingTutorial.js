@@ -60,13 +60,6 @@ const ONBOARDING_SLIDES = [
   },
   {
     id: 7,
-    icon: 'reader-outline',
-    title: 'Clean Reader Mode',
-    description: 'Read articles in a beautiful, distraction-free reader mode with support for RTL languages and dark mode.',
-    color: '#A17F66',
-  },
-  {
-    id: 8,
     icon: 'checkmark-circle-outline',
     title: 'You\'re All Set!',
     description: 'Start by adding your first RSS feed and enjoy a better reading experience. Happy reading!',
@@ -156,7 +149,13 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         {/* Skip Button */}
         {!isLastSlide && (
           <TouchableOpacity 
-            style={styles.skipButton}
+            style={[
+              styles.skipButton,
+              { 
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+              }
+            ]}
             onPress={handleSkip}
             activeOpacity={0.6}
             delayPressIn={0}
@@ -251,7 +250,7 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     position: 'absolute',
-    top: 16,
+    top: 60,
     right: 16,
     zIndex: 10,
     paddingVertical: 12,
@@ -261,7 +260,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   skipText: {
     fontSize: 16,
