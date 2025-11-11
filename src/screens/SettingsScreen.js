@@ -314,6 +314,7 @@ export default function SettingsScreen({ navigation }) {
             title="App Tutorial"
             description="Learn how to use FeedWell features"
             onPress={() => setShowTutorial(true)}
+            isLast={true}
             rightElement={<Ionicons name="help-circle-outline" size={20} color={theme.colors.primary} />}
           />
         </View>

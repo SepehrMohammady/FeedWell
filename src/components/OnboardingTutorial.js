@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
-  ScrollView,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +21,7 @@ const ONBOARDING_SLIDES = [
     title: 'Welcome to FeedWell',
     description: 'Your ad-free RSS reader for a clean, distraction-free reading experience across Android, iOS, and Windows.',
     color: '#A17F66',
+    showLogo: true,
   },
   {
     id: 2,
@@ -39,7 +40,7 @@ const ONBOARDING_SLIDES = [
   {
     id: 4,
     icon: 'filter-outline',
-    title: 'Smart Filtering',
+    title: 'Simple Filtering',
     description: 'Filter articles by All, Unread, or Read. Sort by newest or oldest. Find what you need quickly.',
     color: '#CB936A',
   },
@@ -47,7 +48,7 @@ const ONBOARDING_SLIDES = [
     id: 5,
     icon: 'bookmark-outline',
     title: 'Reading Position',
-    description: 'Set a bookmark line to mark your reading position. It smartly adjusts based on your filter and actions.',
+    description: 'Set a bookmark line to mark your reading position. It adjusts based on your filter and actions.',
     color: '#CD9C8B',
   },
   {
@@ -76,17 +77,32 @@ const ONBOARDING_SLIDES = [
 export default function OnboardingTutorial({ visible, onComplete }) {
   const { theme } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const flatListRef = useRef(null);
+  const onViewableItemsChangedRef = useRef(null);
+  const viewabilityConfigRef = useRef({
+    itemVisiblePercentThreshold: 50,
+  });
+
+  // Initialize the callback once
+  if (!onViewableItemsChangedRef.current) {
+    onViewableItemsChangedRef.current = ({ viewableItems }) => {
+      if (viewableItems.length > 0) {
+        setCurrentSlide(viewableItems[0].index);
+      }
+    };
+  }
 
   if (!visible) return null;
 
   const isLastSlide = currentSlide === ONBOARDING_SLIDES.length - 1;
-  const slide = ONBOARDING_SLIDES[currentSlide];
 
   const handleNext = () => {
     if (isLastSlide) {
       onComplete();
     } else {
-      setCurrentSlide(currentSlide + 1);
+      const nextSlide = currentSlide + 1;
+      setCurrentSlide(nextSlide);
+      flatListRef.current?.scrollToIndex({ index: nextSlide, animated: true });
     }
   };
 
@@ -96,9 +112,41 @@ export default function OnboardingTutorial({ visible, onComplete }) {
 
   const handlePrevious = () => {
     if (currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1);
+      const prevSlide = currentSlide - 1;
+      setCurrentSlide(prevSlide);
+      flatListRef.current?.scrollToIndex({ index: prevSlide, animated: true });
     }
   };
+
+  const renderSlide = ({ item }) => (
+    <View style={[styles.slideContainer, { width }]}>
+      <View style={styles.content}>
+        {/* Logo first (only on first slide) */}
+        {item.showLogo && (
+          <Image 
+            source={require('../../assets/logo.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        )}
+
+        {/* Icon */}
+        <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
+          <Ionicons name={item.icon} size={80} color={item.color} />
+        </View>
+
+        {/* Title */}
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          {item.title}
+        </Text>
+
+        {/* Description */}
+        <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
+          {item.description}
+        </Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -108,6 +156,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
           <TouchableOpacity 
             style={styles.skipButton}
             onPress={handleSkip}
+            activeOpacity={0.7}
           >
             <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
               Skip
@@ -115,53 +164,38 @@ export default function OnboardingTutorial({ visible, onComplete }) {
           </TouchableOpacity>
         )}
 
-        {/* Content */}
-        <ScrollView 
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Icon */}
-          <View style={[styles.iconContainer, { backgroundColor: slide.color + '20' }]}>
-            <Ionicons name={slide.icon} size={80} color={slide.color} />
-          </View>
+        {/* Swipeable Content */}
+        <FlatList
+          ref={flatListRef}
+          data={ONBOARDING_SLIDES}
+          renderItem={renderSlide}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onViewableItemsChanged={onViewableItemsChangedRef.current}
+          viewabilityConfig={viewabilityConfigRef.current}
+          bounces={false}
+          scrollEnabled={true}
+        />
 
-          {/* Logo for first slide */}
-          {currentSlide === 0 && (
-            <Image 
-              source={require('../../assets/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
+        {/* Pagination Dots */}
+        <View style={styles.pagination}>
+          {ONBOARDING_SLIDES.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                {
+                  backgroundColor: index === currentSlide 
+                    ? theme.colors.primary 
+                    : theme.colors.border,
+                  width: index === currentSlide ? 24 : 8,
+                }
+              ]}
             />
-          )}
-
-          {/* Title */}
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            {slide.title}
-          </Text>
-
-          {/* Description */}
-          <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
-            {slide.description}
-          </Text>
-
-          {/* Pagination Dots */}
-          <View style={styles.pagination}>
-            {ONBOARDING_SLIDES.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: index === currentSlide 
-                      ? theme.colors.primary 
-                      : theme.colors.border,
-                    width: index === currentSlide ? 24 : 8,
-                  }
-                ]}
-              />
-            ))}
-          </View>
-        </ScrollView>
+          ))}
+        </View>
 
         {/* Navigation Buttons */}
         <View style={styles.navigation}>
@@ -170,6 +204,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
             <TouchableOpacity 
               style={[styles.navButton, styles.previousButton, { borderColor: theme.colors.border }]}
               onPress={handlePrevious}
+              activeOpacity={0.7}
             >
               <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
@@ -184,6 +219,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
               currentSlide === 0 && styles.nextButtonFullWidth
             ]}
             onPress={handleNext}
+            activeOpacity={0.7}
           >
             <Text style={styles.nextButtonText}>
               {isLastSlide ? 'Get Started' : 'Next'}
@@ -211,11 +247,16 @@ const styles = StyleSheet.create({
     top: 16,
     right: 16,
     zIndex: 10,
-    padding: 8,
+    padding: 12,
+    minWidth: 60,
+    alignItems: 'center',
   },
   skipText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  slideContainer: {
+    flex: 1,
   },
   content: {
     flex: 1,
@@ -225,6 +266,11 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 120,
   },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 24,
+  },
   iconContainer: {
     width: 160,
     height: 160,
@@ -232,11 +278,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 32,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 16,
   },
   title: {
     fontSize: 28,
@@ -251,6 +292,10 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   pagination: {
+    position: 'absolute',
+    bottom: 120,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -259,7 +304,6 @@ const styles = StyleSheet.create({
   dot: {
     height: 8,
     borderRadius: 4,
-    transition: 'all 0.3s ease',
   },
   navigation: {
     position: 'absolute',
@@ -282,6 +326,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     flex: 0,
     width: 56,
+    height: 56,
   },
   nextButton: {
     flex: 1,
