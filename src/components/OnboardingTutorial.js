@@ -121,19 +121,21 @@ export default function OnboardingTutorial({ visible, onComplete }) {
   const renderSlide = ({ item }) => (
     <View style={[styles.slideContainer, { width }]}>
       <View style={styles.content}>
-        {/* Logo first (only on first slide) */}
+        {/* Logo (only on first slide, bigger size, no icon) */}
         {item.showLogo && (
           <Image 
             source={require('../../assets/logo.png')} 
-            style={styles.logo}
+            style={styles.logoLarge}
             resizeMode="contain"
           />
         )}
 
-        {/* Icon */}
-        <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-          <Ionicons name={item.icon} size={80} color={item.color} />
-        </View>
+        {/* Icon (not shown on first slide) */}
+        {!item.showLogo && (
+          <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
+            <Ionicons name={item.icon} size={80} color={item.color} />
+          </View>
+        )}
 
         {/* Title */}
         <Text style={[styles.title, { color: theme.colors.text }]}>
@@ -156,7 +158,10 @@ export default function OnboardingTutorial({ visible, onComplete }) {
           <TouchableOpacity 
             style={styles.skipButton}
             onPress={handleSkip}
-            activeOpacity={0.7}
+            activeOpacity={0.6}
+            delayPressIn={0}
+            delayPressOut={0}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
               Skip
@@ -205,8 +210,10 @@ export default function OnboardingTutorial({ visible, onComplete }) {
               style={[styles.navButton, styles.previousButton, { borderColor: theme.colors.border }]}
               onPress={handlePrevious}
               activeOpacity={0.7}
+              delayPressIn={0}
+              delayPressOut={0}
             >
-              <Ionicons name="arrow-back" size={24} color={theme.colors.primary} />
+              <Ionicons name="arrow-back" size={20} color={theme.colors.primary} />
             </TouchableOpacity>
           )}
 
@@ -247,9 +254,14 @@ const styles = StyleSheet.create({
     top: 16,
     right: 16,
     zIndex: 10,
-    padding: 12,
-    minWidth: 60,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    minWidth: 70,
+    minHeight: 44,
     alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   skipText: {
     fontSize: 16,
@@ -270,6 +282,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     marginBottom: 24,
+  },
+  logoLarge: {
+    width: 180,
+    height: 180,
+    marginBottom: 32,
   },
   iconContainer: {
     width: 160,
@@ -327,6 +344,8 @@ const styles = StyleSheet.create({
     flex: 0,
     width: 56,
     height: 56,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
   },
   nextButton: {
     flex: 1,
