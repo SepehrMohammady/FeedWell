@@ -17,11 +17,13 @@ import { APP_VERSION } from '../config/version';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
+import OnboardingTutorial from '../components/OnboardingTutorial';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleClearAllData = () => {
     console.log('Attempting to clear all data');
@@ -306,6 +308,16 @@ export default function SettingsScreen({ navigation }) {
           />
         </View>
 
+        <SectionHeader title="Help" />
+        <View style={styles.section}>
+          <SettingItem
+            title="App Tutorial"
+            description="Learn how to use FeedWell features"
+            onPress={() => setShowTutorial(true)}
+            rightElement={<Ionicons name="help-circle-outline" size={20} color={theme.colors.primary} />}
+          />
+        </View>
+
         <SectionHeader title="Data" />
         <View style={styles.section}>
           <SettingItem
@@ -364,6 +376,11 @@ export default function SettingsScreen({ navigation }) {
           </Text>
         </View>
       </ScrollView>
+
+      <OnboardingTutorial 
+        visible={showTutorial} 
+        onComplete={() => setShowTutorial(false)}
+      />
     </SafeAreaView>
   );
 }

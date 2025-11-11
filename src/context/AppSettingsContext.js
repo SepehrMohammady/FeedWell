@@ -8,6 +8,7 @@ export function AppSettingsProvider({ children }) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [articleFilter, setArticleFilter] = useState('all'); // 'all', 'unread', 'read'
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export function AppSettingsProvider({ children }) {
       const savedAutoRefresh = await AsyncStorage.getItem('autoRefresh');
       const savedArticleFilter = await AsyncStorage.getItem('articleFilter');
       const savedSortOrder = await AsyncStorage.getItem('sortOrder');
+      const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -35,6 +37,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedSortOrder !== null) {
         setSortOrder(JSON.parse(savedSortOrder));
+      }
+
+      if (savedHasSeenOnboarding !== null) {
+        setHasSeenOnboarding(JSON.parse(savedHasSeenOnboarding));
       }
     } catch (error) {
       console.error('Error loading app settings:', error);
@@ -79,16 +85,37 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const completeOnboarding = async () => {
+    try {
+      setHasSeenOnboarding(true);
+      await AsyncStorage.setItem('hasSeenOnboarding', JSON.stringify(true));
+    } catch (error) {
+      console.error('Error saving onboarding status:', error);
+    }
+  };
+
+  const resetOnboarding = async () => {
+    try {
+      setHasSeenOnboarding(false);
+      await AsyncStorage.setItem('hasSeenOnboarding', JSON.stringify(false));
+    } catch (error) {
+      console.error('Error resetting onboarding status:', error);
+    }
+  };
+
   const value = {
     showImages,
     autoRefresh,
     articleFilter,
     sortOrder,
+    hasSeenOnboarding,
     isLoading,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,
     updateSortOrder,
+    completeOnboarding,
+    resetOnboarding,
   };
 
   return (
