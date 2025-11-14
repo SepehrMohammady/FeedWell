@@ -120,18 +120,19 @@ function feedReducer(state, action) {
 
 export function FeedProvider({ children }) {
   const [state, dispatch] = useReducer(feedReducer, initialState);
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Auto refresh on app start
+  // Auto refresh on app start - only if articles are empty or user has auto-refresh enabled
   useEffect(() => {
-    if (state.feeds.length > 0) {
-      console.log('Auto-refreshing feeds on app start...');
+    if (state.feeds.length > 0 && !isInitialLoad && state.articles.length === 0) {
+      console.log('Auto-refreshing feeds (no cached articles)...');
       autoRefreshFeeds();
     }
-  }, [state.feeds.length]);
+  }, [state.feeds.length, isInitialLoad]);
 
   const loadData = async () => {
     try {
@@ -188,8 +189,12 @@ export function FeedProvider({ children }) {
           console.error('Error parsing reading position JSON:', parseError);
         }
       }
+      
+      // Mark initial load complete
+      setIsInitialLoad(false);
     } catch (error) {
       console.error('Error loading data:', error);
+      setIsInitialLoad(false);
       // Don't dispatch any state changes if load fails completely
     }
   };

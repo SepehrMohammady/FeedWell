@@ -2,7 +2,7 @@
   "expo": {
     "name": "FeedWell",
     "slug": "feedwell",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,7 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.feedwell.app",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
