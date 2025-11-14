@@ -75,6 +75,18 @@ function updateVersionConfig(newVersion) {
   const configPath = path.join(__dirname, '..', 'src', 'config', 'version.js');
   const buildNumber = generateBuildNumber(newVersion);
   
+  // Read existing config to preserve stage value
+  let existingStage = '';
+  try {
+    const existingContent = fs.readFileSync(configPath, 'utf8');
+    const stageMatch = existingContent.match(/stage:\s*['"`]([^'"`]*)['"`]/);
+    if (stageMatch) {
+      existingStage = stageMatch[1];
+    }
+  } catch (error) {
+    // If can't read existing, default to empty (stable)
+  }
+  
   const content = `/**
  * Centralized version management for FeedWell
  * Update this file to maintain version consistency across the entire app
@@ -88,11 +100,11 @@ export const APP_VERSION = {
   buildNumber: ${buildNumber},
   
   // Release stage
-  stage: 'Beta', // 'Alpha', 'Beta', 'RC', 'Stable'
+  stage: '${existingStage}', // 'Alpha', 'Beta', 'RC', or empty for stable
   
   // Full version string for display
   get fullVersion() {
-    return \`\${this.version} (\${this.stage})\`;
+    return this.stage ? \`\${this.version} (\${this.stage})\` : this.version;
   },
   
   // Version for app stores (combines version and build)

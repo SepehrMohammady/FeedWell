@@ -120,22 +120,19 @@ function feedReducer(state, action) {
 
 export function FeedProvider({ children }) {
   const [state, dispatch] = useReducer(feedReducer, initialState);
-  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Auto refresh on app start - only if articles are missing or user has feeds but no articles
+  // Auto refresh on app start - only after initial load is complete
   useEffect(() => {
-    if (isInitialLoad && state.feeds.length > 0 && state.articles.length === 0) {
-      console.log('Auto-refreshing feeds on app start (no articles found)...');
+    if (isInitialized && state.feeds.length > 0) {
+      console.log('Auto-refreshing feeds on app start...');
       autoRefreshFeeds();
     }
-    if (isInitialLoad && (state.feeds.length > 0 || state.articles.length > 0)) {
-      setIsInitialLoad(false);
-    }
-  }, [state.feeds.length, state.articles.length, isInitialLoad]);
+  }, [isInitialized, state.feeds.length]);
 
   const loadData = async () => {
     try {
@@ -153,8 +150,8 @@ export function FeedProvider({ children }) {
         try {
           const parsedFeeds = JSON.parse(feeds);
           console.log('Parsed feeds:', parsedFeeds);
-          // Validate that we got an array (allow empty arrays)
-          if (Array.isArray(parsedFeeds)) {
+          // Validate that we got an array
+          if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
             dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
           } else {
             console.warn('Parsed feeds is not a valid array, skipping load');
@@ -171,7 +168,7 @@ export function FeedProvider({ children }) {
         try {
           const parsedArticles = JSON.parse(articles);
           console.log('Parsed articles count:', parsedArticles.length);
-          // Validate that we got an array (allow empty arrays)
+          // Validate that we got an array
           if (Array.isArray(parsedArticles)) {
             dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
           } else {
@@ -192,9 +189,13 @@ export function FeedProvider({ children }) {
           console.error('Error parsing reading position JSON:', parseError);
         }
       }
+      
+      // Mark as initialized after loading data
+      setIsInitialized(true);
     } catch (error) {
       console.error('Error loading data:', error);
       // Don't dispatch any state changes if load fails completely
+      setIsInitialized(true); // Still mark as initialized even on error
     }
   };
 

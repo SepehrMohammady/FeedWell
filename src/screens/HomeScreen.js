@@ -33,13 +33,6 @@ export default function HomeScreen({ navigation }) {
     .sort((a, b) => new Date(b.pubDate || b.publishedDate) - new Date(a.pubDate || a.publishedDate))
     .slice(0, 5);
 
-  // Auto-refresh on mount
-  useEffect(() => {
-    if (feeds.length > 0) {
-      refreshFeeds();
-    }
-  }, [feeds.length]);
-
   const refreshFeeds = async () => {
     if (feeds.length === 0) return;
     
