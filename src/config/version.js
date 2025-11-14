@@ -11,7 +11,7 @@ export const APP_VERSION = {
   buildNumber: 7,
   
   // Release stage
-  stage: '', // 'Alpha', 'Beta', 'RC', or empty for stable
+  stage: 'RC', // 'Alpha', 'Beta', 'RC', or empty for stable
   
   // Full version string for display
   get fullVersion() {
