@@ -126,13 +126,16 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
-  // Auto refresh on app start - only if articles are empty or user has auto-refresh enabled
+  // Auto refresh on app start - only if articles are missing or user has feeds but no articles
   useEffect(() => {
-    if (state.feeds.length > 0 && !isInitialLoad && state.articles.length === 0) {
-      console.log('Auto-refreshing feeds (no cached articles)...');
+    if (isInitialLoad && state.feeds.length > 0 && state.articles.length === 0) {
+      console.log('Auto-refreshing feeds on app start (no articles found)...');
       autoRefreshFeeds();
     }
-  }, [state.feeds.length, isInitialLoad]);
+    if (isInitialLoad && (state.feeds.length > 0 || state.articles.length > 0)) {
+      setIsInitialLoad(false);
+    }
+  }, [state.feeds.length, state.articles.length, isInitialLoad]);
 
   const loadData = async () => {
     try {
@@ -150,8 +153,8 @@ export function FeedProvider({ children }) {
         try {
           const parsedFeeds = JSON.parse(feeds);
           console.log('Parsed feeds:', parsedFeeds);
-          // Validate that we got an array
-          if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
+          // Validate that we got an array (allow empty arrays)
+          if (Array.isArray(parsedFeeds)) {
             dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
           } else {
             console.warn('Parsed feeds is not a valid array, skipping load');
@@ -168,7 +171,7 @@ export function FeedProvider({ children }) {
         try {
           const parsedArticles = JSON.parse(articles);
           console.log('Parsed articles count:', parsedArticles.length);
-          // Validate that we got an array
+          // Validate that we got an array (allow empty arrays)
           if (Array.isArray(parsedArticles)) {
             dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
           } else {
@@ -189,12 +192,8 @@ export function FeedProvider({ children }) {
           console.error('Error parsing reading position JSON:', parseError);
         }
       }
-      
-      // Mark initial load complete
-      setIsInitialLoad(false);
     } catch (error) {
       console.error('Error loading data:', error);
-      setIsInitialLoad(false);
       // Don't dispatch any state changes if load fails completely
     }
   };
