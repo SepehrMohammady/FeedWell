@@ -121,15 +121,17 @@ function feedReducer(state, action) {
 export function FeedProvider({ children }) {
   const [state, dispatch] = useReducer(feedReducer, initialState);
   const [isInitialized, setIsInitialized] = React.useState(false);
+  const hasAutoRefreshed = React.useRef(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Auto refresh on app start - only after initial load is complete
+  // Auto refresh on app start - only once after initial load is complete
   useEffect(() => {
-    if (isInitialized && state.feeds.length > 0) {
+    if (isInitialized && state.feeds.length > 0 && !hasAutoRefreshed.current) {
       console.log('Auto-refreshing feeds on app start...');
+      hasAutoRefreshed.current = true;
       autoRefreshFeeds();
     }
   }, [isInitialized, state.feeds.length]);
@@ -576,28 +578,30 @@ export function FeedProvider({ children }) {
   }, []);
 
   const markAllRead = useCallback(async () => {
+    const readTimestamp = new Date().toISOString();
+    
+    // Update state first
     dispatch({ type: 'MARK_ALL_READ' });
+    
     try {
-      const storedArticles = await AsyncStorage.getItem('articles');
-      if (storedArticles) {
-        const articles = JSON.parse(storedArticles);
-        const readTimestamp = new Date().toISOString();
-        const updatedArticles = articles.map(article => ({
-          ...article,
-          isRead: true,
-          readAt: readTimestamp
-        }));
-        await saveArticles(updatedArticles);
+      // Use current state articles instead of reading from storage
+      const updatedArticles = state.articles.map(article => ({
+        ...article,
+        isRead: true,
+        readAt: readTimestamp
+      }));
+      
+      // Save updated articles
+      await saveArticles(updatedArticles);
 
-        // Clear reading position since all articles are now read
-        console.log('All articles marked as read, clearing reading position');
-        dispatch({ type: 'CLEAR_READING_POSITION' });
-        await AsyncStorage.removeItem('readingPosition');
-      }
+      // Clear reading position since all articles are now read
+      console.log('All articles marked as read, clearing reading position');
+      dispatch({ type: 'CLEAR_READING_POSITION' });
+      await AsyncStorage.removeItem('readingPosition');
     } catch (error) {
       console.error('Error marking all articles as read in storage:', error);
     }
-  }, []);
+  }, [state.articles]);
 
   const getUnreadArticles = useCallback(() => {
     return state.articles.filter(article => !article.isRead);
