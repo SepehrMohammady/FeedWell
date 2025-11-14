@@ -1,6 +1,6 @@
 {
   "name": "feedwell",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -20,7 +20,10 @@
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/stack": "^7.4.2",
     "expo": "54.0.8",
+    "expo-document-picker": "~14.0.7",
+    "expo-file-system": "~19.0.17",
     "expo-font": "~14.0.8",
+    "expo-sharing": "~14.0.7",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",

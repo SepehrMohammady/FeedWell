@@ -13,16 +13,22 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as DocumentPicker from 'expo-document-picker';
 import { APP_VERSION } from '../config/version';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
+import { useReadLater } from '../context/ReadLaterContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
+import { SafeStorage } from '../utils/SafeStorage';
 
 export default function SettingsScreen({ navigation }) {
-  const { feeds, clearAllData } = useFeed();
+  const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
+  const { articles: readLaterArticles } = useReadLater();
   const [showTutorial, setShowTutorial] = useState(false);
 
   const handleClearAllData = () => {
@@ -111,6 +117,197 @@ export default function SettingsScreen({ navigation }) {
     } catch (error) {
       console.error('Error opening GitHub:', error);
       Alert.alert('Error', 'Failed to open GitHub repository');
+    }
+  };
+
+  const handleBackupData = async () => {
+    try {
+      // Gather all data
+      const backupData = {
+        version: APP_VERSION.version,
+        timestamp: new Date().toISOString(),
+        feeds: feeds,
+        articles: articles,
+        readLater: readLaterArticles,
+        settings: {
+          showImages,
+          autoRefresh,
+          isDarkMode,
+        },
+      };
+
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const fileName = `FeedWell_Backup_${new Date().toISOString().split('T')[0]}.json`;
+
+      if (Platform.OS === 'web') {
+        // Web platform: Download file
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        Alert.alert('Success', 'Backup file downloaded successfully!');
+      } else {
+        // Mobile: Save to file system and share
+        const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+        await FileSystem.writeAsStringAsync(fileUri, jsonString, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+
+        const isAvailable = await Sharing.isAvailableAsync();
+        if (isAvailable) {
+          await Sharing.shareAsync(fileUri, {
+            mimeType: 'application/json',
+            dialogTitle: 'Save FeedWell Backup',
+            UTI: 'public.json',
+          });
+        } else {
+          Alert.alert('Success', `Backup saved to: ${fileUri}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      Alert.alert('Error', 'Failed to create backup. Please try again.');
+    }
+  };
+
+  const handleRestoreData = async () => {
+    try {
+      let jsonString;
+
+      if (Platform.OS === 'web') {
+        // Web platform: Use file input
+        Alert.alert(
+          'Restore Backup',
+          'Please select a FeedWell backup JSON file',
+          [{ text: 'OK' }]
+        );
+        
+        // Create file input dynamically
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              jsonString = event.target.result;
+              await processRestore(jsonString);
+            } catch (error) {
+              Alert.alert('Error', 'Invalid backup file format');
+            }
+          };
+          reader.readAsText(file);
+        };
+        
+        input.click();
+      } else {
+        // Mobile: Use document picker
+        const result = await DocumentPicker.getDocumentAsync({
+          type: 'application/json',
+          copyToCacheDirectory: true,
+        });
+
+        if (result.canceled || !result.assets || result.assets.length === 0) {
+          return;
+        }
+
+        const fileUri = result.assets[0].uri;
+        jsonString = await FileSystem.readAsStringAsync(fileUri, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+
+        await processRestore(jsonString);
+      }
+    } catch (error) {
+      console.error('Error restoring backup:', error);
+      Alert.alert('Error', 'Failed to restore backup. Please check the file and try again.');
+    }
+  };
+
+  const processRestore = async (jsonString) => {
+    try {
+      const backupData = JSON.parse(jsonString);
+
+      // Validate backup structure
+      if (!backupData.feeds || !backupData.articles) {
+        throw new Error('Invalid backup format');
+      }
+
+      // Confirm restore
+      const confirmRestore = () => {
+        return new Promise((resolve) => {
+          if (Platform.OS === 'web') {
+            resolve(window.confirm(
+              `Restore backup from ${backupData.timestamp ? new Date(backupData.timestamp).toLocaleDateString() : 'unknown date'}?\n\n` +
+              `This will replace all current data:\n` +
+              `- ${backupData.feeds.length} feeds\n` +
+              `- ${backupData.articles.length} articles\n` +
+              `- ${backupData.readLater?.length || 0} saved articles\n\n` +
+              `This action cannot be undone.`
+            ));
+          } else {
+            Alert.alert(
+              'Restore Backup',
+              `Restore backup from ${backupData.timestamp ? new Date(backupData.timestamp).toLocaleDateString() : 'unknown date'}?\n\n` +
+              `This will replace all current data:\n` +
+              `- ${backupData.feeds.length} feeds\n` +
+              `- ${backupData.articles.length} articles\n` +
+              `- ${backupData.readLater?.length || 0} saved articles\n\n` +
+              `This action cannot be undone.`,
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Restore', style: 'destructive', onPress: () => resolve(true) },
+              ]
+            );
+          }
+        });
+      };
+
+      const confirmed = await confirmRestore();
+      if (!confirmed) return;
+
+      // Restore feeds
+      await SafeStorage.setItem('feeds', JSON.stringify(backupData.feeds));
+      
+      // Restore articles
+      await SafeStorage.setItem('articles', JSON.stringify(backupData.articles));
+      
+      // Restore read later
+      if (backupData.readLater) {
+        await SafeStorage.setItem('feedwell_read_later_articles', JSON.stringify(backupData.readLater));
+      }
+
+      // Restore settings
+      if (backupData.settings) {
+        if (typeof backupData.settings.showImages === 'boolean') {
+          await updateShowImages(backupData.settings.showImages);
+        }
+        if (typeof backupData.settings.autoRefresh === 'boolean') {
+          await updateAutoRefresh(backupData.settings.autoRefresh);
+        }
+        if (typeof backupData.settings.isDarkMode === 'boolean' && backupData.settings.isDarkMode !== isDarkMode) {
+          await toggleTheme();
+        }
+      }
+
+      Alert.alert(
+        'Success',
+        'Backup restored successfully! Please restart the app to see all changes.',
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error processing restore:', error);
+      throw error;
     }
   };
 
@@ -321,6 +518,18 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Data" />
         <View style={styles.section}>
+          <SettingItem
+            title="Backup Data"
+            description="Export all feeds, articles, and settings"
+            onPress={handleBackupData}
+            rightElement={<Ionicons name="download-outline" size={20} color={theme.colors.primary} />}
+          />
+          <SettingItem
+            title="Restore Data"
+            description="Import data from a backup file"
+            onPress={handleRestoreData}
+            rightElement={<Ionicons name="cloud-upload-outline" size={20} color={theme.colors.primary} />}
+          />
           <SettingItem
             title="Clear All Data"
             description="Remove all feeds and articles"
