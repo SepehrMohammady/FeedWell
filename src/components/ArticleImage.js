@@ -6,14 +6,14 @@ import { useTheme } from '../context/ThemeContext';
 export default function ArticleImage({ uri, style, resizeMode = 'cover', showPlaceholder = true }) {
   const [loadError, setLoadError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   if (!uri || loadError) {
     if (!showPlaceholder) return null;
     
     // Use FeedWell logo as default image with lighter background in dark mode
-    const placeholderBg = theme.dark ? '#3A3A3C' : theme.colors.border;
-    const logoTint = theme.dark ? '#FFFFFF' : undefined;
+    const placeholderBg = isDarkMode ? '#3A3A3C' : theme.colors.border;
+    const logoTint = isDarkMode ? '#FFFFFF' : undefined;
     
     return (
       <View style={[styles.placeholder, style, { backgroundColor: placeholderBg }]}>
