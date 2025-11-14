@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeStorage } from '../utils/SafeStorage';
 
 const FeedContext = createContext();
 
@@ -134,43 +135,89 @@ export function FeedProvider({ children }) {
 
   const loadData = async () => {
     try {
-      console.log('Loading data from AsyncStorage...');
+      console.log('Loading data from SafeStorage...');
       
-      const feeds = await AsyncStorage.getItem('feeds');
-      const articles = await AsyncStorage.getItem('articles');
-      const readingPosition = await AsyncStorage.getItem('readingPosition');
+      const feeds = await SafeStorage.getItem('feeds');
+      const articles = await SafeStorage.getItem('articles');
+      const readingPosition = await SafeStorage.getItem('readingPosition');
       
       console.log('Raw feeds data:', feeds);
       console.log('Raw articles data:', articles ? 'Found' : 'None');
       console.log('Raw reading position data:', readingPosition ? 'Found' : 'None');
       
       if (feeds) {
-        const parsedFeeds = JSON.parse(feeds);
-        console.log('Parsed feeds:', parsedFeeds);
-        dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+        try {
+          const parsedFeeds = JSON.parse(feeds);
+          console.log('Parsed feeds:', parsedFeeds);
+          // Validate that we got an array
+          if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
+            dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+          } else {
+            console.warn('Parsed feeds is not a valid array, skipping load');
+          }
+        } catch (parseError) {
+          console.error('Error parsing feeds JSON:', parseError);
+          // Don't reset feeds if parse fails - keep current state
+        }
       } else {
         console.log('No feeds found in storage');
       }
       
       if (articles) {
-        const parsedArticles = JSON.parse(articles);
-        console.log('Parsed articles count:', parsedArticles.length);
-        dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+        try {
+          const parsedArticles = JSON.parse(articles);
+          console.log('Parsed articles count:', parsedArticles.length);
+          // Validate that we got an array
+          if (Array.isArray(parsedArticles)) {
+            dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+          } else {
+            console.warn('Parsed articles is not a valid array, skipping load');
+          }
+        } catch (parseError) {
+          console.error('Error parsing articles JSON:', parseError);
+          // Don't reset articles if parse fails - keep current state
+        }
       }
 
       if (readingPosition) {
-        const parsedPosition = JSON.parse(readingPosition);
-        console.log('Parsed reading position:', parsedPosition);
-        dispatch({ type: 'SET_READING_POSITION', payload: parsedPosition });
+        try {
+          const parsedPosition = JSON.parse(readingPosition);
+          console.log('Parsed reading position:', parsedPosition);
+          dispatch({ type: 'SET_READING_POSITION', payload: parsedPosition });
+        } catch (parseError) {
+          console.error('Error parsing reading position JSON:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error loading data:', error);
+      // Don't dispatch any state changes if load fails completely
     }
   };
 
   const saveFeeds = async (feeds) => {
     try {
-      await AsyncStorage.setItem('feeds', JSON.stringify(feeds));
+      // Validate feeds before saving
+      if (!Array.isArray(feeds)) {
+        console.error('Cannot save feeds - not an array');
+        return;
+      }
+      
+      // Create backup before saving
+      const existingFeeds = await SafeStorage.getItem('feeds');
+      if (existingFeeds) {
+        await SafeStorage.setItem('feeds_backup', existingFeeds);
+      }
+      
+      const success = await SafeStorage.setItem('feeds', JSON.stringify(feeds));
+      if (!success) {
+        console.warn('Failed to save feeds - attempting to restore from backup');
+        // Try to restore from backup if save failed
+        const backup = await SafeStorage.getItem('feeds_backup');
+        if (backup) {
+          await SafeStorage.setItem('feeds', backup);
+          console.log('Restored feeds from backup');
+        }
+      }
     } catch (error) {
       console.error('Error saving feeds:', error);
     }
@@ -178,9 +225,68 @@ export function FeedProvider({ children }) {
 
   const saveArticles = async (articles) => {
     try {
-      await AsyncStorage.setItem('articles', JSON.stringify(articles));
+      // Validate articles before saving
+      if (!Array.isArray(articles)) {
+        console.error('Cannot save articles - not an array');
+        return;
+      }
+      
+      // Create backup before saving
+      const existingArticles = await SafeStorage.getItem('articles');
+      if (existingArticles) {
+        await SafeStorage.setItem('articles_backup', existingArticles);
+      }
+      
+      // Limit articles to prevent storage overflow
+      // Keep only the 100 most recent articles per feed
+      const MAX_ARTICLES_PER_FEED = 100;
+      const articlesByFeed = {};
+      
+      articles.forEach(article => {
+        if (!articlesByFeed[article.feedUrl]) {
+          articlesByFeed[article.feedUrl] = [];
+        }
+        articlesByFeed[article.feedUrl].push(article);
+      });
+      
+      // Sort each feed's articles by date and keep only the most recent
+      const limitedArticles = [];
+      Object.values(articlesByFeed).forEach(feedArticles => {
+        const sorted = feedArticles.sort((a, b) => 
+          new Date(b.published || b.pubDate || 0) - new Date(a.published || a.pubDate || 0)
+        );
+        limitedArticles.push(...sorted.slice(0, MAX_ARTICLES_PER_FEED));
+      });
+      
+      const success = await SafeStorage.setItem('articles', JSON.stringify(limitedArticles));
+      if (!success) {
+        console.warn('Failed to save articles - attempting with fewer articles');
+        // Try with even fewer articles if it still fails
+        const reducedArticles = limitedArticles.slice(0, 500);
+        const retrySuccess = await SafeStorage.setItem('articles', JSON.stringify(reducedArticles));
+        
+        if (!retrySuccess) {
+          console.warn('Failed to save articles even with reduction - restoring from backup');
+          // Restore from backup if both attempts failed
+          const backup = await SafeStorage.getItem('articles_backup');
+          if (backup) {
+            await SafeStorage.setItem('articles', backup);
+            console.log('Restored articles from backup');
+          }
+        }
+      }
     } catch (error) {
       console.error('Error saving articles:', error);
+      // Try to restore from backup on error
+      try {
+        const backup = await SafeStorage.getItem('articles_backup');
+        if (backup) {
+          await SafeStorage.setItem('articles', backup);
+          console.log('Restored articles from backup after error');
+        }
+      } catch (restoreError) {
+        console.error('Failed to restore from backup:', restoreError);
+      }
     }
   };
 

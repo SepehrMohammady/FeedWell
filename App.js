@@ -13,7 +13,7 @@ import OnboardingTutorial from './src/components/OnboardingTutorial';
 
 function AppContent() {
   const { hasSeenOnboarding, completeOnboarding, isLoading } = useAppSettings();
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function AppContent() {
     <>
       <NavigationContainer>
         <AppNavigator />
-        <StatusBar style={theme.dark ? "light" : "dark"} />
+        <StatusBar style={isDarkMode ? "light" : "dark"} />
       </NavigationContainer>
       <OnboardingTutorial 
         visible={showOnboarding} 

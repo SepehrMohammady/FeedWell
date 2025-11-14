@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeStorage } from '../utils/SafeStorage';
 
 const ReadLaterContext = createContext();
 
@@ -82,11 +83,20 @@ export function ReadLaterProvider({ children }) {
   const loadReadLaterArticles = async () => {
     try {
       dispatch({ type: SET_LOADING, payload: true });
-      const stored = await AsyncStorage.getItem(READ_LATER_STORAGE_KEY);
+      const stored = await SafeStorage.getItem(READ_LATER_STORAGE_KEY);
       if (stored) {
-        const articles = JSON.parse(stored);
-        console.log('Loaded read later articles from storage:', articles.length);
-        dispatch({ type: SET_READ_LATER_ARTICLES, payload: articles });
+        try {
+          const articles = JSON.parse(stored);
+          // Validate that we got an array
+          if (Array.isArray(articles)) {
+            console.log('Loaded read later articles from storage:', articles.length);
+            dispatch({ type: SET_READ_LATER_ARTICLES, payload: articles });
+          } else {
+            console.warn('Stored read later data is not a valid array');
+          }
+        } catch (parseError) {
+          console.error('Error parsing read later articles JSON:', parseError);
+        }
       }
     } catch (error) {
       console.error('Error loading read later articles:', error);
@@ -97,10 +107,42 @@ export function ReadLaterProvider({ children }) {
 
   const saveReadLaterArticles = async (articles) => {
     try {
-      await AsyncStorage.setItem(READ_LATER_STORAGE_KEY, JSON.stringify(articles));
-      console.log('Saved read later articles to storage:', articles.length);
+      // Validate articles before saving
+      if (!Array.isArray(articles)) {
+        console.error('Cannot save read later articles - not an array');
+        return;
+      }
+      
+      // Create backup before saving
+      const existing = await SafeStorage.getItem(READ_LATER_STORAGE_KEY);
+      if (existing) {
+        await SafeStorage.setItem(`${READ_LATER_STORAGE_KEY}_backup`, existing);
+      }
+      
+      const success = await SafeStorage.setItem(READ_LATER_STORAGE_KEY, JSON.stringify(articles));
+      if (success) {
+        console.log('Saved read later articles to storage:', articles.length);
+      } else {
+        console.warn('Failed to save read later articles - restoring from backup');
+        // Restore from backup if save failed
+        const backup = await SafeStorage.getItem(`${READ_LATER_STORAGE_KEY}_backup`);
+        if (backup) {
+          await SafeStorage.setItem(READ_LATER_STORAGE_KEY, backup);
+          console.log('Restored read later articles from backup');
+        }
+      }
     } catch (error) {
       console.error('Error saving read later articles:', error);
+      // Try to restore from backup on error
+      try {
+        const backup = await SafeStorage.getItem(`${READ_LATER_STORAGE_KEY}_backup`);
+        if (backup) {
+          await SafeStorage.setItem(READ_LATER_STORAGE_KEY, backup);
+          console.log('Restored read later articles from backup after error');
+        }
+      } catch (restoreError) {
+        console.error('Failed to restore read later from backup:', restoreError);
+      }
     }
   };
 
@@ -124,7 +166,7 @@ export function ReadLaterProvider({ children }) {
 
   const clearReadLater = async () => {
     try {
-      await AsyncStorage.removeItem(READ_LATER_STORAGE_KEY);
+      await SafeStorage.removeItem(READ_LATER_STORAGE_KEY);
       dispatch({ type: CLEAR_READ_LATER });
     } catch (error) {
       console.error('Error clearing read later articles:', error);
