@@ -155,9 +155,7 @@ export default function SettingsScreen({ navigation }) {
       } else {
         // Mobile: Save to file system and share
         const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-        await FileSystem.writeAsStringAsync(fileUri, jsonString, {
-          encoding: FileSystem.EncodingType.UTF8,
-        });
+        await FileSystem.writeAsStringAsync(fileUri, jsonString);
 
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
@@ -222,9 +220,7 @@ export default function SettingsScreen({ navigation }) {
         }
 
         const fileUri = result.assets[0].uri;
-        jsonString = await FileSystem.readAsStringAsync(fileUri, {
-          encoding: FileSystem.EncodingType.UTF8,
-        });
+        jsonString = await FileSystem.readAsStringAsync(fileUri);
 
         await processRestore(jsonString);
       }
