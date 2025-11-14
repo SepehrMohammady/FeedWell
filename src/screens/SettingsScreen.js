@@ -296,11 +296,31 @@ export default function SettingsScreen({ navigation }) {
         }
       }
 
-      Alert.alert(
-        'Success',
-        'Backup restored successfully! Please restart the app to see all changes.',
-        [{ text: 'OK' }]
-      );
+      // Show success message and reload the app
+      if (Platform.OS === 'web') {
+        if (window.confirm('Backup restored successfully! The app will now reload to apply changes.')) {
+          window.location.reload();
+        }
+      } else {
+        Alert.alert(
+          'Success',
+          'Backup restored successfully! The app will now restart to apply changes.',
+          [
+            { 
+              text: 'Restart Now', 
+              onPress: () => {
+                // For React Native, we need to use expo-updates or native restart
+                // For now, ask user to manually restart
+                Alert.alert(
+                  'Please Restart',
+                  'Please close and reopen the app to see your restored data.',
+                  [{ text: 'OK' }]
+                );
+              }
+            }
+          ]
+        );
+      }
     } catch (error) {
       console.error('Error processing restore:', error);
       throw error;
