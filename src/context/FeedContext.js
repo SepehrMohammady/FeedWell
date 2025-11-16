@@ -409,19 +409,17 @@ export function FeedProvider({ children }) {
   const markArticleRead = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
     console.log('FeedContext: markArticleRead called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
-    // Get updated articles from storage after dispatch
+    // Use current state instead of reading from storage
     try {
-      const storedArticles = await AsyncStorage.getItem('articles');
       const readingPositionData = await AsyncStorage.getItem('readingPosition');
       
-      if (storedArticles) {
-        const articles = JSON.parse(storedArticles);
-        const updatedArticles = articles.map(article =>
-          article.id === articleId
-            ? { ...article, isRead: true, readAt: new Date().toISOString() }
-            : article
-        );
-        await saveArticles(updatedArticles);
+      // Use current state articles
+      const updatedArticles = state.articles.map(article =>
+        article.id === articleId
+          ? { ...article, isRead: true, readAt: new Date().toISOString() }
+          : article
+      );
+      await saveArticles(updatedArticles);
 
         // If there's a reading position, check if we need to adjust it
         if (readingPositionData) {
@@ -500,17 +498,15 @@ export function FeedProvider({ children }) {
     console.log('FeedContext: markArticleUnread called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
     try {
-      const storedArticles = await AsyncStorage.getItem('articles');
       const readingPositionData = await AsyncStorage.getItem('readingPosition');
       
-      if (storedArticles) {
-        const articles = JSON.parse(storedArticles);
-        const updatedArticles = articles.map(article =>
-          article.id === articleId
-            ? { ...article, isRead: false, readAt: null }
-            : article
-        );
-        await saveArticles(updatedArticles);
+      // Use current state articles
+      const updatedArticles = state.articles.map(article =>
+        article.id === articleId
+          ? { ...article, isRead: false, readAt: null }
+          : article
+      );
+      await saveArticles(updatedArticles);
         
         // If there's a reading position, check if we need to adjust it
         if (readingPositionData) {
