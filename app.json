@@ -27,7 +27,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.feedwell.app",
-      "versionCode": 9,
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
