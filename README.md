@@ -19,6 +19,8 @@ FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. 
 ### 🎯 **Reading Features**
 - **Reading Position Bookmarks**: Visual markers to track your progress between articles
 - **Auto-scroll**: Automatically scrolls to your last reading position
+- **Read Later**: Save articles for reading later
+- **Unread Filter**: View only unread articles with persistent read status
 - **Multiple View Modes**: Clean text view or original web view
 - **Offline Reading**: Articles cached locally for offline access
 - **Media Support**: Images and media preserved in articles
@@ -32,7 +34,8 @@ FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. 
 ### 🛡️ **Privacy & Security**
 - **No Data Collection**: All data stays on your device
 - **No Tracking**: No analytics or user tracking
-- **Local Storage**: Feeds and articles stored locally using AsyncStorage
+- **Local Storage**: Feeds and articles stored locally with SafeStorage
+- **Automatic Backups**: Create and restore local backups of your data
 - **No External Dependencies**: No third-party services required
 
 ### 🎨 **User Experience**
@@ -63,9 +66,23 @@ npm start
 ## 📱 Building for Production
 
 ### Android APK
+
+**Option 1: EAS Build (Cloud)**
 ```bash
 npm install -g eas-cli
 eas build --platform android --profile preview
+```
+
+**Option 2: Local Build**
+```bash
+# Generate native Android project
+npx expo prebuild --platform android
+
+# Build with Gradle
+cd android
+.\gradlew assembleRelease
+
+# APK location: android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ### iOS
@@ -76,11 +93,12 @@ eas build --platform ios --profile preview
 ## 🏗️ Technical Architecture
 
 ### Technology Stack
-- **React Native** with Expo for cross-platform development
-- **React Navigation** for seamless navigation
-- **AsyncStorage** for local data persistence
+- **React Native** (v0.81.4) with Expo SDK 54.0.0
+- **React Navigation** (Stack + Bottom Tabs)
+- **SafeStorage** wrapper around AsyncStorage with chunking and backup support
 - **Custom RSS Parser** with advanced ad-blocking
-- **Context API** for state management
+- **Context API** with useReducer for state management
+- **Expo FileSystem** for backup/restore functionality
 
 ### Project Structure
 ```
@@ -100,15 +118,16 @@ FeedWell uses a centralized version management system with a single source of tr
 
 **Update to new version:**
 ```bash
-npm run update-version 1.0.0
+node scripts/update-version.js 1.0.0
 ```
 
-**Sync all files to current version:**
-```bash
-npm run sync-version
-```
+The version is stored in `src/config/version.js` and automatically synchronized to `package.json`, `app.json`, and `package-lock.json`. The script preserves the stage value (Beta/RC/Release).
 
-The main version is stored in `src/config/version.js` and automatically synchronized to `package.json`, `app.json`, and `package-lock.json`.
+### Data Storage
+- **SafeStorage**: Custom wrapper with automatic chunking for large datasets (>2MB)
+- **Article Limiting**: Maximum 100 articles per feed to prevent storage overflow
+- **Automatic Backups**: Backups created before major data operations
+- **JSON Export/Import**: Full data backup and restore via Settings
 
 ### Contributing
 1. Fork the repository
