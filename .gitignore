@@ -18,6 +18,10 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Generated native projects (use expo prebuild to regenerate)
+android/
+ios/
+
 # Debug and log files
 *.log
 logcat.txt
