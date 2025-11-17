@@ -488,7 +488,6 @@ export function FeedProvider({ children }) {
             }
           }
         }
-      }
     } catch (error) {
       console.error('Error updating article read status in storage:', error);
     }
@@ -567,7 +566,6 @@ export function FeedProvider({ children }) {
             }
           }
         }
-      }
     } catch (error) {
       console.error('Error updating article unread status in storage:', error);
     }
