@@ -132,7 +132,10 @@ export function FeedProvider({ children }) {
     if (isInitialized && state.feeds.length > 0 && !hasAutoRefreshed.current) {
       console.log('Auto-refreshing feeds on app start...');
       hasAutoRefreshed.current = true;
-      autoRefreshFeeds();
+      // Add small delay to ensure state is fully synchronized
+      setTimeout(() => {
+        autoRefreshFeeds();
+      }, 100);
     }
   }, [isInitialized, state.feeds.length]);
 
@@ -334,10 +337,9 @@ export function FeedProvider({ children }) {
     console.log('Incoming article IDs:', articles.map(a => a.id).slice(0, 5));
     console.log('Current article IDs (first 5):', state.articles.map(a => a.id).slice(0, 5));
     
-    dispatch({ type: 'ADD_ARTICLES', payload: articles });
-    
-    // Use the same merge logic as the reducer for storage
-    const existingArticles = state.articles;
+    // Read current articles from storage to ensure we have the latest saved state
+    const storedArticles = await SafeStorage.getItem('articles');
+    const existingArticles = storedArticles ? JSON.parse(storedArticles) : state.articles;
     const newArticles = articles;
     const mergedArticles = [];
     const existingIds = new Set();
@@ -365,6 +367,10 @@ export function FeedProvider({ children }) {
     console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
     console.log('=== ADD_ARTICLES DEBUG END ===');
 
+    // Dispatch to update state
+    dispatch({ type: 'ADD_ARTICLES', payload: newArticles });
+    
+    // Save merged articles to storage
     await saveArticles(mergedArticles);
   };
 
