@@ -127,17 +127,25 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
-  // Auto refresh on app start - only once after initial load is complete
+  // Auto refresh on app start - only once after initial load is complete AND articles are loaded
   useEffect(() => {
+    // Only auto-refresh when:
+    // 1. Initialization is complete
+    // 2. We have feeds
+    // 3. We haven't already refreshed
+    // 4. Articles state has been loaded (could be 0 for new users, but that's ok)
     if (isInitialized && state.feeds.length > 0 && !hasAutoRefreshed.current) {
-      console.log('Auto-refreshing feeds on app start...');
+      console.log('=== AUTO-REFRESH TRIGGERED ===');
+      console.log('State articles at auto-refresh time:', state.articles.length);
+      console.log('State unread at auto-refresh time:', state.articles.filter(a => !a.isRead).length);
+      console.log('State read at auto-refresh time:', state.articles.filter(a => a.isRead).length);
       hasAutoRefreshed.current = true;
-      // Add small delay to ensure state is fully synchronized
+      // Add delay to ensure React state updates have propagated
       setTimeout(() => {
         autoRefreshFeeds();
-      }, 100);
+      }, 500);
     }
-  }, [isInitialized, state.feeds.length]);
+  }, [isInitialized, state.feeds.length, state.articles.length]);
 
   const loadData = async () => {
     try {
@@ -337,17 +345,18 @@ export function FeedProvider({ children }) {
     console.log('Incoming article IDs:', articles.map(a => a.id).slice(0, 5));
     console.log('Current article IDs (first 5):', state.articles.map(a => a.id).slice(0, 5));
     
-    // Read current articles from storage to ensure we have the latest saved state
-    const storedArticles = await SafeStorage.getItem('articles');
-    const existingArticles = storedArticles ? JSON.parse(storedArticles) : state.articles;
+    // IMPORTANT: Use state.articles as the source of truth for read status
+    // This ensures we preserve the read status that was loaded from storage at app start
+    // DO NOT read from storage here - it might have stale backup data
+    const existingArticles = state.articles;
     const newArticles = articles;
     const mergedArticles = [];
     const existingIds = new Set();
 
-    console.log('Before merge - existing articles:', existingArticles.length);
+    console.log('Before merge - existing articles from state:', existingArticles.length);
     console.log('Before merge - existing unread:', existingArticles.filter(a => !a.isRead).length);
 
-    // First, add all existing articles (preserving read status)
+    // First, add all existing articles (preserving read status from state)
     existingArticles.forEach(article => {
       mergedArticles.push(article);
       existingIds.add(article.id);
@@ -367,8 +376,9 @@ export function FeedProvider({ children }) {
     console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
     console.log('=== ADD_ARTICLES DEBUG END ===');
 
-    // Dispatch to update state
-    dispatch({ type: 'ADD_ARTICLES', payload: newArticles });
+    // Dispatch to update state - use SET_ARTICLES to replace with merged result
+    // This ensures state and storage are in sync
+    dispatch({ type: 'SET_ARTICLES', payload: mergedArticles });
     
     // Save merged articles to storage
     await saveArticles(mergedArticles);

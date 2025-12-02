@@ -91,6 +91,9 @@ export class SafeStorage {
 
   static async removeItem(key) {
     try {
+      // Clear any chunks first
+      await this.clearChunks(key);
+      // Then remove the main key
       await AsyncStorage.removeItem(key);
       return true;
     } catch (error) {
