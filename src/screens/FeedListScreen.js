@@ -23,7 +23,7 @@ import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 
-export default function FeedListScreen({ navigation }) {
+export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder } = useAppSettings();
@@ -32,6 +32,13 @@ export default function FeedListScreen({ navigation }) {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedArticles, setSelectedArticles] = useState(new Set());
   const flatListRef = useRef(null);
+
+  // Apply filter from navigation params (e.g., when clicking Unread from Home)
+  useEffect(() => {
+    if (route?.params?.filter) {
+      updateArticleFilter(route.params.filter);
+    }
+  }, [route?.params?.filter]);
 
   useEffect(() => {
     if (feeds.length > 0) {

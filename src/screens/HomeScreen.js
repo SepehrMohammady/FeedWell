@@ -172,7 +172,7 @@ export default function HomeScreen({ navigation }) {
           </Text>
           <View style={styles.overviewGrid}>
             {renderOverviewCard('Feeds', totalFeeds, 'newspaper', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'AddFeed' }))}
-            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList' }))}
+            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList', params: { filter: 'unread' } }))}
             {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
           </View>
         </View>
