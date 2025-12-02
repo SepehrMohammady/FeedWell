@@ -47,6 +47,36 @@ export default function AddFeedScreen({ navigation }) {
       ]
     },
     {
+      title: 'Sports',
+      feeds: [
+        { name: 'ESPN', url: 'https://www.espn.com/espn/rss/news' },
+        { name: 'BBC Sport', url: 'http://feeds.bbci.co.uk/sport/rss.xml' },
+        { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040' },
+        { name: 'Bleacher Report', url: 'https://bleacherreport.com/articles/feed' },
+        { name: 'Sports Illustrated', url: 'https://www.si.com/rss/si_topstories.rss' },
+      ]
+    },
+    {
+      title: 'Entertainment',
+      feeds: [
+        { name: 'Entertainment Weekly', url: 'https://ew.com/feed/' },
+        { name: 'Variety', url: 'https://variety.com/feed/' },
+        { name: 'Hollywood Reporter', url: 'https://www.hollywoodreporter.com/feed/' },
+        { name: 'Rolling Stone', url: 'https://www.rollingstone.com/feed/' },
+        { name: 'Pitchfork', url: 'https://pitchfork.com/feed/feed-news/rss' },
+      ]
+    },
+    {
+      title: 'Gaming',
+      feeds: [
+        { name: 'IGN', url: 'https://feeds.ign.com/ign/all' },
+        { name: 'Kotaku', url: 'https://kotaku.com/rss' },
+        { name: 'GameSpot', url: 'https://www.gamespot.com/feeds/mashup/' },
+        { name: 'Polygon', url: 'https://www.polygon.com/rss/index.xml' },
+        { name: 'PC Gamer', url: 'https://www.pcgamer.com/rss/' },
+      ]
+    },
+    {
       title: 'Business',
       feeds: [
         { name: 'Harvard Business Review', url: 'https://feeds.hbr.org/harvardbusiness' },
