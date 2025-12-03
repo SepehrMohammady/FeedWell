@@ -303,22 +303,9 @@ export default function SettingsScreen({ navigation }) {
         }
       } else {
         Alert.alert(
-          'Success',
-          'Backup restored successfully! The app will now restart to apply changes.',
-          [
-            { 
-              text: 'Restart Now', 
-              onPress: () => {
-                // For React Native, we need to use expo-updates or native restart
-                // For now, ask user to manually restart
-                Alert.alert(
-                  'Please Restart',
-                  'Please close and reopen the app to see your restored data.',
-                  [{ text: 'OK' }]
-                );
-              }
-            }
-          ]
+          'Restore Complete',
+          'Backup restored successfully! Please close and reopen the app to see your restored data.',
+          [{ text: 'OK' }]
         );
       }
     } catch (error) {
