@@ -180,7 +180,19 @@ export function FeedProvider({ children }) {
       if (articles) {
         try {
           const parsedArticles = JSON.parse(articles);
+          console.log('========== LOAD DATA DEBUG ==========');
           console.log('Parsed articles count:', parsedArticles.length);
+          const readCount = parsedArticles.filter(a => a.isRead === true).length;
+          const unreadCount = parsedArticles.filter(a => !a.isRead).length;
+          console.log('Articles with isRead=true:', readCount);
+          console.log('Articles with isRead=false/undefined:', unreadCount);
+          // Sample of read status for first 5 articles
+          console.log('Sample article read status:', parsedArticles.slice(0, 5).map(a => ({
+            id: a.id?.substring(0, 30),
+            isRead: a.isRead,
+            readAt: a.readAt
+          })));
+          console.log('======================================');
           // Validate that we got an array
           if (Array.isArray(parsedArticles)) {
             dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
@@ -220,21 +232,12 @@ export function FeedProvider({ children }) {
         return;
       }
       
-      // Create backup before saving
-      const existingFeeds = await SafeStorage.getItem('feeds');
-      if (existingFeeds) {
-        await SafeStorage.setItem('feeds_backup', existingFeeds);
-      }
+      // NOTE: Removed automatic backup creation - backup is now only created
+      // during manual backup operation in Settings.
       
       const success = await SafeStorage.setItem('feeds', JSON.stringify(feeds));
       if (!success) {
-        console.warn('Failed to save feeds - attempting to restore from backup');
-        // Try to restore from backup if save failed
-        const backup = await SafeStorage.getItem('feeds_backup');
-        if (backup) {
-          await SafeStorage.setItem('feeds', backup);
-          console.log('Restored feeds from backup');
-        }
+        console.error('Failed to save feeds - storage write failed');
       }
     } catch (error) {
       console.error('Error saving feeds:', error);
@@ -249,11 +252,9 @@ export function FeedProvider({ children }) {
         return;
       }
       
-      // Create backup before saving
-      const existingArticles = await SafeStorage.getItem('articles');
-      if (existingArticles) {
-        await SafeStorage.setItem('articles_backup', existingArticles);
-      }
+      // NOTE: Removed automatic backup creation - backup is now only created
+      // during manual backup operation in Settings. This prevents stale backup
+      // data from overwriting current read status.
       
       // Limit articles to prevent storage overflow
       // Keep only the 100 most recent articles per feed
@@ -276,35 +277,20 @@ export function FeedProvider({ children }) {
         limitedArticles.push(...sorted.slice(0, MAX_ARTICLES_PER_FEED));
       });
       
+      console.log('========== SAVE ARTICLES DEBUG ==========');
+      console.log('Saving articles count:', limitedArticles.length);
+      console.log('Read count being saved:', limitedArticles.filter(a => a.isRead === true).length);
+      console.log('Unread count being saved:', limitedArticles.filter(a => !a.isRead).length);
+      console.log('=========================================');
+      
       const success = await SafeStorage.setItem('articles', JSON.stringify(limitedArticles));
       if (!success) {
-        console.warn('Failed to save articles - attempting with fewer articles');
-        // Try with even fewer articles if it still fails
-        const reducedArticles = limitedArticles.slice(0, 500);
-        const retrySuccess = await SafeStorage.setItem('articles', JSON.stringify(reducedArticles));
-        
-        if (!retrySuccess) {
-          console.warn('Failed to save articles even with reduction - restoring from backup');
-          // Restore from backup if both attempts failed
-          const backup = await SafeStorage.getItem('articles_backup');
-          if (backup) {
-            await SafeStorage.setItem('articles', backup);
-            console.log('Restored articles from backup');
-          }
-        }
-      }
-    } catch (error) {
+        console.error('Failed to save articles - storage write failed');
+        // Don't try to restore from backup as it may have stale data
+        // Just log the error and continue
+      }\n    } catch (error) {
       console.error('Error saving articles:', error);
-      // Try to restore from backup on error
-      try {
-        const backup = await SafeStorage.getItem('articles_backup');
-        if (backup) {
-          await SafeStorage.setItem('articles', backup);
-          console.log('Restored articles from backup after error');
-        }
-      } catch (restoreError) {
-        console.error('Failed to restore from backup:', restoreError);
-      }
+      // Don't try to restore from backup - it may have old read status
     }
   };
 
@@ -590,6 +576,11 @@ export function FeedProvider({ children }) {
   const markAllRead = useCallback(async () => {
     const readTimestamp = new Date().toISOString();
     
+    console.log('========== MARK ALL READ DEBUG ==========');
+    console.log('Timestamp:', readTimestamp);
+    console.log('Current state articles:', state.articles.length);
+    console.log('Current unread count:', state.articles.filter(a => !a.isRead).length);
+    
     // Update state first
     dispatch({ type: 'MARK_ALL_READ' });
     
@@ -601,8 +592,34 @@ export function FeedProvider({ children }) {
         readAt: readTimestamp
       }));
       
+      console.log('Updated articles count:', updatedArticles.length);
+      console.log('All marked as read:', updatedArticles.every(a => a.isRead === true));
+      console.log('Sample after update:', updatedArticles.slice(0, 3).map(a => ({
+        id: a.id?.substring(0, 30),
+        isRead: a.isRead,
+        readAt: a.readAt
+      })));
+      
       // Save updated articles
       await saveArticles(updatedArticles);
+      
+      // VERIFY: Read back from storage to confirm save
+      setTimeout(async () => {
+        try {
+          const verifyData = await SafeStorage.getItem('articles');
+          if (verifyData) {
+            const verifyArticles = JSON.parse(verifyData);
+            const verifyReadCount = verifyArticles.filter(a => a.isRead === true).length;
+            console.log('========== VERIFY SAVE ==========');
+            console.log('Verified articles in storage:', verifyArticles.length);
+            console.log('Verified read count:', verifyReadCount);
+            console.log('Verified unread count:', verifyArticles.filter(a => !a.isRead).length);
+            console.log('==================================');
+          }
+        } catch (e) {
+          console.error('Verify read failed:', e);
+        }
+      }, 1000);
 
       // Clear reading position since all articles are now read
       console.log('All articles marked as read, clearing reading position');
@@ -644,6 +661,58 @@ export function FeedProvider({ children }) {
     }
   }, []);
 
+  // Diagnostic function to verify storage vs state
+  const runDiagnostics = useCallback(async () => {
+    console.log('\n========== FEEDWELL DIAGNOSTICS ==========');
+    console.log('Timestamp:', new Date().toISOString());
+    
+    // State info
+    console.log('\n--- CURRENT STATE ---');
+    console.log('State articles:', state.articles.length);
+    console.log('State read:', state.articles.filter(a => a.isRead === true).length);
+    console.log('State unread:', state.articles.filter(a => !a.isRead).length);
+    
+    // Storage info
+    console.log('\n--- STORAGE ---');
+    try {
+      const storedArticles = await SafeStorage.getItem('articles');
+      if (storedArticles) {
+        const parsed = JSON.parse(storedArticles);
+        console.log('Storage articles:', parsed.length);
+        console.log('Storage read:', parsed.filter(a => a.isRead === true).length);
+        console.log('Storage unread:', parsed.filter(a => !a.isRead).length);
+        
+        // Check for mismatches
+        const stateMismatch = state.articles.length !== parsed.length;
+        const readMismatch = state.articles.filter(a => a.isRead).length !== parsed.filter(a => a.isRead).length;
+        
+        if (stateMismatch || readMismatch) {
+          console.log('\n⚠️ MISMATCH DETECTED!');
+          console.log('Article count mismatch:', stateMismatch);
+          console.log('Read count mismatch:', readMismatch);
+        } else {
+          console.log('\n✅ State and storage are in sync');
+        }
+      } else {
+        console.log('No articles in storage!');
+      }
+      
+      // Check backup
+      const backup = await SafeStorage.getItem('articles_backup');
+      if (backup) {
+        const backupParsed = JSON.parse(backup);
+        console.log('\n--- BACKUP ---');
+        console.log('Backup articles:', backupParsed.length);
+        console.log('Backup read:', backupParsed.filter(a => a.isRead === true).length);
+        console.log('Backup unread:', backupParsed.filter(a => !a.isRead).length);
+      }
+    } catch (e) {
+      console.error('Diagnostics error:', e);
+    }
+    
+    console.log('==========================================\n');
+  }, [state.articles]);
+
   const clearReadingPosition = useCallback(async () => {
     try {
       dispatch({ type: 'CLEAR_READING_POSITION' });
@@ -684,6 +753,7 @@ export function FeedProvider({ children }) {
     setReadingPosition,
     clearReadingPosition,
     loadReadingPosition,
+    runDiagnostics,
     setLoading: (loading) => dispatch({ type: 'SET_LOADING', payload: loading }),
     setError: (error) => dispatch({ type: 'SET_ERROR', payload: error }),
   };

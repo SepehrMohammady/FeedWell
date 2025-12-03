@@ -25,7 +25,7 @@ import OnboardingTutorial from '../components/OnboardingTutorial';
 import { SafeStorage } from '../utils/SafeStorage';
 
 export default function SettingsScreen({ navigation }) {
-  const { feeds, articles, clearAllData } = useFeed();
+  const { feeds, articles, clearAllData, runDiagnostics } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
@@ -550,8 +550,14 @@ export default function SettingsScreen({ navigation }) {
             title="Clear All Data"
             description="Remove all feeds and articles"
             onPress={handleClearAllData}
-            isLast={true}
             rightElement={<Ionicons name="trash-outline" size={20} color={theme.colors.error} />}
+          />
+          <SettingItem
+            title="Run Diagnostics"
+            description="Check storage and state sync (see console)"
+            onPress={() => {\n              runDiagnostics();\n              Alert.alert('Diagnostics', 'Check the console/Metro logs for diagnostic output');\n            }}
+            isLast={true}
+            rightElement={<Ionicons name="bug-outline" size={20} color={theme.colors.warning || '#FFA500'} />}
           />
         </View>
 
