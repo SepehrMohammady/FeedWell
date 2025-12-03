@@ -555,7 +555,10 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title="Run Diagnostics"
             description="Check storage and state sync (see console)"
-            onPress={() => {\n              runDiagnostics();\n              Alert.alert('Diagnostics', 'Check the console/Metro logs for diagnostic output');\n            }}
+            onPress={() => {
+              runDiagnostics();
+              Alert.alert('Diagnostics', 'Check the console/Metro logs for diagnostic output');
+            }}
             isLast={true}
             rightElement={<Ionicons name="bug-outline" size={20} color={theme.colors.warning || '#FFA500'} />}
           />

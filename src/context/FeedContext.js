@@ -288,7 +288,8 @@ export function FeedProvider({ children }) {
         console.error('Failed to save articles - storage write failed');
         // Don't try to restore from backup as it may have stale data
         // Just log the error and continue
-      }\n    } catch (error) {
+      }
+    } catch (error) {
       console.error('Error saving articles:', error);
       // Don't try to restore from backup - it may have old read status
     }
