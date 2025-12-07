@@ -6,18 +6,18 @@ import { useTheme } from '../context/ThemeContext';
 export default function ArticleImage({ uri, style, resizeMode = 'cover', showPlaceholder = true }) {
   const [loadError, setLoadError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   if (!uri || loadError) {
     if (!showPlaceholder) return null;
     
     // Use FeedWell logo as default image - use inverted logo for dark mode
-    const placeholderBg = theme.dark ? '#3A3A3C' : theme.colors.border;
+    const placeholderBg = isDarkMode ? '#3A3A3C' : theme.colors.border;
     
     return (
       <View style={[styles.placeholder, style, { backgroundColor: placeholderBg }]}>
         <Image
-          source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
+          source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
           style={styles.defaultLogo}
           resizeMode="contain"
         />

@@ -68,7 +68,7 @@ const ONBOARDING_SLIDES = [
 ];
 
 export default function OnboardingTutorial({ visible, onComplete }) {
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
   const flatListRef = useRef(null);
   const onViewableItemsChangedRef = useRef(null);
@@ -117,7 +117,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         {/* Logo (only on first slide, bigger size, no icon) */}
         {item.showLogo && (
           <Image 
-            source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
+            source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
             style={styles.logoLarge}
             resizeMode="contain"
           />

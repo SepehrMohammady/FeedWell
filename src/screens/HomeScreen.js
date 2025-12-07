@@ -17,7 +17,7 @@ import { useReadLater } from '../context/ReadLaterContext';
 import { parseRSSFeed } from '../utils/rssParser';
 
 export default function HomeScreen({ navigation }) {
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
   const [refreshing, setRefreshing] = useState(false);
@@ -150,7 +150,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <Image 
-              source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
+              source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
               style={styles.logoIcon}
               resizeMode="contain"
             />
