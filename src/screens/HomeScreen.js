@@ -150,7 +150,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <Image 
-              source={require('../../assets/logo.png')} 
+              source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
               style={styles.logoIcon}
               resizeMode="contain"
             />

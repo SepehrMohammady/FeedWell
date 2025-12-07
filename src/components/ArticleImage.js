@@ -11,15 +11,14 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
   if (!uri || loadError) {
     if (!showPlaceholder) return null;
     
-    // Use FeedWell logo as default image with lighter background in dark mode
+    // Use FeedWell logo as default image - use inverted logo for dark mode
     const placeholderBg = theme.dark ? '#3A3A3C' : theme.colors.border;
-    const logoTint = theme.dark ? '#FFFFFF' : undefined;
     
     return (
       <View style={[styles.placeholder, style, { backgroundColor: placeholderBg }]}>
         <Image
-          source={require('../../assets/logo.png')}
-          style={[styles.defaultLogo, logoTint && { tintColor: logoTint }]}
+          source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
+          style={styles.defaultLogo}
           resizeMode="contain"
         />
       </View>

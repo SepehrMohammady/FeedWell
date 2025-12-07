@@ -117,7 +117,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         {/* Logo (only on first slide, bigger size, no icon) */}
         {item.showLogo && (
           <Image 
-            source={require('../../assets/logo.png')} 
+            source={theme.dark ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
             style={styles.logoLarge}
             resizeMode="contain"
           />

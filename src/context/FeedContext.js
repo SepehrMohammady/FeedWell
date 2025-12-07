@@ -122,6 +122,13 @@ export function FeedProvider({ children }) {
   const [state, dispatch] = useReducer(feedReducer, initialState);
   const [isInitialized, setIsInitialized] = React.useState(false);
   const hasAutoRefreshed = React.useRef(false);
+  // Use a ref to always have access to the latest state (avoids stale closure issues)
+  const stateRef = React.useRef(state);
+  
+  // Keep stateRef in sync with state
+  React.useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     loadData();
@@ -139,6 +146,12 @@ export function FeedProvider({ children }) {
       console.log('State articles at auto-refresh time:', state.articles.length);
       console.log('State unread at auto-refresh time:', state.articles.filter(a => !a.isRead).length);
       console.log('State read at auto-refresh time:', state.articles.filter(a => a.isRead).length);
+      
+      // CRITICAL: Explicitly update stateRef NOW before scheduling auto-refresh
+      // This ensures the setTimeout callback will see the correct state
+      stateRef.current = state;
+      console.log('StateRef explicitly synced with articles:', stateRef.current.articles.length);
+      
       hasAutoRefreshed.current = true;
       // Add delay to ensure React state updates have propagated
       setTimeout(() => {
@@ -269,10 +282,12 @@ export function FeedProvider({ children }) {
       });
       
       // Sort each feed's articles by date and keep only the most recent
+      // CRITICAL FIX v1.0.22: Use publishedDate (the actual field name in article objects)
+      // Previously used published/pubDate which don't exist, causing random article retention
       const limitedArticles = [];
       Object.values(articlesByFeed).forEach(feedArticles => {
         const sorted = feedArticles.sort((a, b) => 
-          new Date(b.published || b.pubDate || 0) - new Date(a.published || a.pubDate || 0)
+          new Date(b.publishedDate || 0) - new Date(a.publishedDate || 0)
         );
         limitedArticles.push(...sorted.slice(0, MAX_ARTICLES_PER_FEED));
       });
@@ -327,23 +342,44 @@ export function FeedProvider({ children }) {
   const addArticles = async (articles) => {
     console.log('=== ADD_ARTICLES DEBUG START ===');
     console.log('Incoming articles count:', articles.length);
-    console.log('Current state articles count:', state.articles.length);
-    console.log('Current unread count:', state.articles.filter(a => !a.isRead).length);
-    console.log('Incoming article IDs:', articles.map(a => a.id).slice(0, 5));
-    console.log('Current article IDs (first 5):', state.articles.map(a => a.id).slice(0, 5));
     
-    // IMPORTANT: Use state.articles as the source of truth for read status
-    // This ensures we preserve the read status that was loaded from storage at app start
-    // DO NOT read from storage here - it might have stale backup data
-    const existingArticles = state.articles;
+    // CRITICAL FIX v1.0.21: ALWAYS read from storage to get authoritative read status
+    // State may be stale due to React batching/timing issues
+    let existingArticles = [];
+    
+    try {
+      const storedArticles = await SafeStorage.getItem('articles');
+      if (storedArticles) {
+        const parsed = JSON.parse(storedArticles);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          existingArticles = parsed;
+          console.log('Loaded articles from STORAGE:', existingArticles.length);
+          console.log('Storage read count:', existingArticles.filter(a => a.isRead).length);
+          console.log('Storage unread count:', existingArticles.filter(a => !a.isRead).length);
+        }
+      }
+    } catch (err) {
+      console.error('Error reading from storage:', err);
+      // Fallback to stateRef if storage read fails
+      existingArticles = stateRef.current.articles;
+      console.log('Fallback to stateRef - articles:', existingArticles.length);
+    }
+    
+    // If storage was empty, check stateRef as backup
+    if (existingArticles.length === 0) {
+      existingArticles = stateRef.current.articles;
+      console.log('Storage empty, using stateRef - articles:', existingArticles.length);
+    }
+    
     const newArticles = articles;
     const mergedArticles = [];
     const existingIds = new Set();
 
-    console.log('Before merge - existing articles from state:', existingArticles.length);
+    console.log('Before merge - existing articles:', existingArticles.length);
+    console.log('Before merge - existing read:', existingArticles.filter(a => a.isRead).length);
     console.log('Before merge - existing unread:', existingArticles.filter(a => !a.isRead).length);
 
-    // First, add all existing articles (preserving read status from state)
+    // First, add all existing articles (preserving read status from storage)
     existingArticles.forEach(article => {
       mergedArticles.push(article);
       existingIds.add(article.id);
@@ -360,6 +396,7 @@ export function FeedProvider({ children }) {
 
     console.log('Actually new articles added:', actuallyNewCount);
     console.log('Final merged articles count:', mergedArticles.length);
+    console.log('Final read count:', mergedArticles.filter(a => a.isRead).length);
     console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
     console.log('=== ADD_ARTICLES DEBUG END ===');
 
@@ -372,15 +409,30 @@ export function FeedProvider({ children }) {
   };
 
   // Auto refresh function for app start
+  // CRITICAL: Use stateRef to get latest state - this function runs in a setTimeout
+  // and would otherwise capture a stale closure
   const autoRefreshFeeds = async () => {
-    if (state.feeds.length === 0) return;
+    // Use stateRef to get the CURRENT state, not the stale closure value
+    const currentFeeds = stateRef.current.feeds;
+    const currentArticles = stateRef.current.articles;
+    
+    console.log('=== AUTO-REFRESH FUNCTION START ===');
+    console.log('Using stateRef - current feeds:', currentFeeds.length);
+    console.log('Using stateRef - current articles:', currentArticles.length);
+    console.log('Using stateRef - current read count:', currentArticles.filter(a => a.isRead).length);
+    console.log('Using stateRef - current unread count:', currentArticles.filter(a => !a.isRead).length);
+    
+    if (currentFeeds.length === 0) {
+      console.log('No feeds to refresh, returning');
+      return;
+    }
     
     try {
       console.log('Auto-refreshing feeds...');
       const { parseRSSFeed } = require('../utils/rssParser');
       const allArticles = [];
       
-      for (const feed of state.feeds) {
+      for (const feed of currentFeeds) {
         try {
           const parsedFeed = await parseRSSFeed(feed.url);
           allArticles.push(...parsedFeed.articles);
@@ -396,6 +448,7 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error during auto-refresh:', error);
     }
+    console.log('=== AUTO-REFRESH FUNCTION END ===');
   };
 
   const clearAllData = async () => {
@@ -410,14 +463,16 @@ export function FeedProvider({ children }) {
   };
 
   const markArticleRead = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
+    // Use stateRef to get the LATEST state (avoids stale closure)
+    const currentArticles = stateRef.current.articles;
     console.log('FeedContext: markArticleRead called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_READ', payload: articleId });
     // Use current state instead of reading from storage
     try {
       const readingPositionData = await AsyncStorage.getItem('readingPosition');
       
-      // Use current state articles
-      const updatedArticles = state.articles.map(article =>
+      // Use stateRef.current for latest articles
+      const updatedArticles = currentArticles.map(article =>
         article.id === articleId
           ? { ...article, isRead: true, readAt: new Date().toISOString() }
           : article
@@ -494,16 +549,18 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error updating article read status in storage:', error);
     }
-  }, []);
+  }, [state.articles]);
 
   const markArticleUnread = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
+    // Use stateRef to get the LATEST state (avoids stale closure)
+    const currentArticles = stateRef.current.articles;
     console.log('FeedContext: markArticleUnread called for:', articleId, 'filter:', currentFilter, 'sort:', sortOrder);
     dispatch({ type: 'MARK_ARTICLE_UNREAD', payload: articleId });
     try {
       const readingPositionData = await AsyncStorage.getItem('readingPosition');
       
-      // Use current state articles
-      const updatedArticles = state.articles.map(article =>
+      // Use stateRef.current for latest articles
+      const updatedArticles = currentArticles.map(article =>
         article.id === articleId
           ? { ...article, isRead: false, readAt: null }
           : article
@@ -572,22 +629,24 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error updating article unread status in storage:', error);
     }
-  }, []);
+  }, [state.articles]);
 
   const markAllRead = useCallback(async () => {
+    // Use stateRef to get the LATEST state (avoids stale closure)
+    const currentArticles = stateRef.current.articles;
     const readTimestamp = new Date().toISOString();
     
     console.log('========== MARK ALL READ DEBUG ==========');
     console.log('Timestamp:', readTimestamp);
-    console.log('Current state articles:', state.articles.length);
-    console.log('Current unread count:', state.articles.filter(a => !a.isRead).length);
+    console.log('Current state articles:', currentArticles.length);
+    console.log('Current unread count:', currentArticles.filter(a => !a.isRead).length);
     
     // Update state first
     dispatch({ type: 'MARK_ALL_READ' });
     
     try {
-      // Use current state articles instead of reading from storage
-      const updatedArticles = state.articles.map(article => ({
+      // Use stateRef.current for latest articles
+      const updatedArticles = currentArticles.map(article => ({
         ...article,
         isRead: true,
         readAt: readTimestamp
