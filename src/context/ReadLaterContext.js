@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeStorage } from '../utils/SafeStorage';
 
@@ -69,14 +69,19 @@ const READ_LATER_STORAGE_KEY = 'feedwell_read_later_articles';
 // Provider component
 export function ReadLaterProvider({ children }) {
   const [state, dispatch] = useReducer(readLaterReducer, initialState);
+  const isInitialLoad = useRef(true);
 
   // Load read later articles from storage on app start
   useEffect(() => {
     loadReadLaterArticles();
   }, []);
 
-  // Save to storage whenever articles change
+  // Save to storage whenever articles change (but not on initial load)
   useEffect(() => {
+    if (isInitialLoad.current) {
+      // Skip saving on initial load - we just loaded from storage
+      return;
+    }
     saveReadLaterArticles(state.articles);
   }, [state.articles]);
 
@@ -98,8 +103,11 @@ export function ReadLaterProvider({ children }) {
           console.error('Error parsing read later articles JSON:', parseError);
         }
       }
+      // Mark initial load as complete after loading
+      isInitialLoad.current = false;
     } catch (error) {
       console.error('Error loading read later articles:', error);
+      isInitialLoad.current = false;
     } finally {
       dispatch({ type: SET_LOADING, payload: false });
     }
@@ -146,7 +154,7 @@ export function ReadLaterProvider({ children }) {
     }
   };
 
-  const addToReadLater = (article) => {
+  const addToReadLater = useCallback((article) => {
     // Check if article is already in read later
     const exists = state.articles.some(existingArticle => existingArticle.id === article.id);
     if (!exists) {
@@ -158,28 +166,28 @@ export function ReadLaterProvider({ children }) {
       return true; // Successfully added
     }
     return false; // Already exists
-  };
+  }, [state.articles]);
 
-  const removeFromReadLater = (articleId) => {
+  const removeFromReadLater = useCallback((articleId) => {
     dispatch({ type: REMOVE_FROM_READ_LATER, payload: articleId });
-  };
+  }, []);
 
-  const clearReadLater = async () => {
+  const clearReadLater = useCallback(async () => {
     try {
       await SafeStorage.removeItem(READ_LATER_STORAGE_KEY);
       dispatch({ type: CLEAR_READ_LATER });
     } catch (error) {
       console.error('Error clearing read later articles:', error);
     }
-  };
+  }, []);
 
-  const isInReadLater = (articleId) => {
+  const isInReadLater = useCallback((articleId) => {
     return state.articles.some(article => article.id === articleId);
-  };
+  }, [state.articles]);
 
-  const getReadLaterCount = () => {
+  const getReadLaterCount = useCallback(() => {
     return state.articles.length;
-  };
+  }, [state.articles]);
 
   const value = {
     articles: state.articles,

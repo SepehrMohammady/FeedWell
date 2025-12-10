@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,28 @@ import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../ut
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
+import ErrorBoundary from '../components/ErrorBoundary';
 
-export default function ArticleReaderScreen({ route, navigation }) {
+// Maximum characters per chunk to prevent memory issues with very long articles
+const CHUNK_SIZE = 5000;
+
+// Memoized component for rendering content chunks to prevent re-renders
+const ContentChunk = memo(({ text, style, isRTL }) => (
+  <Text
+    style={[
+      style,
+      {
+        writingDirection: isRTL ? 'rtl' : 'ltr',
+        textAlign: isRTL ? 'right' : 'left',
+      }
+    ]}
+  >
+    {text}
+  </Text>
+));
+
+// Main component wrapped with error boundary
+function ArticleReaderScreenContent({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
@@ -33,17 +53,56 @@ export default function ArticleReaderScreen({ route, navigation }) {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollViewRef = useRef(null);
 
+  // Split content into chunks to prevent memory issues with very long articles
+  const contentChunks = useMemo(() => {
+    if (!fullContent) return [];
+    
+    // For short content, return as single chunk
+    if (fullContent.length <= CHUNK_SIZE) {
+      return [fullContent];
+    }
+    
+    // Split by paragraphs first to avoid breaking mid-word
+    const paragraphs = fullContent.split(/\n\n+/);
+    const chunks = [];
+    let currentChunk = '';
+    
+    for (const paragraph of paragraphs) {
+      if (currentChunk.length + paragraph.length > CHUNK_SIZE && currentChunk.length > 0) {
+        chunks.push(currentChunk.trim());
+        currentChunk = paragraph;
+      } else {
+        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+      }
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+    
+    return chunks;
+  }, [fullContent]);
+
+  // Track if we've already marked this article as read
+  const hasMarkedReadRef = useRef(false);
+
   useEffect(() => {
     fetchFullArticle();
+    
+    // Cleanup function
+    return () => {
+      hasMarkedReadRef.current = false;
+    };
   }, []);
 
-  // Mark article as read when the screen is viewed
+  // Mark article as read when the screen is viewed - only once
   useEffect(() => {
-    if (article && article.id) {
-      console.log('ArticleReaderScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead, 'Filter:', currentFilter, 'Sort:', currentSortOrder);
+    if (article && article.id && !hasMarkedReadRef.current) {
+      hasMarkedReadRef.current = true;
+      console.log('ArticleReaderScreen: Marking article as read:', article.id);
       markArticleRead(article.id, currentFilter, currentSortOrder);
     }
-  }, [article, markArticleRead, currentFilter, currentSortOrder]);
+  }, [article?.id]); // Only depend on article.id, not the whole object or markArticleRead
 
   const fetchFullArticle = async () => {
     try {
@@ -442,24 +501,21 @@ export default function ArticleReaderScreen({ route, navigation }) {
                   size={14} 
                   color={theme.colors.textSecondary} 
                 />
-                <Text selectable={true} style={styles.languageText}>
+                <Text style={styles.languageText}>
                   {getLanguageName(languageInfo.code)}
                   {languageInfo.isRTL ? ' (RTL)' : ''}
                 </Text>
               </View>
             )}
-            <Text 
-              selectable={true}
-              style={[
-                styles.articleText,
-                {
-                  writingDirection: languageInfo?.isRTL ? 'rtl' : 'ltr',
-                  textAlign: languageInfo?.isRTL ? 'right' : 'left',
-                }
-              ]}
-            >
-              {fullContent}
-            </Text>
+            {/* Render content in chunks to prevent memory issues with very long articles */}
+            {contentChunks.map((chunk, index) => (
+              <ContentChunk
+                key={index}
+                text={chunk + (index < contentChunks.length - 1 ? '\n\n' : '')}
+                style={styles.articleText}
+                isRTL={languageInfo?.isRTL}
+              />
+            ))}
           </View>
         )}
 
@@ -483,5 +539,14 @@ export default function ArticleReaderScreen({ route, navigation }) {
         </TouchableOpacity>
       )}
     </SafeAreaView>
+  );
+}
+
+// Export wrapped with ErrorBoundary to catch any rendering crashes
+export default function ArticleReaderScreen(props) {
+  return (
+    <ErrorBoundary>
+      <ArticleReaderScreenContent {...props} />
+    </ErrorBoundary>
   );
 }

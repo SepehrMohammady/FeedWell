@@ -22,14 +22,22 @@ export default function ArticleScreen({ route, navigation }) {
   const [showWebView, setShowWebView] = useState(false);
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
+  
+  // Track if we've already marked this article as read
+  const hasMarkedReadRef = React.useRef(false);
 
-  // Mark article as read when the screen is viewed
+  // Mark article as read when the screen is viewed - only once
   useEffect(() => {
-    if (article && article.id) {
-      console.log('ArticleScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead, 'Filter:', currentFilter, 'Sort:', currentSortOrder);
+    if (article && article.id && !hasMarkedReadRef.current) {
+      hasMarkedReadRef.current = true;
+      console.log('ArticleScreen: Marking article as read:', article.id);
       markArticleRead(article.id, currentFilter, currentSortOrder);
     }
-  }, [article, markArticleRead, currentFilter, currentSortOrder]);
+    
+    return () => {
+      hasMarkedReadRef.current = false;
+    };
+  }, [article?.id]); // Only depend on article.id
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
