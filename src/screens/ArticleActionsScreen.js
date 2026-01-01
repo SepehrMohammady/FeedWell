@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -20,14 +20,18 @@ export default function ArticleActionsScreen({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
+  
+  // Track if we've already marked this article as read to prevent infinite loops
+  const hasMarkedReadRef = useRef(false);
 
-  // Mark article as read when the actions screen is viewed
+  // Mark article as read when the actions screen is viewed - only once
   useEffect(() => {
-    if (article && article.id) {
+    if (article && article.id && !hasMarkedReadRef.current) {
+      hasMarkedReadRef.current = true;
       console.log('ArticleActionsScreen: Marking article as read:', article.id, 'Current isRead:', article.isRead, 'Filter:', currentFilter, 'Sort:', currentSortOrder);
       markArticleRead(article.id, currentFilter, currentSortOrder);
     }
-  }, [article, markArticleRead, currentFilter, currentSortOrder]);
+  }, [article?.id]); // Only depend on article.id, not the whole object or markArticleRead
 
   const handleOpenInBrowser = async () => {
     try {

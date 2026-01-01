@@ -549,7 +549,7 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error updating article read status in storage:', error);
     }
-  }, [state.articles]);
+  }, []); // Empty deps - uses stateRef.current for latest state
 
   const markArticleUnread = useCallback(async (articleId, currentFilter = 'all', sortOrder = 'newest') => {
     // Use stateRef to get the LATEST state (avoids stale closure)
@@ -629,7 +629,7 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error updating article unread status in storage:', error);
     }
-  }, [state.articles]);
+  }, []); // Empty deps - uses stateRef.current for latest state
 
   const markAllRead = useCallback(async () => {
     // Use stateRef to get the LATEST state (avoids stale closure)
@@ -688,7 +688,7 @@ export function FeedProvider({ children }) {
     } catch (error) {
       console.error('Error marking all articles as read in storage:', error);
     }
-  }, [state.articles]);
+  }, []); // Empty deps - uses stateRef.current for latest state
 
   const getUnreadArticles = useCallback(() => {
     return state.articles.filter(article => !article.isRead);
@@ -771,7 +771,7 @@ export function FeedProvider({ children }) {
     }
     
     console.log('==========================================\n');
-  }, [state.articles]);
+  }, []); // Empty deps - diagnostics function
 
   const clearReadingPosition = useCallback(async () => {
     try {
