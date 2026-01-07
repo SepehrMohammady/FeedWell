@@ -585,7 +585,7 @@ export default function SettingsScreen({ navigation }) {
             FeedWell automatically blocks ads and tracking from RSS feeds to provide a clean reading experience.
           </Text>
           <Text style={styles.copyrightText}>
-            © 2025 Sepehr Mohammady. Open source under MIT License.
+            © 2026 Sepehr Mohammady. Open source under MIT License.
           </Text>
         </View>
       </ScrollView>

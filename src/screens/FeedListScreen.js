@@ -11,6 +11,7 @@ import {
   Image,
   Platform,
   Share,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -31,6 +32,7 @@ export default function FeedListScreen({ navigation, route }) {
   const [forceRender, setForceRender] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedArticles, setSelectedArticles] = useState(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
   const flatListRef = useRef(null);
 
   // Apply filter from navigation params (e.g., when clicking Unread from Home)
@@ -400,7 +402,7 @@ export default function FeedListScreen({ navigation, route }) {
     );
   };
 
-  // Filter articles based on read status
+  // Filter articles based on read status and search query
   const getFilteredArticles = () => {
     if (!articles || !Array.isArray(articles)) {
       return [];
@@ -408,6 +410,7 @@ export default function FeedListScreen({ navigation, route }) {
     
     let filtered = articles;
     
+    // Apply read status filter
     switch (articleFilter) {
       case 'unread':
         filtered = articles.filter(article => !article.isRead);
@@ -417,6 +420,16 @@ export default function FeedListScreen({ navigation, route }) {
         break;
       default:
         filtered = articles;
+    }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(article => 
+        (article.title && article.title.toLowerCase().includes(query)) ||
+        (article.description && article.description.toLowerCase().includes(query)) ||
+        (article.feedTitle && article.feedTitle.toLowerCase().includes(query))
+      );
     }
 
     // Sort articles
@@ -498,6 +511,30 @@ export default function FeedListScreen({ navigation, route }) {
       borderRadius: 8,
       borderWidth: 1,
       borderColor: theme.colors.primary,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 16,
+      color: theme.colors.text,
+      paddingVertical: 4,
+    },
+    clearSearch: {
+      padding: 4,
     },
     articleItem: {
       backgroundColor: theme.colors.surface,
@@ -798,6 +835,25 @@ export default function FeedListScreen({ navigation, route }) {
               <Ionicons name="add" size={24} color={theme.colors.primary} />
             </TouchableOpacity>
           </View>
+        )}
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search articles..."
+          placeholderTextColor={theme.colors.textSecondary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearSearch}>
+            <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
         )}
       </View>
 

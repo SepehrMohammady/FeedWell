@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +20,36 @@ export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
+
+  // Filter and sort articles
+  const filteredAndSortedArticles = useMemo(() => {
+    let filtered = articles;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(article => 
+        (article.title && article.title.toLowerCase().includes(query)) ||
+        (article.description && article.description.toLowerCase().includes(query)) ||
+        (article.feedTitle && article.feedTitle.toLowerCase().includes(query))
+      );
+    }
+    
+    // Sort articles
+    const sorted = [...filtered].sort((a, b) => {
+      const dateA = new Date(a.publishedDate || 0);
+      const dateB = new Date(b.publishedDate || 0);
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+    
+    return sorted;
+  }, [articles, searchQuery, sortOrder]);
+
+  const toggleSort = () => {
+    setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
+  };
 
   const handleArticlePress = (article) => {
     navigation.navigate('ArticleReader', { article });
@@ -174,17 +205,49 @@ export default function ReadLaterScreen({ navigation }) {
           Saved Articles
         </Text>
         <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
-          {articles.length} {articles.length === 1 ? 'article' : 'articles'} saved
+          {filteredAndSortedArticles.length} {filteredAndSortedArticles.length === 1 ? 'article' : 'articles'} {searchQuery ? 'found' : 'saved'}
         </Text>
       </View>
-      {articles.length > 0 && (
+      <View style={styles.headerButtons}>
         <TouchableOpacity
-          style={[styles.clearButton, { borderColor: theme.colors.error }]}
-          onPress={handleClearAll}
+          style={styles.sortButton}
+          onPress={toggleSort}
         >
-          <Text style={[styles.clearButtonText, { color: theme.colors.error }]}>
-            Clear All
-          </Text>
+          <Ionicons 
+            name={sortOrder === 'newest' ? 'arrow-down' : 'arrow-up'} 
+            size={20} 
+            color={theme.colors.primary} 
+          />
+        </TouchableOpacity>
+        {articles.length > 0 && (
+          <TouchableOpacity
+            style={[styles.clearButton, { borderColor: theme.colors.error }]}
+            onPress={handleClearAll}
+          >
+            <Text style={[styles.clearButtonText, { color: theme.colors.error }]}>
+              Clear All
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+
+  const renderSearchBar = () => (
+    <View style={[styles.searchContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+      <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
+      <TextInput
+        style={[styles.searchInput, { color: theme.colors.text }]}
+        placeholder="Search saved articles..."
+        placeholderTextColor={theme.colors.textSecondary}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      {searchQuery.length > 0 && (
+        <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearSearch}>
+          <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
         </TouchableOpacity>
       )}
     </View>
@@ -193,12 +256,13 @@ export default function ReadLaterScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {renderHeader()}
+      {renderSearchBar()}
       <FlatList
-        data={articles}
+        data={filteredAndSortedArticles}
         keyExtractor={(item) => item.id}
         renderItem={renderArticleItem}
         ListEmptyComponent={renderEmptyState}
-        contentContainerStyle={articles.length === 0 ? styles.emptyList : styles.list}
+        contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : styles.list}
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -236,6 +300,14 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
   },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sortButton: {
+    padding: 8,
+  },
   clearButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -245,6 +317,27 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 4,
+  },
+  clearSearch: {
+    padding: 4,
   },
   list: {
     padding: 16,

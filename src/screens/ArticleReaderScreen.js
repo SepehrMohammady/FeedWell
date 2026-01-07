@@ -28,6 +28,7 @@ const CHUNK_SIZE = 5000;
 // Memoized component for rendering content chunks to prevent re-renders
 const ContentChunk = memo(({ text, style, isRTL }) => (
   <Text
+    selectable={true}
     style={[
       style,
       {
