@@ -39,6 +39,75 @@ const AD_PATTERNS = [
   /googleadservices/gi
 ];
 
+// CRITICAL FIX v1.0.28: Extract media:content and media:thumbnail URLs from raw XML
+// The react-native-rss-parser library does not parse these media namespace elements,
+// so many feeds' article images are missed. This function extracts them directly.
+function extractMediaUrlsFromXml(rawXml) {
+  const mediaUrls = [];
+  
+  // Split raw XML into individual items (RSS <item> or Atom <entry>)
+  const itemRegex = /<item[\s>]([\s\S]*?)<\/item>|<entry[\s>]([\s\S]*?)<\/entry>/gi;
+  let match;
+  
+  while ((match = itemRegex.exec(rawXml)) !== null) {
+    const itemXml = match[1] || match[2] || '';
+    let imageUrl = null;
+    
+    // Try media:content with medium="image" first (most reliable)
+    const mediaContentImage = itemXml.match(/<media:content[^>]+medium=['"]image['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
+      || itemXml.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*medium=['"]image['"][^>]*\/?>/i);
+    if (mediaContentImage) {
+      imageUrl = mediaContentImage[1];
+    }
+    
+    // Try media:content with image type
+    if (!imageUrl) {
+      const mediaContentType = itemXml.match(/<media:content[^>]+type=['"]image\/[^'"]+['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
+        || itemXml.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*type=['"]image\/[^'"]+['"][^>]*\/?>/i);
+      if (mediaContentType) {
+        imageUrl = mediaContentType[1];
+      }
+    }
+    
+    // Try media:thumbnail
+    if (!imageUrl) {
+      const mediaThumbnail = itemXml.match(/<media:thumbnail[^>]+url=['"]([^'"]+)['"][^>]*\/?>/i);
+      if (mediaThumbnail) {
+        imageUrl = mediaThumbnail[1];
+      }
+    }
+    
+    // Try media:content without medium/type attributes (generic fallback)
+    if (!imageUrl) {
+      const mediaContentGeneric = itemXml.match(/<media:content[^>]+url=['"]([^'"]+\.(?:jpg|jpeg|png|gif|webp))['"][^>]*\/?>/i);
+      if (mediaContentGeneric) {
+        imageUrl = mediaContentGeneric[1];
+      }
+    }
+    
+    // Try media:group > media:content
+    if (!imageUrl) {
+      const mediaGroup = itemXml.match(/<media:group[\s\S]*?<media:content[^>]+url=['"]([^'"]+)['"][^>]*\/?>/i);
+      if (mediaGroup) {
+        imageUrl = mediaGroup[1];
+      }
+    }
+    
+    // Try enclosure with image type (some feeds use this)
+    if (!imageUrl) {
+      const enclosure = itemXml.match(/<enclosure[^>]+type=['"]image\/[^'"]+['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
+        || itemXml.match(/<enclosure[^>]+url=['"]([^'"]+)['"][^>]*type=['"]image\/[^'"]+['"][^>]*\/?>/i);
+      if (enclosure) {
+        imageUrl = enclosure[1];
+      }
+    }
+    
+    mediaUrls.push(imageUrl);
+  }
+  
+  return mediaUrls;
+}
+
 // Generate a stable ID for articles that don't have one
 function generateStableId(item, url, index) {
   // Try to use the article's own ID first
@@ -405,10 +474,18 @@ export async function parseRSSFeed(url) {
           // Successfully got content, parse it
           const feed = await parse(responseText);
           
+          // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
+          // The parser doesn't handle media:content/media:thumbnail
+          const mediaUrls = extractMediaUrlsFromXml(responseText);
+          
           // Process and clean articles
           const cleanedArticles = feed.items.map((item, index) => {
             const cleanDescription = cleanHtmlContent(item.description || '');
             const cleanContent = cleanHtmlContent(item.content || '');
+            
+            // Try parser's extractImageUrl first, fall back to raw XML media URL
+            const parsedImageUrl = extractImageUrl(item);
+            const mediaImageUrl = mediaUrls[index] || null;
             
             return {
               id: generateStableId(item, url, index),
@@ -422,7 +499,7 @@ export async function parseRSSFeed(url) {
               categories: item.categories || [],
               feedUrl: url,
               feedTitle: decodeHtmlEntities(feed.title || url),
-              imageUrl: extractImageUrl(item),
+              imageUrl: parsedImageUrl || mediaImageUrl,
               isRead: false, // New articles are unread by default
               readAt: null,
             };
@@ -458,10 +535,18 @@ export async function parseRSSFeed(url) {
     
     const feed = await parse(responseText);
     
+    // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
+    // The parser doesn't handle media:content/media:thumbnail
+    const mediaUrls = extractMediaUrlsFromXml(responseText);
+    
     // Process and clean articles
     const cleanedArticles = feed.items.map((item, index) => {
       const cleanDescription = cleanHtmlContent(item.description || '');
       const cleanContent = cleanHtmlContent(item.content || '');
+      
+      // Try parser's extractImageUrl first, fall back to raw XML media URL
+      const parsedImageUrl = extractImageUrl(item);
+      const mediaImageUrl = mediaUrls[index] || null;
       
       return {
         id: generateStableId(item, url, index),
@@ -475,7 +560,7 @@ export async function parseRSSFeed(url) {
         categories: item.categories || [],
         feedUrl: url,
         feedTitle: decodeHtmlEntities(feed.title || url),
-        imageUrl: extractImageUrl(item),
+        imageUrl: parsedImageUrl || mediaImageUrl,
         isRead: false, // New articles are unread by default
         readAt: null,
       };
