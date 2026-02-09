@@ -304,9 +304,44 @@ export function FeedProvider({ children }) {
         // Don't try to restore from backup as it may have stale data
         // Just log the error and continue
       }
+      
+      // CRITICAL FIX v1.0.28: Also update read article URLs when saving
+      // This ensures pruned articles' read status is remembered
+      const readUrls = new Set();
+      try {
+        const storedReadUrls = await SafeStorage.getItem('readArticleUrls');
+        if (storedReadUrls) {
+          const parsed = JSON.parse(storedReadUrls);
+          if (Array.isArray(parsed)) {
+            parsed.forEach(url => readUrls.add(url));
+          }
+        }
+      } catch (e) { /* ignore */ }
+      
+      // Add read URLs from current articles
+      articles.forEach(article => {
+        if (article.isRead && article.url) {
+          readUrls.add(article.url);
+        }
+      });
+      await saveReadArticleUrls(readUrls);
     } catch (error) {
       console.error('Error saving articles:', error);
       // Don't try to restore from backup - it may have old read status
+    }
+  };
+
+  // CRITICAL FIX v1.0.28: Persist set of read article URLs
+  // This allows restoring read status for articles that were pruned from the 
+  // 100-per-feed limit or re-appear with different IDs
+  const saveReadArticleUrls = async (readUrlsSet) => {
+    try {
+      const urls = Array.from(readUrlsSet);
+      // Limit to 1000 most recent to prevent storage overflow
+      const limited = urls.slice(-1000);
+      await SafeStorage.setItem('readArticleUrls', JSON.stringify(limited));
+    } catch (error) {
+      console.error('Error saving read article URLs:', error);
     }
   };
 
@@ -371,9 +406,33 @@ export function FeedProvider({ children }) {
       console.log('Storage empty, using stateRef - articles:', existingArticles.length);
     }
     
+    // CRITICAL FIX v1.0.28: Load read article URLs to restore read status for 
+    // articles that were pruned and re-appeared, or have unstable IDs
+    let readArticleUrls = new Set();
+    try {
+      const storedReadUrls = await SafeStorage.getItem('readArticleUrls');
+      if (storedReadUrls) {
+        const parsed = JSON.parse(storedReadUrls);
+        if (Array.isArray(parsed)) {
+          readArticleUrls = new Set(parsed);
+          console.log('Loaded read article URLs:', readArticleUrls.size);
+        }
+      }
+    } catch (err) {
+      console.error('Error reading readArticleUrls:', err);
+    }
+    
+    // Also build readArticleUrls from existing articles (in case the set is missing/incomplete)
+    existingArticles.forEach(article => {
+      if (article.isRead && article.url) {
+        readArticleUrls.add(article.url);
+      }
+    });
+    
     const newArticles = articles;
     const mergedArticles = [];
     const existingIds = new Set();
+    const existingUrls = new Map(); // url -> existing article (for URL-based duplicate detection)
 
     console.log('Before merge - existing articles:', existingArticles.length);
     console.log('Before merge - existing read:', existingArticles.filter(a => a.isRead).length);
@@ -383,18 +442,48 @@ export function FeedProvider({ children }) {
     existingArticles.forEach(article => {
       mergedArticles.push(article);
       existingIds.add(article.id);
-    });
-
-    // Then, add only new articles that don't exist yet
-    let actuallyNewCount = 0;
-    newArticles.forEach(newArticle => {
-      if (!existingIds.has(newArticle.id)) {
-        mergedArticles.push(newArticle);
-        actuallyNewCount++;
+      if (article.url) {
+        existingUrls.set(article.url, article);
       }
     });
 
+    // Then, add only new articles that don't exist yet
+    // CRITICAL FIX v1.0.28: Check by BOTH id AND url for duplicates
+    let actuallyNewCount = 0;
+    let restoredReadCount = 0;
+    newArticles.forEach(newArticle => {
+      // Skip if we already have this article by ID
+      if (existingIds.has(newArticle.id)) {
+        return;
+      }
+      
+      // CRITICAL FIX v1.0.28: Also check by URL - if an existing article has the 
+      // same URL, this is the same article with a different ID (unstable GUID)
+      if (newArticle.url && existingUrls.has(newArticle.url)) {
+        console.log('Duplicate detected by URL (different ID):', newArticle.url, 
+          'old ID:', existingUrls.get(newArticle.url).id, 
+          'new ID:', newArticle.id);
+        return; // Skip - already have this article
+      }
+      
+      // This is a genuinely new article - check if its URL was previously read
+      if (newArticle.url && readArticleUrls.has(newArticle.url)) {
+        console.log('Restoring read status for re-appeared article:', newArticle.title?.substring(0, 50));
+        newArticle.isRead = true;
+        newArticle.readAt = new Date().toISOString();
+        restoredReadCount++;
+      }
+      
+      mergedArticles.push(newArticle);
+      existingIds.add(newArticle.id);
+      if (newArticle.url) {
+        existingUrls.set(newArticle.url, newArticle);
+      }
+      actuallyNewCount++;
+    });
+
     console.log('Actually new articles added:', actuallyNewCount);
+    console.log('Restored read status count:', restoredReadCount);
     console.log('Final merged articles count:', mergedArticles.length);
     console.log('Final read count:', mergedArticles.filter(a => a.isRead).length);
     console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
@@ -406,6 +495,14 @@ export function FeedProvider({ children }) {
     
     // Save merged articles to storage
     await saveArticles(mergedArticles);
+    
+    // Update read article URLs set
+    mergedArticles.forEach(article => {
+      if (article.isRead && article.url) {
+        readArticleUrls.add(article.url);
+      }
+    });
+    await saveReadArticleUrls(readArticleUrls);
   };
 
   // Auto refresh function for app start
@@ -458,6 +555,10 @@ export function FeedProvider({ children }) {
     dispatch({ type: 'CLEAR_ALL_DATA' });
     await saveFeeds([]);
     await saveArticles([]);
+    // Also clear read article URLs tracker
+    try {
+      await SafeStorage.setItem('readArticleUrls', JSON.stringify([]));
+    } catch (e) { /* ignore */ }
     
     console.log('FeedContext: clearAllData completed');
   };
