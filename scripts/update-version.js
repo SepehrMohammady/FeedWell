@@ -53,6 +53,7 @@ function syncVersionsFromConfig() {
     updatePackageJson(currentVersion);
     updateAppJson(currentVersion);
     updatePackageLock(currentVersion);
+    updateBuildGradle(currentVersion);
     return currentVersion;
   } catch (error) {
     log(`❌ Error syncing versions: ${error.message}`, 'red');
@@ -162,6 +163,35 @@ function updatePackageLock(newVersion) {
   }
 }
 
+function updateBuildGradle(newVersion) {
+  const gradlePath = path.join(__dirname, '..', 'android', 'app', 'build.gradle');
+  if (!fs.existsSync(gradlePath)) {
+    log(`⚠️  android/app/build.gradle not found (skipped)`, 'yellow');
+    return;
+  }
+  
+  const buildNumber = generateBuildNumber(newVersion);
+  let content = fs.readFileSync(gradlePath, 'utf8');
+  
+  // Check if build.gradle already auto-reads from app.json
+  if (content.includes('appVersionCode') && content.includes('appVersionName')) {
+    log(`✅ build.gradle already auto-reads from app.json (no patch needed)`, 'green');
+    return;
+  }
+  
+  // Patch hardcoded versionCode and versionName
+  const originalContent = content;
+  content = content.replace(/versionCode\s+\d+/, `versionCode ${buildNumber}`);
+  content = content.replace(/versionName\s+"[^"]+"/, `versionName "${newVersion}"`);
+  
+  if (content !== originalContent) {
+    fs.writeFileSync(gradlePath, content);
+    log(`✅ Updated build.gradle: versionCode ${buildNumber}, versionName "${newVersion}"`, 'green');
+  } else {
+    log(`⚠️  build.gradle version patterns not found (may need manual check)`, 'yellow');
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
   
@@ -175,6 +205,7 @@ function main() {
       log('  - package.json', 'blue');
       log('  - app.json', 'blue');
       log('  - package-lock.json', 'blue');
+      log('  - android/app/build.gradle (if present)', 'blue');
       log('\n💡 All versions are now synchronized!', 'yellow');
     } else {
       process.exit(1);
@@ -196,6 +227,7 @@ function main() {
     updatePackageJson(newVersion);
     updateAppJson(newVersion);
     updatePackageLock(newVersion);
+    updateBuildGradle(newVersion);
     
     log(`\n🎉 Successfully updated all files to version ${newVersion}!`, 'green');
     log('📋 Updated files:', 'blue');
@@ -203,6 +235,7 @@ function main() {
     log('  - package.json', 'blue');
     log('  - app.json', 'blue');
     log('  - package-lock.json', 'blue');
+    log('  - android/app/build.gradle (if present)', 'blue');
     log('\n💡 Don\'t forget to commit your changes!', 'yellow');
     
   } catch (error) {
