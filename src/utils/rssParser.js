@@ -108,6 +108,92 @@ function extractMediaUrlsFromXml(rawXml) {
   return mediaUrls;
 }
 
+// v1.0.30: Fetch og:image from article page as fallback when RSS has no image data
+// Social media platforms use this same technique to show link previews
+async function fetchOgImage(articleUrl, timeoutMs = 6000) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    
+    const response = await fetch(articleUrl, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+        'Accept': 'text/html',
+      },
+    });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) return null;
+    
+    const html = await response.text();
+    
+    // Only search the first 50KB (meta tags are in <head>)
+    const head = html.substring(0, 50000);
+    
+    // Try og:image first (most reliable, used by Facebook/Telegram/etc.)
+    const ogPatterns = [
+      /<meta[^>]+property=['"]og:image['"][^>]+content=['"]([^'"]+)['"][^>]*\/?>/i,
+      /<meta[^>]+content=['"]([^'"]+)['"][^>]+property=['"]og:image['"][^>]*\/?>/i,
+    ];
+    for (const pattern of ogPatterns) {
+      const match = head.match(pattern);
+      if (match && match[1] && match[1].startsWith('http')) {
+        return match[1];
+      }
+    }
+    
+    // Try twitter:image (fallback)
+    const twitterPatterns = [
+      /<meta[^>]+name=['"]twitter:image(?::src)?['"][^>]+content=['"]([^'"]+)['"][^>]*\/?>/i,
+      /<meta[^>]+content=['"]([^'"]+)['"][^>]+name=['"]twitter:image(?::src)?['"][^>]*\/?>/i,
+    ];
+    for (const pattern of twitterPatterns) {
+      const match = head.match(pattern);
+      if (match && match[1] && match[1].startsWith('http')) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    // Silently fail - this is just an image enhancement
+    return null;
+  }
+}
+
+// Fetch og:image for all articles that are missing images, in parallel
+async function fetchMissingArticleImages(articles) {
+  const articlesNeedingImages = articles
+    .map((article, index) => ({ article, index }))
+    .filter(({ article }) => !article.imageUrl && article.url);
+  
+  if (articlesNeedingImages.length === 0) return articles;
+  
+  console.log(`[og:image] Fetching preview images for ${articlesNeedingImages.length} articles without RSS images...`);
+  
+  const results = await Promise.allSettled(
+    articlesNeedingImages.map(({ article }) => fetchOgImage(article.url))
+  );
+  
+  const updatedArticles = [...articles];
+  let foundCount = 0;
+  
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled' && result.value) {
+      const articleIndex = articlesNeedingImages[i].index;
+      updatedArticles[articleIndex] = {
+        ...updatedArticles[articleIndex],
+        imageUrl: result.value,
+      };
+      foundCount++;
+    }
+  });
+  
+  console.log(`[og:image] Found ${foundCount}/${articlesNeedingImages.length} preview images from article pages`);
+  return updatedArticles;
+}
+
 // Generate a stable ID for articles that don't have one
 function generateStableId(item, url, index) {
   // Try to use the article's own ID first
@@ -505,11 +591,14 @@ export async function parseRSSFeed(url) {
             };
           });
 
+          // v1.0.30: Fetch og:image for articles missing images (like TechCrunch)
+          const articlesWithImages = await fetchMissingArticleImages(cleanedArticles);
+
           return {
             title: decodeHtmlEntities(feed.title || url),
             description: feed.description || '',
             url: url,
-            articles: cleanedArticles,
+            articles: articlesWithImages,
           };
         } catch (error) {
           console.warn(`CORS proxy ${proxy.replace(/\?.*$/, '')} failed:`, error.message);
@@ -566,11 +655,14 @@ export async function parseRSSFeed(url) {
       };
     });
 
+    // v1.0.30: Fetch og:image for articles missing images (like TechCrunch)
+    const articlesWithImages = await fetchMissingArticleImages(cleanedArticles);
+
     return {
       title: decodeHtmlEntities(feed.title || url),
       description: feed.description || '',
       url: url,
-      articles: cleanedArticles,
+      articles: articlesWithImages,
     };
   } catch (error) {
     console.error('Error parsing RSS feed:', error);
