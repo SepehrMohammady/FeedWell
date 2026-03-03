@@ -1,145 +1,179 @@
-# FeedWell - Cross-Platform RSS Reader
+<p align="center">
+  <img src="assets/icon.png" alt="FeedWell Logo" width="120" height="120" style="border-radius: 24px;" />
+</p>
 
-FeedWell is a modern, ad-free RSS feed reader built with React Native and Expo. It provides a clean reading experience across Android, iOS, and Windows platforms, automatically blocking ads and tracking scripts.
+<h1 align="center">FeedWell</h1>
 
-## ✨ Key Features
+<p align="center">
+  <strong>Ad-free RSS feed reader for Android, iOS & Windows</strong>
+</p>
 
-### 🚫 **Ad-Free Reading Experience**
-- Automatically removes ads, tracking scripts, and promotional content
-- Clean, distraction-free article rendering
-- Custom ad-blocking algorithm for RSS feeds
-- WebView with JavaScript injection for ad-free web browsing
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.32-blue?style=flat-square" alt="Version" />
+  <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Windows-green?style=flat-square" alt="Platforms" />
+  <img src="https://img.shields.io/badge/license-MIT-orange?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/ads-blocked-red?style=flat-square" alt="Ad-free" />
+</p>
 
-### 📱 **Cross-Platform Support**
-- **Android**: Native Android app via Expo
-- **iOS**: Native iOS app (requires macOS for building)
-- **Windows**: Web-based application
-- Consistent experience across all platforms
+<p align="center">
+  <em>Read the web, minus the clutter.</em>
+</p>
 
-### 🎯 **Reading Features**
-- **Reading Position Bookmarks**: Visual markers to track your progress between articles
-- **Auto-scroll**: Automatically scrolls to your last reading position
-- **Read Later**: Save articles for reading later
-- **Unread Filter**: View only unread articles with persistent read status
-- **Multiple View Modes**: Clean text view or original web view
-- **Offline Reading**: Articles cached locally for offline access
-- **Media Support**: Images and media preserved in articles
+---
 
-### 🔄 **Feed Management**
-- **Auto-Refresh**: Keeps your feeds updated automatically
-- **Popular Feeds**: Quick access to BBC, TechCrunch, Reuters, The Verge, and more
-- **Custom Feeds**: Add any RSS or Atom feed URL
-- **Feed Organization**: Easy feed management and removal
+## 🚫 What is FeedWell?
 
-### 🛡️ **Privacy & Security**
-- **No Data Collection**: All data stays on your device
-- **No Tracking**: No analytics or user tracking
-- **Local Storage**: Feeds and articles stored locally with SafeStorage
-- **Automatic Backups**: Create and restore local backups of your data
-- **No External Dependencies**: No third-party services required
+FeedWell is a **clean, private RSS reader** that blocks ads, removes trackers, and lets you focus on what matters — the content. Subscribe to any RSS or Atom feed and enjoy distraction-free reading.
 
-### 🎨 **User Experience**
-- **Modern Design**: Clean, intuitive interface focused on content
-- **Navigation**: Smooth navigation with React Navigation
-- **Fast Performance**: Optimized parsing and rendering
-- **Error Handling**: Comprehensive error handling and recovery
+No accounts. No tracking. No ads. Everything stays on your device.
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Node.js (v16 or later)
-- Expo CLI: `npm install -g @expo/cli`
+## ✨ Features
 
-### Installation
+<table>
+<tr>
+<td width="50%">
+
+### 📰 Smart Feed Reader
+- Subscribe to any RSS / Atom feed
+- One-tap access to popular feeds (BBC, TechCrunch, Reuters, The Verge, and more)
+- Auto-refresh keeps articles up to date
+- Search articles across all feeds
+- Filter by read / unread status
+
+</td>
+<td width="50%">
+
+### 🚫 Built-in Ad Blocker
+- Strips ads, tracking scripts & promotional content from feeds
+- Removes tracking pixels and analytics
+- Blocks ad domains (Google Ads, Facebook, Taboola, etc.)
+- Clean HTML rendering preserves article structure
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📖 Beautiful Reader
+- In-app article reader with clean typography
+- RTL language support (Farsi, Arabic, Hebrew)
+- Selectable text for copying
+- Reading position bookmarks
+- Open in browser or read in-app
+
+</td>
+<td width="50%">
+
+### 🔖 Save for Later
+- Bookmark articles to read later
+- Search & sort saved articles
+- Sort by newest or oldest
+- Share articles with preview images
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🎨 Personalized Experience
+- Dark mode & light mode
+- Adjustable font size
+- Toggle article images on/off
+- Choose your theme accent color
+- Responsive layout for any screen size
+
+</td>
+<td width="50%">
+
+### 🛡️ Privacy First
+- **Zero data collection** — all data stays on your device
+- **No analytics** — no tracking whatsoever
+- **Local storage** — feeds & articles stored securely
+- **Backup & restore** — export/import your data anytime
+- **Open source** — inspect every line of code
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📱 Supported Platforms
+
+| Platform | Status |
+|----------|--------|
+| 🤖 Android | ✅ Full support |
+| 🍎 iOS | ✅ Full support |
+| 🪟 Windows | ✅ Web-based |
+
+---
+
+## 📥 Installation
+
+### Android
+Download the latest APK from [Releases](https://github.com/SepehrMohammady/FeedWell/releases) and install it directly on your device.
+
+### Build from Source
 ```bash
 git clone https://github.com/SepehrMohammady/FeedWell.git
 cd FeedWell
 npm install
+```
+
+**Android APK:**
+```bash
+cd android
+.\gradlew assembleRelease
+# APK → android/app/build/outputs/apk/release/app-release.apk
+```
+
+**Development server:**
+```bash
 npm start
 ```
 
-### Running on Different Platforms
-- **Android**: `npm run android`
-- **iOS**: `npm run ios` (requires macOS)
-- **Web/Windows**: `npm run web`
+---
 
-## 📱 Building for Production
+## 🗂️ Project Structure
 
-### Android APK
-
-**Option 1: EAS Build (Cloud)**
-```bash
-npm install -g eas-cli
-eas build --platform android --profile preview
 ```
-
-**Option 2: Local Build**
-```bash
-# Generate native Android project
-npx expo prebuild --platform android
-
-# Build with Gradle
-cd android
-.\gradlew assembleRelease
-
-# APK location: android/app/build/outputs/apk/release/app-release.apk
+FeedWell/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── config/         # Version & app configuration
+│   ├── context/        # State management (feeds, themes, settings)
+│   ├── navigation/     # Tab & stack navigation
+│   ├── screens/        # App screens (Home, Feeds, Reader, Settings)
+│   └── utils/          # RSS parser, ad blocker, language detection
+├── assets/             # App icons & splash images
+├── scripts/            # Version management tools
+└── android/            # Native Android build files
 ```
-
-### iOS
-```bash
-eas build --platform ios --profile preview
-```
-
-## 🏗️ Technical Architecture
-
-### Technology Stack
-- **React Native** (v0.81.4) with Expo SDK 54.0.0
-- **React Navigation** (Stack + Bottom Tabs)
-- **SafeStorage** wrapper around AsyncStorage with chunking and backup support
-- **Custom RSS Parser** with advanced ad-blocking
-- **Context API** with useReducer for state management
-- **Expo FileSystem** for backup/restore functionality
-
-### Project Structure
-```
-src/
-├── components/     # Reusable UI components
-├── context/        # React Context for state management
-├── navigation/     # Navigation configuration
-├── screens/        # Main app screens
-├── utils/          # RSS parsing and ad-blocking utilities
-└── config/         # App configuration and version management
-```
-
-## 🛠️ Development
-
-### Version Management
-FeedWell uses a centralized version management system with a single source of truth.
-
-**Update to new version:**
-```bash
-node scripts/update-version.js 1.0.0
-```
-
-The version is stored in `src/config/version.js` and automatically synchronized to `package.json`, `app.json`, and `package-lock.json`. The script preserves the stage value (Beta/RC/Release).
-
-### Data Storage
-- **SafeStorage**: Custom wrapper with automatic chunking for large datasets (>2MB)
-- **Article Limiting**: Maximum 100 articles per feed to prevent storage overflow
-- **Automatic Backups**: Backups created before major data operations
-- **JSON Export/Import**: Full data backup and restore via Settings
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test across platforms
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-**FeedWell** - Reading the web, minus the clutter. 🚀
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | React Native + Expo SDK 54 |
+| Navigation | React Navigation (Stack + Bottom Tabs) |
+| State | React Context API + useReducer |
+| Storage | AsyncStorage with SafeStorage wrapper |
+| RSS Parsing | react-native-rss-parser + custom ad-blocking |
+| Build | Gradle (Android) / Expo (iOS & Web) |
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <strong>FeedWell</strong> — Your feeds. Your way. No ads. No tracking.<br/>
+  Made with ❤️ by <a href="https://github.com/SepehrMohammady">Sepehr Mohammady</a>
+</p>

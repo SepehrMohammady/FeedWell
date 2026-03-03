@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeStorage } from '../utils/SafeStorage';
 
 const ReadLaterContext = createContext();
