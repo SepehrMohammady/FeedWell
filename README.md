@@ -21,7 +21,7 @@
 
 ---
 
-## 🚫 What is FeedWell?
+## � What is FeedWell?
 
 FeedWell is a **clean, private RSS reader** that blocks ads, removes trackers, and lets you focus on what matters — the content. Subscribe to any RSS or Atom feed and enjoy distraction-free reading.
 
