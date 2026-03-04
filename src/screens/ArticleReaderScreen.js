@@ -10,6 +10,10 @@ import {
   Platform,
   Image,
   Linking,
+  Modal,
+  FlatList,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +25,17 @@ import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } f
 import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
 import ErrorBoundary from '../components/ErrorBoundary';
+import {
+  translateText,
+  identifyLanguage,
+  localCodeToMLKit,
+  loadTargetLanguage,
+  saveTargetLanguage,
+  getMLKitName,
+  getDisplayName,
+  AVAILABLE_LANGUAGES,
+  getPopularLanguages,
+} from '../utils/translationService';
 
 // Maximum characters per chunk to prevent memory issues with very long articles
 const CHUNK_SIZE = 5000;
@@ -54,6 +69,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollViewRef = useRef(null);
 
+  // Translation state
+  const [isTranslated, setIsTranslated] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState(null);
+  const [translatedTitle, setTranslatedTitle] = useState(null);
+  const [translating, setTranslating] = useState(false);
+  const [translationProgress, setTranslationProgress] = useState('');
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [targetLangCode, setTargetLangCode] = useState('en');
+  const [detectedSourceLang, setDetectedSourceLang] = useState(null); // ML Kit name
+  const [languageSearchQuery, setLanguageSearchQuery] = useState('');
+
   // Split content into chunks to prevent memory issues with very long articles
   const contentChunks = useMemo(() => {
     if (!fullContent) return [];
@@ -83,6 +109,32 @@ function ArticleReaderScreenContent({ route, navigation }) {
     
     return chunks;
   }, [fullContent]);
+
+  // Chunks for translated content
+  const translatedChunks = useMemo(() => {
+    if (!translatedContent) return [];
+    if (translatedContent.length <= CHUNK_SIZE) return [translatedContent];
+    
+    const paragraphs = translatedContent.split(/\n\n+/);
+    const chunks = [];
+    let currentChunk = '';
+    
+    for (const paragraph of paragraphs) {
+      if (currentChunk.length + paragraph.length > CHUNK_SIZE && currentChunk.length > 0) {
+        chunks.push(currentChunk.trim());
+        currentChunk = paragraph;
+      } else {
+        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+      }
+    }
+    if (currentChunk.trim()) chunks.push(currentChunk.trim());
+    return chunks;
+  }, [translatedContent]);
+
+  // Load saved target language preference on mount
+  useEffect(() => {
+    loadTargetLanguage().then(code => setTargetLangCode(code));
+  }, []);
 
   // Track if we've already marked this article as read
   const hasMarkedReadRef = useRef(false);
@@ -192,6 +244,118 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setLoading(false);
     }
   };
+
+  const handleTranslate = async () => {
+    // If already translated, toggle back to original
+    if (isTranslated) {
+      setIsTranslated(false);
+      return;
+    }
+
+    // If we already have a translation cached, show it
+    if (translatedContent) {
+      setIsTranslated(true);
+      return;
+    }
+
+    const contentToTranslate = fullContent;
+    if (!contentToTranslate || contentToTranslate.length === 0) return;
+
+    setTranslating(true);
+    setTranslationProgress('Detecting language...');
+
+    try {
+      // Step 1: Detect source language using ML Kit
+      let sourceLangName = detectedSourceLang;
+      if (!sourceLangName) {
+        const identified = await identifyLanguage(contentToTranslate);
+        if (identified) {
+          sourceLangName = identified;
+          setDetectedSourceLang(identified);
+        } else {
+          // Fallback to our local detection
+          const localCode = languageInfo?.code;
+          sourceLangName = localCodeToMLKit(localCode);
+          if (!sourceLangName) sourceLangName = 'English';
+          setDetectedSourceLang(sourceLangName);
+        }
+      }
+
+      const targetLangName = getMLKitName(targetLangCode);
+
+      // Check if source and target are the same
+      if (sourceLangName === targetLangName) {
+        Alert.alert(
+          'Same Language',
+          `The article appears to be in ${sourceLangName}. Please choose a different target language.`,
+          [
+            { text: 'Change Language', onPress: () => setShowLanguagePicker(true) },
+            { text: 'Cancel', style: 'cancel' },
+          ]
+        );
+        setTranslating(false);
+        setTranslationProgress('');
+        return;
+      }
+
+      // Step 2: Translate title
+      setTranslationProgress('Translating title...');
+      const translatedTitleText = await translateText(
+        article.title,
+        sourceLangName,
+        targetLangName,
+        setTranslationProgress
+      );
+      setTranslatedTitle(translatedTitleText);
+
+      // Step 3: Translate content
+      const translated = await translateText(
+        contentToTranslate,
+        sourceLangName,
+        targetLangName,
+        setTranslationProgress
+      );
+
+      setTranslatedContent(translated);
+      setIsTranslated(true);
+    } catch (error) {
+      console.error('Translation error:', error);
+      Alert.alert(
+        'Translation Failed',
+        error.message || 'Unable to translate this article. Please check your connection for initial model download.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setTranslating(false);
+      setTranslationProgress('');
+    }
+  };
+
+  const handleChangeTargetLanguage = async (langCode) => {
+    setTargetLangCode(langCode);
+    await saveTargetLanguage(langCode);
+    setShowLanguagePicker(false);
+    // Clear cached translation so it re-translates with new language
+    setTranslatedContent(null);
+    setTranslatedTitle(null);
+    setIsTranslated(false);
+    setLanguageSearchQuery('');
+  };
+
+  // Filtered languages for the picker
+  const filteredLanguages = useMemo(() => {
+    if (!languageSearchQuery.trim()) {
+      // Show popular first, then the rest
+      const popular = getPopularLanguages();
+      const popularCodes = new Set(popular.map(l => l.code));
+      const rest = AVAILABLE_LANGUAGES.filter(l => !popularCodes.has(l.code));
+      return [...popular, ...rest];
+    }
+    const q = languageSearchQuery.toLowerCase();
+    return AVAILABLE_LANGUAGES.filter(
+      lang => lang.displayName.toLowerCase().includes(q) || lang.code.includes(q)
+    );
+  }, [languageSearchQuery]);
 
   const handleShare = async () => {
     try {
@@ -319,7 +483,6 @@ function ArticleReaderScreenContent({ route, navigation }) {
     languageInfo: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 12,
       paddingHorizontal: 12,
       paddingVertical: 6,
       backgroundColor: theme.colors.border,
@@ -331,6 +494,135 @@ function ArticleReaderScreenContent({ route, navigation }) {
       color: theme.colors.textSecondary,
       fontWeight: '500',
       marginLeft: 6,
+    },
+    translationBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginBottom: 12,
+    },
+    translateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+      gap: 6,
+    },
+    translateButtonActive: {
+      backgroundColor: theme.colors.success || '#4CAF50',
+    },
+    translateButtonDisabled: {
+      opacity: 0.7,
+    },
+    translateButtonText: {
+      fontSize: 12,
+      color: '#fff',
+      fontWeight: '600',
+    },
+    translationProgressContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: theme.colors.border,
+      borderRadius: 8,
+    },
+    translationProgressText: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+    },
+    translatedBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: (theme.colors.success || '#4CAF50') + '15',
+      borderRadius: 8,
+      borderLeftWidth: 3,
+      borderLeftColor: theme.colors.success || '#4CAF50',
+    },
+    translatedBannerText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      fontWeight: '500',
+    },
+    // Modal styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      backgroundColor: theme.colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '75%',
+      paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    modalSearchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      margin: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: theme.colors.background,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    modalSearchInput: {
+      flex: 1,
+      fontSize: 15,
+      color: theme.colors.text,
+      marginLeft: 8,
+      paddingVertical: 4,
+    },
+    languageList: {
+      flex: 1,
+    },
+    languageItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    languageItemSelected: {
+      backgroundColor: (theme.colors.primary) + '15',
+    },
+    languageItemText: {
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    languageItemTextSelected: {
+      color: theme.colors.primary,
+      fontWeight: '600',
     },
     loadingContainer: {
       alignItems: 'center',
@@ -419,6 +711,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.headerButton}
+            onPress={() => setShowLanguagePicker(true)}
+          >
+            <Ionicons name="language-outline" size={24} color={theme.colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
             onPress={handleOpenBrowser}
           >
             <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
@@ -450,12 +748,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
           style={[
             styles.articleTitle,
             {
-              writingDirection: getTextDirection(article.title),
-              textAlign: getTextAlignment(article.title),
+              writingDirection: isTranslated ? getTextDirection(translatedTitle || article.title) : getTextDirection(article.title),
+              textAlign: isTranslated ? getTextAlignment(translatedTitle || article.title) : getTextAlignment(article.title),
             }
           ]}
         >
-          {article.title}
+          {isTranslated && translatedTitle ? translatedTitle : article.title}
         </Text>
 
         {article.authors && article.authors.length > 0 && (
@@ -495,28 +793,85 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {fullContent && !loading && (
           <View style={styles.articleContent}>
-            {languageInfo && languageInfo.confidence > 0.6 && (
-              <View style={styles.languageInfo}>
-                <Ionicons 
-                  name="language-outline" 
-                  size={14} 
-                  color={theme.colors.textSecondary} 
-                />
-                <Text style={styles.languageText}>
-                  {getLanguageName(languageInfo.code)}
-                  {languageInfo.isRTL ? ' (RTL)' : ''}
+            {/* Language info + translate controls */}
+            <View style={styles.translationBar}>
+              {languageInfo && languageInfo.confidence > 0.6 && (
+                <View style={styles.languageInfo}>
+                  <Ionicons 
+                    name="language-outline" 
+                    size={14} 
+                    color={theme.colors.textSecondary} 
+                  />
+                  <Text style={styles.languageText}>
+                    {getLanguageName(languageInfo.code)}
+                    {languageInfo.isRTL ? ' (RTL)' : ''}
+                  </Text>
+                </View>
+              )}
+              
+              <TouchableOpacity
+                style={[
+                  styles.translateButton,
+                  isTranslated && styles.translateButtonActive,
+                  translating && styles.translateButtonDisabled,
+                ]}
+                onPress={handleTranslate}
+                disabled={translating}
+              >
+                {translating ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons 
+                    name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
+                    size={16} 
+                    color="#fff" 
+                  />
+                )}
+                <Text style={styles.translateButtonText}>
+                  {translating ? 'Translating...' : isTranslated ? 'Show Original' : `Translate to ${getDisplayName(targetLangCode)}`}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Translation progress */}
+            {translating && translationProgress ? (
+              <View style={styles.translationProgressContainer}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={styles.translationProgressText}>{translationProgress}</Text>
+              </View>
+            ) : null}
+
+            {/* Show translation banner when translated */}
+            {isTranslated && (
+              <View style={styles.translatedBanner}>
+                <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
+                <Text style={styles.translatedBannerText}>
+                  Translated to {getDisplayName(targetLangCode)}
+                  {detectedSourceLang ? ` from ${detectedSourceLang}` : ''}
                 </Text>
               </View>
             )}
+
             {/* Render content in chunks to prevent memory issues with very long articles */}
-            {contentChunks.map((chunk, index) => (
-              <ContentChunk
-                key={index}
-                text={chunk + (index < contentChunks.length - 1 ? '\n\n' : '')}
-                style={styles.articleText}
-                isRTL={languageInfo?.isRTL}
-              />
-            ))}
+            {isTranslated && translatedChunks.length > 0 ? (
+              translatedChunks.map((chunk, index) => (
+                <ContentChunk
+                  key={`t-${index}`}
+                  text={chunk + (index < translatedChunks.length - 1 ? '\n\n' : '')}
+                  style={styles.articleText}
+                  isRTL={['ar', 'fa', 'he', 'ur'].includes(targetLangCode)}
+                />
+              ))
+            ) : (
+              contentChunks.map((chunk, index) => (
+                <ContentChunk
+                  key={index}
+                  text={chunk + (index < contentChunks.length - 1 ? '\n\n' : '')}
+                  style={styles.articleText}
+                  isRTL={languageInfo?.isRTL}
+                />
+              ))
+            )}
           </View>
         )}
 
@@ -539,6 +894,80 @@ function ArticleReaderScreenContent({ route, navigation }) {
           <Ionicons name="chevron-up" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+
+      {/* Language Picker Modal */}
+      <Modal
+        visible={showLanguagePicker}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => {
+          setShowLanguagePicker(false);
+          setLanguageSearchQuery('');
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Translate To</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowLanguagePicker(false);
+                  setLanguageSearchQuery('');
+                }}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalSearchContainer}>
+              <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
+              <TextInput
+                style={styles.modalSearchInput}
+                placeholder="Search languages..."
+                placeholderTextColor={theme.colors.textTertiary}
+                value={languageSearchQuery}
+                onChangeText={setLanguageSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {languageSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setLanguageSearchQuery('')}>
+                  <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <FlatList
+              data={filteredLanguages}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.languageItem,
+                    item.code === targetLangCode && styles.languageItemSelected,
+                  ]}
+                  onPress={() => handleChangeTargetLanguage(item.code)}
+                >
+                  <Text
+                    style={[
+                      styles.languageItemText,
+                      item.code === targetLangCode && styles.languageItemTextSelected,
+                    ]}
+                  >
+                    {item.displayName}
+                  </Text>
+                  {item.code === targetLangCode && (
+                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+              style={styles.languageList}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,10 @@ import {
   Switch,
   Platform,
   Linking,
+  Modal,
+  FlatList,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +27,15 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
 import { SafeStorage } from '../utils/SafeStorage';
+import {
+  AVAILABLE_LANGUAGES,
+  getPopularLanguages,
+  getDisplayName,
+  loadTargetLanguage,
+  saveTargetLanguage,
+  getLanguageModelsStatus,
+  isModelDownloaded,
+} from '../utils/translationService';
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
@@ -30,6 +43,53 @@ export default function SettingsScreen({ navigation }) {
   const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const [showTutorial, setShowTutorial] = useState(false);
+
+  // Translation settings state
+  const [targetLangCode, setTargetLangCode] = useState('en');
+  const [showLangPicker, setShowLangPicker] = useState(false);
+  const [langSearchQuery, setLangSearchQuery] = useState('');
+  const [downloadedModels, setDownloadedModels] = useState([]);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [showModelManager, setShowModelManager] = useState(false);
+
+  // Load target language on mount
+  useEffect(() => {
+    loadTargetLanguage().then(code => setTargetLangCode(code));
+  }, []);
+
+  const handleChangeDefaultLang = async (langCode) => {
+    setTargetLangCode(langCode);
+    await saveTargetLanguage(langCode);
+    setShowLangPicker(false);
+    setLangSearchQuery('');
+  };
+
+  const handleOpenModelManager = async () => {
+    setShowModelManager(true);
+    setLoadingModels(true);
+    try {
+      const statuses = await getLanguageModelsStatus();
+      setDownloadedModels(statuses.filter(s => s.downloaded));
+    } catch (error) {
+      console.error('Error loading model status:', error);
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
+  // Filtered languages for picker
+  const pickerLanguages = (() => {
+    if (!langSearchQuery.trim()) {
+      const popular = getPopularLanguages();
+      const popularCodes = new Set(popular.map(l => l.code));
+      const rest = AVAILABLE_LANGUAGES.filter(l => !popularCodes.has(l.code));
+      return [...popular, ...rest];
+    }
+    const q = langSearchQuery.toLowerCase();
+    return AVAILABLE_LANGUAGES.filter(
+      lang => lang.displayName.toLowerCase().includes(q) || lang.code.includes(q)
+    );
+  })();
 
   const handleClearAllData = () => {
     console.log('Attempting to clear all data');
@@ -456,6 +516,141 @@ export default function SettingsScreen({ navigation }) {
       color: theme.colors.textSecondary,
       marginBottom: 4,
     },
+    // Translation modal styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      backgroundColor: theme.colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '75%',
+      paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    modalSearchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      margin: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: theme.colors.background,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    modalSearchInput: {
+      flex: 1,
+      fontSize: 15,
+      color: theme.colors.text,
+      marginLeft: 8,
+      paddingVertical: 4,
+    },
+    langList: {
+      flex: 1,
+    },
+    langItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    langItemSelected: {
+      backgroundColor: (theme.colors.primary) + '15',
+    },
+    langItemText: {
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    langItemTextSelected: {
+      color: theme.colors.primary,
+      fontWeight: '600',
+    },
+    modelLoadingContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    modelLoadingText: {
+      marginTop: 16,
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+    },
+    modelEmptyContainer: {
+      alignItems: 'center',
+      padding: 32,
+    },
+    modelEmptyTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    modelEmptyText: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    modelItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    modelItemInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    modelItemText: {
+      fontSize: 15,
+      color: theme.colors.text,
+    },
+    modelItemSize: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+    },
+    modelListHeader: {
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      backgroundColor: theme.colors.background,
+    },
+    modelListHeaderText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    modelListSubtext: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 4,
+      lineHeight: 16,
+    },
   });
 
   return (
@@ -505,6 +700,23 @@ export default function SettingsScreen({ navigation }) {
                 thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
               />
             }
+          />
+        </View>
+
+        <SectionHeader title="Translation" />
+        <View style={styles.section}>
+          <SettingItem
+            title="Default Language"
+            description={`Translate articles to ${getDisplayName(targetLangCode)}`}
+            onPress={() => setShowLangPicker(true)}
+            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
+          />
+          <SettingItem
+            title="Downloaded Models"
+            description="View and manage offline translation models"
+            onPress={handleOpenModelManager}
+            isLast={true}
+            rightElement={<Ionicons name="cloud-download-outline" size={20} color={theme.colors.primary} />}
           />
         </View>
 
@@ -594,6 +806,144 @@ export default function SettingsScreen({ navigation }) {
         visible={showTutorial} 
         onComplete={() => setShowTutorial(false)}
       />
+
+      {/* Default Language Picker Modal */}
+      <Modal
+        visible={showLangPicker}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => {
+          setShowLangPicker(false);
+          setLangSearchQuery('');
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Default Translate Language</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowLangPicker(false);
+                  setLangSearchQuery('');
+                }}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalSearchContainer}>
+              <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
+              <TextInput
+                style={styles.modalSearchInput}
+                placeholder="Search languages..."
+                placeholderTextColor={theme.colors.textTertiary}
+                value={langSearchQuery}
+                onChangeText={setLangSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {langSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setLangSearchQuery('')}>
+                  <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <FlatList
+              data={pickerLanguages}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.langItem,
+                    item.code === targetLangCode && styles.langItemSelected,
+                  ]}
+                  onPress={() => handleChangeDefaultLang(item.code)}
+                >
+                  <Text
+                    style={[
+                      styles.langItemText,
+                      item.code === targetLangCode && styles.langItemTextSelected,
+                    ]}
+                  >
+                    {item.displayName}
+                  </Text>
+                  {item.code === targetLangCode && (
+                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+              style={styles.langList}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Downloaded Models Manager Modal */}
+      <Modal
+        visible={showModelManager}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowModelManager(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Downloaded Models</Text>
+              <TouchableOpacity
+                onPress={() => setShowModelManager(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {loadingModels ? (
+              <View style={styles.modelLoadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={styles.modelLoadingText}>Checking downloaded models...</Text>
+              </View>
+            ) : downloadedModels.length === 0 ? (
+              <View style={styles.modelEmptyContainer}>
+                <Ionicons name="cloud-download-outline" size={48} color={theme.colors.textSecondary} />
+                <Text style={styles.modelEmptyTitle}>No Models Downloaded</Text>
+                <Text style={styles.modelEmptyText}>
+                  Translation models are automatically downloaded when you first translate an article.
+                  Each model is about 30 MB and works fully offline after download.
+                </Text>
+              </View>
+            ) : (
+              <FlatList
+                data={downloadedModels}
+                keyExtractor={(item) => item.code}
+                renderItem={({ item }) => (
+                  <View style={styles.modelItem}>
+                    <View style={styles.modelItemInfo}>
+                      <Ionicons name="checkmark-circle" size={20} color={theme.colors.success} />
+                      <Text style={styles.modelItemText}>{item.displayName}</Text>
+                    </View>
+                    <Text style={styles.modelItemSize}>~30 MB</Text>
+                  </View>
+                )}
+                showsVerticalScrollIndicator={false}
+                style={styles.langList}
+                ListHeaderComponent={
+                  <View style={styles.modelListHeader}>
+                    <Text style={styles.modelListHeaderText}>
+                      {downloadedModels.length} model{downloadedModels.length !== 1 ? 's' : ''} downloaded
+                    </Text>
+                    <Text style={styles.modelListSubtext}>
+                      Models are downloaded automatically when translating. To free space, clear app data.
+                    </Text>
+                  </View>
+                }
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
