@@ -31,9 +31,11 @@ import {
   localCodeToMLKit,
   loadTargetLanguage,
   saveTargetLanguage,
+  loadTranslationMode,
   getMLKitName,
   getDisplayName,
   AVAILABLE_LANGUAGES,
+  TRANSLATION_MODES,
   getPopularLanguages,
 } from '../utils/translationService';
 
@@ -77,8 +79,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [translationProgress, setTranslationProgress] = useState('');
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [targetLangCode, setTargetLangCode] = useState('en');
-  const [detectedSourceLang, setDetectedSourceLang] = useState(null); // ML Kit name
+  const [detectedSourceLang, setDetectedSourceLang] = useState(null); // BCP-47 code
   const [languageSearchQuery, setLanguageSearchQuery] = useState('');
+  const [translationMode, setTranslationMode] = useState(TRANSLATION_MODES.AUTO);
+  const [translationMethod, setTranslationMethod] = useState(null); // 'online' | 'offline' | 'none'
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -137,9 +141,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
     return chunks;
   }, [translatedContent]);
 
-  // Load saved target language preference on mount
+  // Load saved target language and translation mode on mount
   useEffect(() => {
     loadTargetLanguage().then(code => setTargetLangCode(code));
+    loadTranslationMode().then(mode => setTranslationMode(mode));
   }, []);
 
   // Track if we've already marked this article as read
@@ -271,29 +276,25 @@ function ArticleReaderScreenContent({ route, navigation }) {
     setTranslationProgress('Detecting language...');
 
     try {
-      // Step 1: Detect source language using ML Kit
-      let sourceLangName = detectedSourceLang;
-      if (!sourceLangName) {
+      // Step 1: Detect source language (returns BCP-47 code)
+      let sourceLangCode = detectedSourceLang;
+      if (!sourceLangCode) {
         const identified = await identifyLanguage(contentToTranslate);
         if (identified) {
-          sourceLangName = identified;
+          sourceLangCode = identified;
           setDetectedSourceLang(identified);
         } else {
           // Fallback to our local detection
-          const localCode = languageInfo?.code;
-          sourceLangName = localCodeToMLKit(localCode);
-          if (!sourceLangName) sourceLangName = 'English';
-          setDetectedSourceLang(sourceLangName);
+          sourceLangCode = languageInfo?.code || 'en';
+          setDetectedSourceLang(sourceLangCode);
         }
       }
 
-      const targetLangName = getMLKitName(targetLangCode);
-
       // Check if source and target are the same
-      if (sourceLangName === targetLangName) {
+      if (sourceLangCode === targetLangCode) {
         Alert.alert(
           'Same Language',
-          `The article appears to be in ${sourceLangName}. Please choose a different target language.`,
+          `The article appears to be in ${getDisplayName(sourceLangCode)}. Please choose a different target language.`,
           [
             { text: 'Change Language', onPress: () => setShowLanguagePicker(true) },
             { text: 'Cancel', style: 'cancel' },
@@ -306,23 +307,26 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
       // Step 2: Translate title
       setTranslationProgress('Translating title...');
-      const translatedTitleText = await translateText(
+      const titleResult = await translateText(
         article.title,
-        sourceLangName,
-        targetLangName,
-        setTranslationProgress
+        sourceLangCode,
+        targetLangCode,
+        setTranslationProgress,
+        translationMode
       );
-      setTranslatedTitle(translatedTitleText);
+      setTranslatedTitle(titleResult.text);
 
       // Step 3: Translate content
-      const translated = await translateText(
+      const contentResult = await translateText(
         contentToTranslate,
-        sourceLangName,
-        targetLangName,
-        setTranslationProgress
+        sourceLangCode,
+        targetLangCode,
+        setTranslationProgress,
+        translationMode
       );
 
-      setTranslatedContent(translated);
+      setTranslatedContent(contentResult.text);
+      setTranslationMethod(contentResult.method);
       setIsTranslated(true);
     } catch (error) {
       console.error('Translation error:', error);
@@ -866,7 +870,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
                 <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
                 <Text style={styles.translatedBannerText}>
                   Translated to {getDisplayName(targetLangCode)}
-                  {detectedSourceLang ? ` from ${detectedSourceLang}` : ''}
+                  {detectedSourceLang ? ` from ${getDisplayName(detectedSourceLang)}` : ''}
+                  {translationMethod === 'online' ? ' (Google Translate)' : translationMethod === 'offline' ? ' (Offline)' : ''}
                 </Text>
               </View>
             )}

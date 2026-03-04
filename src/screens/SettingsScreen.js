@@ -33,6 +33,9 @@ import {
   getDisplayName,
   loadTargetLanguage,
   saveTargetLanguage,
+  loadTranslationMode,
+  saveTranslationMode,
+  TRANSLATION_MODES,
   getLanguageModelsStatus,
   isModelDownloaded,
 } from '../utils/translationService';
@@ -51,10 +54,12 @@ export default function SettingsScreen({ navigation }) {
   const [downloadedModels, setDownloadedModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [showModelManager, setShowModelManager] = useState(false);
+  const [translationMode, setTranslationMode] = useState(TRANSLATION_MODES.AUTO);
 
-  // Load target language on mount
+  // Load target language and translation mode on mount
   useEffect(() => {
     loadTargetLanguage().then(code => setTargetLangCode(code));
+    loadTranslationMode().then(mode => setTranslationMode(mode));
   }, []);
 
   const handleChangeDefaultLang = async (langCode) => {
@@ -705,6 +710,32 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Translation" />
         <View style={styles.section}>
+          <SettingItem
+            title="Translation Mode"
+            description={
+              translationMode === TRANSLATION_MODES.AUTO ? 'Auto: Online first, offline fallback' :
+              translationMode === TRANSLATION_MODES.ONLINE ? 'Online only (Google Translate)' :
+              'Offline only (ML Kit)'
+            }
+            onPress={() => {
+              const modes = [TRANSLATION_MODES.AUTO, TRANSLATION_MODES.ONLINE, TRANSLATION_MODES.OFFLINE];
+              const currentIdx = modes.indexOf(translationMode);
+              const nextMode = modes[(currentIdx + 1) % modes.length];
+              setTranslationMode(nextMode);
+              saveTranslationMode(nextMode);
+            }}
+            rightElement={
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons
+                  name={translationMode === TRANSLATION_MODES.AUTO ? 'sync-outline' : translationMode === TRANSLATION_MODES.ONLINE ? 'cloud-outline' : 'phone-portrait-outline'}
+                  size={20}
+                  color={theme.colors.primary}
+                  style={{ marginRight: 4 }}
+                />
+                <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
+              </View>
+            }
+          />
           <SettingItem
             title="Default Language"
             description={`Translate articles to ${getDisplayName(targetLangCode)}`}
