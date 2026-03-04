@@ -166,14 +166,6 @@ FeedWell/
 
 ---
 
-## 🧪 Testers
-
-Thanks to the following people for testing FeedWell and providing valuable feedback:
-
-- Houriyeh Emadoleslami
-
----
-
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
