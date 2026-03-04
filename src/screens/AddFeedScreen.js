@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActionSheetIOS,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -594,6 +595,35 @@ export default function AddFeedScreen({ navigation }) {
       color: theme.colors.textTertiary,
       textAlign: 'center',
     },
+    loadingOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingBox: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 28,
+      alignItems: 'center',
+      minWidth: 200,
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+    },
+    loadingText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginTop: 16,
+    },
+    loadingSubtext: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+      marginTop: 6,
+    },
   });
 
   return (
@@ -747,6 +777,22 @@ export default function AddFeedScreen({ navigation }) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Loading overlay - visible regardless of scroll position */}
+      <Modal
+        visible={loading}
+        transparent={true}
+        animationType="fade"
+        statusBarTranslucent={true}
+      >
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={theme.colors.primary} size="large" />
+            <Text style={styles.loadingText}>Adding feed...</Text>
+            <Text style={styles.loadingSubtext}>Fetching and parsing articles</Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

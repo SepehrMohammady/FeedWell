@@ -39,11 +39,13 @@ const AD_PATTERNS = [
   /googleadservices/gi
 ];
 
-// CRITICAL FIX v1.0.28: Extract media:content and media:thumbnail URLs from raw XML
+// CRITICAL FIX v1.0.28 + v1.1.6: Extract media:content and media:thumbnail URLs from raw XML
 // The react-native-rss-parser library does not parse these media namespace elements,
 // so many feeds' article images are missed. This function extracts them directly.
+// Returns { byIndex: [...], byUrl: {url: imageUrl} } for robust matching.
 function extractMediaUrlsFromXml(rawXml) {
-  const mediaUrls = [];
+  const byIndex = [];
+  const byUrl = {};
   
   // Split raw XML into individual items (RSS <item> or Atom <entry>)
   const itemRegex = /<item[\s>]([\s\S]*?)<\/item>|<entry[\s>]([\s\S]*?)<\/entry>/gi;
@@ -53,14 +55,58 @@ function extractMediaUrlsFromXml(rawXml) {
     const itemXml = match[1] || match[2] || '';
     let imageUrl = null;
     
-    // Try media:content with medium="image" first (most reliable)
-    const mediaContentImage = itemXml.match(/<media:content[^>]+medium=['"]image['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
-      || itemXml.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*medium=['"]image['"][^>]*\/?>/i);
-    if (mediaContentImage) {
-      imageUrl = mediaContentImage[1];
+    // Extract article link/guid for URL-based matching
+    const linkMatch = itemXml.match(/<link[^>]*>([^<]+)<\/link>/i)
+      || itemXml.match(/<link[^>]+href=['"]([^'"]+)['"][^>]*\/?>/i);
+    const guidMatch = itemXml.match(/<guid[^>]*>([^<]+)<\/guid>/i);
+    const articleLink = linkMatch?.[1]?.trim();
+    const articleGuid = guidMatch?.[1]?.trim();
+    
+    // 1. Try media:group first — extract the BEST (largest) image (CNN, etc.)
+    const groupMatch = itemXml.match(/<media:group>([\s\S]*?)<\/media:group>/i);
+    if (groupMatch) {
+      const groupContent = groupMatch[1];
+      // Find largest image by width
+      const contentRegex = /<media:content[^>]*\burl=['"]([^'"]+)['"][^>]*\bwidth=['"](\d+)['"][^>]*\/?>/gi;
+      let bestUrl = null;
+      let bestWidth = 0;
+      let cm;
+      while ((cm = contentRegex.exec(groupContent)) !== null) {
+        const w = parseInt(cm[2], 10);
+        if (w > bestWidth) {
+          bestWidth = w;
+          bestUrl = cm[1];
+        }
+      }
+      // Also try width before url (different attribute order)
+      if (!bestUrl) {
+        const contentRegex2 = /<media:content[^>]*\bwidth=['"](\d+)['"][^>]*\burl=['"]([^'"]+)['"][^>]*\/?>/gi;
+        while ((cm = contentRegex2.exec(groupContent)) !== null) {
+          const w = parseInt(cm[1], 10);
+          if (w > bestWidth) {
+            bestWidth = w;
+            bestUrl = cm[2];
+          }
+        }
+      }
+      // Fallback: just get first url from any media:content in the group
+      if (!bestUrl) {
+        const fallback = groupContent.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*\/?>/i);
+        if (fallback) bestUrl = fallback[1];
+      }
+      if (bestUrl) imageUrl = bestUrl;
     }
     
-    // Try media:content with image type
+    // 2. Try media:content with medium="image" (common in many feeds)
+    if (!imageUrl) {
+      const mediaContentImage = itemXml.match(/<media:content[^>]+medium=['"]image['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
+        || itemXml.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*medium=['"]image['"][^>]*\/?>/i);
+      if (mediaContentImage) {
+        imageUrl = mediaContentImage[1];
+      }
+    }
+    
+    // 3. Try media:content with image type
     if (!imageUrl) {
       const mediaContentType = itemXml.match(/<media:content[^>]+type=['"]image\/[^'"]+['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
         || itemXml.match(/<media:content[^>]+url=['"]([^'"]+)['"][^>]*type=['"]image\/[^'"]+['"][^>]*\/?>/i);
@@ -69,7 +115,7 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
     
-    // Try media:thumbnail
+    // 4. Try media:thumbnail
     if (!imageUrl) {
       const mediaThumbnail = itemXml.match(/<media:thumbnail[^>]+url=['"]([^'"]+)['"][^>]*\/?>/i);
       if (mediaThumbnail) {
@@ -77,7 +123,7 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
     
-    // Try media:content without medium/type attributes (generic fallback)
+    // 5. Try media:content without medium/type attributes (generic fallback)
     if (!imageUrl) {
       const mediaContentGeneric = itemXml.match(/<media:content[^>]+url=['"]([^'"]+\.(?:jpg|jpeg|png|gif|webp))['"][^>]*\/?>/i);
       if (mediaContentGeneric) {
@@ -85,15 +131,7 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
     
-    // Try media:group > media:content
-    if (!imageUrl) {
-      const mediaGroup = itemXml.match(/<media:group[\s\S]*?<media:content[^>]+url=['"]([^'"]+)['"][^>]*\/?>/i);
-      if (mediaGroup) {
-        imageUrl = mediaGroup[1];
-      }
-    }
-    
-    // Try enclosure with image type (some feeds use this)
+    // 6. Try enclosure with image type (some feeds use this)
     if (!imageUrl) {
       const enclosure = itemXml.match(/<enclosure[^>]+type=['"]image\/[^'"]+['"][^>]*url=['"]([^'"]+)['"][^>]*\/?>/i)
         || itemXml.match(/<enclosure[^>]+url=['"]([^'"]+)['"][^>]*type=['"]image\/[^'"]+['"][^>]*\/?>/i);
@@ -102,7 +140,7 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
 
-    // v1.1.5: Try extracting <img> from description CDATA (CNN, etc.)
+    // 7. Try extracting <img> from description CDATA
     if (!imageUrl) {
       const descMatch = itemXml.match(/<description[^>]*>\s*(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?\s*<\/description>/i);
       if (descMatch) {
@@ -114,10 +152,16 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
     
-    mediaUrls.push(imageUrl);
+    byIndex.push(imageUrl);
+    
+    // Store in URL map for robust matching
+    if (imageUrl) {
+      if (articleLink) byUrl[articleLink] = imageUrl;
+      if (articleGuid && articleGuid !== articleLink) byUrl[articleGuid] = imageUrl;
+    }
   }
   
-  return mediaUrls;
+  return { byIndex, byUrl };
 }
 
 // v1.0.30: Fetch og:image from article page as fallback when RSS has no image data
@@ -617,7 +661,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
           
           // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
           // The parser doesn't handle media:content/media:thumbnail
-          const mediaUrls = extractMediaUrlsFromXml(responseText);
+          const media = extractMediaUrlsFromXml(responseText);
           
           // Process and clean articles
           const cleanedArticles = feed.items.map((item, index) => {
@@ -626,7 +670,8 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
             
             // Try parser's extractImageUrl first, fall back to raw XML media URL
             const parsedImageUrl = extractImageUrl(item);
-            const mediaImageUrl = mediaUrls[index] || null;
+            const articleUrl = item.links?.[0]?.url || item.url || '';
+            const mediaImageUrl = media.byUrl[articleUrl] || media.byUrl[item.id] || media.byIndex[index] || null;
             
             return {
               id: generateStableId(item, url, index),
@@ -684,7 +729,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
     
     // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
     // The parser doesn't handle media:content/media:thumbnail
-    const mediaUrls = extractMediaUrlsFromXml(responseText);
+    const media = extractMediaUrlsFromXml(responseText);
     
     // Process and clean articles
     const cleanedArticles = feed.items.map((item, index) => {
@@ -693,7 +738,8 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
       
       // Try parser's extractImageUrl first, fall back to raw XML media URL
       const parsedImageUrl = extractImageUrl(item);
-      const mediaImageUrl = mediaUrls[index] || null;
+      const articleUrl = item.links?.[0]?.url || item.url || '';
+      const mediaImageUrl = media.byUrl[articleUrl] || media.byUrl[item.id] || media.byIndex[index] || null;
       
       return {
         id: generateStableId(item, url, index),
