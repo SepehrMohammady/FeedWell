@@ -527,11 +527,21 @@ export function FeedProvider({ children }) {
     try {
       console.log('Auto-refreshing feeds...');
       const { parseRSSFeed } = require('../utils/rssParser');
+      
+      // Read maxArticleAge setting from AsyncStorage
+      let maxArticleAge = 6;
+      try {
+        const stored = await AsyncStorage.getItem('maxArticleAge');
+        if (stored !== null) maxArticleAge = parseInt(stored, 10);
+      } catch (e) {
+        console.warn('Failed to read maxArticleAge:', e);
+      }
+      
       const allArticles = [];
       
       for (const feed of currentFeeds) {
         try {
-          const parsedFeed = await parseRSSFeed(feed.url);
+          const parsedFeed = await parseRSSFeed(feed.url, maxArticleAge);
           allArticles.push(...parsedFeed.articles);
         } catch (error) {
           console.error(`Error parsing feed ${feed.url} during auto-refresh:`, error);

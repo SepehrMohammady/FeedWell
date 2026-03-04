@@ -14,12 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
 import { useReadLater } from '../context/ReadLaterContext';
+import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 
 export default function HomeScreen({ navigation }) {
   const { theme, isDarkMode } = useTheme();
   const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
+  const { maxArticleAge } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
 
   // Calculate stats
@@ -42,7 +44,7 @@ export default function HomeScreen({ navigation }) {
       
       for (const feed of feeds) {
         try {
-          const parsedFeed = await parseRSSFeed(feed.url);
+          const parsedFeed = await parseRSSFeed(feed.url, maxArticleAge);
           allArticles.push(...parsedFeed.articles);
         } catch (error) {
           console.error(`Error parsing feed ${feed.url}:`, error);

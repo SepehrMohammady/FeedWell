@@ -27,7 +27,7 @@ import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
-  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder } = useAppSettings();
+  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -97,7 +97,7 @@ export default function FeedListScreen({ navigation, route }) {
       
       for (const feed of feeds) {
         try {
-          const parsedFeed = await parseRSSFeed(feed.url);
+          const parsedFeed = await parseRSSFeed(feed.url, maxArticleAge);
           console.log(`Feed ${feed.title} returned ${parsedFeed.articles.length} articles`);
           allArticles.push(...parsedFeed.articles);
         } catch (error) {

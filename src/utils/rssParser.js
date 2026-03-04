@@ -194,6 +194,29 @@ async function fetchMissingArticleImages(articles) {
   return updatedArticles;
 }
 
+// v1.1.4: Filter out articles older than maxAge months
+// maxAge: 0 = no filter, 1/3/6/12 = months
+function filterOldArticles(articles, maxAgeMonths) {
+  if (!maxAgeMonths || maxAgeMonths <= 0) return articles;
+  
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - maxAgeMonths);
+  
+  const filtered = articles.filter(article => {
+    if (!article.publishedDate) return true; // keep articles without dates
+    const pubDate = new Date(article.publishedDate);
+    // If date parsing fails, keep the article
+    if (isNaN(pubDate.getTime())) return true;
+    return pubDate >= cutoff;
+  });
+  
+  if (filtered.length < articles.length) {
+    console.log(`[article-filter] Removed ${articles.length - filtered.length} articles older than ${maxAgeMonths} month(s)`);
+  }
+  
+  return filtered;
+}
+
 // Generate a stable ID for articles that don't have one
 function generateStableId(item, url, index) {
   // Try to use the article's own ID first
@@ -512,7 +535,8 @@ function isLowQualityContent(text) {
 }
 
 // Parse RSS feed and clean articles
-export async function parseRSSFeed(url) {
+// maxArticleAge: max age in months (0 = no limit)
+export async function parseRSSFeed(url, maxArticleAge = 0) {
   try {
     let fetchUrl = url;
     
@@ -594,11 +618,14 @@ export async function parseRSSFeed(url) {
           // v1.0.30: Fetch og:image for articles missing images (like TechCrunch)
           const articlesWithImages = await fetchMissingArticleImages(cleanedArticles);
 
+          // v1.1.4: Filter out old articles based on user setting
+          const filteredArticles = filterOldArticles(articlesWithImages, maxArticleAge);
+
           return {
             title: decodeHtmlEntities(feed.title || url),
             description: feed.description || '',
             url: url,
-            articles: articlesWithImages,
+            articles: filteredArticles,
           };
         } catch (error) {
           console.warn(`CORS proxy ${proxy.replace(/\?.*$/, '')} failed:`, error.message);
@@ -658,11 +685,14 @@ export async function parseRSSFeed(url) {
     // v1.0.30: Fetch og:image for articles missing images (like TechCrunch)
     const articlesWithImages = await fetchMissingArticleImages(cleanedArticles);
 
+    // v1.1.4: Filter out old articles based on user setting
+    const filteredArticles = filterOldArticles(articlesWithImages, maxArticleAge);
+
     return {
       title: decodeHtmlEntities(feed.title || url),
       description: feed.description || '',
       url: url,
-      articles: articlesWithImages,
+      articles: filteredArticles,
     };
   } catch (error) {
     console.error('Error parsing RSS feed:', error);

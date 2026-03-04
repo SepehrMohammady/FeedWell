@@ -18,12 +18,14 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
+import { useAppSettings } from '../context/AppSettingsContext';
 
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const { addFeed, addArticles, feeds, removeFeed } = useFeed();
   const { theme } = useTheme();
+  const { maxArticleAge } = useAppSettings();
 
   const feedCategories = [
     {
@@ -39,18 +41,18 @@ export default function AddFeedScreen({ navigation }) {
     {
       title: 'News',
       feeds: [
-        { name: 'BBC News', url: 'http://feeds.bbci.co.uk/news/rss.xml' },
+        { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
         { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
         { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
         { name: 'Associated Press', url: 'https://feeds.apnews.com/apnews/topnews' },
-        { name: 'CNN News', url: 'http://rss.cnn.com/rss/edition.rss' },
+        { name: 'CNN News', url: 'https://rss.cnn.com/rss/edition.rss' },
       ]
     },
     {
       title: 'Sports',
       feeds: [
         { name: 'ESPN', url: 'https://www.espn.com/espn/rss/news' },
-        { name: 'BBC Sport', url: 'http://feeds.bbci.co.uk/sport/rss.xml' },
+        { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
         { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040' },
         { name: 'Bleacher Report', url: 'https://bleacherreport.com/articles/feed' },
         { name: 'Sports Illustrated', url: 'https://www.si.com/rss/si_topstories.rss' },
@@ -133,7 +135,7 @@ export default function AddFeedScreen({ navigation }) {
       
       // Try the regular parser first
       try {
-        feedData = await parseRSSFeed(url.trim());
+        feedData = await parseRSSFeed(url.trim(), maxArticleAge);
       } catch (error) {
         console.log('Regular parser failed, trying CORS proxy:', error.message);
         try {
@@ -221,7 +223,7 @@ export default function AddFeedScreen({ navigation }) {
               let feedData;
               
               try {
-                feedData = await parseRSSFeed(feed.url);
+                feedData = await parseRSSFeed(feed.url, maxArticleAge);
               } catch (primaryError) {
                 console.log('Primary parser failed, trying CORS proxy:', primaryError.message);
                 try {

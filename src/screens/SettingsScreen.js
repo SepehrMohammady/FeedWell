@@ -46,7 +46,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, updateShowImages, updateAutoRefresh } = useAppSettings();
+  const { showImages, autoRefresh, updateShowImages, updateAutoRefresh, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -62,6 +62,7 @@ export default function SettingsScreen({ navigation }) {
   const [allModels, setAllModels] = useState([]);
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
+  const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
 
   // Load target language and translation mode on mount
   useEffect(() => {
@@ -74,6 +75,21 @@ export default function SettingsScreen({ navigation }) {
     await saveTargetLanguage(langCode);
     setShowLangPicker(false);
     setLangSearchQuery('');
+  };
+
+  // Article age filter options
+  const articleAgeOptions = [
+    { value: 0, label: 'No limit' },
+    { value: 1, label: '1 month' },
+    { value: 3, label: '3 months' },
+    { value: 6, label: '6 months' },
+    { value: 12, label: '1 year' },
+    { value: 24, label: '2 years' },
+  ];
+
+  const getArticleAgeLabel = (months) => {
+    const option = articleAgeOptions.find(o => o.value === months);
+    return option ? option.label : `${months} months`;
   };
 
   const handleOpenModelManager = async () => {
@@ -255,6 +271,7 @@ export default function SettingsScreen({ navigation }) {
           showImages,
           autoRefresh,
           isDarkMode,
+          maxArticleAge,
         },
       };
 
@@ -415,6 +432,9 @@ export default function SettingsScreen({ navigation }) {
         }
         if (typeof backupData.settings.isDarkMode === 'boolean' && backupData.settings.isDarkMode !== isDarkMode) {
           await toggleTheme();
+        }
+        if (typeof backupData.settings.maxArticleAge === 'number') {
+          await updateMaxArticleAge(backupData.settings.maxArticleAge);
         }
       }
 
@@ -784,7 +804,6 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title="Dark Mode"
             description="Switch between light and dark themes"
-            isLast={true}
             rightElement={
               <Switch
                 value={isDarkMode}
@@ -793,6 +812,13 @@ export default function SettingsScreen({ navigation }) {
                 thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
               />
             }
+          />
+          <SettingItem
+            title="Article Age Filter"
+            description={maxArticleAge === 0 ? 'No limit — show all articles' : `Only show articles from the last ${getArticleAgeLabel(maxArticleAge)}`}
+            onPress={() => setShowArticleAgePicker(true)}
+            isLast={true}
+            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
           />
         </View>
 
@@ -862,6 +888,7 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
+          <TesterItem>Houriyeh Emadoleslami</TesterItem>
           <TesterItem>Mohammad Torabi</TesterItem>
           <TesterItem isLast={true}>Saeed Abdollahi Taromsari</TesterItem>
         </View>
@@ -1152,6 +1179,63 @@ export default function SettingsScreen({ navigation }) {
                 <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
               )}
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Article Age Filter Picker Modal */}
+      <Modal
+        visible={showArticleAgePicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowArticleAgePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Article Age Filter</Text>
+              <TouchableOpacity
+                onPress={() => setShowArticleAgePicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.modeItemDesc, { paddingHorizontal: 16, paddingBottom: 8 }]}>
+              Filter out articles older than the selected period when refreshing feeds.
+            </Text>
+
+            {articleAgeOptions.map((option, index) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.modeItem, 
+                  maxArticleAge === option.value && styles.langItemSelected,
+                  index === articleAgeOptions.length - 1 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => {
+                  updateMaxArticleAge(option.value);
+                  setShowArticleAgePicker(false);
+                }}
+              >
+                <View style={styles.modeItemContent}>
+                  <Ionicons 
+                    name={option.value === 0 ? 'infinite-outline' : 'time-outline'} 
+                    size={22} 
+                    color={maxArticleAge === option.value ? theme.colors.primary : theme.colors.text} 
+                  />
+                  <View style={styles.modeItemText}>
+                    <Text style={[styles.modeItemTitle, maxArticleAge === option.value && { color: theme.colors.primary }]}>
+                      {option.label}
+                    </Text>
+                  </View>
+                </View>
+                {maxArticleAge === option.value && (
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </Modal>

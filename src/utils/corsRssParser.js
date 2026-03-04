@@ -154,7 +154,7 @@ export const testFeeds = [
   },
   {
     name: 'BBC World News',
-    url: 'http://feeds.bbci.co.uk/news/world/rss.xml',
+    url: 'https://feeds.bbci.co.uk/news/world/rss.xml',
     description: 'BBC World News feed'
   },
   {

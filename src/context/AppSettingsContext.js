@@ -8,6 +8,7 @@ export function AppSettingsProvider({ children }) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [articleFilter, setArticleFilter] = useState('all'); // 'all', 'unread', 'read'
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
+  const [maxArticleAge, setMaxArticleAge] = useState(6); // months: 0 = no limit, 1, 3, 6, 12
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,6 +22,7 @@ export function AppSettingsProvider({ children }) {
       const savedAutoRefresh = await AsyncStorage.getItem('autoRefresh');
       const savedArticleFilter = await AsyncStorage.getItem('articleFilter');
       const savedSortOrder = await AsyncStorage.getItem('sortOrder');
+      const savedMaxArticleAge = await AsyncStorage.getItem('maxArticleAge');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -37,6 +39,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedSortOrder !== null) {
         setSortOrder(JSON.parse(savedSortOrder));
+      }
+
+      if (savedMaxArticleAge !== null) {
+        setMaxArticleAge(JSON.parse(savedMaxArticleAge));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -85,6 +91,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateMaxArticleAge = async (value) => {
+    try {
+      setMaxArticleAge(value);
+      await AsyncStorage.setItem('maxArticleAge', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving maxArticleAge setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -108,12 +123,14 @@ export function AppSettingsProvider({ children }) {
     autoRefresh,
     articleFilter,
     sortOrder,
+    maxArticleAge,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,
     updateSortOrder,
+    updateMaxArticleAge,
     completeOnboarding,
     resetOnboarding,
   };
