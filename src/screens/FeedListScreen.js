@@ -402,13 +402,27 @@ export default function FeedListScreen({ navigation, route }) {
     );
   };
 
+  // v1.1.5: Helper to filter articles by age (same logic as in rssParser)
+  const filterByAge = (articleList) => {
+    if (!maxArticleAge || maxArticleAge <= 0) return articleList;
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - maxArticleAge);
+    return articleList.filter(article => {
+      if (!article.publishedDate) return true;
+      const pubDate = new Date(article.publishedDate);
+      if (isNaN(pubDate.getTime())) return true;
+      return pubDate >= cutoff;
+    });
+  };
+
   // Filter articles based on read status and search query
   const getFilteredArticles = () => {
     if (!articles || !Array.isArray(articles)) {
       return [];
     }
     
-    let filtered = articles;
+    // v1.1.5: Apply age filter to existing articles
+    let filtered = filterByAge(articles);
     
     // Apply read status filter
     switch (articleFilter) {
@@ -456,12 +470,20 @@ export default function FeedListScreen({ navigation, route }) {
     updateSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
   };
 
+  // v1.1.5: Age-aware counts for the header button
+  const getAgeFilteredUnreadCount = () => {
+    return filterByAge(articles).filter(a => !a.isRead).length;
+  };
+  const getAgeFilteredReadCount = () => {
+    return filterByAge(articles).filter(a => a.isRead).length;
+  };
+
   const getFilterButtonText = () => {
     switch (articleFilter) {
       case 'unread':
-        return `Unread (${getUnreadCount()})`;
+        return `Unread (${getAgeFilteredUnreadCount()})`;
       case 'read':
-        return `Read (${getReadCount()})`;
+        return `Read (${getAgeFilteredReadCount()})`;
       default:
         return 'All';
     }

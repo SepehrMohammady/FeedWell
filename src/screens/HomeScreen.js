@@ -24,14 +24,28 @@ export default function HomeScreen({ navigation }) {
   const { maxArticleAge } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
 
-  // Calculate stats
+  // v1.1.5: Helper to filter articles by age
+  const filterByAge = (articleList) => {
+    if (!maxArticleAge || maxArticleAge <= 0) return articleList;
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - maxArticleAge);
+    return articleList.filter(article => {
+      if (!article.publishedDate) return true;
+      const pubDate = new Date(article.publishedDate);
+      if (isNaN(pubDate.getTime())) return true;
+      return pubDate >= cutoff;
+    });
+  };
+
+  // Calculate stats (respecting age filter)
+  const ageFilteredArticles = filterByAge(articles);
   const totalFeeds = feeds.length;
-  const totalArticles = articles.length;
-  const unreadCount = getUnreadCount();
+  const totalArticles = ageFilteredArticles.length;
+  const unreadCount = ageFilteredArticles.filter(a => !a.isRead).length;
   const readLaterCount = readLaterArticles.length;
   
   // Get the last 5 articles sorted by publish date (most recent first)
-  const recentArticles = [...articles]
+  const recentArticles = [...ageFilteredArticles]
     .sort((a, b) => new Date(b.pubDate || b.publishedDate) - new Date(a.pubDate || a.publishedDate))
     .slice(0, 5);
 

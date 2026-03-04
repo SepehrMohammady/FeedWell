@@ -489,15 +489,37 @@ export function FeedProvider({ children }) {
     console.log('Final unread count:', mergedArticles.filter(a => !a.isRead).length);
     console.log('=== ADD_ARTICLES DEBUG END ===');
 
+    // v1.1.5: Clean old articles from storage based on maxArticleAge setting
+    let cleanedArticles = mergedArticles;
+    try {
+      const storedAge = await AsyncStorage.getItem('maxArticleAge');
+      const maxAge = storedAge !== null ? JSON.parse(storedAge) : 6;
+      if (maxAge > 0) {
+        const cutoff = new Date();
+        cutoff.setMonth(cutoff.getMonth() - maxAge);
+        cleanedArticles = mergedArticles.filter(article => {
+          if (!article.publishedDate) return true;
+          const pubDate = new Date(article.publishedDate);
+          if (isNaN(pubDate.getTime())) return true;
+          return pubDate >= cutoff;
+        });
+        if (cleanedArticles.length < mergedArticles.length) {
+          console.log(`[article-cleanup] Removed ${mergedArticles.length - cleanedArticles.length} old articles from storage`);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to apply article age cleanup:', e);
+    }
+
     // Dispatch to update state - use SET_ARTICLES to replace with merged result
     // This ensures state and storage are in sync
-    dispatch({ type: 'SET_ARTICLES', payload: mergedArticles });
+    dispatch({ type: 'SET_ARTICLES', payload: cleanedArticles });
     
     // Save merged articles to storage
-    await saveArticles(mergedArticles);
+    await saveArticles(cleanedArticles);
     
     // Update read article URLs set
-    mergedArticles.forEach(article => {
+    cleanedArticles.forEach(article => {
       if (article.isRead && article.url) {
         readArticleUrls.add(article.url);
       }

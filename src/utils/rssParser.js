@@ -101,6 +101,18 @@ function extractMediaUrlsFromXml(rawXml) {
         imageUrl = enclosure[1];
       }
     }
+
+    // v1.1.5: Try extracting <img> from description CDATA (CNN, etc.)
+    if (!imageUrl) {
+      const descMatch = itemXml.match(/<description[^>]*>\s*(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?\s*<\/description>/i);
+      if (descMatch) {
+        const descHtml = descMatch[1];
+        const imgMatch = descHtml.match(/<img[^>]+src=['"]([^'"]+)['"][^>]*>/i);
+        if (imgMatch && imgMatch[1] && imgMatch[1].startsWith('http')) {
+          imageUrl = imgMatch[1];
+        }
+      }
+    }
     
     mediaUrls.push(imageUrl);
   }
@@ -110,16 +122,18 @@ function extractMediaUrlsFromXml(rawXml) {
 
 // v1.0.30: Fetch og:image from article page as fallback when RSS has no image data
 // Social media platforms use this same technique to show link previews
-async function fetchOgImage(articleUrl, timeoutMs = 6000) {
+async function fetchOgImage(articleUrl, timeoutMs = 8000) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     
     const response = await fetch(articleUrl, {
       signal: controller.signal,
+      redirect: 'follow',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-        'Accept': 'text/html',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
       },
     });
     clearTimeout(timeoutId);
@@ -152,6 +166,23 @@ async function fetchOgImage(articleUrl, timeoutMs = 6000) {
       const match = head.match(pattern);
       if (match && match[1] && match[1].startsWith('http')) {
         return match[1];
+      }
+    }
+
+    // v1.1.5: Try JSON-LD structured data (CNN, news sites)
+    const jsonLdMatch = head.match(/<script[^>]+type=['"]application\/ld\+json['"][^>]*>([\s\S]*?)<\/script>/i);
+    if (jsonLdMatch) {
+      try {
+        const jsonLd = JSON.parse(jsonLdMatch[1]);
+        const imageData = jsonLd.image || jsonLd.thumbnailUrl;
+        if (imageData) {
+          const imgUrl = typeof imageData === 'string' ? imageData :
+            Array.isArray(imageData) ? (typeof imageData[0] === 'string' ? imageData[0] : imageData[0]?.url) :
+            imageData.url;
+          if (imgUrl && imgUrl.startsWith('http')) return imgUrl;
+        }
+      } catch (e) {
+        // JSON parse failed, skip
       }
     }
     
