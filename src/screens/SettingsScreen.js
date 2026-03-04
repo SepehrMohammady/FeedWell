@@ -31,6 +31,7 @@ import {
   AVAILABLE_LANGUAGES,
   getPopularLanguages,
   getDisplayName,
+  getMLKitName,
   loadTargetLanguage,
   saveTargetLanguage,
   loadTranslationMode,
@@ -38,6 +39,8 @@ import {
   TRANSLATION_MODES,
   getLanguageModelsStatus,
   isModelDownloaded,
+  downloadModel,
+  deleteModel,
 } from '../utils/translationService';
 
 export default function SettingsScreen({ navigation }) {
@@ -55,6 +58,10 @@ export default function SettingsScreen({ navigation }) {
   const [loadingModels, setLoadingModels] = useState(false);
   const [showModelManager, setShowModelManager] = useState(false);
   const [translationMode, setTranslationMode] = useState(TRANSLATION_MODES.AUTO);
+  const [showTranslationModePicker, setShowTranslationModePicker] = useState(false);
+  const [allModels, setAllModels] = useState([]);
+  const [modelSearchQuery, setModelSearchQuery] = useState('');
+  const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
 
   // Load target language and translation mode on mount
   useEffect(() => {
@@ -71,15 +78,65 @@ export default function SettingsScreen({ navigation }) {
 
   const handleOpenModelManager = async () => {
     setShowModelManager(true);
+    setModelSearchQuery('');
     setLoadingModels(true);
     try {
       const statuses = await getLanguageModelsStatus();
+      setAllModels(statuses);
       setDownloadedModels(statuses.filter(s => s.downloaded));
     } catch (error) {
       console.error('Error loading model status:', error);
     } finally {
       setLoadingModels(false);
     }
+  };
+
+  const handleDownloadModel = async (lang) => {
+    setDownloadingModel(lang.code);
+    try {
+      const success = await downloadModel(lang.mlKitName);
+      if (success) {
+        setAllModels(prev => prev.map(m => m.code === lang.code ? { ...m, downloaded: true } : m));
+        setDownloadedModels(prev => [...prev, { ...lang, downloaded: true }]);
+      } else {
+        Alert.alert('Download Failed', `Could not download ${lang.displayName} model.`);
+      }
+    } catch (error) {
+      Alert.alert('Download Failed', error.message);
+    } finally {
+      setDownloadingModel(null);
+    }
+  };
+
+  const handleDeleteModel = async (lang) => {
+    Alert.alert(
+      'Delete Model',
+      `Remove ${lang.displayName} offline translation model (~30 MB)?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const success = await deleteModel(lang.mlKitName);
+              if (success) {
+                setAllModels(prev => prev.map(m => m.code === lang.code ? { ...m, downloaded: false } : m));
+                setDownloadedModels(prev => prev.filter(m => m.code !== lang.code));
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Could not delete the model.');
+            }
+          }
+        },
+      ]
+    );
+  };
+
+  const handleSelectTranslationMode = (mode) => {
+    setTranslationMode(mode);
+    saveTranslationMode(mode);
+    setShowTranslationModePicker(false);
   };
 
   // Filtered languages for picker
@@ -656,6 +713,37 @@ export default function SettingsScreen({ navigation }) {
       marginTop: 4,
       lineHeight: 16,
     },
+    modelActionButton: {
+      padding: 8,
+    },
+    modeItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    modeItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      gap: 14,
+    },
+    modeItemText: {
+      flex: 1,
+    },
+    modeItemTitle: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    modeItemDesc: {
+      fontSize: 13,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
+    },
   });
 
   return (
@@ -717,24 +805,8 @@ export default function SettingsScreen({ navigation }) {
               translationMode === TRANSLATION_MODES.ONLINE ? 'Online only (Google Translate)' :
               'Offline only (ML Kit)'
             }
-            onPress={() => {
-              const modes = [TRANSLATION_MODES.AUTO, TRANSLATION_MODES.ONLINE, TRANSLATION_MODES.OFFLINE];
-              const currentIdx = modes.indexOf(translationMode);
-              const nextMode = modes[(currentIdx + 1) % modes.length];
-              setTranslationMode(nextMode);
-              saveTranslationMode(nextMode);
-            }}
-            rightElement={
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons
-                  name={translationMode === TRANSLATION_MODES.AUTO ? 'sync-outline' : translationMode === TRANSLATION_MODES.ONLINE ? 'cloud-outline' : 'phone-portrait-outline'}
-                  size={20}
-                  color={theme.colors.primary}
-                  style={{ marginRight: 4 }}
-                />
-                <Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />
-              </View>
-            }
+            onPress={() => setShowTranslationModePicker(true)}
+            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Default Language"
@@ -917,45 +989,83 @@ export default function SettingsScreen({ navigation }) {
         visible={showModelManager}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowModelManager(false)}
+        onRequestClose={() => {
+          setShowModelManager(false);
+          setModelSearchQuery('');
+        }}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Downloaded Models</Text>
+              <Text style={styles.modalTitle}>Offline Models</Text>
               <TouchableOpacity
-                onPress={() => setShowModelManager(false)}
+                onPress={() => {
+                  setShowModelManager(false);
+                  setModelSearchQuery('');
+                }}
                 style={styles.modalCloseButton}
               >
                 <Ionicons name="close" size={24} color={theme.colors.text} />
               </TouchableOpacity>
             </View>
 
+            <View style={styles.modalSearchContainer}>
+              <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
+              <TextInput
+                style={styles.modalSearchInput}
+                placeholder="Search languages..."
+                placeholderTextColor={theme.colors.textTertiary}
+                value={modelSearchQuery}
+                onChangeText={setModelSearchQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {modelSearchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setModelSearchQuery('')}>
+                  <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
+              )}
+            </View>
+
             {loadingModels ? (
               <View style={styles.modelLoadingContainer}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
-                <Text style={styles.modelLoadingText}>Checking downloaded models...</Text>
-              </View>
-            ) : downloadedModels.length === 0 ? (
-              <View style={styles.modelEmptyContainer}>
-                <Ionicons name="cloud-download-outline" size={48} color={theme.colors.textSecondary} />
-                <Text style={styles.modelEmptyTitle}>No Models Downloaded</Text>
-                <Text style={styles.modelEmptyText}>
-                  Translation models are automatically downloaded when you first translate an article.
-                  Each model is about 30 MB and works fully offline after download.
-                </Text>
+                <Text style={styles.modelLoadingText}>Checking models...</Text>
               </View>
             ) : (
               <FlatList
-                data={downloadedModels}
+                data={modelSearchQuery.trim()
+                  ? allModels.filter(m => m.displayName.toLowerCase().includes(modelSearchQuery.toLowerCase()) || m.code.includes(modelSearchQuery.toLowerCase()))
+                  : [...allModels.filter(m => m.downloaded), ...allModels.filter(m => !m.downloaded)]
+                }
                 keyExtractor={(item) => item.code}
                 renderItem={({ item }) => (
                   <View style={styles.modelItem}>
                     <View style={styles.modelItemInfo}>
-                      <Ionicons name="checkmark-circle" size={20} color={theme.colors.success} />
-                      <Text style={styles.modelItemText}>{item.displayName}</Text>
+                      <Ionicons
+                        name={item.downloaded ? 'checkmark-circle' : 'cloud-download-outline'}
+                        size={20}
+                        color={item.downloaded ? theme.colors.success : theme.colors.textSecondary}
+                      />
+                      <Text style={[styles.modelItemText, item.downloaded && { fontWeight: '600' }]}>{item.displayName}</Text>
                     </View>
-                    <Text style={styles.modelItemSize}>~30 MB</Text>
+                    {downloadingModel === item.code ? (
+                      <ActivityIndicator size="small" color={theme.colors.primary} />
+                    ) : item.downloaded ? (
+                      <TouchableOpacity
+                        onPress={() => handleDeleteModel(item)}
+                        style={styles.modelActionButton}
+                      >
+                        <Ionicons name="trash-outline" size={18} color={theme.colors.error || '#FF3B30'} />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => handleDownloadModel(item)}
+                        style={styles.modelActionButton}
+                      >
+                        <Ionicons name="download-outline" size={18} color={theme.colors.primary} />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
                 showsVerticalScrollIndicator={false}
@@ -966,12 +1076,82 @@ export default function SettingsScreen({ navigation }) {
                       {downloadedModels.length} model{downloadedModels.length !== 1 ? 's' : ''} downloaded
                     </Text>
                     <Text style={styles.modelListSubtext}>
-                      Models are downloaded automatically when translating. To free space, clear app data.
+                      Each model is ~30 MB. Downloaded models work fully offline.
                     </Text>
                   </View>
                 }
               />
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Translation Mode Picker Modal */}
+      <Modal
+        visible={showTranslationModePicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowTranslationModePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Translation Mode</Text>
+              <TouchableOpacity
+                onPress={() => setShowTranslationModePicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.modeItem, translationMode === TRANSLATION_MODES.AUTO && styles.langItemSelected]}
+              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.AUTO)}
+            >
+              <View style={styles.modeItemContent}>
+                <Ionicons name="sync-outline" size={22} color={translationMode === TRANSLATION_MODES.AUTO ? theme.colors.primary : theme.colors.text} />
+                <View style={styles.modeItemText}>
+                  <Text style={[styles.modeItemTitle, translationMode === TRANSLATION_MODES.AUTO && { color: theme.colors.primary }]}>Auto (Recommended)</Text>
+                  <Text style={styles.modeItemDesc}>Online first, offline fallback when no internet</Text>
+                </View>
+              </View>
+              {translationMode === TRANSLATION_MODES.AUTO && (
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.modeItem, translationMode === TRANSLATION_MODES.ONLINE && styles.langItemSelected]}
+              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.ONLINE)}
+            >
+              <View style={styles.modeItemContent}>
+                <Ionicons name="cloud-outline" size={22} color={translationMode === TRANSLATION_MODES.ONLINE ? theme.colors.primary : theme.colors.text} />
+                <View style={styles.modeItemText}>
+                  <Text style={[styles.modeItemTitle, translationMode === TRANSLATION_MODES.ONLINE && { color: theme.colors.primary }]}>Online Only</Text>
+                  <Text style={styles.modeItemDesc}>Google Translate — higher quality, requires internet</Text>
+                </View>
+              </View>
+              {translationMode === TRANSLATION_MODES.ONLINE && (
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.modeItem, { borderBottomWidth: 0 }, translationMode === TRANSLATION_MODES.OFFLINE && styles.langItemSelected]}
+              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.OFFLINE)}
+            >
+              <View style={styles.modeItemContent}>
+                <Ionicons name="phone-portrait-outline" size={22} color={translationMode === TRANSLATION_MODES.OFFLINE ? theme.colors.primary : theme.colors.text} />
+                <View style={styles.modeItemText}>
+                  <Text style={[styles.modeItemTitle, translationMode === TRANSLATION_MODES.OFFLINE && { color: theme.colors.primary }]}>Offline Only</Text>
+                  <Text style={styles.modeItemDesc}>ML Kit on-device — works without internet, basic quality</Text>
+                </View>
+              </View>
+              {translationMode === TRANSLATION_MODES.OFFLINE && (
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

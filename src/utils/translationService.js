@@ -268,6 +268,26 @@ export async function isModelDownloaded(mlKitName) {
   catch (error) { console.error('Error checking model status:', error); return false; }
 }
 
+export async function downloadModel(mlKitName) {
+  try {
+    await FastTranslator.downloadLanguageModel(mlKitName);
+    return true;
+  } catch (error) {
+    console.error('Error downloading model:', error);
+    return false;
+  }
+}
+
+export async function deleteModel(mlKitName) {
+  try {
+    await FastTranslator.deleteLanguageModel(mlKitName);
+    return true;
+  } catch (error) {
+    console.error('Error deleting model:', error);
+    return false;
+  }
+}
+
 export async function getLanguageModelsStatus() {
   const results = [];
   for (const lang of AVAILABLE_LANGUAGES) {
@@ -313,7 +333,7 @@ export function getPopularLanguages() {
 }
 
 export default {
-  translateText, identifyLanguage, isModelDownloaded, getLanguageModelsStatus,
+  translateText, identifyLanguage, isModelDownloaded, downloadModel, deleteModel, getLanguageModelsStatus,
   getMLKitName, getDisplayName, localCodeToMLKit, saveTargetLanguage, loadTargetLanguage,
   saveTranslationMode, loadTranslationMode, getPopularLanguages,
   AVAILABLE_LANGUAGES, TRANSLATION_MODES,

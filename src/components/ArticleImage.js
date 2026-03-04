@@ -8,7 +8,10 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
   const [loading, setLoading] = useState(true);
   const { theme, isDarkMode } = useTheme();
 
-  if (!uri || loadError) {
+  // Upgrade http:// to https:// when possible (Android blocks cleartext by default)
+  const safeUri = uri && uri.startsWith('http://') ? uri.replace('http://', 'https://') : uri;
+
+  if (!safeUri || loadError) {
     if (!showPlaceholder) return null;
     
     // Use FeedWell logo as default image - use inverted logo for dark mode
@@ -27,7 +30,7 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
 
   return (
     <Image
-      source={{ uri }}
+      source={{ uri: safeUri }}
       style={style}
       resizeMode={resizeMode}
       onError={() => {
