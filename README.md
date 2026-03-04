@@ -9,10 +9,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.32-blue?style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Windows-green?style=flat-square" alt="Platforms" />
   <img src="https://img.shields.io/badge/license-MIT-orange?style=flat-square" alt="License" />
-  <img src="https://img.shields.io/badge/ads-blocked-red?style=flat-square" alt="Ad-free" />
 </p>
 
 <p align="center">
@@ -58,9 +56,9 @@ No accounts. No tracking. No ads. Everything stays on your device.
 
 ### 📖 Beautiful Reader
 - In-app article reader with clean typography
+- **Translate articles** — Google Translate (online) + ML Kit (offline)
 - RTL language support (Farsi, Arabic, Hebrew)
 - Selectable text for copying
-- Reading position bookmarks
 - Open in browser or read in-app
 
 </td>
@@ -163,6 +161,7 @@ FeedWell/
 | State | React Context API + useReducer |
 | Storage | AsyncStorage with SafeStorage wrapper |
 | RSS Parsing | react-native-rss-parser + custom ad-blocking |
+| Translation | Google Translate API + ML Kit on-device |
 | Build | Gradle (Android) / Expo (iOS & Web) |
 
 ---
