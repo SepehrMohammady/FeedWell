@@ -60,6 +60,13 @@ const ONBOARDING_SLIDES = [
   },
   {
     id: 7,
+    icon: 'language-outline',
+    title: 'Translate Articles',
+    description: 'Translate articles into 50+ languages. Online mode (Google Translate) gives the best accuracy. Offline mode (ML Kit) works without internet but may be less accurate for complex sentences.',
+    color: '#6B8E9B',
+  },
+  {
+    id: 8,
     icon: 'checkmark-circle-outline',
     title: 'You\'re All Set!',
     description: 'Start by adding your first RSS feed and enjoy a better reading experience. Happy reading!',

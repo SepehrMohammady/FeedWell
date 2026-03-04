@@ -238,6 +238,7 @@ async function fetchOgImage(articleUrl, timeoutMs = 8000) {
 }
 
 // Fetch og:image for all articles that are missing images, in parallel
+// v1.1.8: Limit to first 5 articles to avoid slow feed loading
 async function fetchMissingArticleImages(articles) {
   const articlesNeedingImages = articles
     .map((article, index) => ({ article, index }))
@@ -245,10 +246,12 @@ async function fetchMissingArticleImages(articles) {
   
   if (articlesNeedingImages.length === 0) return articles;
   
-  console.log(`[og:image] Fetching preview images for ${articlesNeedingImages.length} articles without RSS images...`);
+  // Limit to first 5 to keep feed loading fast (was causing major slowdown)
+  const batch = articlesNeedingImages.slice(0, 5);
+  console.log(`[og:image] Fetching preview images for ${batch.length}/${articlesNeedingImages.length} articles without RSS images...`);
   
   const results = await Promise.allSettled(
-    articlesNeedingImages.map(({ article }) => fetchOgImage(article.url))
+    batch.map(({ article }) => fetchOgImage(article.url, 5000))
   );
   
   const updatedArticles = [...articles];
@@ -256,7 +259,7 @@ async function fetchMissingArticleImages(articles) {
   
   results.forEach((result, i) => {
     if (result.status === 'fulfilled' && result.value) {
-      const articleIndex = articlesNeedingImages[i].index;
+      const articleIndex = batch[i].index;
       updatedArticles[articleIndex] = {
         ...updatedArticles[articleIndex],
         imageUrl: result.value,
@@ -265,7 +268,7 @@ async function fetchMissingArticleImages(articles) {
     }
   });
   
-  console.log(`[og:image] Found ${foundCount}/${articlesNeedingImages.length} preview images from article pages`);
+  console.log(`[og:image] Found ${foundCount}/${batch.length} preview images from article pages`);
   return updatedArticles;
 }
 
