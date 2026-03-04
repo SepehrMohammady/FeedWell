@@ -80,6 +80,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [detectedSourceLang, setDetectedSourceLang] = useState(null); // ML Kit name
   const [languageSearchQuery, setLanguageSearchQuery] = useState('');
 
+  // Check if article language matches target translation language
+  const isSameLanguage = useMemo(() => {
+    if (!languageInfo || !languageInfo.code || languageInfo.confidence < 0.6) return false;
+    return languageInfo.code === targetLangCode;
+  }, [languageInfo, targetLangCode]);
+
   // Split content into chunks to prevent memory issues with very long articles
   const contentChunks = useMemo(() => {
     if (!fullContent) return [];
@@ -563,7 +569,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       backgroundColor: theme.colors.surface,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
-      maxHeight: '75%',
+      height: '75%',
       paddingBottom: Platform.OS === 'ios' ? 34 : 16,
     },
     modalHeader: {
@@ -711,9 +717,19 @@ function ArticleReaderScreenContent({ route, navigation }) {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={() => setShowLanguagePicker(true)}
+            onPress={isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate}
+            onLongPress={() => setShowLanguagePicker(true)}
+            disabled={translating}
           >
-            <Ionicons name="language-outline" size={24} color={theme.colors.primary} />
+            {translating ? (
+              <ActivityIndicator size="small" color={theme.colors.text} />
+            ) : (
+              <Ionicons 
+                name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
+                size={24} 
+                color={isTranslated ? theme.colors.success : theme.colors.text} 
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
@@ -809,28 +825,31 @@ function ArticleReaderScreenContent({ route, navigation }) {
                 </View>
               )}
               
-              <TouchableOpacity
-                style={[
-                  styles.translateButton,
-                  isTranslated && styles.translateButtonActive,
-                  translating && styles.translateButtonDisabled,
-                ]}
-                onPress={handleTranslate}
-                disabled={translating}
-              >
-                {translating ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Ionicons 
-                    name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
-                    size={16} 
-                    color="#fff" 
-                  />
-                )}
-                <Text style={styles.translateButtonText}>
-                  {translating ? 'Translating...' : isTranslated ? 'Show Original' : `Translate to ${getDisplayName(targetLangCode)}`}
-                </Text>
-              </TouchableOpacity>
+              {/* Only show translate button when article language differs from target */}
+              {!isSameLanguage && (
+                <TouchableOpacity
+                  style={[
+                    styles.translateButton,
+                    isTranslated && styles.translateButtonActive,
+                    translating && styles.translateButtonDisabled,
+                  ]}
+                  onPress={handleTranslate}
+                  disabled={translating}
+                >
+                  {translating ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Ionicons 
+                      name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
+                      size={16} 
+                      color="#fff" 
+                    />
+                  )}
+                  <Text style={styles.translateButtonText}>
+                    {translating ? 'Translating...' : isTranslated ? 'Show Original' : `Translate to ${getDisplayName(targetLangCode)}`}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Translation progress */}

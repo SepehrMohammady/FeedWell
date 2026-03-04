@@ -526,7 +526,7 @@ export default function SettingsScreen({ navigation }) {
       backgroundColor: theme.colors.surface,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
-      maxHeight: '75%',
+      height: '75%',
       paddingBottom: Platform.OS === 'ios' ? 34 : 16,
     },
     modalHeader: {
