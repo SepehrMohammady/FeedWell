@@ -712,17 +712,36 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
       throw new Error('All CORS proxies failed. This feed may not be accessible from web browsers due to CORS restrictions.');
     }
     
-    // Direct fetch for mobile/native platforms
-    const response = await fetch(fetchUrl);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch feed: ${response.status} - ${response.statusText}`);
-    }
-    
-    const responseText = await response.text();
-    
-    if (!responseText || responseText.trim() === '') {
-      throw new Error('Empty response from feed URL');
+    // Direct fetch for mobile/native platforms with retry logic
+    let responseText;
+    const maxRetries = 2;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(fetchUrl, {
+          headers: {
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+            'User-Agent': 'FeedWell/1.1.7 RSS Reader',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch feed: ${response.status} - ${response.statusText}`);
+        }
+        
+        responseText = await response.text();
+        
+        if (!responseText || responseText.trim() === '') {
+          throw new Error('Empty response from feed URL');
+        }
+        break; // Success, exit retry loop
+      } catch (fetchError) {
+        if (attempt < maxRetries) {
+          console.log(`Fetch attempt ${attempt + 1} failed, retrying in ${(attempt + 1) * 1000}ms:`, fetchError.message);
+          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+        } else {
+          throw fetchError;
+        }
+      }
     }
     
     const feed = await parse(responseText);

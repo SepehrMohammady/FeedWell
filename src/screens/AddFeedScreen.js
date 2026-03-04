@@ -44,8 +44,8 @@ export default function AddFeedScreen({ navigation }) {
       feeds: [
         { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
         { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
-        { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
-        { name: 'Associated Press', url: 'https://feeds.apnews.com/apnews/topnews' },
+        { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml' },
+        { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss' },
         { name: 'CNN News', url: 'https://rss.cnn.com/rss/edition.rss' },
       ]
     },
@@ -55,14 +55,13 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'ESPN', url: 'https://www.espn.com/espn/rss/news' },
         { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
         { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040' },
-        { name: 'Bleacher Report', url: 'https://bleacherreport.com/articles/feed' },
-        { name: 'Sports Illustrated', url: 'https://www.si.com/rss/si_topstories.rss' },
+        { name: 'CBS Sports', url: 'https://www.cbssports.com/rss/headlines/' },
       ]
     },
     {
       title: 'Entertainment',
       feeds: [
-        { name: 'Entertainment Weekly', url: 'https://ew.com/feed/' },
+        { name: 'Deadline', url: 'https://deadline.com/feed/' },
         { name: 'Variety', url: 'https://variety.com/feed/' },
         { name: 'Hollywood Reporter', url: 'https://www.hollywoodreporter.com/feed/' },
         { name: 'Rolling Stone', url: 'https://www.rollingstone.com/feed/' },
@@ -82,10 +81,9 @@ export default function AddFeedScreen({ navigation }) {
     {
       title: 'Business',
       feeds: [
-        { name: 'Harvard Business Review', url: 'https://feeds.hbr.org/harvardbusiness' },
-        { name: 'Forbes', url: 'https://www.forbes.com/real-time/feed2/' },
+        { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
         { name: 'Financial Times', url: 'https://www.ft.com/rss/home' },
-        { name: 'Wall Street Journal', url: 'https://feeds.wsj.com/wsj/xml/rss/3_7085.xml' },
+        { name: 'The Economist', url: 'https://www.economist.com/international/rss.xml' },
         { name: 'Bloomberg', url: 'https://feeds.bloomberg.com/markets/news.rss' },
       ]
     },
@@ -94,7 +92,7 @@ export default function AddFeedScreen({ navigation }) {
       feeds: [
         { name: 'Science Daily', url: 'https://www.sciencedaily.com/rss/all.xml' },
         { name: 'NASA', url: 'https://www.nasa.gov/rss/dyn/breaking_news.rss' },
-        { name: 'Scientific American', url: 'https://rss.sciam.com/ScientificAmerican-Global' },
+        { name: 'Engadget', url: 'https://www.engadget.com/rss.xml' },
         { name: 'Nature', url: 'https://www.nature.com/nature.rss' },
         { name: 'New Scientist', url: 'https://www.newscientist.com/feed/home/' },
       ]
@@ -102,7 +100,7 @@ export default function AddFeedScreen({ navigation }) {
     {
       title: 'Lifestyle',
       feeds: [
-        { name: 'Medium', url: 'https://medium.com/feed' },
+        { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
         { name: 'Lifehacker', url: 'https://lifehacker.com/rss' },
         { name: 'The Guardian Culture', url: 'https://www.theguardian.com/culture/rss' },
         { name: 'Mashable', url: 'https://mashable.com/feeds/rss/all' },
@@ -182,8 +180,8 @@ export default function AddFeedScreen({ navigation }) {
       // More detailed error message
       let errorMessage = 'Failed to add feed. ';
       
-      if (error.message.includes('CORS')) {
-        errorMessage += 'This feed may not be accessible from the web browser due to CORS restrictions. ';
+      if (error.message.includes('CORS') || error.message.includes('accessible')) {
+        errorMessage += 'This feed could not be loaded. It may be temporarily unavailable — please try again. ';
       } else if (error.message.includes('Network')) {
         errorMessage += 'Please check the feed URL and your internet connection. ';
       } else if (error.message.includes('Failed to fetch')) {
@@ -264,9 +262,9 @@ export default function AddFeedScreen({ navigation }) {
 
               // More specific error handling
               if (error.message.includes('Network request failed') || error.message.includes('fetch')) {
-                errorMessage += 'Network connection error. Please check the feed URL and your internet connection.';
-              } else if (error.message.includes('CORS')) {
-                errorMessage += 'This feed cannot be accessed due to browser security restrictions.';
+                errorMessage += 'Network connection error. Please check your internet connection and try again.';
+              } else if (error.message.includes('CORS') || error.message.includes('accessible')) {
+                errorMessage += 'This feed could not be loaded. It may be temporarily unavailable — please try again.';
               } else if (error.message.includes('404') || error.message.includes('Not found')) {
                 errorMessage += 'The feed URL is not accessible (404 error).';
               } else if (error.message.includes('Invalid') || error.message.includes('parse')) {

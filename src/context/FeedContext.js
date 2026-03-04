@@ -53,20 +53,44 @@ function feedReducer(state, action) {
           const mergedArticles = [];
           const existingIds = new Set();
 
-          // First, add all existing articles
+          // First, add all existing articles and track their indices
+          const existingIndexMap = new Map();
           existingArticles.forEach(article => {
             mergedArticles.push(article);
             existingIds.add(article.id);
+            existingIndexMap.set(article.id, mergedArticles.length - 1);
           });
 
-          // Then, add only new articles that don't exist yet
+          // Then, add new articles OR update existing ones with missing data
           let newCount = 0;
+          let updatedCount = 0;
           newArticles.forEach(newArticle => {
             if (!existingIds.has(newArticle.id)) {
               mergedArticles.push(newArticle);
               newCount++;
+            } else {
+              // v1.1.7: Update existing article's imageUrl/description if new data available
+              const idx = existingIndexMap.get(newArticle.id);
+              if (idx !== undefined) {
+                const existing = mergedArticles[idx];
+                let needsUpdate = false;
+                const updates = {};
+                if (newArticle.imageUrl && !existing.imageUrl) {
+                  updates.imageUrl = newArticle.imageUrl;
+                  needsUpdate = true;
+                }
+                if (newArticle.description && (!existing.description || existing.description.length < 10)) {
+                  updates.description = newArticle.description;
+                  needsUpdate = true;
+                }
+                if (needsUpdate) {
+                  mergedArticles[idx] = { ...existing, ...updates };
+                  updatedCount++;
+                }
+              }
             }
           });
+          if (updatedCount > 0) console.log('Reducer - updated existing articles:', updatedCount);
 
           console.log('Reducer - actually new articles:', newCount);
           console.log('Reducer - final count:', mergedArticles.length);
