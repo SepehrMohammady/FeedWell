@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Alert,
   ActivityIndicator,
   Image,
   Platform,
@@ -23,6 +22,7 @@ import { parseRSSFeed } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
+import CustomAlert from '../components/CustomAlert';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
@@ -34,6 +34,7 @@ export default function FeedListScreen({ navigation, route }) {
   const [selectedArticles, setSelectedArticles] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const flatListRef = useRef(null);
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', icon: null, buttons: [] });
 
   // Apply filter from navigation params (e.g., when clicking Unread from Home)
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function FeedListScreen({ navigation, route }) {
       console.log('=== REFRESH FEEDS DEBUG END ===');
     } catch (error) {
       setError('Failed to refresh feeds');
-      Alert.alert('Error', 'Failed to refresh feeds. Please check your internet connection.');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to refresh feeds. Please check your internet connection.', icon: 'wifi-outline', buttons: [{ text: 'OK' }] });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -132,23 +133,25 @@ export default function FeedListScreen({ navigation, route }) {
   const handleMarkAllRead = async () => {
     const unreadCount = getUnreadCount();
     if (unreadCount === 0) {
-      Alert.alert('Info', 'No unread articles to mark as read.');
+      setAlertConfig({ visible: true, title: 'Info', message: 'No unread articles to mark as read.', icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
       return;
     }
 
     const confirmAction = () => {
       markAllRead();
-      Alert.alert('Success', `Marked ${unreadCount} articles as read.`);
+      setAlertConfig({ visible: true, title: 'Success', message: `Marked ${unreadCount} articles as read.`, icon: 'checkmark-circle', buttons: [{ text: 'OK' }] });
     };
 
-    Alert.alert(
-      'Mark All Read',
-      `Mark all ${unreadCount} unread articles as read?`,
-      [
+    setAlertConfig({
+      visible: true,
+      title: 'Mark All Read',
+      message: `Mark all ${unreadCount} unread articles as read?`,
+      icon: 'checkmark-done-outline',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
-      ]
-    );
+      ],
+    });
   };
 
   const handleShare = async (article) => {
@@ -213,27 +216,25 @@ export default function FeedListScreen({ navigation, route }) {
             viewPosition: 0.3,
           });
         } catch (error) {
-          Alert.alert('Reading Position', 'You can see your reading position marked in the list below.');
+          setAlertConfig({ visible: true, title: 'Reading Position', message: 'You can see your reading position marked in the list below.', icon: 'location-outline', buttons: [{ text: 'OK' }] });
         }
       } else {
-        Alert.alert('Reading Position', 'The reading position article is not visible in the current filter/sort view.');
+        setAlertConfig({ visible: true, title: 'Reading Position', message: 'The reading position article is not visible in the current filter/sort view.', icon: 'location-outline', buttons: [{ text: 'OK' }] });
       }
     }
   };
 
   const handleClearReadingPosition = () => {
-    Alert.alert(
-      'Clear Reading Position',
-      'Are you sure you want to remove the reading position line?',
-      [
+    setAlertConfig({
+      visible: true,
+      title: 'Clear Reading Position',
+      message: 'Are you sure you want to remove the reading position line?',
+      icon: 'bookmark-outline',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Clear', 
-          style: 'destructive',
-          onPress: clearReadingPosition
-        }
-      ]
-    );
+        { text: 'Clear', style: 'destructive', onPress: clearReadingPosition },
+      ],
+    });
   };
 
   const toggleSelectionMode = () => {
@@ -912,6 +913,16 @@ export default function FeedListScreen({ navigation, route }) {
             </View>
           )
         }
+      />
+
+      {/* Custom themed alert dialog */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
     </SafeAreaView>
   );

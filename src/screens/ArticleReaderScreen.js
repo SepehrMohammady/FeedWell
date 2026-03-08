@@ -13,7 +13,6 @@ import {
   Modal,
   FlatList,
   TextInput,
-  Alert,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +26,7 @@ import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } f
 import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
 import ErrorBoundary from '../components/ErrorBoundary';
+import CustomAlert from '../components/CustomAlert';
 import {
   translateText,
   identifyLanguage,
@@ -81,6 +81,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const viewportHeightRef = useRef(0);
   const hasAutoScrolled = useRef(false);
   const bookmarkFlashAnim = useRef(new Animated.Value(0)).current;
+  const [contentReady, setContentReady] = useState(false);
+
+  // Custom alert state
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', icon: null, buttons: [] });
 
   // Translation state
   const [isTranslated, setIsTranslated] = useState(false);
@@ -124,27 +128,40 @@ function ArticleReaderScreenContent({ route, navigation }) {
   // Auto-scroll to bookmark when content finishes loading
   const handleContentSizeChange = useCallback((w, h) => {
     contentHeightRef.current = h;
-    if (bookmarkScrollPercent != null && !hasAutoScrolled.current && !loading && h > 0) {
+    if (h > 0 && viewportHeightRef.current > 0) {
+      setContentReady(true);
+    }
+  }, []);
+
+  // Effect to auto-scroll when all conditions are met
+  useEffect(() => {
+    if (
+      bookmarkScrollPercent != null &&
+      !hasAutoScrolled.current &&
+      !loading &&
+      contentReady
+    ) {
       hasAutoScrolled.current = true;
-      const maxScroll = h - viewportHeightRef.current;
+      const maxScroll = contentHeightRef.current - viewportHeightRef.current;
       if (maxScroll > 0) {
         const targetY = bookmarkScrollPercent * maxScroll;
-        // Small delay to ensure layout is complete
         setTimeout(() => {
           scrollViewRef.current?.scrollTo({ y: targetY, animated: true });
-          // Flash the bookmark indicator
           Animated.sequence([
             Animated.timing(bookmarkFlashAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
             Animated.delay(1500),
             Animated.timing(bookmarkFlashAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
           ]).start();
-        }, 300);
+        }, 400);
       }
     }
-  }, [bookmarkScrollPercent, loading, bookmarkFlashAnim]);
+  }, [bookmarkScrollPercent, loading, contentReady, bookmarkFlashAnim]);
 
   const handleScrollViewLayout = useCallback((event) => {
     viewportHeightRef.current = event.nativeEvent.layout.height;
+    if (contentHeightRef.current > 0 && event.nativeEvent.layout.height > 0) {
+      setContentReady(true);
+    }
   }, []);
 
   const saveBookmark = useCallback(async () => {
@@ -181,15 +198,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   const handleBookmarkPress = useCallback(() => {
     if (hasBookmark) {
-      Alert.alert(
-        'Reading Bookmark',
-        'What would you like to do?',
-        [
+      setAlertConfig({
+        visible: true,
+        title: 'Reading Bookmark',
+        message: 'What would you like to do?',
+        icon: 'bookmark',
+        buttons: [
           { text: 'Update Position', onPress: saveBookmark },
           { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
           { text: 'Cancel', style: 'cancel' },
-        ]
-      );
+        ],
+      });
     } else {
       saveBookmark();
     }
@@ -397,14 +416,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
       // Check if source and target are the same
       if (sourceLangCode === targetLangCode) {
-        Alert.alert(
-          'Same Language',
-          `The article appears to be in ${getDisplayName(sourceLangCode)}. Please choose a different target language.`,
-          [
+        setAlertConfig({
+          visible: true,
+          title: 'Same Language',
+          message: `The article appears to be in ${getDisplayName(sourceLangCode)}. Please choose a different target language.`,
+          icon: 'language-outline',
+          buttons: [
             { text: 'Change Language', onPress: () => setShowLanguagePicker(true) },
             { text: 'Cancel', style: 'cancel' },
-          ]
-        );
+          ],
+        });
         setTranslating(false);
         setTranslationProgress('');
         return;
@@ -435,11 +456,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setIsTranslated(true);
     } catch (error) {
       console.error('Translation error:', error);
-      Alert.alert(
-        'Translation Failed',
-        error.message || 'Unable to translate this article. Please check your connection for initial model download.',
-        [{ text: 'OK' }]
-      );
+      setAlertConfig({
+        visible: true,
+        title: 'Translation Failed',
+        message: error.message || 'Unable to translate this article. Please check your connection for initial model download.',
+        icon: 'alert-circle-outline',
+        buttons: [{ text: 'OK' }],
+      });
     } finally {
       setTranslating(false);
       setTranslationProgress('');
@@ -1146,6 +1169,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* Custom themed alert dialog */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+      />
     </SafeAreaView>
   );
 }
