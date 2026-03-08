@@ -14,9 +14,11 @@ import {
   FlatList,
   TextInput,
   Alert,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
@@ -71,6 +73,15 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollViewRef = useRef(null);
 
+  // Bookmark state
+  const [hasBookmark, setHasBookmark] = useState(false);
+  const [bookmarkScrollPercent, setBookmarkScrollPercent] = useState(null);
+  const currentScrollY = useRef(0);
+  const contentHeightRef = useRef(0);
+  const viewportHeightRef = useRef(0);
+  const hasAutoScrolled = useRef(false);
+  const bookmarkFlashAnim = useRef(new Animated.Value(0)).current;
+
   // Translation state
   const [isTranslated, setIsTranslated] = useState(false);
   const [translatedContent, setTranslatedContent] = useState(null);
@@ -89,6 +100,100 @@ function ArticleReaderScreenContent({ route, navigation }) {
     if (!languageInfo || !languageInfo.code || languageInfo.confidence < 0.6) return false;
     return languageInfo.code === targetLangCode;
   }, [languageInfo, targetLangCode]);
+
+  // Bookmark storage key
+  const bookmarkKey = `reading_bookmark_${article.id}`;
+
+  // Load bookmark on mount
+  useEffect(() => {
+    const loadBookmark = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(bookmarkKey);
+        if (saved) {
+          const data = JSON.parse(saved);
+          setHasBookmark(true);
+          setBookmarkScrollPercent(data.scrollPercent);
+        }
+      } catch (e) {
+        console.warn('Failed to load bookmark:', e);
+      }
+    };
+    loadBookmark();
+  }, [bookmarkKey]);
+
+  // Auto-scroll to bookmark when content finishes loading
+  const handleContentSizeChange = useCallback((w, h) => {
+    contentHeightRef.current = h;
+    if (bookmarkScrollPercent != null && !hasAutoScrolled.current && !loading && h > 0) {
+      hasAutoScrolled.current = true;
+      const maxScroll = h - viewportHeightRef.current;
+      if (maxScroll > 0) {
+        const targetY = bookmarkScrollPercent * maxScroll;
+        // Small delay to ensure layout is complete
+        setTimeout(() => {
+          scrollViewRef.current?.scrollTo({ y: targetY, animated: true });
+          // Flash the bookmark indicator
+          Animated.sequence([
+            Animated.timing(bookmarkFlashAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+            Animated.delay(1500),
+            Animated.timing(bookmarkFlashAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+          ]).start();
+        }, 300);
+      }
+    }
+  }, [bookmarkScrollPercent, loading, bookmarkFlashAnim]);
+
+  const handleScrollViewLayout = useCallback((event) => {
+    viewportHeightRef.current = event.nativeEvent.layout.height;
+  }, []);
+
+  const saveBookmark = useCallback(async () => {
+    const maxScroll = contentHeightRef.current - viewportHeightRef.current;
+    if (maxScroll <= 0) return;
+    const scrollPercent = currentScrollY.current / maxScroll;
+    try {
+      await AsyncStorage.setItem(bookmarkKey, JSON.stringify({
+        scrollPercent,
+        timestamp: Date.now(),
+      }));
+      setHasBookmark(true);
+      setBookmarkScrollPercent(scrollPercent);
+      // Flash animation
+      Animated.sequence([
+        Animated.timing(bookmarkFlashAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.delay(1000),
+        Animated.timing(bookmarkFlashAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+      ]).start();
+    } catch (e) {
+      console.warn('Failed to save bookmark:', e);
+    }
+  }, [bookmarkKey, bookmarkFlashAnim]);
+
+  const removeBookmark = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem(bookmarkKey);
+      setHasBookmark(false);
+      setBookmarkScrollPercent(null);
+    } catch (e) {
+      console.warn('Failed to remove bookmark:', e);
+    }
+  }, [bookmarkKey]);
+
+  const handleBookmarkPress = useCallback(() => {
+    if (hasBookmark) {
+      Alert.alert(
+        'Reading Bookmark',
+        'What would you like to do?',
+        [
+          { text: 'Update Position', onPress: saveBookmark },
+          { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
+          { text: 'Cancel', style: 'cancel' },
+        ]
+      );
+    } else {
+      saveBookmark();
+    }
+  }, [hasBookmark, saveBookmark, removeBookmark]);
 
   // Split content into chunks to prevent memory issues with very long articles
   const contentChunks = useMemo(() => {
@@ -396,6 +501,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
+    currentScrollY.current = offsetY;
     // Show button when user scrolls down more than 200 pixels
     setShowScrollToTop(offsetY > 200);
   };
@@ -706,6 +812,28 @@ function ArticleReaderScreenContent({ route, navigation }) {
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
     },
+    bookmarkToast: {
+      position: 'absolute',
+      bottom: 90,
+      alignSelf: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: theme.colors.primary || '#007AFF',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 20,
+      elevation: 6,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+    },
+    bookmarkToastText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+    },
   });
 
   return (
@@ -719,6 +847,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reader</Text>
         <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleBookmarkPress}
+          >
+            <Ionicons
+              name={hasBookmark ? 'bookmark' : 'bookmark-outline'}
+              size={24}
+              color={hasBookmark ? theme.colors.primary : theme.colors.text}
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
             onPress={isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate}
@@ -757,6 +895,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        onContentSizeChange={handleContentSizeChange}
+        onLayout={handleScrollViewLayout}
       >
         <View style={styles.articleHeader}>
           <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
@@ -918,6 +1058,20 @@ function ArticleReaderScreenContent({ route, navigation }) {
           <Ionicons name="chevron-up" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+
+      {/* Bookmark saved indicator */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.bookmarkToast,
+          { opacity: bookmarkFlashAnim },
+        ]}
+      >
+        <Ionicons name="bookmark" size={16} color="#fff" />
+        <Text style={styles.bookmarkToastText}>
+          {hasBookmark ? 'Bookmark saved' : 'Scrolled to bookmark'}
+        </Text>
+      </Animated.View>
 
       {/* Language Picker Modal */}
       <Modal
