@@ -591,6 +591,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     content: {
       flex: 1,
+    },
+    contentInner: {
       paddingVertical: 20,
       paddingHorizontal: 32,
     },
@@ -984,6 +986,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         onContentSizeChange={handleContentSizeChange}
         onLayout={handleScrollViewLayout}
       >
+        <View style={styles.contentInner}>
         <View style={styles.articleHeader}>
           <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
           <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
@@ -1134,8 +1137,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
             </Text>
           </View>
         )}
+        </View>
 
-        {/* Saved bookmark marker - scrolls with content, sits in the margin */}
+        {/* Saved bookmark marker - scrolls with content, sits in the margin outside text */}
         {hasBookmark && bookmarkLineY != null && (
           <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
