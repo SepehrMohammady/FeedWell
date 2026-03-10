@@ -591,7 +591,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     content: {
       flex: 1,
-      padding: 20,
+      paddingVertical: 20,
+      paddingHorizontal: 32,
     },
     articleHeader: {
       marginBottom: 16,
@@ -875,16 +876,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     savedBookmarkLine: {
       position: 'absolute',
-      left: 0,
-      right: 0,
+      left: 4,
+      right: 4,
       flexDirection: 'row',
       alignItems: 'center',
       zIndex: 10,
     },
     savedBookmarkBar: {
-      width: 40,
-      height: 2,
+      flex: 1,
+      height: 1.5,
       borderRadius: 1,
+      opacity: 0.5,
     },
     savedBookmarkIcon: {
       width: 18,
@@ -896,8 +898,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     aimLineContainer: {
       position: 'absolute',
       top: '50%',
-      left: 20,
-      right: 20,
+      left: 4,
+      right: 4,
       flexDirection: 'row',
       alignItems: 'center',
       opacity: 0.35,
@@ -972,6 +974,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         </View>
       </View>
 
+      <View style={{ flex: 1 }}>
       <ScrollView 
         ref={scrollViewRef}
         style={styles.content} 
@@ -1161,6 +1164,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
           <Ionicons name="chevron-up" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+      </View>
 
       {/* Bookmark saved indicator */}
       <Animated.View
