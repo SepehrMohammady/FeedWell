@@ -144,9 +144,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
       contentReady
     ) {
       hasAutoScrolled.current = true;
-      const maxScroll = contentHeightRef.current - viewportHeightRef.current;
-      if (maxScroll > 0) {
-        const targetY = bookmarkScrollPercent * maxScroll;
+      const cH = contentHeightRef.current;
+      const vH = viewportHeightRef.current;
+      if (cH > vH) {
+        // scrollPercent is the center of viewport as fraction of content height
+        const targetY = Math.max(0, bookmarkScrollPercent * cH - vH / 2);
         setTimeout(() => {
           scrollViewRef.current?.scrollTo({ y: targetY, animated: true });
           Animated.sequence([
@@ -167,9 +169,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
   }, []);
 
   const saveBookmark = useCallback(async () => {
-    const maxScroll = contentHeightRef.current - viewportHeightRef.current;
-    if (maxScroll <= 0) return;
-    const scrollPercent = currentScrollY.current / maxScroll;
+    const cH = contentHeightRef.current;
+    const vH = viewportHeightRef.current;
+    if (cH <= vH) return;
+    // Store the center of the viewport as a fraction of total content height
+    const centerY = currentScrollY.current + vH / 2;
+    const scrollPercent = Math.min(Math.max(centerY / cH, 0), 1);
     try {
       await AsyncStorage.setItem(bookmarkKey, JSON.stringify({
         scrollPercent,
@@ -218,10 +223,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   // Compute the Y position of the saved bookmark inside the ScrollView content
   const bookmarkLineY = useMemo(() => {
-    if (!hasBookmark || bookmarkScrollPercent == null || measuredContentHeight === 0 || viewportHeightRef.current === 0) return null;
-    const maxScroll = measuredContentHeight - viewportHeightRef.current;
-    if (maxScroll <= 0) return null;
-    return bookmarkScrollPercent * maxScroll;
+    if (!hasBookmark || bookmarkScrollPercent == null || measuredContentHeight === 0) return null;
+    return bookmarkScrollPercent * measuredContentHeight;
   }, [hasBookmark, bookmarkScrollPercent, measuredContentHeight]);
 
   // Determine text direction for bookmark indicator positioning
@@ -877,12 +880,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
       flexDirection: 'row',
       alignItems: 'center',
       zIndex: 10,
-      paddingHorizontal: 4,
     },
     savedBookmarkBar: {
-      flex: 1,
+      width: 40,
       height: 2,
-      opacity: 0.7,
+      borderRadius: 1,
     },
     savedBookmarkIcon: {
       width: 18,
@@ -1130,13 +1132,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
           </View>
         )}
 
-        {/* Saved bookmark line - scrolls with content */}
+        {/* Saved bookmark marker - scrolls with content, sits in the margin */}
         {hasBookmark && bookmarkLineY != null && (
           <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
               <Ionicons name="bookmark" size={10} color="#fff" />
             </View>
-            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary }]} />
+            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary + '50' }]} />
           </View>
         )}
       </ScrollView>
