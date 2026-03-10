@@ -224,6 +224,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
     return bookmarkScrollPercent * maxScroll;
   }, [hasBookmark, bookmarkScrollPercent, measuredContentHeight]);
 
+  // Determine text direction for bookmark indicator positioning
+  const isRTL = languageInfo?.isRTL || false;
+
   // Split content into chunks to prevent memory issues with very long articles
   const contentChunks = useMemo(() => {
     if (!fullContent) return [];
@@ -874,6 +877,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       flexDirection: 'row',
       alignItems: 'center',
       zIndex: 10,
+      paddingHorizontal: 4,
     },
     savedBookmarkBar: {
       flex: 1,
@@ -881,42 +885,34 @@ function ArticleReaderScreenContent({ route, navigation }) {
       opacity: 0.7,
     },
     savedBookmarkIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      width: 18,
+      height: 18,
+      borderRadius: 9,
       justifyContent: 'center',
       alignItems: 'center',
-      marginHorizontal: 4,
     },
     aimLineContainer: {
       position: 'absolute',
-      top: 0,
-      bottom: 0,
+      top: '50%',
       left: 20,
       right: 20,
-      justifyContent: 'center',
-      zIndex: 5,
-    },
-    aimLine: {
       flexDirection: 'row',
       alignItems: 'center',
+      opacity: 0.35,
     },
     aimLineBar: {
       flex: 1,
-      height: 1,
+      height: 0,
       borderStyle: 'dashed',
-      borderWidth: 0.5,
-      borderColor: theme.colors.textSecondary + '60',
+      borderTopWidth: 1.5,
     },
     aimLineIcon: {
-      width: 22,
-      height: 22,
-      borderRadius: 11,
+      width: 20,
+      height: 20,
+      borderRadius: 10,
       borderWidth: 1.5,
-      borderColor: theme.colors.textSecondary + '60',
       justifyContent: 'center',
       alignItems: 'center',
-      marginHorizontal: 4,
       backgroundColor: theme.colors.surface + 'CC',
     },
   });
@@ -1136,8 +1132,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {/* Saved bookmark line - scrolls with content */}
         {hasBookmark && bookmarkLineY != null && (
-          <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY }]}>
-            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary }]} />
+          <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
               <Ionicons name="bookmark" size={10} color="#fff" />
             </View>
@@ -1146,16 +1141,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Fixed aim line - shows where bookmark will be placed */}
-      {showScrollToTop && !hasBookmark && (
-        <View pointerEvents="none" style={styles.aimLineContainer}>
-          <View style={styles.aimLine}>
-            <View style={styles.aimLineBar} />
-            <View style={styles.aimLineIcon}>
-              <Ionicons name="bookmark-outline" size={12} color={theme.colors.textSecondary} />
-            </View>
-            <View style={styles.aimLineBar} />
+      {/* Fixed aim line - shows where new bookmark will be placed */}
+      {showScrollToTop && (
+        <View pointerEvents="none" style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
+            <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
           </View>
+          <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
         </View>
       )}
 
