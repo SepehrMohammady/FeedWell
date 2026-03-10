@@ -15,6 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import ArticleImage from '../components/ArticleImage';
+import CustomAlert from '../components/CustomAlert';
 
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
@@ -22,6 +23,7 @@ export default function ReadLaterScreen({ navigation }) {
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
   // Filter and sort articles
   const filteredAndSortedArticles = useMemo(() => {
@@ -67,18 +69,20 @@ export default function ReadLaterScreen({ navigation }) {
       }
     } else {
       // Mobile environment - use Alert
-      Alert.alert(
-        'Clear All',
-        'Are you sure you want to remove all saved articles?',
-        [
+      setAlertConfig({
+        visible: true,
+        title: 'Clear All',
+        message: 'Are you sure you want to remove all saved articles?',
+        icon: 'trash-outline',
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           { 
             text: 'Clear All', 
             style: 'destructive',
             onPress: clearReadLater
           },
-        ]
-      );
+        ],
+      });
     }
   };
 
@@ -92,18 +96,20 @@ export default function ReadLaterScreen({ navigation }) {
       }
     } else {
       // Mobile environment - use Alert
-      Alert.alert(
-        'Remove Article',
-        'Remove this article from saved articles?',
-        [
+      setAlertConfig({
+        visible: true,
+        title: 'Remove Article',
+        message: 'Remove this article from saved articles?',
+        icon: 'trash-outline',
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           { 
             text: 'Remove', 
             style: 'destructive',
             onPress: () => removeFromReadLater(articleId)
           },
-        ]
-      );
+        ],
+      });
     }
   };
 
@@ -271,6 +277,15 @@ export default function ReadLaterScreen({ navigation }) {
           />
         }
         showsVerticalScrollIndicator={false}
+      />
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
     </SafeAreaView>
   );

@@ -7,7 +7,6 @@ import {
   ScrollView,
   Image,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +15,7 @@ import { useFeed } from '../context/FeedContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
+import CustomAlert from '../components/CustomAlert';
 
 export default function HomeScreen({ navigation }) {
   const { theme, isDarkMode } = useTheme();
@@ -23,6 +23,7 @@ export default function HomeScreen({ navigation }) {
   const { articles: readLaterArticles } = useReadLater();
   const { maxArticleAge } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
   // v1.1.5: Helper to filter articles by age
   const filterByAge = (articleList) => {
@@ -70,7 +71,7 @@ export default function HomeScreen({ navigation }) {
       }
     } catch (error) {
       setError('Failed to refresh feeds');
-      Alert.alert('Error', 'Failed to refresh feeds. Please check your internet connection.');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to refresh feeds. Please check your internet connection.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -228,6 +229,15 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
       </ScrollView>
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+      />
     </SafeAreaView>
   );
 }

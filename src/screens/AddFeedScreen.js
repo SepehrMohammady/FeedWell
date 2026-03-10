@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
@@ -20,6 +19,7 @@ import { useTheme } from '../context/ThemeContext';
 import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 import { useAppSettings } from '../context/AppSettingsContext';
+import CustomAlert from '../components/CustomAlert';
 
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
@@ -27,6 +27,7 @@ export default function AddFeedScreen({ navigation }) {
   const { addFeed, addArticles, feeds, removeFeed } = useFeed();
   const { theme } = useTheme();
   const { maxArticleAge } = useAppSettings();
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
   const feedCategories = [
     {
@@ -113,18 +114,18 @@ export default function AddFeedScreen({ navigation }) {
 
   const handleAddFeed = async () => {
     if (!url.trim()) {
-      Alert.alert('Error', 'Please enter a feed URL');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Please enter a feed URL', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       return;
     }
 
     if (!isValidRSSUrl(url.trim())) {
-      Alert.alert('Error', 'Please enter a valid HTTP or HTTPS URL');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Please enter a valid HTTP or HTTPS URL', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       return;
     }
 
     // Check if feed already exists
     if (feeds.some(feed => feed.url === url.trim())) {
-      Alert.alert('Error', 'This feed has already been added');
+      setAlertConfig({ visible: true, title: 'Error', message: 'This feed has already been added', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       return;
     }
 
@@ -153,7 +154,7 @@ export default function AddFeedScreen({ navigation }) {
       });
       
       if (!feedData.articles || feedData.articles.length === 0) {
-        Alert.alert('Warning', 'This feed appears to be empty or invalid, but will be added anyway.');
+        setAlertConfig({ visible: true, title: 'Warning', message: 'This feed appears to be empty or invalid, but will be added anyway.', icon: 'warning-outline', buttons: [{ text: 'OK' }] });
       }
 
       await addFeed(url.trim(), feedData.title);
@@ -162,20 +163,21 @@ export default function AddFeedScreen({ navigation }) {
         await addArticles(feedData.articles);
       }
 
-      Alert.alert(
-        'Success',
-        `Added "${feedData.title}" with ${feedData.articles?.length || 0} articles`,
-        [{ 
+      setAlertConfig({
+        visible: true,
+        title: 'Success',
+        message: `Added "${feedData.title}" with ${feedData.articles?.length || 0} articles`,
+        icon: 'checkmark-circle-outline',
+        buttons: [{ 
           text: 'OK', 
           onPress: () => {
-            // Reset to FeedList screen in the Feeds tab
             navigation.reset({
               index: 0,
               routes: [{ name: 'FeedList' }],
             });
           }
-        }]
-      );
+        }],
+      });
     } catch (error) {
       console.error('Error adding feed:', error);
       
@@ -194,7 +196,7 @@ export default function AddFeedScreen({ navigation }) {
         errorMessage += 'Please verify the feed URL is correct and accessible.';
       }
       
-      Alert.alert('Error', errorMessage);
+      setAlertConfig({ visible: true, title: 'Error', message: errorMessage, icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     } finally {
       setLoading(false);
     }
@@ -203,15 +205,17 @@ export default function AddFeedScreen({ navigation }) {
   const handleDirectAddFeed = async (feed) => {
     // Check if feed already exists
     if (feeds.some(existingFeed => existingFeed.url === feed.url)) {
-      Alert.alert('Already Added', `"${feed.name}" is already in your feeds`);
+      setAlertConfig({ visible: true, title: 'Already Added', message: `"${feed.name}" is already in your feeds`, icon: 'information-circle-outline', buttons: [{ text: 'OK' }] });
       return;
     }
 
     // Show confirmation popup
-    Alert.alert(
-      'Add Feed',
-      `Add "${feed.name}" to your feeds?`,
-      [
+    setAlertConfig({
+      visible: true,
+      title: 'Add Feed',
+      message: `Add "${feed.name}" to your feeds?`,
+      icon: 'add-circle-outline',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Add',
@@ -244,11 +248,13 @@ export default function AddFeedScreen({ navigation }) {
                   await addArticles(feedData.articles);
                 }
 
-                Alert.alert(
-                  'Success',
-                  `"${feed.name}" has been added successfully!${feedData.articles?.length > 0 ? ` Found ${feedData.articles.length} articles.` : ''}`,
-                  [{ text: 'OK' }]
-                );
+                setAlertConfig({
+                  visible: true,
+                  title: 'Success',
+                  message: `"${feed.name}" has been added successfully!${feedData.articles?.length > 0 ? ` Found ${feedData.articles.length} articles.` : ''}`,
+                  icon: 'checkmark-circle-outline',
+                  buttons: [{ text: 'OK' }],
+                });
               } else {
                 throw new Error('Unable to load feed content. Please check the feed URL and try again.');
               }
@@ -282,10 +288,12 @@ export default function AddFeedScreen({ navigation }) {
               // Add troubleshooting tip
               errorMessage += '\n\nTip: You can try adding the feed manually using the URL input above.';
 
-              Alert.alert(
-                'Error',
-                errorMessage,
-                [
+              setAlertConfig({
+                visible: true,
+                title: 'Error',
+                message: errorMessage,
+                icon: 'alert-circle-outline',
+                buttons: [
                   { text: 'Cancel', style: 'cancel' },
                   {
                     text: 'Try Manual Add',
@@ -294,15 +302,15 @@ export default function AddFeedScreen({ navigation }) {
                       console.log('Populated URL field for manual add:', feed.url);
                     }
                   }
-                ]
-              );
+                ],
+              });
             } finally {
               setLoading(false);
             }
           }
         }
-      ]
-    );
+      ],
+    });
   };
 
   const clearInput = () => {
@@ -337,18 +345,20 @@ export default function AddFeedScreen({ navigation }) {
         }
       );
     } else {
-      Alert.alert(
-        'Remove Feed',
-        `Remove "${feed.title}"? This will remove the feed and all its articles.`,
-        [
+      setAlertConfig({
+        visible: true,
+        title: 'Remove Feed',
+        message: `Remove "${feed.title}"? This will remove the feed and all its articles.`,
+        icon: 'trash-outline',
+        buttons: [
           { text: 'Cancel', style: 'cancel' },
           {
             text: 'Remove',
             style: 'destructive',
             onPress: () => performRemoveFeed(feed),
           },
-        ]
-      );
+        ],
+      });
     }
   };
 
@@ -365,7 +375,7 @@ export default function AddFeedScreen({ navigation }) {
         // Don't show success alert on web to avoid too many popups
         console.log('Feed removed successfully');
       } else {
-        Alert.alert('Success', `Removed "${feed.title}"`);
+        setAlertConfig({ visible: true, title: 'Success', message: `Removed "${feed.title}"`, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
       }
     } catch (error) {
       console.error('Error removing feed:', error);
@@ -373,7 +383,7 @@ export default function AddFeedScreen({ navigation }) {
       if (Platform.OS === 'web') {
         window.alert('Failed to remove feed. Please try again.');
       } else {
-        Alert.alert('Error', 'Failed to remove feed. Please try again.');
+        setAlertConfig({ visible: true, title: 'Error', message: 'Failed to remove feed. Please try again.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       }
     }
   };
@@ -793,6 +803,15 @@ export default function AddFeedScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+      />
     </SafeAreaView>
   );
 }

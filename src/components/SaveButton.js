@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
+import CustomAlert from './CustomAlert';
 
 export default function SaveButton({ article, size = 24, style, variant = 'default' }) {
   const { theme } = useTheme();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const [isLoading, setIsLoading] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   
   const isBookmarked = isInReadLater(article.id);
 
@@ -80,18 +82,20 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
         }
       } else {
         // Mobile environment - use Alert
-        Alert.alert(
-          'Remove from Saved',
-          'Remove this article from saved articles?',
-          [
+        setAlertConfig({
+          visible: true,
+          title: 'Remove from Saved',
+          message: 'Remove this article from saved articles?',
+          icon: 'trash-outline',
+          buttons: [
             { text: 'Cancel', style: 'cancel' },
             { 
               text: 'Remove', 
               style: 'destructive',
               onPress: () => removeFromReadLater(article.id)
             },
-          ]
-        );
+          ],
+        });
       }
     } else {
       // Add to read later with offline content
@@ -110,11 +114,7 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
             const message = enhancedArticle.offlineCached 
               ? 'Article downloaded and saved for offline reading!' 
               : 'Article saved (limited offline content available)';
-            Alert.alert(
-              'Saved!',
-              message,
-              [{ text: 'OK' }]
-            );
+            setAlertConfig({ visible: true, title: 'Saved!', message, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
           }
         } else {
           // Use browser-compatible alert for web, Alert for mobile
@@ -123,11 +123,7 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
             window.alert('This article is already saved');
           } else {
             // Mobile environment - use Alert
-            Alert.alert(
-              'Already Saved',
-              'This article is already saved',
-              [{ text: 'OK' }]
-            );
+            setAlertConfig({ visible: true, title: 'Already Saved', message: 'This article is already saved', icon: 'information-circle-outline', buttons: [{ text: 'OK' }] });
           }
         }
       } catch (error) {
@@ -136,17 +132,14 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
           ? 'Failed to download article content. Saved with limited offline content.'
           : 'Failed to save article. Please try again.';
         
-        Alert.alert(
-          'Save Error',
-          errorMessage,
-          [{ text: 'OK' }]
-        );
+        setAlertConfig({ visible: true, title: 'Save Error', message: errorMessage, icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       }
     }
   };
 
   return (
-    <TouchableOpacity
+    <View>
+      <TouchableOpacity
       style={[
         variant === 'header' || variant === 'simple' ? styles.headerButton : styles.button,
         variant === 'header' || variant === 'simple' ? {} : { backgroundColor: theme.colors.surface },
@@ -169,6 +162,16 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
         />
       )}
     </TouchableOpacity>
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
+      />
+    </View>
   );
 }
 

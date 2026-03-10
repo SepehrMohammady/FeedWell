@@ -82,6 +82,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const hasAutoScrolled = useRef(false);
   const bookmarkFlashAnim = useRef(new Animated.Value(0)).current;
   const [contentReady, setContentReady] = useState(false);
+  const [measuredContentHeight, setMeasuredContentHeight] = useState(0);
 
   // Custom alert state
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', icon: null, buttons: [] });
@@ -128,6 +129,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   // Auto-scroll to bookmark when content finishes loading
   const handleContentSizeChange = useCallback((w, h) => {
     contentHeightRef.current = h;
+    setMeasuredContentHeight(h);
     if (h > 0 && viewportHeightRef.current > 0) {
       setContentReady(true);
     }
@@ -213,6 +215,14 @@ function ArticleReaderScreenContent({ route, navigation }) {
       saveBookmark();
     }
   }, [hasBookmark, saveBookmark, removeBookmark]);
+
+  // Compute the Y position of the saved bookmark inside the ScrollView content
+  const bookmarkLineY = useMemo(() => {
+    if (!hasBookmark || bookmarkScrollPercent == null || measuredContentHeight === 0 || viewportHeightRef.current === 0) return null;
+    const maxScroll = measuredContentHeight - viewportHeightRef.current;
+    if (maxScroll <= 0) return null;
+    return bookmarkScrollPercent * maxScroll;
+  }, [hasBookmark, bookmarkScrollPercent, measuredContentHeight]);
 
   // Split content into chunks to prevent memory issues with very long articles
   const contentChunks = useMemo(() => {
@@ -857,6 +867,58 @@ function ArticleReaderScreenContent({ route, navigation }) {
       fontSize: 14,
       fontWeight: '600',
     },
+    savedBookmarkLine: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      alignItems: 'center',
+      zIndex: 10,
+    },
+    savedBookmarkBar: {
+      flex: 1,
+      height: 2,
+      opacity: 0.7,
+    },
+    savedBookmarkIcon: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginHorizontal: 4,
+    },
+    aimLineContainer: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 20,
+      right: 20,
+      justifyContent: 'center',
+      zIndex: 5,
+    },
+    aimLine: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    aimLineBar: {
+      flex: 1,
+      height: 1,
+      borderStyle: 'dashed',
+      borderWidth: 0.5,
+      borderColor: theme.colors.textSecondary + '60',
+    },
+    aimLineIcon: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 1.5,
+      borderColor: theme.colors.textSecondary + '60',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginHorizontal: 4,
+      backgroundColor: theme.colors.surface + 'CC',
+    },
   });
 
   return (
@@ -1071,7 +1133,31 @@ function ArticleReaderScreenContent({ route, navigation }) {
             </Text>
           </View>
         )}
+
+        {/* Saved bookmark line - scrolls with content */}
+        {hasBookmark && bookmarkLineY != null && (
+          <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY }]}>
+            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary }]} />
+            <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
+              <Ionicons name="bookmark" size={10} color="#fff" />
+            </View>
+            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary }]} />
+          </View>
+        )}
       </ScrollView>
+
+      {/* Fixed aim line - shows where bookmark will be placed */}
+      {showScrollToTop && !hasBookmark && (
+        <View pointerEvents="none" style={styles.aimLineContainer}>
+          <View style={styles.aimLine}>
+            <View style={styles.aimLineBar} />
+            <View style={styles.aimLineIcon}>
+              <Ionicons name="bookmark-outline" size={12} color={theme.colors.textSecondary} />
+            </View>
+            <View style={styles.aimLineBar} />
+          </View>
+        </View>
+      )}
 
       {showScrollToTop && (
         <TouchableOpacity

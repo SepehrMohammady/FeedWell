@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Switch,
   Platform,
   Linking,
@@ -26,6 +25,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
+import CustomAlert from '../components/CustomAlert';
 import { SafeStorage } from '../utils/SafeStorage';
 import {
   AVAILABLE_LANGUAGES,
@@ -63,6 +63,8 @@ export default function SettingsScreen({ navigation }) {
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
+  const restoreResolveRef = useRef(null);
 
   // Load target language and translation mode on mount
   useEffect(() => {
@@ -115,20 +117,22 @@ export default function SettingsScreen({ navigation }) {
         setAllModels(prev => prev.map(m => m.code === lang.code ? { ...m, downloaded: true } : m));
         setDownloadedModels(prev => [...prev, { ...lang, downloaded: true }]);
       } else {
-        Alert.alert('Download Failed', `Could not download ${lang.displayName} model.`);
+        setAlertConfig({ visible: true, title: 'Download Failed', message: `Could not download ${lang.displayName} model.`, icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       }
     } catch (error) {
-      Alert.alert('Download Failed', error.message);
+      setAlertConfig({ visible: true, title: 'Download Failed', message: error.message, icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     } finally {
       setDownloadingModel(null);
     }
   };
 
   const handleDeleteModel = async (lang) => {
-    Alert.alert(
-      'Delete Model',
-      `Remove ${lang.displayName} offline translation model (~30 MB)?`,
-      [
+    setAlertConfig({
+      visible: true,
+      title: 'Delete Model',
+      message: `Remove ${lang.displayName} offline translation model (~30 MB)?`,
+      icon: 'trash-outline',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete',
@@ -141,12 +145,12 @@ export default function SettingsScreen({ navigation }) {
                 setDownloadedModels(prev => prev.filter(m => m.code !== lang.code));
               }
             } catch (error) {
-              Alert.alert('Error', 'Could not delete the model.');
+              setAlertConfig({ visible: true, title: 'Error', message: 'Could not delete the model.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
             }
           }
         },
-      ]
-    );
+      ],
+    });
   };
 
   const handleSelectTranslationMode = (mode) => {
@@ -181,19 +185,21 @@ export default function SettingsScreen({ navigation }) {
       return;
     }
     
-    // For mobile platforms, use Alert.alert
-    Alert.alert(
-      'Clear All Data',
-      'This will remove all feeds and articles. This action cannot be undone.',
-      [
+    // For mobile platforms, use CustomAlert
+    setAlertConfig({
+      visible: true,
+      title: 'Clear All Data',
+      message: 'This will remove all feeds and articles. This action cannot be undone.',
+      icon: 'trash-outline',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Clear',
           style: 'destructive',
           onPress: () => performClearAllData(),
         },
-      ]
-    );
+      ],
+    });
   };
 
   const performClearAllData = async () => {
@@ -206,7 +212,7 @@ export default function SettingsScreen({ navigation }) {
       if (Platform.OS === 'web') {
         window.alert('All data has been cleared successfully!');
       } else {
-        Alert.alert('Success', 'All data has been cleared');
+        setAlertConfig({ visible: true, title: 'Success', message: 'All data has been cleared', icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
       }
     } catch (error) {
       console.error('Error clearing data:', error);
@@ -215,7 +221,7 @@ export default function SettingsScreen({ navigation }) {
       if (Platform.OS === 'web') {
         window.alert('Failed to clear data. Please try again.');
       } else {
-        Alert.alert('Error', 'Failed to clear data');
+        setAlertConfig({ visible: true, title: 'Error', message: 'Failed to clear data', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
       }
     }
   };
@@ -230,12 +236,12 @@ export default function SettingsScreen({ navigation }) {
         if (supported) {
           await Linking.openURL(url);
         } else {
-          Alert.alert('Error', 'Cannot open URL');
+          setAlertConfig({ visible: true, title: 'Error', message: 'Cannot open URL', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
         }
       }
     } catch (error) {
       console.error('Error opening website:', error);
-      Alert.alert('Error', 'Failed to open website');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to open website', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     }
   };
 
@@ -249,12 +255,12 @@ export default function SettingsScreen({ navigation }) {
         if (supported) {
           await Linking.openURL(url);
         } else {
-          Alert.alert('Error', 'Cannot open URL');
+          setAlertConfig({ visible: true, title: 'Error', message: 'Cannot open URL', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
         }
       }
     } catch (error) {
       console.error('Error opening GitHub:', error);
-      Alert.alert('Error', 'Failed to open GitHub repository');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to open GitHub repository', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     }
   };
 
@@ -290,7 +296,7 @@ export default function SettingsScreen({ navigation }) {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         
-        Alert.alert('Success', 'Backup file downloaded successfully!');
+        setAlertConfig({ visible: true, title: 'Success', message: 'Backup file downloaded successfully!', icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
       } else {
         // Mobile: Save to file system and share
         const fileUri = `${FileSystem.documentDirectory}${fileName}`;
@@ -304,12 +310,12 @@ export default function SettingsScreen({ navigation }) {
             UTI: 'public.json',
           });
         } else {
-          Alert.alert('Success', `Backup saved to: ${fileUri}`);
+          setAlertConfig({ visible: true, title: 'Success', message: `Backup saved to: ${fileUri}`, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
         }
       }
     } catch (error) {
       console.error('Error creating backup:', error);
-      Alert.alert('Error', 'Failed to create backup. Please try again.');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to create backup. Please try again.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     }
   };
 
@@ -319,11 +325,7 @@ export default function SettingsScreen({ navigation }) {
 
       if (Platform.OS === 'web') {
         // Web platform: Use file input
-        Alert.alert(
-          'Restore Backup',
-          'Please select a FeedWell backup JSON file',
-          [{ text: 'OK' }]
-        );
+        setAlertConfig({ visible: true, title: 'Restore Backup', message: 'Please select a FeedWell backup JSON file', icon: 'cloud-upload-outline', buttons: [{ text: 'OK' }] });
         
         // Create file input dynamically
         const input = document.createElement('input');
@@ -340,7 +342,7 @@ export default function SettingsScreen({ navigation }) {
               jsonString = event.target.result;
               await processRestore(jsonString);
             } catch (error) {
-              Alert.alert('Error', 'Invalid backup file format');
+              setAlertConfig({ visible: true, title: 'Error', message: 'Invalid backup file format', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
             }
           };
           reader.readAsText(file);
@@ -365,7 +367,7 @@ export default function SettingsScreen({ navigation }) {
       }
     } catch (error) {
       console.error('Error restoring backup:', error);
-      Alert.alert('Error', 'Failed to restore backup. Please check the file and try again.');
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to restore backup. Please check the file and try again.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     }
   };
 
@@ -391,19 +393,22 @@ export default function SettingsScreen({ navigation }) {
               `This action cannot be undone.`
             ));
           } else {
-            Alert.alert(
-              'Restore Backup',
-              `Restore backup from ${backupData.timestamp ? new Date(backupData.timestamp).toLocaleDateString() : 'unknown date'}?\n\n` +
+            restoreResolveRef.current = resolve;
+            setAlertConfig({
+              visible: true,
+              title: 'Restore Backup',
+              message: `Restore backup from ${backupData.timestamp ? new Date(backupData.timestamp).toLocaleDateString() : 'unknown date'}?\n\n` +
               `This will replace all current data:\n` +
               `- ${backupData.feeds.length} feeds\n` +
               `- ${backupData.articles.length} articles\n` +
               `- ${backupData.readLater?.length || 0} saved articles\n\n` +
               `This action cannot be undone.`,
-              [
-                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-                { text: 'Restore', style: 'destructive', onPress: () => resolve(true) },
-              ]
-            );
+              icon: 'cloud-download-outline',
+              buttons: [
+                { text: 'Cancel', style: 'cancel', onPress: () => { restoreResolveRef.current?.(false); restoreResolveRef.current = null; } },
+                { text: 'Restore', style: 'destructive', onPress: () => { restoreResolveRef.current?.(true); restoreResolveRef.current = null; } },
+              ],
+            });
           }
         });
       };
@@ -444,11 +449,13 @@ export default function SettingsScreen({ navigation }) {
           window.location.reload();
         }
       } else {
-        Alert.alert(
-          'Restore Complete',
-          'Backup restored successfully! Please close and reopen the app to see your restored data.',
-          [{ text: 'OK' }]
-        );
+        setAlertConfig({
+          visible: true,
+          title: 'Restore Complete',
+          message: 'Backup restored successfully! Please close and reopen the app to see your restored data.',
+          icon: 'checkmark-circle-outline',
+          buttons: [{ text: 'OK' }],
+        });
       }
     } catch (error) {
       console.error('Error processing restore:', error);
@@ -1239,6 +1246,21 @@ export default function SettingsScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        icon={alertConfig.icon}
+        buttons={alertConfig.buttons}
+        onDismiss={() => {
+          setAlertConfig(prev => ({ ...prev, visible: false }));
+          if (restoreResolveRef.current) {
+            restoreResolveRef.current(false);
+            restoreResolveRef.current = null;
+          }
+        }}
+      />
     </SafeAreaView>
   );
 }

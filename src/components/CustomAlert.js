@@ -32,11 +32,8 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
   const { theme } = useTheme();
 
   const handleButtonPress = (button) => {
+    button.onPress?.();
     onDismiss?.();
-    // Small delay so the modal closes before the action runs
-    setTimeout(() => {
-      button.onPress?.();
-    }, 100);
   };
 
   const styles = StyleSheet.create({
