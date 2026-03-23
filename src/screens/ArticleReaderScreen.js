@@ -208,10 +208,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setAlertConfig({
         visible: true,
         title: 'Reading Bookmark',
-        message: 'What would you like to do?',
+        message: 'Remove your saved reading position?',
         icon: 'bookmark',
         buttons: [
-          { text: 'Update Position', onPress: saveBookmark },
           { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
           { text: 'Cancel', style: 'cancel' },
         ],
@@ -1155,14 +1154,19 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Fixed aim line - shows where new bookmark will be placed */}
+      {/* Fixed aim line - tappable to save bookmark */}
       {showScrollToTop && (
-        <View pointerEvents="none" style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
+          onPress={saveBookmark}
+          style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+        >
           <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
             <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
           </View>
           <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
-        </View>
+        </TouchableOpacity>
       )}
 
       {showScrollToTop && (
