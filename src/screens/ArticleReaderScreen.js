@@ -1141,12 +1141,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {/* Saved bookmark marker - scrolls with content, sits in the margin outside text */}
         {hasBookmark && bookmarkLineY != null && (
-          <View pointerEvents="none" style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
+            onPress={handleBookmarkPress}
+            style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+          >
             <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
               <Ionicons name="bookmark" size={10} color="#fff" />
             </View>
             <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary + '50' }]} />
-          </View>
+          </TouchableOpacity>
         )}
       </ScrollView>
 
