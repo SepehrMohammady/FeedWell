@@ -208,9 +208,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setAlertConfig({
         visible: true,
         title: 'Reading Bookmark',
-        message: 'Remove your saved reading position?',
+        message: 'What would you like to do?',
         icon: 'bookmark',
         buttons: [
+          { text: 'Update Position', onPress: saveBookmark },
           { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
           { text: 'Cancel', style: 'cancel' },
         ],
@@ -219,6 +220,19 @@ function ArticleReaderScreenContent({ route, navigation }) {
       saveBookmark();
     }
   }, [hasBookmark, saveBookmark, removeBookmark]);
+
+  const handleIndicatorPress = useCallback(() => {
+    setAlertConfig({
+      visible: true,
+      title: 'Reading Bookmark',
+      message: 'Remove your saved reading position?',
+      icon: 'bookmark',
+      buttons: [
+        { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    });
+  }, [removeBookmark]);
 
   // Compute the Y position of the saved bookmark inside the ScrollView content
   const bookmarkLineY = useMemo(() => {
@@ -1143,7 +1157,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
           <TouchableOpacity
             activeOpacity={0.6}
             hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-            onPress={handleBookmarkPress}
+            onPress={handleIndicatorPress}
             style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
           >
             <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
