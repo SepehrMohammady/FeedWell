@@ -46,7 +46,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, updateShowImages, updateAutoRefresh, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -821,6 +821,18 @@ export default function SettingsScreen({ navigation }) {
             }
           />
           <SettingItem
+            title="Bookmark Indicators"
+            description="Show reading position markers in article reader"
+            rightElement={
+              <Switch
+                value={showBookmarkIndicators}
+                onValueChange={updateShowBookmarkIndicators}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={showBookmarkIndicators ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
             title="Article Age Filter"
             description={maxArticleAge === 0 ? 'No limit — show all articles' : `Only show articles from the last ${getArticleAgeLabel(maxArticleAge)}`}
             onPress={() => setShowArticleAgePicker(true)}
@@ -896,6 +908,7 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
           <TesterItem>Houriyeh Emadoleslami</TesterItem>
+          <TesterItem>Chris (few-thoughts)</TesterItem>
           <TesterItem>Mohammad Torabi</TesterItem>
           <TesterItem isLast={true}>Saeed Abdollahi Taromsari</TesterItem>
         </View>

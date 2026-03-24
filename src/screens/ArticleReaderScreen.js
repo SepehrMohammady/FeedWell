@@ -64,7 +64,7 @@ const ContentChunk = memo(({ text, style, isRTL }) => (
 function ArticleReaderScreenContent({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
-  const { showImages } = useAppSettings();
+  const { showImages, showBookmarkIndicators } = useAppSettings();
   const { markArticleRead } = useFeed();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1153,7 +1153,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         </View>
 
         {/* Saved bookmark marker - scrolls with content, sits in the margin outside text */}
-        {hasBookmark && bookmarkLineY != null && (
+        {showBookmarkIndicators && hasBookmark && bookmarkLineY != null && (
           <TouchableOpacity
             activeOpacity={0.6}
             hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
@@ -1168,12 +1168,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Fixed aim line - tappable to save bookmark */}
-      {showScrollToTop && (
+      {/* Fixed aim line - tappable to save/remove bookmark */}
+      {showBookmarkIndicators && showScrollToTop && (
         <TouchableOpacity
           activeOpacity={0.6}
           hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-          onPress={saveBookmark}
+          onPress={hasBookmark ? handleIndicatorPress : saveBookmark}
           style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
           <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>

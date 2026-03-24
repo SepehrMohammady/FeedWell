@@ -801,24 +801,27 @@ export default function FeedListScreen({ navigation, route }) {
                 return article && article.isRead;
               });
               
+              const showMarkRead = articleFilter === 'all' || hasUnread;
+              const showMarkUnread = articleFilter === 'all' || hasRead;
+              
               return (
                 <>
-                  {hasUnread && (
+                  {showMarkRead && (
                     <TouchableOpacity
                       style={styles.headerButton}
                       onPress={markSelectedAsRead}
-                      disabled={selectedArticles.size === 0}
+                      disabled={selectedArticles.size === 0 || !hasUnread}
                     >
-                      <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.text} />
+                      <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.text} />
                     </TouchableOpacity>
                   )}
-                  {hasRead && (
+                  {showMarkUnread && (
                     <TouchableOpacity
                       style={styles.headerButton}
                       onPress={markSelectedAsUnread}
-                      disabled={selectedArticles.size === 0}
+                      disabled={selectedArticles.size === 0 || !hasRead}
                     >
-                      <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.text} />
+                      <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.text} />
                     </TouchableOpacity>
                   )}
                 </>

@@ -9,6 +9,7 @@ export function AppSettingsProvider({ children }) {
   const [articleFilter, setArticleFilter] = useState('all'); // 'all', 'unread', 'read'
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
   const [maxArticleAge, setMaxArticleAge] = useState(6); // months: 0 = no limit, 1, 3, 6, 12
+  const [showBookmarkIndicators, setShowBookmarkIndicators] = useState(true);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -23,6 +24,7 @@ export function AppSettingsProvider({ children }) {
       const savedArticleFilter = await AsyncStorage.getItem('articleFilter');
       const savedSortOrder = await AsyncStorage.getItem('sortOrder');
       const savedMaxArticleAge = await AsyncStorage.getItem('maxArticleAge');
+      const savedShowBookmarkIndicators = await AsyncStorage.getItem('showBookmarkIndicators');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -43,6 +45,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedMaxArticleAge !== null) {
         setMaxArticleAge(JSON.parse(savedMaxArticleAge));
+      }
+
+      if (savedShowBookmarkIndicators !== null) {
+        setShowBookmarkIndicators(JSON.parse(savedShowBookmarkIndicators));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -100,6 +106,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateShowBookmarkIndicators = async (value) => {
+    try {
+      setShowBookmarkIndicators(value);
+      await AsyncStorage.setItem('showBookmarkIndicators', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving showBookmarkIndicators setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -124,6 +139,7 @@ export function AppSettingsProvider({ children }) {
     articleFilter,
     sortOrder,
     maxArticleAge,
+    showBookmarkIndicators,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
@@ -131,6 +147,7 @@ export function AppSettingsProvider({ children }) {
     updateArticleFilter,
     updateSortOrder,
     updateMaxArticleAge,
+    updateShowBookmarkIndicators,
     completeOnboarding,
     resetOnboarding,
   };
