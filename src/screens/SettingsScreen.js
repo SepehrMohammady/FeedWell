@@ -46,7 +46,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -829,6 +829,30 @@ export default function SettingsScreen({ navigation }) {
                 onValueChange={updateShowBookmarkIndicators}
                 trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={showBookmarkIndicators ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
+            title="Open Reader Directly"
+            description="Skip article preview and open the Reader straight from Feeds"
+            rightElement={
+              <Switch
+                value={skipArticleView}
+                onValueChange={updateSkipArticleView}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={skipArticleView ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
+            title="Reading Position in Feeds"
+            description="Show reading position markers between articles in the feed list"
+            rightElement={
+              <Switch
+                value={showReadingPositionInFeeds}
+                onValueChange={updateShowReadingPositionInFeeds}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={showReadingPositionInFeeds ? '#fff' : '#f4f3f4'}
               />
             }
           />

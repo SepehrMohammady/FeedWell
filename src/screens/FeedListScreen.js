@@ -27,7 +27,7 @@ import CustomAlert from '../components/CustomAlert';
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
-  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge } = useAppSettings();
+  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds } = useAppSettings();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -189,11 +189,19 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const handleArticlePress = (article) => {
-    navigation.navigate('ArticleActions', { 
-      article,
-      currentFilter: articleFilter,
-      currentSortOrder: sortOrder
-    });
+    if (skipArticleView) {
+      navigation.navigate('ArticleReader', {
+        article,
+        currentFilter: articleFilter,
+        currentSortOrder: sortOrder
+      });
+    } else {
+      navigation.navigate('ArticleActions', { 
+        article,
+        currentFilter: articleFilter,
+        currentSortOrder: sortOrder
+      });
+    }
   };
 
   const handleSetReadingPosition = (articleIndex) => {
@@ -383,7 +391,7 @@ export default function FeedListScreen({ navigation, route }) {
         </TouchableOpacity>
 
         {/* Show reading position line after this article if it matches */}
-        {showReadingPositionAfter && !selectionMode && (
+        {showReadingPositionInFeeds && showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
             onPress={handleGoToReadingPosition}
             onClear={handleClearReadingPosition}
@@ -392,7 +400,7 @@ export default function FeedListScreen({ navigation, route }) {
         )}
 
         {/* Show potential reading position lines between articles */}
-        {!showReadingPositionAfter && !selectionMode && (
+        {showReadingPositionInFeeds && !showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
             onPress={() => handleSetReadingPosition(index)}
             onClear={() => {}}

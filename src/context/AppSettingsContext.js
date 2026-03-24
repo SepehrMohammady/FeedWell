@@ -10,6 +10,8 @@ export function AppSettingsProvider({ children }) {
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
   const [maxArticleAge, setMaxArticleAge] = useState(6); // months: 0 = no limit, 1, 3, 6, 12
   const [showBookmarkIndicators, setShowBookmarkIndicators] = useState(true);
+  const [skipArticleView, setSkipArticleView] = useState(false);
+  const [showReadingPositionInFeeds, setShowReadingPositionInFeeds] = useState(true);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,6 +27,8 @@ export function AppSettingsProvider({ children }) {
       const savedSortOrder = await AsyncStorage.getItem('sortOrder');
       const savedMaxArticleAge = await AsyncStorage.getItem('maxArticleAge');
       const savedShowBookmarkIndicators = await AsyncStorage.getItem('showBookmarkIndicators');
+      const savedSkipArticleView = await AsyncStorage.getItem('skipArticleView');
+      const savedShowReadingPositionInFeeds = await AsyncStorage.getItem('showReadingPositionInFeeds');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -49,6 +53,14 @@ export function AppSettingsProvider({ children }) {
 
       if (savedShowBookmarkIndicators !== null) {
         setShowBookmarkIndicators(JSON.parse(savedShowBookmarkIndicators));
+      }
+
+      if (savedSkipArticleView !== null) {
+        setSkipArticleView(JSON.parse(savedSkipArticleView));
+      }
+
+      if (savedShowReadingPositionInFeeds !== null) {
+        setShowReadingPositionInFeeds(JSON.parse(savedShowReadingPositionInFeeds));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -115,6 +127,24 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateSkipArticleView = async (value) => {
+    try {
+      setSkipArticleView(value);
+      await AsyncStorage.setItem('skipArticleView', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving skipArticleView setting:', error);
+    }
+  };
+
+  const updateShowReadingPositionInFeeds = async (value) => {
+    try {
+      setShowReadingPositionInFeeds(value);
+      await AsyncStorage.setItem('showReadingPositionInFeeds', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving showReadingPositionInFeeds setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -140,6 +170,8 @@ export function AppSettingsProvider({ children }) {
     sortOrder,
     maxArticleAge,
     showBookmarkIndicators,
+    skipArticleView,
+    showReadingPositionInFeeds,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
@@ -148,6 +180,8 @@ export function AppSettingsProvider({ children }) {
     updateSortOrder,
     updateMaxArticleAge,
     updateShowBookmarkIndicators,
+    updateSkipArticleView,
+    updateShowReadingPositionInFeeds,
     completeOnboarding,
     resetOnboarding,
   };
