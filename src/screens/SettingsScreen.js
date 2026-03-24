@@ -907,8 +907,8 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem isNote={true}>Thank you for your valuable feedback!</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
-          <TesterItem>Houriyeh Emadoleslami</TesterItem>
           <TesterItem>Chris (few-thoughts)</TesterItem>
+          <TesterItem>Houriyeh Emadoleslami</TesterItem>
           <TesterItem>Mohammad Torabi</TesterItem>
           <TesterItem isLast={true}>Saeed Abdollahi Taromsari</TesterItem>
         </View>
