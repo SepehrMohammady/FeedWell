@@ -1,9 +1,7 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 
 import FeedListScreen from '../screens/FeedListScreen';
@@ -57,8 +55,6 @@ function FeedStack() {
 
 export default function AppNavigator() {
   const { theme } = useTheme();
-  const insets = useSafeAreaInsets();
-  const tabBarBottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 4);
   
   return (
     <Tab.Navigator
@@ -83,8 +79,6 @@ export default function AppNavigator() {
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
-          paddingBottom: tabBarBottomPadding,
-          height: 56 + tabBarBottomPadding,
         },
         headerShown: false,
       })}

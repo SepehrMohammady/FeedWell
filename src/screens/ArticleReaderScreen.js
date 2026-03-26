@@ -14,6 +14,7 @@ import {
   FlatList,
   TextInput,
   Animated,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -1365,7 +1366,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
         transparent={true}
         onRequestClose={() => setShowNotesModal(false)}
       >
-        <View style={styles.notesModalOverlay}>
+        <KeyboardAvoidingView
+          style={styles.notesModalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <View style={[styles.notesModalContainer, { backgroundColor: theme.colors.surface }]}>
             <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border }]}>
               <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>Notes</Text>
@@ -1410,7 +1414,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
               <Text style={styles.notesSaveButtonText}>Save Note</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
