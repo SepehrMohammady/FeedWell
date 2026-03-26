@@ -3,18 +3,30 @@ import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { FeedProvider } from './src/context/FeedContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { ReadLaterProvider } from './src/context/ReadLaterContext';
+import { NotesProvider } from './src/context/NotesContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
 
 function AppContent() {
-  const { hasSeenOnboarding, completeOnboarding, isLoading } = useAppSettings();
+  const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation } = useAppSettings();
   const { theme, isDarkMode } = useTheme();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Lock/unlock screen orientation based on setting
+  useEffect(() => {
+    if (isLoading) return;
+    if (allowRotation) {
+      ScreenOrientation.unlockAsync();
+    } else {
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+    }
+  }, [allowRotation, isLoading]);
 
   useEffect(() => {
     if (!isLoading && !hasSeenOnboarding) {
@@ -52,9 +64,11 @@ export default function App() {
         <ThemeProvider>
           <AppSettingsProvider>
             <ReadLaterProvider>
-              <FeedProvider>
-                <AppContent />
-              </FeedProvider>
+              <NotesProvider>
+                <FeedProvider>
+                  <AppContent />
+                </FeedProvider>
+              </NotesProvider>
             </ReadLaterProvider>
           </AppSettingsProvider>
         </ThemeProvider>

@@ -12,6 +12,7 @@ export function AppSettingsProvider({ children }) {
   const [showBookmarkIndicators, setShowBookmarkIndicators] = useState(true);
   const [skipArticleView, setSkipArticleView] = useState(false);
   const [showReadingPositionInFeeds, setShowReadingPositionInFeeds] = useState(true);
+  const [allowRotation, setAllowRotation] = useState(false);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,6 +30,7 @@ export function AppSettingsProvider({ children }) {
       const savedShowBookmarkIndicators = await AsyncStorage.getItem('showBookmarkIndicators');
       const savedSkipArticleView = await AsyncStorage.getItem('skipArticleView');
       const savedShowReadingPositionInFeeds = await AsyncStorage.getItem('showReadingPositionInFeeds');
+      const savedAllowRotation = await AsyncStorage.getItem('allowRotation');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -61,6 +63,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedShowReadingPositionInFeeds !== null) {
         setShowReadingPositionInFeeds(JSON.parse(savedShowReadingPositionInFeeds));
+      }
+
+      if (savedAllowRotation !== null) {
+        setAllowRotation(JSON.parse(savedAllowRotation));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -145,6 +151,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateAllowRotation = async (value) => {
+    try {
+      setAllowRotation(value);
+      await AsyncStorage.setItem('allowRotation', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving allowRotation setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -172,6 +187,7 @@ export function AppSettingsProvider({ children }) {
     showBookmarkIndicators,
     skipArticleView,
     showReadingPositionInFeeds,
+    allowRotation,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
@@ -182,6 +198,7 @@ export function AppSettingsProvider({ children }) {
     updateShowBookmarkIndicators,
     updateSkipArticleView,
     updateShowReadingPositionInFeeds,
+    updateAllowRotation,
     completeOnboarding,
     resetOnboarding,
   };

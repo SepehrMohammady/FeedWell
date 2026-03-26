@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,17 +9,24 @@ import {
   Linking,
   Share,
   Platform,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
+import { useNotes } from '../context/NotesContext';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
+  const { getNote, setNote, hasNote } = useNotes();
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const articleNote = getNote(article?.id);
   
   // Track if we've already marked this article as read to prevent infinite loops
   const hasMarkedReadRef = useRef(false);
@@ -163,7 +170,57 @@ export default function ArticleActionsScreen({ route, navigation }) {
     shareButton: {
       backgroundColor: theme.colors.warning,
     },
+    notesButton: {
+      backgroundColor: theme.colors.textSecondary,
+    },
     actionButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    notesModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    notesModalContainer: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingBottom: 24,
+      maxHeight: '70%',
+    },
+    notesModalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+    },
+    notesModalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+    },
+    notesModalCloseButton: {
+      padding: 4,
+    },
+    notesInput: {
+      margin: 16,
+      padding: 14,
+      borderRadius: 12,
+      borderWidth: 1,
+      fontSize: 15,
+      lineHeight: 22,
+      minHeight: 150,
+      maxHeight: 300,
+    },
+    notesSaveButton: {
+      marginHorizontal: 16,
+      paddingVertical: 14,
+      borderRadius: 10,
+      alignItems: 'center',
+    },
+    notesSaveButtonText: {
       color: '#fff',
       fontSize: 16,
       fontWeight: '600',
@@ -235,8 +292,74 @@ export default function ArticleActionsScreen({ route, navigation }) {
             <Ionicons name="share-outline" size={24} color="#fff" />
             <Text style={styles.actionButtonText}>Share</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.notesButton]}
+            onPress={() => {
+              setNoteText(articleNote ? articleNote.text : '');
+              setShowNotesModal(true);
+            }}
+          >
+            <Ionicons name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'} size={24} color="#fff" />
+            <Text style={styles.actionButtonText}>{hasNote(article?.id) ? 'View Notes' : 'Add Note'}</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Notes Modal */}
+      <Modal
+        visible={showNotesModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowNotesModal(false)}
+      >
+        <View style={styles.notesModalOverlay}>
+          <View style={[styles.notesModalContainer, { backgroundColor: theme.colors.surface }]}>
+            <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border }]}>
+              <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>Notes</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {noteText.trim() !== '' && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setNote(article.id, '');
+                      setNoteText('');
+                      setShowNotesModal(false);
+                    }}
+                    style={styles.notesModalCloseButton}
+                  >
+                    <Ionicons name="trash-outline" size={22} color={theme.colors.error} />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => setShowNotesModal(false)}
+                  style={styles.notesModalCloseButton}
+                >
+                  <Ionicons name="close" size={24} color={theme.colors.text} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <TextInput
+              style={[styles.notesInput, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+              multiline
+              placeholder="Write your notes about this article..."
+              placeholderTextColor={theme.colors.textTertiary}
+              value={noteText}
+              onChangeText={setNoteText}
+              textAlignVertical="top"
+              autoFocus={true}
+            />
+            <TouchableOpacity
+              style={[styles.notesSaveButton, { backgroundColor: theme.colors.primary }]}
+              onPress={() => {
+                setNote(article.id, noteText);
+                setShowNotesModal(false);
+              }}
+            >
+              <Text style={styles.notesSaveButtonText}>Save Note</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

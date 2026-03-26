@@ -13,7 +13,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -46,8 +46,9 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
+  const insets = useSafeAreaInsets();
   const [showTutorial, setShowTutorial] = useState(false);
 
   // Translation settings state
@@ -616,7 +617,7 @@ export default function SettingsScreen({ navigation }) {
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       height: '75%',
-      paddingBottom: Platform.OS === 'ios' ? 34 : 16,
+      paddingBottom: Math.max(insets.bottom, 16),
     },
     modalHeader: {
       flexDirection: 'row',
@@ -853,6 +854,18 @@ export default function SettingsScreen({ navigation }) {
                 onValueChange={updateShowReadingPositionInFeeds}
                 trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={showReadingPositionInFeeds ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
+            title="Screen Rotation"
+            description="Allow the app to rotate when you turn your device"
+            rightElement={
+              <Switch
+                value={allowRotation}
+                onValueChange={updateAllowRotation}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={allowRotation ? '#fff' : '#f4f3f4'}
               />
             }
           />

@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
+import { useNotes } from '../context/NotesContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
@@ -66,6 +67,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const { theme } = useTheme();
   const { showImages, showBookmarkIndicators } = useAppSettings();
   const { markArticleRead } = useFeed();
+  const { getNote, setNote, hasNote } = useNotes();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -99,6 +101,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [languageSearchQuery, setLanguageSearchQuery] = useState('');
   const [translationMode, setTranslationMode] = useState(TRANSLATION_MODES.AUTO);
   const [translationMethod, setTranslationMethod] = useState(null); // 'online' | 'offline' | 'none'
+
+  // Notes state
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const articleNote = getNote(article?.id);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -934,6 +941,53 @@ function ArticleReaderScreenContent({ route, navigation }) {
       alignItems: 'center',
       backgroundColor: theme.colors.surface + 'CC',
     },
+    notesModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'flex-end',
+    },
+    notesModalContainer: {
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingBottom: 24,
+      maxHeight: '70%',
+    },
+    notesModalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+    },
+    notesModalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+    },
+    notesModalCloseButton: {
+      padding: 4,
+    },
+    notesInput: {
+      margin: 16,
+      padding: 14,
+      borderRadius: 12,
+      borderWidth: 1,
+      fontSize: 15,
+      lineHeight: 22,
+      minHeight: 150,
+      maxHeight: 300,
+    },
+    notesSaveButton: {
+      marginHorizontal: 16,
+      paddingVertical: 14,
+      borderRadius: 10,
+      alignItems: 'center',
+    },
+    notesSaveButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
   });
 
   return (
@@ -980,6 +1034,19 @@ function ArticleReaderScreenContent({ route, navigation }) {
             <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
           </TouchableOpacity>
           <SaveButton article={article} size={24} variant="header" />
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => {
+              setNoteText(articleNote ? articleNote.text : '');
+              setShowNotesModal(true);
+            }}
+          >
+            <Ionicons
+              name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'}
+              size={24}
+              color={hasNote(article?.id) ? theme.colors.primary : theme.colors.text}
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
             onPress={handleShare}
@@ -1290,6 +1357,61 @@ function ArticleReaderScreenContent({ route, navigation }) {
         buttons={alertConfig.buttons}
         onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
+
+      {/* Notes Modal */}
+      <Modal
+        visible={showNotesModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowNotesModal(false)}
+      >
+        <View style={styles.notesModalOverlay}>
+          <View style={[styles.notesModalContainer, { backgroundColor: theme.colors.surface }]}>
+            <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border }]}>
+              <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>Notes</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {noteText.trim() !== '' && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setNote(article.id, '');
+                      setNoteText('');
+                      setShowNotesModal(false);
+                    }}
+                    style={styles.notesModalCloseButton}
+                  >
+                    <Ionicons name="trash-outline" size={22} color={theme.colors.error} />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => setShowNotesModal(false)}
+                  style={styles.notesModalCloseButton}
+                >
+                  <Ionicons name="close" size={24} color={theme.colors.text} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <TextInput
+              style={[styles.notesInput, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+              multiline
+              placeholder="Write your notes about this article..."
+              placeholderTextColor={theme.colors.textTertiary}
+              value={noteText}
+              onChangeText={setNoteText}
+              textAlignVertical="top"
+              autoFocus={true}
+            />
+            <TouchableOpacity
+              style={[styles.notesSaveButton, { backgroundColor: theme.colors.primary }]}
+              onPress={() => {
+                setNote(article.id, noteText);
+                setShowNotesModal(false);
+              }}
+            >
+              <Text style={styles.notesSaveButtonText}>Save Note</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
