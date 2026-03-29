@@ -9,6 +9,7 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { ReadLaterProvider } from './src/context/ReadLaterContext';
 import { NotesProvider } from './src/context/NotesContext';
+import { AmbientSoundProvider } from './src/context/AmbientSoundContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
@@ -65,9 +66,11 @@ export default function App() {
           <AppSettingsProvider>
             <ReadLaterProvider>
               <NotesProvider>
-                <FeedProvider>
-                  <AppContent />
-                </FeedProvider>
+                <AmbientSoundProvider>
+                  <FeedProvider>
+                    <AppContent />
+                  </FeedProvider>
+                </AmbientSoundProvider>
               </NotesProvider>
             </ReadLaterProvider>
           </AppSettingsProvider>

@@ -1,8 +1,10 @@
 import React from 'react';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import MiniPlayer from '../components/MiniPlayer';
 
 import FeedListScreen from '../screens/FeedListScreen';
 import ArticleActionsScreen from '../screens/ArticleActionsScreen';
@@ -57,6 +59,7 @@ export default function AppNavigator() {
   const { theme } = useTheme();
   
   return (
+    <View style={{ flex: 1 }}>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
@@ -92,5 +95,7 @@ export default function AppNavigator() {
       />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
+    <MiniPlayer />
+    </View>
   );
 }

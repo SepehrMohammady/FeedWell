@@ -24,6 +24,7 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
+import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
 import CustomAlert from '../components/CustomAlert';
 import { SafeStorage } from '../utils/SafeStorage';
@@ -48,6 +49,7 @@ export default function SettingsScreen({ navigation }) {
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
+  const { currentSoundId, isPlaying, selectSound, stopSound, volume, setVolume } = useAmbientSound();
   const insets = useSafeAreaInsets();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -876,6 +878,39 @@ export default function SettingsScreen({ navigation }) {
             isLast={true}
             rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
           />
+        </View>
+
+        <SectionHeader title="Ambient Sounds" />
+        <View style={styles.section}>
+          {AMBIENT_SOUNDS.map((sound, index) => {
+            const isActive = currentSoundId === sound.id;
+            const isCurrentlyPlaying = isActive && isPlaying;
+            return (
+              <SettingItem
+                key={sound.id}
+                title={sound.name}
+                description={sound.description}
+                onPress={() => selectSound(sound.id)}
+                isLast={index === AMBIENT_SOUNDS.length - 1}
+                rightElement={
+                  isActive ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Ionicons
+                        name={isCurrentlyPlaying ? 'pause-circle' : 'play-circle'}
+                        size={26}
+                        color={theme.colors.primary}
+                      />
+                      <TouchableOpacity onPress={stopSound} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                        <Ionicons name="stop-circle-outline" size={22} color={theme.colors.error} />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <Ionicons name={sound.icon} size={20} color={theme.colors.textTertiary} />
+                  )
+                }
+              />
+            );
+          })}
         </View>
 
         <SectionHeader title="Translation" />
