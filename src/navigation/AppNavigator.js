@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBar } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -59,8 +60,13 @@ export default function AppNavigator() {
   const { theme } = useTheme();
   
   return (
-    <View style={{ flex: 1 }}>
     <Tab.Navigator
+      tabBar={(props) => (
+        <View>
+          <MiniPlayer />
+          <BottomTabBar {...props} />
+        </View>
+      )}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
@@ -95,7 +101,5 @@ export default function AppNavigator() {
       />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
-    <MiniPlayer />
-    </View>
   );
 }
