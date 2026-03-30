@@ -916,13 +916,13 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Read Aloud" />
         <View style={styles.section}>
-          <View style={styles.settingItem}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <View style={[styles.settingItem, { flexDirection: 'column', alignItems: 'stretch' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Speech Speed</Text>
               <Text style={[styles.settingTitle, { color: theme.colors.primary, fontWeight: '700' }]}>{speechRate}x</Text>
             </View>
             <Slider
-              style={{ width: '100%', height: 36 }}
+              style={{ width: '100%', height: 40 }}
               minimumValue={0.5}
               maximumValue={2.0}
               step={0.25}
@@ -932,7 +932,7 @@ export default function SettingsScreen({ navigation }) {
               maximumTrackTintColor={theme.colors.border}
               thumbTintColor={theme.colors.primary}
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>0.5x</Text>
               <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>1.0x</Text>
               <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>2.0x</Text>
