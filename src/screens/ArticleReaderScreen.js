@@ -112,6 +112,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [noteText, setNoteText] = useState('');
   const articleNote = getNote(article?.id);
 
+  // Overflow menu state
+  const [showOverflowMenu, setShowOverflowMenu] = useState(false);
+
   // TTS state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [ttsCurrentIndex, setTtsCurrentIndex] = useState(-1); // -1 = inactive, 0 = title, 1+ = body paragraph
@@ -1082,6 +1085,36 @@ function ArticleReaderScreenContent({ route, navigation }) {
       paddingVertical: 2,
       marginHorizontal: -4,
     },
+    overflowBackdrop: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      alignItems: 'flex-end',
+    },
+    overflowMenu: {
+      marginTop: Platform.OS === 'ios' ? 90 : 60,
+      marginRight: 12,
+      borderRadius: 12,
+      paddingVertical: 4,
+      minWidth: 200,
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+    },
+    overflowItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: theme.colors.border,
+    },
+    overflowItemText: {
+      fontSize: 16,
+      marginLeft: 14,
+      fontWeight: '500',
+    },
   });
 
   return (
@@ -1123,26 +1156,6 @@ function ArticleReaderScreenContent({ route, navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={handleOpenBrowser}
-          >
-            <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-          <SaveButton article={article} size={24} variant="header" />
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => {
-              setNoteText(articleNote ? articleNote.text : '');
-              setShowNotesModal(true);
-            }}
-          >
-            <Ionicons
-              name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'}
-              size={24}
-              color={hasNote(article?.id) ? theme.colors.primary : theme.colors.text}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
             onPress={handleReadAloud}
           >
             <Ionicons
@@ -1153,9 +1166,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={handleShare}
+            onPress={() => setShowOverflowMenu(true)}
           >
-            <Ionicons name="share-outline" size={24} color={theme.colors.text} />
+            <Ionicons name="ellipsis-vertical" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         </View>
       </View>
@@ -1536,6 +1549,56 @@ function ArticleReaderScreenContent({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Overflow menu */}
+      <Modal
+        visible={showOverflowMenu}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowOverflowMenu(false)}
+      >
+        <TouchableOpacity
+          style={styles.overflowBackdrop}
+          activeOpacity={1}
+          onPress={() => setShowOverflowMenu(false)}
+        >
+          <View style={[styles.overflowMenu, { backgroundColor: theme.colors.surface }]}>
+            <TouchableOpacity
+              style={styles.overflowItem}
+              onPress={() => { setShowOverflowMenu(false); handleOpenBrowser(); }}
+            >
+              <Ionicons name="globe-outline" size={22} color={theme.colors.text} />
+              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Open in Browser</Text>
+            </TouchableOpacity>
+            <View style={styles.overflowItem}>
+              <SaveButton article={article} size={22} variant="header" />
+              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Save for Later</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.overflowItem}
+              onPress={() => {
+                setShowOverflowMenu(false);
+                setNoteText(articleNote ? articleNote.text : '');
+                setShowNotesModal(true);
+              }}
+            >
+              <Ionicons
+                name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'}
+                size={22}
+                color={hasNote(article?.id) ? theme.colors.primary : theme.colors.text}
+              />
+              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Notes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.overflowItem, { borderBottomWidth: 0 }]}
+              onPress={() => { setShowOverflowMenu(false); handleShare(); }}
+            >
+              <Ionicons name="share-outline" size={22} color={theme.colors.text} />
+              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Share</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
