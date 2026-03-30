@@ -14,6 +14,7 @@ export function AppSettingsProvider({ children }) {
   const [showReadingPositionInFeeds, setShowReadingPositionInFeeds] = useState(true);
   const [allowRotation, setAllowRotation] = useState(false);
   const [speechRate, setSpeechRate] = useState(1.0);
+  const [readerHeaderActions, setReaderHeaderActions] = useState(['bookmark', 'translate', 'readAloud']);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -33,6 +34,7 @@ export function AppSettingsProvider({ children }) {
       const savedShowReadingPositionInFeeds = await AsyncStorage.getItem('showReadingPositionInFeeds');
       const savedAllowRotation = await AsyncStorage.getItem('allowRotation');
       const savedSpeechRate = await AsyncStorage.getItem('speechRate');
+      const savedReaderHeaderActions = await AsyncStorage.getItem('readerHeaderActions');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -73,6 +75,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedSpeechRate !== null) {
         setSpeechRate(JSON.parse(savedSpeechRate));
+      }
+
+      if (savedReaderHeaderActions !== null) {
+        setReaderHeaderActions(JSON.parse(savedReaderHeaderActions));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -175,6 +181,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateReaderHeaderActions = async (value) => {
+    try {
+      setReaderHeaderActions(value);
+      await AsyncStorage.setItem('readerHeaderActions', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving readerHeaderActions setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -204,6 +219,7 @@ export function AppSettingsProvider({ children }) {
     showReadingPositionInFeeds,
     allowRotation,
     speechRate,
+    readerHeaderActions,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
@@ -216,6 +232,7 @@ export function AppSettingsProvider({ children }) {
     updateShowReadingPositionInFeeds,
     updateAllowRotation,
     updateSpeechRate,
+    updateReaderHeaderActions,
     completeOnboarding,
     resetOnboarding,
   };

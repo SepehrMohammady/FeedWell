@@ -24,10 +24,10 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
 import { useNotes } from '../context/NotesContext';
+import { useReadLater } from '../context/ReadLaterContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
-import SaveButton from '../components/SaveButton';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CustomAlert from '../components/CustomAlert';
 import {
@@ -70,9 +70,10 @@ function cleanTextForTTS(text) {
 function ArticleReaderScreenContent({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
-  const { showImages, showBookmarkIndicators, speechRate } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
   const { markArticleRead } = useFeed();
   const { getNote, setNote, hasNote } = useNotes();
+  const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -211,6 +212,114 @@ function ArticleReaderScreenContent({ route, navigation }) {
     setIsSpeaking(false);
     setTtsCurrentIndex(-1);
   }, []);
+
+  // Save article handler (replaces SaveButton component)
+  const [isSaving, setIsSaving] = useState(false);
+  const isSaved = isInReadLater(article?.id);
+  const handleSaveArticle = useCallback(async () => {
+    if (isSaved) {
+      removeFromReadLater(article.id);
+    } else {
+      try {
+        setIsSaving(true);
+        let enhanced = { ...article, offlineContent: article.content || article.description || '', offlineCached: false, cachedAt: new Date().toISOString() };
+        if (article.url) {
+          try {
+            const res = await fetch(article.url);
+            if (res.ok) {
+              const html = await res.text();
+              const full = extractArticleContent(html);
+              enhanced = { ...enhanced, offlineContent: cleanHtmlContent(full) || enhanced.offlineContent, offlineCached: true };
+            }
+          } catch (e) { /* use existing content */ }
+        }
+        addToReadLater(enhanced);
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  }, [isSaved, article, addToReadLater, removeFromReadLater]);
+
+  // All reader actions definition (order defines overflow menu order)
+  const MAX_PINNED = 4;
+  const allActions = useMemo(() => [
+    {
+      id: 'bookmark',
+      label: 'Bookmark',
+      icon: hasBookmark ? 'bookmark' : 'bookmark-outline',
+      color: hasBookmark ? theme.colors.primary : theme.colors.text,
+      onPress: handleBookmarkPress,
+    },
+    {
+      id: 'translate',
+      label: 'Translate',
+      icon: isTranslated ? 'swap-horizontal' : 'language-outline',
+      color: isTranslated ? theme.colors.success : theme.colors.text,
+      onPress: isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate,
+      onLongPress: () => setShowLanguagePicker(true),
+      disabled: translating,
+      loading: translating,
+    },
+    {
+      id: 'readAloud',
+      label: 'Read Aloud',
+      icon: isSpeaking ? 'volume-high' : 'volume-high-outline',
+      color: isSpeaking ? theme.colors.primary : theme.colors.text,
+      onPress: handleReadAloud,
+    },
+    {
+      id: 'browser',
+      label: 'Open in Browser',
+      icon: 'globe-outline',
+      color: theme.colors.text,
+      onPress: handleOpenBrowser,
+    },
+    {
+      id: 'save',
+      label: isSaved ? 'Unsave Article' : 'Save for Later',
+      icon: isSaved ? 'save' : 'save-outline',
+      color: isSaved ? theme.colors.primary : theme.colors.text,
+      onPress: handleSaveArticle,
+      loading: isSaving,
+    },
+    {
+      id: 'notes',
+      label: 'Notes',
+      icon: hasNote(article?.id) ? 'document-text' : 'document-text-outline',
+      color: hasNote(article?.id) ? theme.colors.primary : theme.colors.text,
+      onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
+    },
+    {
+      id: 'share',
+      label: 'Share',
+      icon: 'share-outline',
+      color: theme.colors.text,
+      onPress: handleShare,
+    },
+  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, article?.id, articleNote, theme.colors]);
+
+  const pinnedActions = useMemo(() => {
+    return readerHeaderActions
+      .map(id => allActions.find(a => a.id === id))
+      .filter(Boolean)
+      .slice(0, MAX_PINNED);
+  }, [readerHeaderActions, allActions]);
+
+  const overflowActions = useMemo(() => {
+    return allActions.filter(a => !readerHeaderActions.includes(a.id));
+  }, [readerHeaderActions, allActions]);
+
+  const togglePinAction = useCallback((actionId) => {
+    const isPinned = readerHeaderActions.includes(actionId);
+    let next;
+    if (isPinned) {
+      next = readerHeaderActions.filter(id => id !== actionId);
+    } else {
+      if (readerHeaderActions.length >= MAX_PINNED) return; // already at max
+      next = [...readerHeaderActions, actionId];
+    }
+    updateReaderHeaderActions(next);
+  }, [readerHeaderActions, updateReaderHeaderActions]);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -1095,7 +1204,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       marginRight: 12,
       borderRadius: 12,
       paddingVertical: 4,
-      minWidth: 200,
+      minWidth: 240,
       elevation: 8,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
@@ -1114,6 +1223,26 @@ function ArticleReaderScreenContent({ route, navigation }) {
       fontSize: 16,
       marginLeft: 14,
       fontWeight: '500',
+      flex: 1,
+    },
+    overflowItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    overflowPinButton: {
+      padding: 8,
+      marginLeft: 8,
+    },
+    overflowDivider: {
+      height: StyleSheet.hairlineWidth,
+      marginVertical: 4,
+    },
+    overflowSectionLabel: {
+      fontSize: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      fontWeight: '600',
     },
   });
 
@@ -1128,42 +1257,21 @@ function ArticleReaderScreenContent({ route, navigation }) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reader</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={handleBookmarkPress}
-          >
-            <Ionicons
-              name={hasBookmark ? 'bookmark' : 'bookmark-outline'}
-              size={24}
-              color={hasBookmark ? theme.colors.primary : theme.colors.text}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate}
-            onLongPress={() => setShowLanguagePicker(true)}
-            disabled={translating}
-          >
-            {translating ? (
-              <ActivityIndicator size="small" color={theme.colors.text} />
-            ) : (
-              <Ionicons 
-                name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
-                size={24} 
-                color={isTranslated ? theme.colors.success : theme.colors.text} 
-              />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={handleReadAloud}
-          >
-            <Ionicons
-              name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
-              size={24}
-              color={isSpeaking ? theme.colors.primary : theme.colors.text}
-            />
-          </TouchableOpacity>
+          {pinnedActions.map(action => (
+            <TouchableOpacity
+              key={action.id}
+              style={styles.headerButton}
+              onPress={action.onPress}
+              onLongPress={action.onLongPress}
+              disabled={action.disabled}
+            >
+              {action.loading ? (
+                <ActivityIndicator size="small" color={theme.colors.text} />
+              ) : (
+                <Ionicons name={action.icon} size={24} color={action.color} />
+              )}
+            </TouchableOpacity>
+          ))}
           <TouchableOpacity
             style={styles.headerButton}
             onPress={() => setShowOverflowMenu(true)}
@@ -1564,39 +1672,69 @@ function ArticleReaderScreenContent({ route, navigation }) {
           onPress={() => setShowOverflowMenu(false)}
         >
           <View style={[styles.overflowMenu, { backgroundColor: theme.colors.surface }]}>
-            <TouchableOpacity
-              style={styles.overflowItem}
-              onPress={() => { setShowOverflowMenu(false); handleOpenBrowser(); }}
-            >
-              <Ionicons name="globe-outline" size={22} color={theme.colors.text} />
-              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Open in Browser</Text>
-            </TouchableOpacity>
-            <View style={styles.overflowItem}>
-              <SaveButton article={article} size={22} variant="header" />
-              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Save for Later</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.overflowItem}
-              onPress={() => {
-                setShowOverflowMenu(false);
-                setNoteText(articleNote ? articleNote.text : '');
-                setShowNotesModal(true);
-              }}
-            >
-              <Ionicons
-                name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'}
-                size={22}
-                color={hasNote(article?.id) ? theme.colors.primary : theme.colors.text}
-              />
-              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Notes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.overflowItem, { borderBottomWidth: 0 }]}
-              onPress={() => { setShowOverflowMenu(false); handleShare(); }}
-            >
-              <Ionicons name="share-outline" size={22} color={theme.colors.text} />
-              <Text style={[styles.overflowItemText, { color: theme.colors.text }]}>Share</Text>
-            </TouchableOpacity>
+            {overflowActions.map((action, index) => (
+              <View
+                key={action.id}
+                style={[
+                  styles.overflowItem,
+                  index === overflowActions.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.overflowItemContent}
+                  onPress={() => { setShowOverflowMenu(false); action.onPress(); }}
+                  disabled={action.disabled}
+                >
+                  {action.loading ? (
+                    <ActivityIndicator size="small" color={theme.colors.text} />
+                  ) : (
+                    <Ionicons name={action.icon} size={22} color={action.color} />
+                  )}
+                  <Text numberOfLines={1} style={[styles.overflowItemText, { color: theme.colors.text }]}>{action.label}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.overflowPinButton}
+                  onPress={() => togglePinAction(action.id)}
+                  disabled={pinnedActions.length >= MAX_PINNED}
+                >
+                  <Ionicons
+                    name="pin"
+                    size={16}
+                    color={pinnedActions.length >= MAX_PINNED ? theme.colors.textTertiary : theme.colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </View>
+            ))}
+            {pinnedActions.length > 0 && (
+              <>
+                <View style={[styles.overflowDivider, { backgroundColor: theme.colors.border }]} />
+                <Text style={[styles.overflowSectionLabel, { color: theme.colors.textSecondary }]}>Pinned to header (tap to unpin)</Text>
+                {pinnedActions.map((action, index) => (
+                  <View
+                    key={action.id}
+                    style={[
+                      styles.overflowItem,
+                      index === pinnedActions.length - 1 && { borderBottomWidth: 0 },
+                    ]}
+                  >
+                    <View style={styles.overflowItemContent}>
+                      <Ionicons name={action.icon} size={22} color={action.color} />
+                      <Text numberOfLines={1} style={[styles.overflowItemText, { color: theme.colors.textSecondary }]}>{action.label}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.overflowPinButton}
+                      onPress={() => togglePinAction(action.id)}
+                    >
+                      <Ionicons
+                        name="pin-outline"
+                        size={16}
+                        color={theme.colors.primary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
           </View>
         </TouchableOpacity>
       </Modal>
