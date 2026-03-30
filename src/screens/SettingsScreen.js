@@ -916,7 +916,7 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Read Aloud" />
         <View style={styles.section}>
-          <View style={[styles.settingItem, { flexDirection: 'column', alignItems: 'stretch' }]}>
+          <View style={[styles.settingItem, { flexDirection: 'column', alignItems: 'stretch', borderBottomWidth: 0 }]}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
               <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Speech Speed</Text>
               <Text style={[styles.settingTitle, { color: theme.colors.primary, fontWeight: '700' }]}>{speechRate}x</Text>
@@ -933,9 +933,8 @@ export default function SettingsScreen({ navigation }) {
               thumbTintColor={theme.colors.primary}
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>0.5x</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>1.0x</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>2.0x</Text>
+              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Slow</Text>
+              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>Fast</Text>
             </View>
           </View>
         </View>
