@@ -13,6 +13,7 @@ export function AppSettingsProvider({ children }) {
   const [skipArticleView, setSkipArticleView] = useState(false);
   const [showReadingPositionInFeeds, setShowReadingPositionInFeeds] = useState(true);
   const [allowRotation, setAllowRotation] = useState(false);
+  const [speechRate, setSpeechRate] = useState(1.0);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,6 +32,7 @@ export function AppSettingsProvider({ children }) {
       const savedSkipArticleView = await AsyncStorage.getItem('skipArticleView');
       const savedShowReadingPositionInFeeds = await AsyncStorage.getItem('showReadingPositionInFeeds');
       const savedAllowRotation = await AsyncStorage.getItem('allowRotation');
+      const savedSpeechRate = await AsyncStorage.getItem('speechRate');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       
       if (savedShowImages !== null) {
@@ -67,6 +69,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedAllowRotation !== null) {
         setAllowRotation(JSON.parse(savedAllowRotation));
+      }
+
+      if (savedSpeechRate !== null) {
+        setSpeechRate(JSON.parse(savedSpeechRate));
       }
 
       if (savedHasSeenOnboarding !== null) {
@@ -160,6 +166,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateSpeechRate = async (value) => {
+    try {
+      setSpeechRate(value);
+      await AsyncStorage.setItem('speechRate', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving speechRate setting:', error);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
       setHasSeenOnboarding(true);
@@ -188,6 +203,7 @@ export function AppSettingsProvider({ children }) {
     skipArticleView,
     showReadingPositionInFeeds,
     allowRotation,
+    speechRate,
     hasSeenOnboarding,
     isLoading,
     updateShowImages,
@@ -199,6 +215,7 @@ export function AppSettingsProvider({ children }) {
     updateSkipArticleView,
     updateShowReadingPositionInFeeds,
     updateAllowRotation,
+    updateSpeechRate,
     completeOnboarding,
     resetOnboarding,
   };

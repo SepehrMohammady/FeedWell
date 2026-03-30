@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import * as Speech from 'expo-speech';
 import {
   View,
   Text,
@@ -66,7 +67,7 @@ const ContentChunk = memo(({ text, style, isRTL }) => (
 function ArticleReaderScreenContent({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
-  const { showImages, showBookmarkIndicators } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate } = useAppSettings();
   const { markArticleRead } = useFeed();
   const { getNote, setNote, hasNote } = useNotes();
   const [fullContent, setFullContent] = useState(null);
@@ -107,6 +108,41 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [noteText, setNoteText] = useState('');
   const articleNote = getNote(article?.id);
+
+  // TTS state
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Stop TTS on unmount
+  useEffect(() => {
+    return () => { Speech.stop(); };
+  }, []);
+
+  // TTS handlers
+  const handleReadAloud = useCallback(async () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+      return;
+    }
+    const title = isTranslated && translatedTitle ? translatedTitle : article.title;
+    const body = isTranslated && translatedContent ? translatedContent : fullContent;
+    const text = (title || '') + '.\n\n' + (body || '');
+    if (!text.trim()) return;
+    const lang = isTranslated ? targetLangCode : (languageInfo?.code || undefined);
+    setIsSpeaking(true);
+    Speech.speak(text, {
+      language: lang,
+      rate: speechRate,
+      onDone: () => setIsSpeaking(false),
+      onStopped: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false),
+    });
+  }, [isSpeaking, isTranslated, translatedTitle, translatedContent, article.title, fullContent, languageInfo, targetLangCode, speechRate]);
+
+  const handleStopSpeech = useCallback(() => {
+    Speech.stop();
+    setIsSpeaking(false);
+  }, []);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -989,6 +1025,32 @@ function ArticleReaderScreenContent({ route, navigation }) {
       fontSize: 16,
       fontWeight: '600',
     },
+    ttsFloatingBar: {
+      position: 'absolute',
+      bottom: 16,
+      left: 16,
+      right: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 12,
+      elevation: 6,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+    },
+    ttsFloatingBarText: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: '600',
+      flex: 1,
+      marginLeft: 10,
+    },
+    ttsStopButton: {
+      padding: 4,
+    },
   });
 
   return (
@@ -1046,6 +1108,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
               name={hasNote(article?.id) ? 'document-text' : 'document-text-outline'}
               size={24}
               color={hasNote(article?.id) ? theme.colors.primary : theme.colors.text}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleReadAloud}
+          >
+            <Ionicons
+              name={isSpeaking ? 'volume-high' : 'volume-high-outline'}
+              size={24}
+              color={isSpeaking ? theme.colors.primary : theme.colors.text}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -1258,6 +1330,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
         >
           <Ionicons name="chevron-up" size={24} color="#fff" />
         </TouchableOpacity>
+      )}
+
+      {isSpeaking && (
+        <View style={[styles.ttsFloatingBar, { backgroundColor: theme.colors.primary }]}>
+          <Ionicons name="volume-high" size={18} color="#fff" />
+          <Text style={styles.ttsFloatingBarText}>Reading aloud...</Text>
+          <TouchableOpacity onPress={handleStopSpeech} style={styles.ttsStopButton}>
+            <Ionicons name="stop-circle" size={28} color="#fff" />
+          </TouchableOpacity>
+        </View>
       )}
       </View>
 

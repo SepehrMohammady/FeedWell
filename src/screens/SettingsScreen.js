@@ -47,7 +47,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { currentSoundId, isPlaying, selectSound, stopSound, volume, setVolume } = useAmbientSound();
   const insets = useSafeAreaInsets();
@@ -66,6 +66,7 @@ export default function SettingsScreen({ navigation }) {
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
+  const [showSpeechRatePicker, setShowSpeechRatePicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
@@ -913,6 +914,17 @@ export default function SettingsScreen({ navigation }) {
           })}
         </View>
 
+        <SectionHeader title="Read Aloud" />
+        <View style={styles.section}>
+          <SettingItem
+            title="Speech Speed"
+            description={`Reading speed: ${speechRate}x`}
+            onPress={() => setShowSpeechRatePicker(true)}
+            isLast={true}
+            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
+          />
+        </View>
+
         <SectionHeader title="Translation" />
         <View style={styles.section}>
           <SettingItem
@@ -1324,6 +1336,63 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                 </View>
                 {maxArticleAge === option.value && (
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Speech Rate Picker Modal */}
+      <Modal
+        visible={showSpeechRatePicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowSpeechRatePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Speech Speed</Text>
+              <TouchableOpacity
+                onPress={() => setShowSpeechRatePicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.modeItemDesc, { paddingHorizontal: 16, paddingBottom: 8 }]}>
+              Adjust the reading speed for the Read Aloud feature.
+            </Text>
+
+            {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((rate, index, arr) => (
+              <TouchableOpacity
+                key={rate}
+                style={[
+                  styles.modeItem,
+                  speechRate === rate && styles.langItemSelected,
+                  index === arr.length - 1 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => {
+                  updateSpeechRate(rate);
+                  setShowSpeechRatePicker(false);
+                }}
+              >
+                <View style={styles.modeItemContent}>
+                  <Ionicons
+                    name={rate <= 1.0 ? 'speedometer-outline' : 'speedometer'}
+                    size={22}
+                    color={speechRate === rate ? theme.colors.primary : theme.colors.text}
+                  />
+                  <View style={styles.modeItemText}>
+                    <Text style={[styles.modeItemTitle, speechRate === rate && { color: theme.colors.primary }]}>
+                      {rate}x{rate === 1.0 ? ' (Default)' : ''}
+                    </Text>
+                  </View>
+                </View>
+                {speechRate === rate && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>
