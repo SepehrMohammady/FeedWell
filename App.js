@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FeedProvider } from './src/context/FeedContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
@@ -14,10 +15,34 @@ import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
 
+const NAV_STATE_KEY = 'feedwell_nav_state';
+
 function AppContent() {
   const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation } = useAppSettings();
   const { theme, isDarkMode } = useTheme();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [navStateReady, setNavStateReady] = useState(false);
+  const [initialNavState, setInitialNavState] = useState(undefined);
+
+  // Restore navigation state on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem(NAV_STATE_KEY);
+        if (saved) {
+          setInitialNavState(JSON.parse(saved));
+        }
+      } catch (e) {
+        // Ignore restore errors
+      } finally {
+        setNavStateReady(true);
+      }
+    })();
+  }, []);
+
+  const onNavStateChange = useCallback((state) => {
+    AsyncStorage.setItem(NAV_STATE_KEY, JSON.stringify(state));
+  }, []);
 
   // Lock/unlock screen orientation based on setting
   useEffect(() => {
@@ -40,13 +65,16 @@ function AppContent() {
     completeOnboarding();
   };
 
-  if (isLoading) {
+  if (isLoading || !navStateReady) {
     return null; // Or a loading screen
   }
 
   return (
     <>
-      <NavigationContainer>
+      <NavigationContainer
+        initialState={initialNavState}
+        onStateChange={onNavStateChange}
+      >
         <AppNavigator />
         <StatusBar style={isDarkMode ? "light" : "dark"} />
       </NavigationContainer>
