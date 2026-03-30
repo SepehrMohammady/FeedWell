@@ -13,6 +13,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,7 +67,6 @@ export default function SettingsScreen({ navigation }) {
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
-  const [showSpeechRatePicker, setShowSpeechRatePicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
@@ -916,13 +916,28 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Read Aloud" />
         <View style={styles.section}>
-          <SettingItem
-            title="Speech Speed"
-            description={`Reading speed: ${speechRate}x`}
-            onPress={() => setShowSpeechRatePicker(true)}
-            isLast={true}
-            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
-          />
+          <View style={styles.settingItem}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={[styles.settingTitle, { color: theme.colors.text }]}>Speech Speed</Text>
+              <Text style={[styles.settingTitle, { color: theme.colors.primary, fontWeight: '700' }]}>{speechRate}x</Text>
+            </View>
+            <Slider
+              style={{ width: '100%', height: 36 }}
+              minimumValue={0.5}
+              maximumValue={2.0}
+              step={0.25}
+              value={speechRate}
+              onSlidingComplete={(val) => updateSpeechRate(Math.round(val * 100) / 100)}
+              minimumTrackTintColor={theme.colors.primary}
+              maximumTrackTintColor={theme.colors.border}
+              thumbTintColor={theme.colors.primary}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 }}>
+              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>0.5x</Text>
+              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>1.0x</Text>
+              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>2.0x</Text>
+            </View>
+          </View>
         </View>
 
         <SectionHeader title="Translation" />
@@ -1336,63 +1351,6 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                 </View>
                 {maxArticleAge === option.value && (
-                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </Modal>
-
-      {/* Speech Rate Picker Modal */}
-      <Modal
-        visible={showSpeechRatePicker}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setShowSpeechRatePicker(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Speech Speed</Text>
-              <TouchableOpacity
-                onPress={() => setShowSpeechRatePicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={[styles.modeItemDesc, { paddingHorizontal: 16, paddingBottom: 8 }]}>
-              Adjust the reading speed for the Read Aloud feature.
-            </Text>
-
-            {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((rate, index, arr) => (
-              <TouchableOpacity
-                key={rate}
-                style={[
-                  styles.modeItem,
-                  speechRate === rate && styles.langItemSelected,
-                  index === arr.length - 1 && { borderBottomWidth: 0 },
-                ]}
-                onPress={() => {
-                  updateSpeechRate(rate);
-                  setShowSpeechRatePicker(false);
-                }}
-              >
-                <View style={styles.modeItemContent}>
-                  <Ionicons
-                    name={rate <= 1.0 ? 'speedometer-outline' : 'speedometer'}
-                    size={22}
-                    color={speechRate === rate ? theme.colors.primary : theme.colors.text}
-                  />
-                  <View style={styles.modeItemText}>
-                    <Text style={[styles.modeItemTitle, speechRate === rate && { color: theme.colors.primary }]}>
-                      {rate}x{rate === 1.0 ? ' (Default)' : ''}
-                    </Text>
-                  </View>
-                </View>
-                {speechRate === rate && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>

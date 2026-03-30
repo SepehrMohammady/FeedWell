@@ -44,24 +44,27 @@ import {
   getPopularLanguages,
 } from '../utils/translationService';
 
-// Maximum characters per chunk to prevent memory issues with very long articles
-const CHUNK_SIZE = 5000;
+// Map short ISO-639 codes to full BCP-47 locales for TTS engine compatibility
+const TTS_LOCALE_MAP = {
+  'fa': 'fa-IR', 'ar': 'ar-SA', 'he': 'he-IL', 'ur': 'ur-PK',
+  'zh': 'zh-CN', 'ja': 'ja-JP', 'ko': 'ko-KR', 'hi': 'hi-IN',
+  'bn': 'bn-BD', 'pt': 'pt-BR', 'en': 'en-US', 'es': 'es-ES',
+  'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT', 'ru': 'ru-RU',
+  'tr': 'tr-TR', 'nl': 'nl-NL', 'pl': 'pl-PL', 'sv': 'sv-SE',
+  'da': 'da-DK', 'nb': 'nb-NO', 'fi': 'fi-FI', 'el': 'el-GR',
+  'cs': 'cs-CZ', 'ro': 'ro-RO', 'hu': 'hu-HU', 'th': 'th-TH',
+  'vi': 'vi-VN', 'id': 'id-ID', 'ms': 'ms-MY',
+};
 
-// Memoized component for rendering content chunks to prevent re-renders
-const ContentChunk = memo(({ text, style, isRTL }) => (
-  <Text
-    selectable={true}
-    style={[
-      style,
-      {
-        writingDirection: isRTL ? 'rtl' : 'ltr',
-        textAlign: isRTL ? 'right' : 'left',
-      }
-    ]}
-  >
-    {text}
-  </Text>
-));
+// Strip HTML remnants and entities for clean TTS input
+function cleanTextForTTS(text) {
+  if (!text) return '';
+  let t = text.replace(/<[^>]+>/g, '');
+  t = t.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+       .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&nbsp;/g, ' ');
+  t = t.replace(/\s+/g, ' ').trim();
+  return t;
+}
 
 // Main component wrapped with error boundary
 function ArticleReaderScreenContent({ route, navigation }) {
@@ -111,37 +114,99 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   // TTS state
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [ttsCurrentIndex, setTtsCurrentIndex] = useState(-1); // -1 = inactive, 0 = title, 1+ = body paragraph
+  const ttsParagraphsRef = useRef([]);
+  const ttsBodyOffsetRef = useRef(1);
+  const speakNextRef = useRef(null);
+  const ttsLangRef = useRef(null);
+  const articleContentYRef = useRef(0);
+  const paragraphYRef = useRef({});
+  const titleYRef = useRef(0);
 
-  // Stop TTS on unmount
+  // Stop TTS on unmount or when content/translation changes
   useEffect(() => {
     return () => { Speech.stop(); };
   }, []);
+
+  // Stop TTS when translation is toggled
+  useEffect(() => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+      setTtsCurrentIndex(-1);
+    }
+  }, [isTranslated]);
+
+  // Ref-based speak function to avoid stale closures in recursive callbacks
+  useEffect(() => {
+    speakNextRef.current = (index) => {
+      const paras = ttsParagraphsRef.current;
+      if (index >= paras.length) {
+        setIsSpeaking(false);
+        setTtsCurrentIndex(-1);
+        return;
+      }
+      setTtsCurrentIndex(index);
+
+      // Auto-scroll to current paragraph
+      let targetY;
+      if (index === 0 && ttsBodyOffsetRef.current > 0) {
+        targetY = titleYRef.current;
+      } else {
+        const bodyIdx = index - ttsBodyOffsetRef.current;
+        targetY = articleContentYRef.current + (paragraphYRef.current[bodyIdx] || 0);
+      }
+      if (scrollViewRef.current && targetY > 0) {
+        scrollViewRef.current.scrollTo({ y: Math.max(0, targetY - 80), animated: true });
+      }
+
+      const cleanText = cleanTextForTTS(paras[index]);
+      if (!cleanText) {
+        // Skip empty paragraphs
+        speakNextRef.current?.(index + 1);
+        return;
+      }
+      Speech.speak(cleanText, {
+        language: ttsLangRef.current,
+        rate: speechRate,
+        onDone: () => speakNextRef.current?.(index + 1),
+        onStopped: () => { setIsSpeaking(false); setTtsCurrentIndex(-1); },
+        onError: () => speakNextRef.current?.(index + 1),
+      });
+    };
+  }, [speechRate]);
 
   // TTS handlers
   const handleReadAloud = useCallback(async () => {
     if (isSpeaking) {
       Speech.stop();
       setIsSpeaking(false);
+      setTtsCurrentIndex(-1);
       return;
     }
-    const title = isTranslated && translatedTitle ? translatedTitle : article.title;
-    const body = isTranslated && translatedContent ? translatedContent : fullContent;
-    const text = (title || '') + '.\n\n' + (body || '');
-    if (!text.trim()) return;
-    const lang = isTranslated ? targetLangCode : (languageInfo?.code || undefined);
+    const useTranslated = isTranslated && translatedContent;
+    const title = useTranslated ? (translatedTitle || article.title) : article.title;
+    const body = useTranslated ? translatedContent : fullContent;
+    if (!body?.trim()) return;
+
+    const bodyParagraphs = body.split(/\n\n+/).filter(p => p.trim());
+    const hasTitle = !!title?.trim();
+    ttsBodyOffsetRef.current = hasTitle ? 1 : 0;
+    const allParagraphs = hasTitle ? [title, ...bodyParagraphs] : bodyParagraphs;
+    ttsParagraphsRef.current = allParagraphs;
+
+    // Resolve language to full BCP-47 locale
+    const rawLang = useTranslated ? targetLangCode : (languageInfo?.code || undefined);
+    ttsLangRef.current = rawLang ? (TTS_LOCALE_MAP[rawLang] || rawLang) : undefined;
+
     setIsSpeaking(true);
-    Speech.speak(text, {
-      language: lang,
-      rate: speechRate,
-      onDone: () => setIsSpeaking(false),
-      onStopped: () => setIsSpeaking(false),
-      onError: () => setIsSpeaking(false),
-    });
-  }, [isSpeaking, isTranslated, translatedTitle, translatedContent, article.title, fullContent, languageInfo, targetLangCode, speechRate]);
+    speakNextRef.current?.(0);
+  }, [isSpeaking, isTranslated, translatedTitle, translatedContent, article.title, fullContent, languageInfo, targetLangCode]);
 
   const handleStopSpeech = useCallback(() => {
     Speech.stop();
     setIsSpeaking(false);
+    setTtsCurrentIndex(-1);
   }, []);
 
   // Check if article language matches target translation language
@@ -287,55 +352,15 @@ function ArticleReaderScreenContent({ route, navigation }) {
   // Determine text direction for bookmark indicator positioning
   const isRTL = languageInfo?.isRTL || false;
 
-  // Split content into chunks to prevent memory issues with very long articles
-  const contentChunks = useMemo(() => {
+  // Split content into paragraphs for rendering and TTS tracking
+  const paragraphs = useMemo(() => {
     if (!fullContent) return [];
-    
-    // For short content, return as single chunk
-    if (fullContent.length <= CHUNK_SIZE) {
-      return [fullContent];
-    }
-    
-    // Split by paragraphs first to avoid breaking mid-word
-    const paragraphs = fullContent.split(/\n\n+/);
-    const chunks = [];
-    let currentChunk = '';
-    
-    for (const paragraph of paragraphs) {
-      if (currentChunk.length + paragraph.length > CHUNK_SIZE && currentChunk.length > 0) {
-        chunks.push(currentChunk.trim());
-        currentChunk = paragraph;
-      } else {
-        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
-      }
-    }
-    
-    if (currentChunk.trim()) {
-      chunks.push(currentChunk.trim());
-    }
-    
-    return chunks;
+    return fullContent.split(/\n\n+/).filter(p => p.trim());
   }, [fullContent]);
 
-  // Chunks for translated content
-  const translatedChunks = useMemo(() => {
+  const translatedParagraphs = useMemo(() => {
     if (!translatedContent) return [];
-    if (translatedContent.length <= CHUNK_SIZE) return [translatedContent];
-    
-    const paragraphs = translatedContent.split(/\n\n+/);
-    const chunks = [];
-    let currentChunk = '';
-    
-    for (const paragraph of paragraphs) {
-      if (currentChunk.length + paragraph.length > CHUNK_SIZE && currentChunk.length > 0) {
-        chunks.push(currentChunk.trim());
-        currentChunk = paragraph;
-      } else {
-        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
-      }
-    }
-    if (currentChunk.trim()) chunks.push(currentChunk.trim());
-    return chunks;
+    return translatedContent.split(/\n\n+/).filter(p => p.trim());
   }, [translatedContent]);
 
   // Load saved target language and translation mode on mount
@@ -1051,6 +1076,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
     ttsStopButton: {
       padding: 4,
     },
+    ttsHighlight: {
+      borderRadius: 6,
+      paddingHorizontal: 4,
+      paddingVertical: 2,
+      marginHorizontal: -4,
+    },
   });
 
   return (
@@ -1145,18 +1176,23 @@ function ArticleReaderScreenContent({ route, navigation }) {
           <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
         </View>
 
-        <Text 
-          selectable={true}
-          style={[
-            styles.articleTitle,
-            {
-              writingDirection: isTranslated ? getTextDirection(translatedTitle || article.title) : getTextDirection(article.title),
-              textAlign: isTranslated ? getTextAlignment(translatedTitle || article.title) : getTextAlignment(article.title),
-            }
-          ]}
+        <View
+          onLayout={(e) => { titleYRef.current = e.nativeEvent.layout.y; }}
+          style={isSpeaking && ttsCurrentIndex === 0 && ttsBodyOffsetRef.current > 0 ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
         >
-          {isTranslated && translatedTitle ? translatedTitle : article.title}
-        </Text>
+          <Text 
+            selectable={true}
+            style={[
+              styles.articleTitle,
+              {
+                writingDirection: isTranslated ? getTextDirection(translatedTitle || article.title) : getTextDirection(article.title),
+                textAlign: isTranslated ? getTextAlignment(translatedTitle || article.title) : getTextAlignment(article.title),
+              }
+            ]}
+          >
+            {isTranslated && translatedTitle ? translatedTitle : article.title}
+          </Text>
+        </View>
 
         {article.authors && article.authors.length > 0 && (
           <Text selectable={true} style={styles.articleAuthor}>
@@ -1194,7 +1230,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
 
         {fullContent && !loading && (
-          <View style={styles.articleContent}>
+          <View style={styles.articleContent} onLayout={(e) => { articleContentYRef.current = e.nativeEvent.layout.y; }}>
             {/* Language info + translate controls */}
             <View style={styles.translationBar}>
               {languageInfo && languageInfo.confidence > 0.6 && (
@@ -1258,26 +1294,29 @@ function ArticleReaderScreenContent({ route, navigation }) {
               </View>
             )}
 
-            {/* Render content in chunks to prevent memory issues with very long articles */}
-            {isTranslated && translatedChunks.length > 0 ? (
-              translatedChunks.map((chunk, index) => (
-                <ContentChunk
-                  key={`t-${index}`}
-                  text={chunk + (index < translatedChunks.length - 1 ? '\n\n' : '')}
-                  style={styles.articleText}
-                  isRTL={['ar', 'fa', 'he', 'ur'].includes(targetLangCode)}
-                />
-              ))
-            ) : (
-              contentChunks.map((chunk, index) => (
-                <ContentChunk
-                  key={index}
-                  text={chunk + (index < contentChunks.length - 1 ? '\n\n' : '')}
-                  style={styles.articleText}
-                  isRTL={languageInfo?.isRTL}
-                />
-              ))
-            )}
+            {/* Render content as individual paragraphs for TTS highlight tracking */}
+            {(isTranslated && translatedParagraphs.length > 0 ? translatedParagraphs : paragraphs).map((para, index) => {
+              const isRTL = isTranslated ? ['ar', 'fa', 'he', 'ur'].includes(targetLangCode) : languageInfo?.isRTL;
+              const isHighlighted = isSpeaking && ttsCurrentIndex === index + ttsBodyOffsetRef.current;
+              return (
+                <View
+                  key={isTranslated ? `t-${index}` : index}
+                  onLayout={(e) => { paragraphYRef.current[index] = e.nativeEvent.layout.y; }}
+                  style={isHighlighted ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
+                >
+                  <Text
+                    selectable={true}
+                    style={[
+                      styles.articleText,
+                      { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' },
+                      index < (isTranslated ? translatedParagraphs.length : paragraphs.length) - 1 ? { marginBottom: 16 } : null,
+                    ]}
+                  >
+                    {para}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         )}
 
