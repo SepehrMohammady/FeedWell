@@ -25,6 +25,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
 import { useNotes } from '../context/NotesContext';
 import { useReadLater } from '../context/ReadLaterContext';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
@@ -74,6 +75,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const { markArticleRead } = useFeed();
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
+  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -1319,10 +1321,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
           ))}
           <TouchableOpacity
             style={styles.headerButton}
+            onPress={() => openSoundPlaylist(true)}
+          >
+            <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
+            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sounds</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
             onPress={() => setShowOverflowMenu(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.text} />
-            <Text style={[styles.headerButtonLabel, { color: theme.colors.text }]}>More</Text>
+            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>More</Text>
           </TouchableOpacity>
         </View>
       </View>

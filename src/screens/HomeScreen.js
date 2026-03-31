@@ -185,8 +185,8 @@ export default function HomeScreen({ navigation }) {
               style={styles.soundButton}
               onPress={() => openSoundPlaylist(true)}
             >
-              <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
-              <Text style={styles.soundButtonLabel}>Sounds</Text>
+              <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
+              <Text style={[styles.soundButtonLabel, { color: theme.colors.textSecondary }]}>Sounds</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginTop: 2,
     fontWeight: '500',
-    color: '#888',
+    color: undefined, // Will use theme via inline style
   },
   welcomeText: {
     fontSize: 28,

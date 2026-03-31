@@ -39,6 +39,7 @@ export function AmbientSoundProvider({ children }) {
   const [autoPlay, setAutoPlayState] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [lastSoundId, setLastSoundId] = useState(null);
+  const autoPlayFiredRef = useRef(false);
 
   // Configure audio mode on mount
   useEffect(() => {
@@ -185,10 +186,12 @@ export function AmbientSoundProvider({ children }) {
     }
   }, []);
 
-  // Auto-play last sound on app start if enabled
+  // Auto-play last sound on app start if enabled (fires only once)
   useEffect(() => {
+    if (autoPlayFiredRef.current) return;
     const soundToPlay = currentSoundId || lastSoundId;
     if (autoPlay && soundToPlay && !isPlaying && !soundRef.current) {
+      autoPlayFiredRef.current = true;
       playSound(soundToPlay);
     }
   }, [autoPlay, currentSoundId, lastSoundId]);

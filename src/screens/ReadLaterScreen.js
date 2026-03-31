@@ -221,8 +221,8 @@ export default function ReadLaterScreen({ navigation }) {
           style={styles.sortButton}
           onPress={() => openSoundPlaylist(true)}
         >
-          <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
-          <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sounds</Text>
+          <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sounds</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.sortButton}
@@ -231,9 +231,9 @@ export default function ReadLaterScreen({ navigation }) {
           <Ionicons 
             name={sortOrder === 'newest' ? 'arrow-down' : 'arrow-up'} 
             size={20} 
-            color={theme.colors.primary} 
+            color={theme.colors.text} 
           />
-          <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sort</Text>
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sort</Text>
         </TouchableOpacity>
         {articles.length > 0 && (
           <TouchableOpacity
@@ -341,7 +341,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginTop: 2,
     fontWeight: '500',
-    color: '#888',
   },
   clearButton: {
     paddingHorizontal: 12,

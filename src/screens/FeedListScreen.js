@@ -530,6 +530,16 @@ export default function FeedListScreen({ navigation, route }) {
       paddingVertical: 4,
       minWidth: 40,
     },
+    headerRightGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'flex-end',
+      gap: 4,
+    },
+    filterPill: {
+      marginRight: 4,
+    },
     headerButtons: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -549,14 +559,14 @@ export default function FeedListScreen({ navigation, route }) {
     },
     filterButtonText: {
       fontSize: 12,
-      color: theme.colors.primary,
+      color: theme.colors.text,
       fontWeight: '600',
       paddingHorizontal: 8,
       paddingVertical: 4,
       backgroundColor: theme.colors.background,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors.text,
     },
     searchContainer: {
       flexDirection: 'row',
@@ -863,41 +873,43 @@ export default function FeedListScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.headerButtons}>
+          <View style={styles.headerRightGroup}>
             <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => openSoundPlaylist(true)}
-            >
-              <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
-              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sounds</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerButton}
+              style={styles.filterPill}
               onPress={toggleFilter}
             >
               <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={toggleSort}
-            >
-              <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.primary} />
-              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sort</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={handleMarkAllRead}
-            >
-              <Ionicons name="checkmark-done" size={20} color={theme.colors.primary} />
-              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Read All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate('AddFeed')}
-            >
-              <Ionicons name="add" size={20} color={theme.colors.primary} />
-              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Add</Text>
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => openSoundPlaylist(true)}
+              >
+                <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
+                <Text style={styles.headerButtonLabel}>Sounds</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={toggleSort}
+              >
+                <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.text} />
+                <Text style={styles.headerButtonLabel}>Sort</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={handleMarkAllRead}
+              >
+                <Ionicons name="checkmark-done" size={20} color={theme.colors.text} />
+                <Text style={styles.headerButtonLabel}>Read All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('AddFeed')}
+              >
+                <Ionicons name="add" size={20} color={theme.colors.text} />
+                <Text style={styles.headerButtonLabel}>Add</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </View>

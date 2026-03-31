@@ -14,12 +14,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
   const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
+  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
 
   
   // Track if we've already marked this article as read to prevent infinite loops
@@ -259,6 +261,10 @@ export default function ArticleActionsScreen({ route, navigation }) {
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
             <Ionicons name="share-outline" size={20} color={theme.colors.text} />
             <Text style={styles.headerButtonLabel}>Share</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton} onPress={() => openSoundPlaylist(true)}>
+            <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
+            <Text style={styles.headerButtonLabel}>Sounds</Text>
           </TouchableOpacity>
         </View>
       </View>
