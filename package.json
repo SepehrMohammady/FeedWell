@@ -1,6 +1,6 @@
 {
   "name": "feedwell",
-  "version": "1.4.13",
+  "version": "1.5.0",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.2",
+    "@mozilla/readability": "^0.6.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/slider": "5.0.1",
     "@react-navigation/bottom-tabs": "^7.4.2",
@@ -29,6 +30,7 @@
     "expo-speech": "~14.0.8",
     "expo-status-bar": "~3.0.8",
     "fast-mlkit-translate-text": "^1.0.3",
+    "linkedom": "^0.18.12",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",

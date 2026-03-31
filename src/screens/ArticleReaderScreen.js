@@ -27,6 +27,7 @@ import { useNotes } from '../context/NotesContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { cleanHtmlContent, extractArticleContent } from '../utils/rssParser';
+import { extractWithReadability, parseReadabilityContent } from '../utils/readabilityService';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -77,6 +78,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist, isPlaying: isSoundPlaying } = useAmbientSound();
   const [fullContent, setFullContent] = useState(null);
+  const [contentBlocks, setContentBlocks] = useState(null); // Readability content blocks (text + images)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [languageInfo, setLanguageInfo] = useState(null);
@@ -251,8 +253,18 @@ function ArticleReaderScreenContent({ route, navigation }) {
             const res = await fetch(article.url);
             if (res.ok) {
               const html = await res.text();
-              const full = extractArticleContent(html);
-              enhanced = { ...enhanced, offlineContent: cleanHtmlContent(full) || enhanced.offlineContent, offlineCached: true };
+              // Try Readability first for offline content
+              let offlineText = '';
+              try {
+                const readResult = extractWithReadability(html, article.url);
+                if (readResult && readResult.textContent && readResult.textContent.length > 200) {
+                  offlineText = readResult.textContent;
+                }
+              } catch (e) { /* fall through to regex */ }
+              if (!offlineText) {
+                offlineText = cleanHtmlContent(extractArticleContent(html));
+              }
+              enhanced = { ...enhanced, offlineContent: offlineText || enhanced.offlineContent, offlineCached: true };
             }
           } catch (e) { /* use existing content */ }
         }
@@ -417,6 +429,27 @@ function ArticleReaderScreenContent({ route, navigation }) {
     return translatedContent.split(/\n\n+/).filter(p => p.trim());
   }, [translatedContent]);
 
+  // Build image position map from Readability content blocks
+  // Maps paragraph index → image block to render before that paragraph
+  const imagePositions = useMemo(() => {
+    if (!contentBlocks || contentBlocks.length === 0) return new Map();
+    const positions = new Map();
+    let textParaCount = 0;
+    for (const block of contentBlocks) {
+      if (block.type === 'image') {
+        // Place image before the next text paragraph
+        if (!positions.has(textParaCount)) {
+          positions.set(textParaCount, []);
+        }
+        positions.get(textParaCount).push(block);
+      } else {
+        const paras = block.content.split(/\n\n+/).filter(p => p.trim());
+        textParaCount += paras.length;
+      }
+    }
+    return positions;
+  }, [contentBlocks]);
+
   // Load saved target language and translation mode on mount
   useEffect(() => {
     loadTargetLanguage().then(code => setTargetLangCode(code));
@@ -484,26 +517,50 @@ function ArticleReaderScreenContent({ route, navigation }) {
             setHtmlLangCode(langMatch[1].split('-')[0].toLowerCase());
           }
           
-          // Extract main article content using sophisticated extraction
-          const articleContent = extractArticleContent(html);
+          // Try Mozilla Readability first (best quality extraction)
+          let readabilitySuccess = false;
+          try {
+            const readabilityResult = extractWithReadability(html, article.url);
+            if (readabilityResult && readabilityResult.textContent && readabilityResult.textContent.length > 200) {
+              // Parse content blocks (text + images interleaved)
+              const blocks = parseReadabilityContent(readabilityResult.content);
+              if (blocks.length > 0) {
+                setContentBlocks(blocks);
+                // Build plain text from text blocks for TTS/translation/language detection
+                const plainText = blocks
+                  .filter(b => b.type === 'text')
+                  .map(b => b.content)
+                  .join('\n\n');
+                content = plainText || readabilityResult.textContent;
+              } else {
+                content = readabilityResult.textContent;
+              }
+              readabilitySuccess = true;
+              console.log('Using Readability content, length:', content.length, 'blocks:', blocks.length);
+            }
+          } catch (readabilityError) {
+            console.log('Readability failed, falling back to regex extraction:', readabilityError.message);
+          }
           
-          // Check if extracted content looks like actual article text
-          const isValidContent = articleContent.length > 200 && 
-                                !articleContent.includes('contain-intrinsic-size') &&
-                                !articleContent.includes('background-color:var') &&
-                                !articleContent.includes('webkit-text-decoration') &&
-                                !articleContent.includes('z-index:') &&
-                                !articleContent.includes('position:relative') &&
-                                !articleContent.includes('display:block') &&
-                                !articleContent.includes('font-size:var') &&
-                                !articleContent.includes('padding:var');
-          
-          // Use fetched content if it's valid and longer than RSS content
-          if (isValidContent && articleContent.length > content.length) {
-            content = articleContent;
-            console.log('Using extracted article content, length:', articleContent.length);
-          } else {
-            console.log('Article extraction failed or content too short, using RSS content');
+          // Fallback: regex-based extraction if Readability failed
+          if (!readabilitySuccess) {
+            const articleContent = extractArticleContent(html);
+            const isValidContent = articleContent.length > 200 && 
+                                  !articleContent.includes('contain-intrinsic-size') &&
+                                  !articleContent.includes('background-color:var') &&
+                                  !articleContent.includes('webkit-text-decoration') &&
+                                  !articleContent.includes('z-index:') &&
+                                  !articleContent.includes('position:relative') &&
+                                  !articleContent.includes('display:block') &&
+                                  !articleContent.includes('font-size:var') &&
+                                  !articleContent.includes('padding:var');
+            
+            if (isValidContent && articleContent.length > content.length) {
+              content = articleContent;
+              console.log('Using regex extracted content, length:', articleContent.length);
+            } else {
+              console.log('Regex extraction failed or content too short, using RSS content');
+            }
           }
         }
       } catch (fetchError) {
@@ -885,6 +942,25 @@ function ArticleReaderScreenContent({ route, navigation }) {
       color: theme.colors.text,
       lineHeight: 28,
       fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    },
+    inlineImageContainer: {
+      marginVertical: 12,
+      borderRadius: 8,
+      overflow: 'hidden',
+    },
+    inlineImage: {
+      width: '100%',
+      height: undefined,
+      aspectRatio: 16 / 9,
+      borderRadius: 8,
+      backgroundColor: theme.colors.border,
+    },
+    imageCaption: {
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: 6,
+      fontStyle: 'italic',
+      textAlign: 'center',
     },
     languageInfo: {
       flexDirection: 'row',
@@ -1433,23 +1509,39 @@ function ArticleReaderScreenContent({ route, navigation }) {
             {(isTranslated && translatedParagraphs.length > 0 ? translatedParagraphs : paragraphs).map((para, index) => {
               const isRTL = isTranslated ? ['ar', 'fa', 'he', 'ur'].includes(targetLangCode) : languageInfo?.isRTL;
               const isHighlighted = isSpeaking && ttsCurrentIndex === index + ttsBodyOffsetRef.current;
+              const displayParas = isTranslated && translatedParagraphs.length > 0 ? translatedParagraphs : paragraphs;
               return (
-                <View
-                  key={isTranslated ? `t-${index}` : index}
-                  onLayout={(e) => { paragraphYRef.current[index] = e.nativeEvent.layout.y; }}
-                  style={isHighlighted ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
-                >
-                  <Text
-                    selectable={true}
-                    style={[
-                      styles.articleText,
-                      { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' },
-                      index < (isTranslated ? translatedParagraphs.length : paragraphs.length) - 1 ? { marginBottom: 16 } : null,
-                    ]}
+                <React.Fragment key={isTranslated ? `t-${index}` : index}>
+                  {/* Inline images from Readability (before this paragraph) */}
+                  {showImages && imagePositions.has(index) && imagePositions.get(index).map((img, imgIdx) => (
+                    <View key={`img-${index}-${imgIdx}`} style={styles.inlineImageContainer}>
+                      <Image
+                        source={{ uri: img.src }}
+                        style={styles.inlineImage}
+                        resizeMode="contain"
+                        accessibilityLabel={img.alt || 'Article image'}
+                      />
+                      {img.caption ? (
+                        <Text style={[styles.imageCaption, { color: theme.colors.textSecondary }]}>{img.caption}</Text>
+                      ) : null}
+                    </View>
+                  ))}
+                  <View
+                    onLayout={(e) => { paragraphYRef.current[index] = e.nativeEvent.layout.y; }}
+                    style={isHighlighted ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
                   >
-                    {para}
-                  </Text>
-                </View>
+                    <Text
+                      selectable={true}
+                      style={[
+                        styles.articleText,
+                        { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' },
+                        index < displayParas.length - 1 ? { marginBottom: 16 } : null,
+                      ]}
+                    >
+                      {para}
+                    </Text>
+                  </View>
+                </React.Fragment>
               );
             })}
           </View>
