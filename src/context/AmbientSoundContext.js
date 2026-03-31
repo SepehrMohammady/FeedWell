@@ -36,6 +36,7 @@ export function AmbientSoundProvider({ children }) {
   const [volume, setVolumeState] = useState(0.5);
   const [isLoading, setIsLoading] = useState(false);
   const [autoPlay, setAutoPlayState] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
 
   // Configure audio mode on mount
   useEffect(() => {
@@ -197,6 +198,8 @@ export function AmbientSoundProvider({ children }) {
     stopSound,
     setVolume,
     setAutoPlay,
+    showPlaylist,
+    setShowPlaylist,
     sounds: AMBIENT_SOUNDS,
   };
 

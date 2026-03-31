@@ -89,17 +89,35 @@ export default function ArticleActionsScreen({ route, navigation }) {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
       backgroundColor: theme.colors.surface,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },
+    backButton: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+    },
     headerButton: {
-      padding: 8,
-      width: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+    },
+    headerButtonLabel: {
+      fontSize: 9,
+      marginTop: 2,
+      fontWeight: '500',
+      color: theme.colors.textSecondary,
     },
     headerActions: {
       flexDirection: 'row',
+      alignItems: 'center',
     },
     headerTitle: {
       fontSize: 18,
@@ -228,16 +246,19 @@ export default function ArticleActionsScreen({ route, navigation }) {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons name="arrow-back" size={20} color={theme.colors.text} />
+          <Text style={styles.headerButtonLabel}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Article</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
-            <Ionicons name="globe-outline" size={24} color={theme.colors.text} />
+            <Ionicons name="globe-outline" size={20} color={theme.colors.text} />
+            <Text style={styles.headerButtonLabel}>Browser</Text>
           </TouchableOpacity>
-          <SaveButton article={article} size={24} variant="header" />
+          <SaveButton article={article} size={20} variant="header" label="Save" />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-            <Ionicons name="share-outline" size={24} color={theme.colors.text} />
+            <Ionicons name="share-outline" size={20} color={theme.colors.text} />
+            <Text style={styles.headerButtonLabel}>Share</Text>
           </TouchableOpacity>
         </View>
       </View>

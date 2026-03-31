@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
 import CustomAlert from './CustomAlert';
 
-export default function SaveButton({ article, size = 24, style, variant = 'default' }) {
+export default function SaveButton({ article, size = 24, style, variant = 'default', label }) {
   const { theme } = useTheme();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const [isLoading, setIsLoading] = useState(false);
@@ -160,6 +160,11 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
           size={size}
           color={theme.colors.text}
         />
+      )}
+      {label && (
+        <Text style={{ fontSize: 9, marginTop: 2, fontWeight: '500', color: theme.colors.textSecondary }} numberOfLines={1}>
+          {isBookmarked ? 'Unsave' : label}
+        </Text>
       )}
     </TouchableOpacity>
 

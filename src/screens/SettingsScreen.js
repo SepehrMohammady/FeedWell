@@ -50,7 +50,7 @@ export default function SettingsScreen({ navigation }) {
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
-  const { autoPlay, setAutoPlay, currentSound, isPlaying } = useAmbientSound();
+  const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const insets = useSafeAreaInsets();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -887,19 +887,15 @@ export default function SettingsScreen({ navigation }) {
             title="Auto-play on Startup"
             description={autoPlay ? `Will play ${currentSound?.name || 'last sound'} when app opens` : 'Ambient sounds won\'t start automatically'}
             onPress={() => setAutoPlay(!autoPlay)}
+            isLast={true}
             rightElement={
-              <Ionicons
-                name={autoPlay ? 'toggle' : 'toggle-outline'}
-                size={36}
-                color={autoPlay ? theme.colors.primary : theme.colors.textTertiary}
+              <Switch
+                value={autoPlay}
+                onValueChange={setAutoPlay}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={autoPlay ? '#fff' : '#f4f3f4'}
               />
             }
-          />
-          <SettingItem
-            title="Sound Selection"
-            description={isPlaying && currentSound ? `Now playing: ${currentSound.name}` : 'Use the mini player to browse and select sounds'}
-            isLast={true}
-            rightElement={<Ionicons name="musical-notes-outline" size={20} color={theme.colors.textTertiary} />}
           />
         </View>
 

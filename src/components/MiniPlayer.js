@@ -16,16 +16,16 @@ import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext'
 
 export default function MiniPlayer() {
   const { theme } = useTheme();
-  const { currentSound, currentSoundId, isPlaying, isLoading, volume, togglePlayPause, stopSound, setVolume, selectSound } = useAmbientSound();
+  const { currentSound, currentSoundId, isPlaying, isLoading, volume, togglePlayPause, stopSound, setVolume, selectSound, showPlaylist, setShowPlaylist } = useAmbientSound();
   const [expanded, setExpanded] = useState(false);
-  const [showPlaylist, setShowPlaylist] = useState(false);
   const [showSoundInfo, setShowSoundInfo] = useState(null);
 
-  // Don't render if no sound is selected
-  if (!currentSound && !isLoading) return null;
+  // Always render the playlist modal, but only render the player bar when a sound is selected
+  const showPlayerBar = currentSound || isLoading;
 
   return (
     <>
+    {showPlayerBar && (
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}>
       <View style={styles.mainRow}>
         <TouchableOpacity style={styles.soundInfo} onPress={() => setExpanded(!expanded)}>
@@ -87,6 +87,7 @@ export default function MiniPlayer() {
         </View>
       )}
     </View>
+    )}
 
     {/* Sound Playlist Modal */}
     <Modal

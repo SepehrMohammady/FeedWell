@@ -224,6 +224,7 @@ export default function ReadLaterScreen({ navigation }) {
             size={20} 
             color={theme.colors.primary} 
           />
+          <Text style={styles.headerButtonLabel}>Sort</Text>
         </TouchableOpacity>
         {articles.length > 0 && (
           <TouchableOpacity
@@ -321,7 +322,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sortButton: {
-    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    minWidth: 40,
+  },
+  headerButtonLabel: {
+    fontSize: 9,
+    marginTop: 2,
+    fontWeight: '500',
+    color: '#888',
   },
   clearButton: {
     paddingHorizontal: 12,

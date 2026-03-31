@@ -23,11 +23,13 @@ import ArticleImage from '../components/ArticleImage';
 import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 import CustomAlert from '../components/CustomAlert';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds } = useAppSettings();
+  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -522,15 +524,28 @@ export default function FeedListScreen({ navigation, route }) {
       color: theme.colors.text,
     },
     addButton: {
-      padding: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 40,
     },
     headerButtons: {
       flexDirection: 'row',
       alignItems: 'center',
     },
     headerButton: {
-      padding: 8,
-      marginRight: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 40,
+    },
+    headerButtonLabel: {
+      fontSize: 9,
+      marginTop: 2,
+      fontWeight: '500',
+      color: theme.colors.textSecondary,
     },
     filterButtonText: {
       fontSize: 12,
@@ -790,12 +805,14 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={selectAllArticles}
             >
               <Ionicons name="checkbox" size={20} color={theme.colors.text} />
+              <Text style={styles.headerButtonLabel}>All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={deselectAllArticles}
             >
               <Ionicons name="square-outline" size={20} color={theme.colors.text} />
+              <Text style={styles.headerButtonLabel}>None</Text>
             </TouchableOpacity>
             {(() => {
               // Check if selection contains any unread articles
@@ -821,6 +838,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasUnread}
                     >
                       <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.text} />
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.textSecondary }]}>Read</Text>
                     </TouchableOpacity>
                   )}
                   {showMarkUnread && (
@@ -830,6 +848,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasRead}
                     >
                       <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.text} />
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.textSecondary }]}>Unread</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -840,10 +859,18 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={toggleSelectionMode}
             >
               <Ionicons name="close" size={24} color={theme.colors.text} />
+              <Text style={styles.headerButtonLabel}>Cancel</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => openSoundPlaylist(true)}
+            >
+              <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
+              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sounds</Text>
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={toggleFilter}
@@ -855,18 +882,21 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={toggleSort}
             >
               <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.primary} />
+              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sort</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={handleMarkAllRead}
             >
-              <Ionicons name="checkmark-done" size={24} color={theme.colors.primary} />
+              <Ionicons name="checkmark-done" size={20} color={theme.colors.primary} />
+              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Read All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => navigation.navigate('AddFeed')}
             >
-              <Ionicons name="add" size={24} color={theme.colors.primary} />
+              <Ionicons name="add" size={20} color={theme.colors.primary} />
+              <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Add</Text>
             </TouchableOpacity>
           </View>
         )}
