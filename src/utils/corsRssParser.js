@@ -139,32 +139,3 @@ export async function parseRSSFeedWithProxy(url) {
 
   throw new Error('All CORS proxies failed. This feed may not be accessible from the web browser.');
 }
-
-// Test feeds that work well without CORS issues
-export const testFeeds = [
-  {
-    name: 'Hacker News',
-    url: 'https://hnrss.org/frontpage',
-    description: 'Tech news and discussions'
-  },
-  {
-    name: 'NPR News',
-    url: 'https://feeds.npr.org/1001/rss.xml',
-    description: 'National Public Radio news'
-  },
-  {
-    name: 'BBC World News',
-    url: 'https://feeds.bbci.co.uk/news/world/rss.xml',
-    description: 'BBC World News feed'
-  },
-  {
-    name: 'Dev.to',
-    url: 'https://dev.to/feed',
-    description: 'Developer community articles'
-  },
-  {
-    name: 'GitHub Blog',
-    url: 'https://github.blog/feed/',
-    description: 'GitHub official blog'
-  }
-];

@@ -26,7 +26,7 @@ import { useFeed } from '../context/FeedContext';
 import { useNotes } from '../context/NotesContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
-import { cleanHtmlContent, extractCleanText, extractArticleContent } from '../utils/rssParser';
+import { cleanHtmlContent, extractArticleContent } from '../utils/rssParser';
 import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } from '../utils/languageDetection';
 import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';

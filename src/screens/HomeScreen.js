@@ -265,19 +265,6 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
   },
-  soundButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    minWidth: 40,
-  },
-  soundButtonLabel: {
-    fontSize: 9,
-    marginTop: 2,
-    fontWeight: '500',
-    color: undefined, // Will use theme via inline style
-  },
   welcomeText: {
     fontSize: 28,
     fontWeight: 'bold',

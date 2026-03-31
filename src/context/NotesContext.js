@@ -87,31 +87,12 @@ export function NotesProvider({ children }) {
     return !!notes[articleId];
   }, [notes]);
 
-  const deleteNote = useCallback((articleId) => {
-    setNotes(prev => {
-      const updated = { ...prev };
-      delete updated[articleId];
-      return updated;
-    });
-  }, []);
-
-  const getAllNotes = useCallback(() => {
-    return notes;
-  }, [notes]);
-
-  const getNotesCount = useCallback(() => {
-    return Object.keys(notes).length;
-  }, [notes]);
-
   const value = {
     notes,
     isLoading,
     setNote,
     getNote,
     hasNote,
-    deleteNote,
-    getAllNotes,
-    getNotesCount,
   };
 
   return (

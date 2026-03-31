@@ -31,7 +31,7 @@ const RTL_UNICODE_RANGES = [
 /**
  * Detect if a character is RTL
  */
-export function isRTLCharacter(char) {
+function isRTLCharacter(char) {
   const code = char.charCodeAt(0);
   return RTL_UNICODE_RANGES.some(([start, end]) => code >= start && code <= end);
 }
@@ -39,7 +39,7 @@ export function isRTLCharacter(char) {
 /**
  * Detect if text contains RTL characters
  */
-export function containsRTL(text) {
+function containsRTL(text) {
   if (!text) return false;
   
   // Check for RTL characters in the text
@@ -55,7 +55,7 @@ export function containsRTL(text) {
 /**
  * Calculate RTL percentage in text
  */
-export function getRTLPercentage(text) {
+function getRTLPercentage(text) {
   if (!text) return 0;
   
   let rtlCount = 0;
@@ -78,7 +78,7 @@ export function getRTLPercentage(text) {
 /**
  * Detect if text is primarily RTL
  */
-export function isPrimaryRTL(text) {
+function isPrimaryRTL(text) {
   if (!text) return false;
   
   const rtlPercentage = getRTLPercentage(text);
@@ -297,7 +297,7 @@ export function getTextAlignment(text) {
 /**
  * Language names mapping
  */
-export const LANGUAGE_NAMES = {
+const LANGUAGE_NAMES = {
   'ar': 'العربية',
   'fa': 'فارسی',
   'he': 'עברית',
