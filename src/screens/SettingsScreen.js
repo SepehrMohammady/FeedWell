@@ -25,7 +25,7 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
-import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
 import CustomAlert from '../components/CustomAlert';
 import { SafeStorage } from '../utils/SafeStorage';
@@ -50,7 +50,7 @@ export default function SettingsScreen({ navigation }) {
   const { theme, isDarkMode, toggleTheme } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
-  const { currentSoundId, isPlaying, selectSound, stopSound, volume, setVolume } = useAmbientSound();
+  const { autoPlay, setAutoPlay, currentSound, isPlaying } = useAmbientSound();
   const insets = useSafeAreaInsets();
   const [showTutorial, setShowTutorial] = useState(false);
 
@@ -883,35 +883,24 @@ export default function SettingsScreen({ navigation }) {
 
         <SectionHeader title="Ambient Sounds" />
         <View style={styles.section}>
-          {AMBIENT_SOUNDS.map((sound, index) => {
-            const isActive = currentSoundId === sound.id;
-            const isCurrentlyPlaying = isActive && isPlaying;
-            return (
-              <SettingItem
-                key={sound.id}
-                title={sound.name}
-                description={sound.description}
-                onPress={() => selectSound(sound.id)}
-                isLast={index === AMBIENT_SOUNDS.length - 1}
-                rightElement={
-                  isActive ? (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Ionicons
-                        name={isCurrentlyPlaying ? 'pause-circle' : 'play-circle'}
-                        size={26}
-                        color={theme.colors.primary}
-                      />
-                      <TouchableOpacity onPress={stopSound} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                        <Ionicons name="stop-circle-outline" size={22} color={theme.colors.error} />
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <Ionicons name={sound.icon} size={20} color={theme.colors.textTertiary} />
-                  )
-                }
+          <SettingItem
+            title="Auto-play on Startup"
+            description={autoPlay ? `Will play ${currentSound?.name || 'last sound'} when app opens` : 'Ambient sounds won\'t start automatically'}
+            onPress={() => setAutoPlay(!autoPlay)}
+            rightElement={
+              <Ionicons
+                name={autoPlay ? 'toggle' : 'toggle-outline'}
+                size={36}
+                color={autoPlay ? theme.colors.primary : theme.colors.textTertiary}
               />
-            );
-          })}
+            }
+          />
+          <SettingItem
+            title="Sound Selection"
+            description={isPlaying && currentSound ? `Now playing: ${currentSound.name}` : 'Use the mini player to browse and select sounds'}
+            isLast={true}
+            rightElement={<Ionicons name="musical-notes-outline" size={20} color={theme.colors.textTertiary} />}
+          />
         </View>
 
         <SectionHeader title="Read Aloud" />

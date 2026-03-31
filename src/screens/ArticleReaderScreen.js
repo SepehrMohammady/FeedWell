@@ -53,7 +53,7 @@ const TTS_LOCALE_MAP = {
   'tr': 'tr-TR', 'nl': 'nl-NL', 'pl': 'pl-PL', 'sv': 'sv-SE',
   'da': 'da-DK', 'nb': 'nb-NO', 'fi': 'fi-FI', 'el': 'el-GR',
   'cs': 'cs-CZ', 'ro': 'ro-RO', 'hu': 'hu-HU', 'th': 'th-TH',
-  'vi': 'vi-VN', 'id': 'id-ID', 'ms': 'ms-MY',
+  'vi': 'vi-VN', 'id': 'id-ID', 'ms': 'ms-MY', 'uk': 'uk-UA',
 };
 
 // Strip HTML remnants and entities for clean TTS input
@@ -78,6 +78,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [languageInfo, setLanguageInfo] = useState(null);
+  const [htmlLangCode, setHtmlLangCode] = useState(null); // From <html lang="xx">
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollViewRef = useRef(null);
 
@@ -200,12 +201,32 @@ function ArticleReaderScreenContent({ route, navigation }) {
     ttsParagraphsRef.current = allParagraphs;
 
     // Resolve language to full BCP-47 locale
-    const rawLang = useTranslated ? targetLangCode : (languageInfo?.code || undefined);
+    // Priority: translated target > high-confidence detection > HTML lang > feed language > low-confidence detection
+    let rawLang;
+    if (useTranslated) {
+      rawLang = targetLangCode;
+    } else if (languageInfo?.code && languageInfo.code !== 'en' && languageInfo.confidence >= 0.7) {
+      // High-confidence non-English detection from content
+      rawLang = languageInfo.code;
+    } else if (htmlLangCode && htmlLangCode !== 'en') {
+      // HTML <html lang="xx"> attribute (very reliable)
+      rawLang = htmlLangCode;
+    } else if (article.feedLanguage) {
+      // RSS feed <language> metadata
+      rawLang = article.feedLanguage.split('-')[0].toLowerCase();
+    } else if (languageInfo?.code) {
+      // Fallback to any detection result (including low-confidence English)
+      rawLang = languageInfo.code;
+    } else if (htmlLangCode) {
+      // HTML lang even if English
+      rawLang = htmlLangCode;
+    }
     ttsLangRef.current = rawLang ? (TTS_LOCALE_MAP[rawLang] || rawLang) : undefined;
+    console.log('TTS language resolved:', { rawLang, locale: ttsLangRef.current, htmlLang: htmlLangCode, feedLang: article.feedLanguage, detected: languageInfo?.code, confidence: languageInfo?.confidence });
 
     setIsSpeaking(true);
     speakNextRef.current?.(0);
-  }, [isSpeaking, isTranslated, translatedTitle, translatedContent, article.title, fullContent, languageInfo, targetLangCode]);
+  }, [isSpeaking, isTranslated, translatedTitle, translatedContent, article.title, fullContent, languageInfo, targetLangCode, htmlLangCode, article.feedLanguage]);
 
   const handleStopSpeech = useCallback(() => {
     Speech.stop();
@@ -239,87 +260,6 @@ function ArticleReaderScreenContent({ route, navigation }) {
       }
     }
   }, [isSaved, article, addToReadLater, removeFromReadLater]);
-
-  // All reader actions definition (order defines overflow menu order)
-  const MAX_PINNED = 4;
-  const allActions = useMemo(() => [
-    {
-      id: 'bookmark',
-      label: 'Bookmark',
-      icon: hasBookmark ? 'bookmark' : 'bookmark-outline',
-      color: hasBookmark ? theme.colors.primary : theme.colors.text,
-      onPress: handleBookmarkPress,
-    },
-    {
-      id: 'translate',
-      label: 'Translate',
-      icon: isTranslated ? 'swap-horizontal' : 'language-outline',
-      color: isTranslated ? theme.colors.success : theme.colors.text,
-      onPress: isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate,
-      onLongPress: () => setShowLanguagePicker(true),
-      disabled: translating,
-      loading: translating,
-    },
-    {
-      id: 'readAloud',
-      label: 'Read Aloud',
-      icon: isSpeaking ? 'volume-high' : 'volume-high-outline',
-      color: isSpeaking ? theme.colors.primary : theme.colors.text,
-      onPress: handleReadAloud,
-    },
-    {
-      id: 'browser',
-      label: 'Open in Browser',
-      icon: 'globe-outline',
-      color: theme.colors.text,
-      onPress: handleOpenBrowser,
-    },
-    {
-      id: 'save',
-      label: isSaved ? 'Unsave Article' : 'Save for Later',
-      icon: isSaved ? 'save' : 'save-outline',
-      color: isSaved ? theme.colors.primary : theme.colors.text,
-      onPress: handleSaveArticle,
-      loading: isSaving,
-    },
-    {
-      id: 'notes',
-      label: 'Notes',
-      icon: hasNote(article?.id) ? 'document-text' : 'document-text-outline',
-      color: hasNote(article?.id) ? theme.colors.primary : theme.colors.text,
-      onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
-    },
-    {
-      id: 'share',
-      label: 'Share',
-      icon: 'share-outline',
-      color: theme.colors.text,
-      onPress: handleShare,
-    },
-  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, article?.id, articleNote, theme.colors]);
-
-  const pinnedActions = useMemo(() => {
-    return readerHeaderActions
-      .map(id => allActions.find(a => a.id === id))
-      .filter(Boolean)
-      .slice(0, MAX_PINNED);
-  }, [readerHeaderActions, allActions]);
-
-  const overflowActions = useMemo(() => {
-    return allActions.filter(a => !readerHeaderActions.includes(a.id));
-  }, [readerHeaderActions, allActions]);
-
-  const togglePinAction = useCallback((actionId) => {
-    const isPinned = readerHeaderActions.includes(actionId);
-    let next;
-    if (isPinned) {
-      next = readerHeaderActions.filter(id => id !== actionId);
-    } else {
-      if (readerHeaderActions.length >= MAX_PINNED) return; // already at max
-      next = [...readerHeaderActions, actionId];
-    }
-    updateReaderHeaderActions(next);
-  }, [readerHeaderActions, updateReaderHeaderActions]);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -536,6 +476,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
         if (response.ok) {
           const html = await response.text();
           
+          // Extract lang attribute from <html lang="xx"> tag
+          const langMatch = html.match(/<html[^>]*\slang\s*=\s*["']([^"']+)["']/i);
+          if (langMatch) {
+            setHtmlLangCode(langMatch[1].split('-')[0].toLowerCase());
+          }
+          
           // Extract main article content using sophisticated extraction
           const articleContent = extractArticleContent(html);
           
@@ -732,6 +678,95 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
   };
 
+  // All reader actions definition (order defines overflow menu order)
+  // MUST be placed after all handler definitions to avoid undefined references
+  const MAX_PINNED = 4;
+  const allActions = useMemo(() => [
+    {
+      id: 'bookmark',
+      label: 'Bookmark',
+      shortLabel: 'Bookmark',
+      icon: hasBookmark ? 'bookmark' : 'bookmark-outline',
+      color: hasBookmark ? theme.colors.primary : theme.colors.text,
+      onPress: handleBookmarkPress,
+    },
+    {
+      id: 'translate',
+      label: 'Translate',
+      shortLabel: 'Translate',
+      icon: isTranslated ? 'swap-horizontal' : 'language-outline',
+      color: isTranslated ? theme.colors.success : theme.colors.text,
+      onPress: isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate,
+      onLongPress: () => setShowLanguagePicker(true),
+      disabled: translating,
+      loading: translating,
+    },
+    {
+      id: 'readAloud',
+      label: 'Read Aloud',
+      shortLabel: 'Read',
+      icon: isSpeaking ? 'volume-high' : 'volume-high-outline',
+      color: isSpeaking ? theme.colors.primary : theme.colors.text,
+      onPress: handleReadAloud,
+    },
+    {
+      id: 'browser',
+      label: 'Open in Browser',
+      shortLabel: 'Browser',
+      icon: 'globe-outline',
+      color: theme.colors.text,
+      onPress: handleOpenBrowser,
+    },
+    {
+      id: 'save',
+      label: isSaved ? 'Unsave Article' : 'Save for Later',
+      shortLabel: isSaved ? 'Unsave' : 'Save',
+      icon: isSaved ? 'save' : 'save-outline',
+      color: isSaved ? theme.colors.primary : theme.colors.text,
+      onPress: handleSaveArticle,
+      loading: isSaving,
+    },
+    {
+      id: 'notes',
+      label: 'Notes',
+      shortLabel: 'Notes',
+      icon: hasNote(article?.id) ? 'document-text' : 'document-text-outline',
+      color: hasNote(article?.id) ? theme.colors.primary : theme.colors.text,
+      onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
+    },
+    {
+      id: 'share',
+      label: 'Share',
+      shortLabel: 'Share',
+      icon: 'share-outline',
+      color: theme.colors.text,
+      onPress: handleShare,
+    },
+  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, article?.id, articleNote, theme.colors, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare]);
+
+  const pinnedActions = useMemo(() => {
+    return readerHeaderActions
+      .map(id => allActions.find(a => a.id === id))
+      .filter(Boolean)
+      .slice(0, MAX_PINNED);
+  }, [readerHeaderActions, allActions]);
+
+  const overflowActions = useMemo(() => {
+    return allActions.filter(a => !readerHeaderActions.includes(a.id));
+  }, [readerHeaderActions, allActions]);
+
+  const togglePinAction = useCallback((actionId) => {
+    const isPinned = readerHeaderActions.includes(actionId);
+    let next;
+    if (isPinned) {
+      next = readerHeaderActions.filter(id => id !== actionId);
+    } else {
+      if (readerHeaderActions.length >= MAX_PINNED) return;
+      next = [...readerHeaderActions, actionId];
+    }
+    updateReaderHeaderActions(next);
+  }, [readerHeaderActions, updateReaderHeaderActions]);
+
   const handleScroll = (event) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     currentScrollY.current = offsetY;
@@ -763,14 +798,23 @@ function ArticleReaderScreenContent({ route, navigation }) {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 16,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
       backgroundColor: theme.colors.surface,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors.border,
     },
     headerButton: {
-      padding: 8,
-      width: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+    },
+    headerButtonLabel: {
+      fontSize: 9,
+      marginTop: 2,
+      fontWeight: '500',
     },
     headerActions: {
       flexDirection: 'row',
@@ -1268,15 +1312,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
               {action.loading ? (
                 <ActivityIndicator size="small" color={theme.colors.text} />
               ) : (
-                <Ionicons name={action.icon} size={24} color={action.color} />
+                <Ionicons name={action.icon} size={20} color={action.color} />
               )}
+              <Text style={[styles.headerButtonLabel, { color: action.color }]} numberOfLines={1}>{action.shortLabel}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             style={styles.headerButton}
             onPress={() => setShowOverflowMenu(true)}
           >
-            <Ionicons name="ellipsis-vertical" size={24} color={theme.colors.text} />
+            <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.text} />
+            <Text style={[styles.headerButtonLabel, { color: theme.colors.text }]}>More</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1352,48 +1398,6 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {fullContent && !loading && (
           <View style={styles.articleContent} onLayout={(e) => { articleContentYRef.current = e.nativeEvent.layout.y; }}>
-            {/* Language info + translate controls */}
-            <View style={styles.translationBar}>
-              {languageInfo && languageInfo.confidence > 0.6 && (
-                <View style={styles.languageInfo}>
-                  <Ionicons 
-                    name="language-outline" 
-                    size={14} 
-                    color={theme.colors.textSecondary} 
-                  />
-                  <Text style={styles.languageText}>
-                    {getLanguageName(languageInfo.code)}
-                    {languageInfo.isRTL ? ' (RTL)' : ''}
-                  </Text>
-                </View>
-              )}
-              
-              {/* Only show translate button when article language differs from target */}
-              {!isSameLanguage && (
-                <TouchableOpacity
-                  style={[
-                    styles.translateButton,
-                    isTranslated && styles.translateButtonActive,
-                    translating && styles.translateButtonDisabled,
-                  ]}
-                  onPress={handleTranslate}
-                  disabled={translating}
-                >
-                  {translating ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Ionicons 
-                      name={isTranslated ? 'swap-horizontal' : 'language-outline'} 
-                      size={16} 
-                      color="#fff" 
-                    />
-                  )}
-                  <Text style={styles.translateButtonText}>
-                    {translating ? 'Translating...' : isTranslated ? 'Show Original' : `Translate to ${getDisplayName(targetLangCode)}`}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
 
             {/* Translation progress */}
             {translating && translationProgress ? (

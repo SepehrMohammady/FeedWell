@@ -688,6 +688,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
               categories: item.categories || [],
               feedUrl: url,
               feedTitle: decodeHtmlEntities(feed.title || url),
+              feedLanguage: feed.language || '',
               imageUrl: parsedImageUrl || mediaImageUrl,
               isRead: false, // New articles are unread by default
               readAt: null,
@@ -703,6 +704,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
           return {
             title: decodeHtmlEntities(feed.title || url),
             description: feed.description || '',
+            language: feed.language || '',
             url: url,
             articles: filteredArticles,
           };
@@ -775,6 +777,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
         categories: item.categories || [],
         feedUrl: url,
         feedTitle: decodeHtmlEntities(feed.title || url),
+        feedLanguage: feed.language || '',
         imageUrl: parsedImageUrl || mediaImageUrl,
         isRead: false, // New articles are unread by default
         readAt: null,
@@ -790,6 +793,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
     return {
       title: decodeHtmlEntities(feed.title || url),
       description: feed.description || '',
+      language: feed.language || '',
       url: url,
       articles: filteredArticles,
     };
