@@ -15,6 +15,7 @@ import { useFeed } from '../context/FeedContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 import CustomAlert from '../components/CustomAlert';
 
 export default function HomeScreen({ navigation }) {
@@ -22,6 +23,7 @@ export default function HomeScreen({ navigation }) {
   const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
   const { maxArticleAge } = useAppSettings();
+  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
@@ -179,6 +181,13 @@ export default function HomeScreen({ navigation }) {
                 Your RSS reading dashboard
               </Text>
             </View>
+            <TouchableOpacity
+              style={styles.soundButton}
+              onPress={() => openSoundPlaylist(true)}
+            >
+              <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
+              <Text style={styles.soundButtonLabel}>Sounds</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -264,6 +273,19 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
+  },
+  soundButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    minWidth: 40,
+  },
+  soundButtonLabel: {
+    fontSize: 9,
+    marginTop: 2,
+    fontWeight: '500',
+    color: '#888',
   },
   welcomeText: {
     fontSize: 28,

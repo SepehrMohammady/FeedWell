@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const AmbientSoundContext = createContext();
 
 const STORAGE_KEY_SOUND = 'ambient_current_sound';
+const STORAGE_KEY_LAST_SOUND = 'ambient_last_sound';
 const STORAGE_KEY_VOLUME = 'ambient_volume';
 const STORAGE_KEY_AUTOPLAY = 'ambient_autoplay';
 
@@ -37,6 +38,7 @@ export function AmbientSoundProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [autoPlay, setAutoPlayState] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
+  const [lastSoundId, setLastSoundId] = useState(null);
 
   // Configure audio mode on mount
   useEffect(() => {
@@ -59,9 +61,11 @@ export function AmbientSoundProvider({ children }) {
       const savedVolume = await AsyncStorage.getItem(STORAGE_KEY_VOLUME);
       const savedSoundId = await AsyncStorage.getItem(STORAGE_KEY_SOUND);
       const savedAutoPlay = await AsyncStorage.getItem(STORAGE_KEY_AUTOPLAY);
+      const savedLastSound = await AsyncStorage.getItem(STORAGE_KEY_LAST_SOUND);
       if (savedVolume !== null) setVolumeState(parseFloat(savedVolume));
       if (savedSoundId !== null) setCurrentSoundId(savedSoundId);
       if (savedAutoPlay !== null) setAutoPlayState(savedAutoPlay === 'true');
+      if (savedLastSound !== null) setLastSoundId(savedLastSound);
     } catch (error) {
       console.error('Error loading ambient sound preferences:', error);
     }
@@ -90,10 +94,12 @@ export function AmbientSoundProvider({ children }) {
 
       soundRef.current = sound;
       setCurrentSoundId(soundId);
+      setLastSoundId(soundId);
       setIsPlaying(true);
 
       // Save preference
       await AsyncStorage.setItem(STORAGE_KEY_SOUND, soundId);
+      await AsyncStorage.setItem(STORAGE_KEY_LAST_SOUND, soundId);
 
       // Listen for playback status changes
       sound.setOnPlaybackStatusUpdate((status) => {
@@ -181,10 +187,11 @@ export function AmbientSoundProvider({ children }) {
 
   // Auto-play last sound on app start if enabled
   useEffect(() => {
-    if (autoPlay && currentSoundId && !isPlaying && !soundRef.current) {
-      playSound(currentSoundId);
+    const soundToPlay = currentSoundId || lastSoundId;
+    if (autoPlay && soundToPlay && !isPlaying && !soundRef.current) {
+      playSound(soundToPlay);
     }
-  }, [autoPlay, currentSoundId]);
+  }, [autoPlay, currentSoundId, lastSoundId]);
 
   const value = {
     currentSound,

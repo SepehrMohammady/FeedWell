@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
+import { useAmbientSound } from '../context/AmbientSoundContext';
 import ArticleImage from '../components/ArticleImage';
 import CustomAlert from '../components/CustomAlert';
 
@@ -21,6 +22,7 @@ export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
   const { showImages } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
+  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
@@ -217,6 +219,13 @@ export default function ReadLaterScreen({ navigation }) {
       <View style={styles.headerButtons}>
         <TouchableOpacity
           style={styles.sortButton}
+          onPress={() => openSoundPlaylist(true)}
+        >
+          <Ionicons name="musical-notes-outline" size={20} color={theme.colors.primary} />
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sounds</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.sortButton}
           onPress={toggleSort}
         >
           <Ionicons 
@@ -224,7 +233,7 @@ export default function ReadLaterScreen({ navigation }) {
             size={20} 
             color={theme.colors.primary} 
           />
-          <Text style={styles.headerButtonLabel}>Sort</Text>
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.primary }]}>Sort</Text>
         </TouchableOpacity>
         {articles.length > 0 && (
           <TouchableOpacity

@@ -858,7 +858,7 @@ export default function FeedListScreen({ navigation, route }) {
               style={styles.headerButton}
               onPress={toggleSelectionMode}
             >
-              <Ionicons name="close" size={24} color={theme.colors.text} />
+              <Ionicons name="close" size={20} color={theme.colors.text} />
               <Text style={styles.headerButtonLabel}>Cancel</Text>
             </TouchableOpacity>
           </View>
