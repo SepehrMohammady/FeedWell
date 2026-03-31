@@ -1164,11 +1164,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
       bottom: 30,
       right: 20,
       backgroundColor: theme.colors.primary || '#007AFF',
-      borderRadius: 25,
-      width: 50,
-      height: 50,
+      borderRadius: 20,
+      width: 40,
+      height: 40,
       justifyContent: 'center',
       alignItems: 'center',
+      opacity: 0.75,
       elevation: 5,
       shadowColor: '#000',
       shadowOffset: {
@@ -1594,7 +1595,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
           style={styles.scrollToTopButton}
           onPress={handleScrollToTop}
         >
-          <Ionicons name="chevron-up" size={24} color="#fff" />
+          <Ionicons name="chevron-up" size={20} color="#fff" />
         </TouchableOpacity>
       )}
 
