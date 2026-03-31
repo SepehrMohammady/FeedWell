@@ -75,7 +75,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const { markArticleRead } = useFeed();
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
-  const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
+  const { setShowPlaylist: openSoundPlaylist, isPlaying: isSoundPlaying } = useAmbientSound();
   const [fullContent, setFullContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -744,7 +744,15 @@ function ArticleReaderScreenContent({ route, navigation }) {
       color: theme.colors.text,
       onPress: handleShare,
     },
-  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, article?.id, articleNote, theme.colors, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare]);
+    {
+      id: 'sounds',
+      label: 'Ambient Sounds',
+      shortLabel: 'Sounds',
+      icon: isSoundPlaying ? 'musical-notes' : 'musical-notes-outline',
+      color: isSoundPlaying ? theme.colors.primary : theme.colors.text,
+      onPress: () => openSoundPlaylist(true),
+    },
+  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, article?.id, articleNote, theme.colors, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, openSoundPlaylist]);
 
   const pinnedActions = useMemo(() => {
     return readerHeaderActions
@@ -1321,13 +1329,6 @@ function ArticleReaderScreenContent({ route, navigation }) {
           ))}
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={() => openSoundPlaylist(true)}
-          >
-            <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
-            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sounds</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.headerButton}
             onPress={() => setShowOverflowMenu(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.text} />
@@ -1711,7 +1712,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                   disabled={pinnedActions.length >= MAX_PINNED}
                 >
                   <Ionicons
-                    name="pin"
+                    name="pin-outline"
                     size={16}
                     color={pinnedActions.length >= MAX_PINNED ? theme.colors.textTertiary : theme.colors.textSecondary}
                   />
@@ -1739,7 +1740,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                       onPress={() => togglePinAction(action.id)}
                     >
                       <Ionicons
-                        name="pin-outline"
+                        name="pin"
                         size={16}
                         color={theme.colors.primary}
                       />
