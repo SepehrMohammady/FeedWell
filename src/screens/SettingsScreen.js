@@ -968,13 +968,13 @@ export default function SettingsScreen({ navigation }) {
             title="Backup Data"
             description="Export all feeds, articles, and settings"
             onPress={handleBackupData}
-            rightElement={<Ionicons name="download-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="push-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Restore Data"
             description="Import data from a backup file"
             onPress={handleRestoreData}
-            rightElement={<Ionicons name="cloud-upload-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="download-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Clear All Data"

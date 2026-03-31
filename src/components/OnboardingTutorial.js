@@ -41,7 +41,7 @@ const ONBOARDING_SLIDES = [
     id: 4,
     icon: 'filter-outline',
     title: 'Simple Filtering',
-    description: 'Filter articles by All, Unread, or Read. Sort by newest or oldest. Find what you need quickly.',
+    description: 'Filter articles by All, Unread, or Read. Sort by newest or oldest. Mark all as Read or Unread with one tap.',
     color: '#CB936A',
   },
   {
@@ -60,13 +60,20 @@ const ONBOARDING_SLIDES = [
   },
   {
     id: 7,
+    icon: 'musical-notes-outline',
+    title: 'Ambient Sounds',
+    description: 'Play background sounds like white noise, lo-fi beats, or nature ambience while reading. Access from the Sounds icon in the header or Reader menu.',
+    color: '#7B8E6B',
+  },
+  {
+    id: 8,
     icon: 'language-outline',
     title: 'Translate Articles',
     description: 'Translate articles into 50+ languages. Online mode (Google Translate) gives the best accuracy. Offline mode (ML Kit) works without internet but may be less accurate for complex sentences.',
     color: '#6B8E9B',
   },
   {
-    id: 8,
+    id: 9,
     icon: 'checkmark-circle-outline',
     title: 'You\'re All Set!',
     description: 'Start by adding your first RSS feed and enjoy a better reading experience. Happy reading!',

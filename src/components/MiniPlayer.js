@@ -158,12 +158,19 @@ export default function MiniPlayer() {
               <View style={styles.infoHeader}>
                 <Ionicons name={showSoundInfo.icon} size={28} color={theme.colors.primary} />
                 <Text style={[styles.infoTitle, { color: theme.colors.text }]}>{showSoundInfo.name}</Text>
+                <TouchableOpacity
+                  style={styles.infoCloseButton}
+                  onPress={() => setShowSoundInfo(null)}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="close" size={22} color={theme.colors.textSecondary} />
+                </TouchableOpacity>
               </View>
               <Text style={[styles.infoDescription, { color: theme.colors.textSecondary }]}>{showSoundInfo.description}</Text>
               
               <View style={[styles.infoSection, { borderTopColor: theme.colors.border }]}>
                 <View style={styles.infoRow}>
-                  <Ionicons name="brain-outline" size={18} color={theme.colors.primary} />
+                  <Ionicons name="bulb-outline" size={18} color={theme.colors.primary} />
                   <View style={styles.infoRowText}>
                     <Text style={[styles.infoLabel, { color: theme.colors.text }]}>Brain Effect</Text>
                     <Text style={[styles.infoValue, { color: theme.colors.textSecondary }]}>{showSoundInfo.info.brain}</Text>
@@ -349,6 +356,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 8,
+  },
+  infoCloseButton: {
+    marginLeft: 'auto',
+    padding: 4,
   },
   infoTitle: {
     fontSize: 20,

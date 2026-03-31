@@ -26,7 +26,7 @@ import CustomAlert from '../components/CustomAlert';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 
 export default function FeedListScreen({ navigation, route }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds } = useAppSettings();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
@@ -152,6 +152,30 @@ export default function FeedListScreen({ navigation, route }) {
       buttons: [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
+      ],
+    });
+  };
+
+  const handleMarkAllUnread = async () => {
+    const readCount = getReadCount();
+    if (readCount === 0) {
+      setAlertConfig({ visible: true, title: 'Info', message: 'No read articles to mark as unread.', icon: 'information-circle-outline', buttons: [{ text: 'OK' }] });
+      return;
+    }
+
+    const confirmAction = () => {
+      markAllUnread();
+      setAlertConfig({ visible: true, title: 'Success', message: `Marked ${readCount} articles as unread.`, icon: 'checkmark-circle', buttons: [{ text: 'OK' }] });
+    };
+
+    setAlertConfig({
+      visible: true,
+      title: 'Mark All Unread',
+      message: `Mark all ${readCount} read articles as unread?`,
+      icon: 'mail-unread-outline',
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Mark All Unread', onPress: confirmAction, style: 'destructive' },
       ],
     });
   };
@@ -895,13 +919,24 @@ export default function FeedListScreen({ navigation, route }) {
                 <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.text} />
                 <Text style={styles.headerButtonLabel}>Sort</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.headerButton}
-                onPress={handleMarkAllRead}
-              >
-                <Ionicons name="checkmark-done" size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>Read All</Text>
-              </TouchableOpacity>
+              {articleFilter !== 'read' && (
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={handleMarkAllRead}
+                >
+                  <Ionicons name="checkmark-done" size={20} color={theme.colors.text} />
+                  <Text style={styles.headerButtonLabel}>Read All</Text>
+                </TouchableOpacity>
+              )}
+              {articleFilter !== 'unread' && (
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={handleMarkAllUnread}
+                >
+                  <Ionicons name="mail-unread-outline" size={20} color={theme.colors.text} />
+                  <Text style={styles.headerButtonLabel}>Unread All</Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddFeed')}

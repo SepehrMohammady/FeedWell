@@ -130,6 +130,15 @@ function feedReducer(state, action) {
           readAt: readTimestamp
         }))
       };
+    case 'MARK_ALL_UNREAD':
+      return {
+        ...state,
+        articles: state.articles.map(article => ({
+          ...article,
+          isRead: false,
+          readAt: null
+        }))
+      };
     case 'CLEAR_ALL_DATA':
       console.log('CLEAR_ALL_DATA: Clearing all feeds and articles');
       return { ...state, feeds: [], articles: [] };
@@ -847,6 +856,23 @@ export function FeedProvider({ children }) {
     }
   }, []); // Empty deps - uses stateRef.current for latest state
 
+  const markAllUnread = useCallback(async () => {
+    const currentArticles = stateRef.current.articles;
+    dispatch({ type: 'MARK_ALL_UNREAD' });
+    try {
+      const updatedArticles = currentArticles.map(article => ({
+        ...article,
+        isRead: false,
+        readAt: null
+      }));
+      await saveArticles(updatedArticles);
+      dispatch({ type: 'CLEAR_READING_POSITION' });
+      await AsyncStorage.removeItem('readingPosition');
+    } catch (error) {
+      console.error('Error marking all articles as unread:', error);
+    }
+  }, []);
+
   const getUnreadArticles = useCallback(() => {
     return state.articles.filter(article => !article.isRead);
   }, [state.articles]);
@@ -962,6 +988,7 @@ export function FeedProvider({ children }) {
     markArticleRead,
     markArticleUnread,
     markAllRead,
+    markAllUnread,
     getUnreadArticles,
     getUnreadCount,
     getReadArticles,
