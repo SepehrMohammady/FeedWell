@@ -37,11 +37,21 @@ export function AmbientSoundProvider({ children }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(0.5);
   const [volumesPerSound, setVolumesPerSound] = useState({});
+  const volumesPerSoundRef = useRef({});
   const [isLoading, setIsLoading] = useState(false);
   const [autoPlay, setAutoPlayState] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [lastSoundId, setLastSoundId] = useState(null);
   const autoPlayFiredRef = useRef(false);
+  const currentSoundIdRef = useRef(null);
+
+  // Keep refs in sync
+  useEffect(() => {
+    volumesPerSoundRef.current = volumesPerSound;
+  }, [volumesPerSound]);
+  useEffect(() => {
+    currentSoundIdRef.current = currentSoundId;
+  }, [currentSoundId]);
 
   // Configure audio mode on mount
   useEffect(() => {
@@ -96,8 +106,9 @@ export function AmbientSoundProvider({ children }) {
         soundRef.current = null;
       }
 
-      // Use per-sound volume if available, otherwise use current volume
-      const soundVolume = volumesPerSound[soundId] !== undefined ? volumesPerSound[soundId] : volume;
+      // Use per-sound volume from ref (avoids stale closure), fallback to current volume
+      const latestVolumes = volumesPerSoundRef.current;
+      const soundVolume = latestVolumes[soundId] !== undefined ? latestVolumes[soundId] : volume;
       setVolumeState(soundVolume);
 
       const { sound } = await Audio.Sound.createAsync(
@@ -129,7 +140,7 @@ export function AmbientSoundProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, [volume, volumesPerSound]);
+  }, [volume]);
 
   const togglePlayPause = useCallback(async () => {
     if (!soundRef.current) {
@@ -177,16 +188,17 @@ export function AmbientSoundProvider({ children }) {
         await soundRef.current.setVolumeAsync(clamped);
       }
       await AsyncStorage.setItem(STORAGE_KEY_VOLUME, clamped.toString());
-      // Save per-sound volume
-      if (currentSoundId) {
-        const updated = { ...volumesPerSound, [currentSoundId]: clamped };
+      // Save per-sound volume using ref for latest state
+      const activeSoundId = currentSoundIdRef.current;
+      if (activeSoundId) {
+        const updated = { ...volumesPerSoundRef.current, [activeSoundId]: clamped };
         setVolumesPerSound(updated);
         await AsyncStorage.setItem(STORAGE_KEY_VOLUMES_PER_SOUND, JSON.stringify(updated));
       }
     } catch (error) {
       console.error('Error setting volume:', error);
     }
-  }, [currentSoundId, volumesPerSound]);
+  }, []);
 
   const selectSound = useCallback(async (soundId) => {
     if (soundId === currentSoundId && isPlaying) {

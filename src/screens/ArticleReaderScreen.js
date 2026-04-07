@@ -70,10 +70,15 @@ function cleanTextForTTS(text) {
 
 // Main component wrapped with error boundary
 function ArticleReaderScreenContent({ route, navigation }) {
-  const { article, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
+  const { article: passedArticle, articleLink, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
   const { theme } = useTheme();
   const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
-  const { markArticleRead } = useFeed();
+  const { markArticleRead, articles: allArticles } = useFeed();
+  
+  // Resolve article from deep link if needed
+  const article = passedArticle || (articleLink ? allArticles.find(a => a.link === articleLink || a.links?.[0]?.url === articleLink) : null)
+    || (articleLink ? { title: 'Article', link: articleLink, links: [{ url: articleLink }], content: '', feedTitle: '' } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
+  
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist, isPlaying: isSoundPlaying } = useAmbientSound();

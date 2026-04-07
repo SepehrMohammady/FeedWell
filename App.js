@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { AppState } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { AppState, Linking } from 'react-native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,12 +16,32 @@ import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
 import KinetosisOverlay from './src/components/KinetosisOverlay';
-import { setupNotificationChannel, scheduleReminderNotification } from './src/utils/notificationService';
+import { setupNotificationChannel, scheduleReminderNotification, cancelReminderNotification } from './src/utils/notificationService';
 
 const NAV_STATE_KEY = 'feedwell_nav_state';
+const navigationRef = createNavigationContainerRef();
+
+function handleDeepLink(url) {
+  if (!url || !navigationRef.isReady()) return;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'feedwell:' && parsed.pathname === '//article') {
+      const articleUrl = parsed.searchParams?.get('url') || decodeURIComponent(url.split('url=')[1] || '');
+      if (articleUrl) {
+        // Navigate to Feeds tab, then push ArticleReader with the article link
+        navigationRef.navigate('Feeds', {
+          screen: 'ArticleReader',
+          params: { articleLink: articleUrl },
+        });
+      }
+    }
+  } catch (e) {
+    // Ignore malformed URLs
+  }
+}
 
 function AppContent() {
-  const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation } = useAppSettings();
+  const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation, readingReminder } = useAppSettings();
   const { theme, isDarkMode } = useTheme();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [navStateReady, setNavStateReady] = useState(false);
@@ -60,15 +80,30 @@ function AppContent() {
   // Set up notification channel and schedule reminder on app open/foreground
   useEffect(() => {
     setupNotificationChannel();
-    scheduleReminderNotification();
+    if (readingReminder) {
+      scheduleReminderNotification();
+    } else {
+      cancelReminderNotification();
+    }
 
     const subscription = AppState.addEventListener('change', (nextState) => {
       if (nextState === 'active') {
-        scheduleReminderNotification();
+        if (readingReminder) {
+          scheduleReminderNotification();
+        }
       }
     });
 
     return () => subscription.remove();
+  }, [readingReminder]);
+
+  // Handle deep links from widget
+  useEffect(() => {
+    // Handle initial URL (app was launched from widget)
+    Linking.getInitialURL().then(handleDeepLink);
+    // Handle URLs when app is already open
+    const linkSub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+    return () => linkSub.remove();
   }, []);
 
   useEffect(() => {
@@ -89,6 +124,7 @@ function AppContent() {
   return (
     <>
       <NavigationContainer
+        ref={navigationRef}
         initialState={initialNavState}
         onStateChange={onNavStateChange}
       >

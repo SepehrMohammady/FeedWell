@@ -76,8 +76,12 @@ class LatestArticlesWidget : AppWidgetProvider() {
                 }
             }
             ACTION_OPEN -> {
+                val articleUrl = intent.getStringExtra("article_url")
                 val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                if (articleUrl != null) {
+                    launchIntent?.data = android.net.Uri.parse("feedwell://article?url=${android.net.Uri.encode(articleUrl)}")
+                }
                 if (launchIntent != null) {
                     context.startActivity(launchIntent)
                 }
@@ -113,11 +117,22 @@ class LatestArticlesWidget : AppWidgetProvider() {
             val title = article.optString("title", "Untitled")
             val feedName = article.optString("feedName", "")
             val pubDate = article.optString("pubDate", "")
+            val link = article.optString("link", "")
 
             views.setTextViewText(R.id.widget_article_title, title)
             views.setTextViewText(R.id.widget_article_feed, feedName)
             views.setTextViewText(R.id.widget_article_date, formatDate(pubDate))
             views.setTextViewText(R.id.widget_page_indicator, "${safeIndex + 1} / ${articles.length()}")
+
+            // Open app on article tap — deep link to specific article
+            val openIntent = Intent(context, LatestArticlesWidget::class.java).apply {
+                action = ACTION_OPEN
+                putExtra("article_url", link)
+            }
+            val openPending = PendingIntent.getBroadcast(
+                context, 3, openIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_article_container, openPending)
         } else {
             views.setTextViewText(R.id.widget_article_title, "No articles yet")
             views.setTextViewText(R.id.widget_article_feed, "Open FeedWell to load feeds")
@@ -142,15 +157,6 @@ class LatestArticlesWidget : AppWidgetProvider() {
             context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_prev_button, prevPending)
-
-        // Open app on article tap
-        val openIntent = Intent(context, LatestArticlesWidget::class.java).apply {
-            action = ACTION_OPEN
-        }
-        val openPending = PendingIntent.getBroadcast(
-            context, 3, openIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_article_container, openPending)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }

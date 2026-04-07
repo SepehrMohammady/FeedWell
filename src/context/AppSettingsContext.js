@@ -17,6 +17,7 @@ export function AppSettingsProvider({ children }) {
   const [readerHeaderActions, setReaderHeaderActions] = useState(['bookmark', 'translate', 'readAloud']);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [readingReminder, setReadingReminder] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export function AppSettingsProvider({ children }) {
       const savedReaderHeaderActions = await AsyncStorage.getItem('readerHeaderActions');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       const savedReduceMotion = await AsyncStorage.getItem('reduceMotion');
+      const savedReadingReminder = await AsyncStorage.getItem('readingReminder');
       
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -89,6 +91,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedReduceMotion !== null) {
         setReduceMotion(JSON.parse(savedReduceMotion));
+      }
+
+      if (savedReadingReminder !== null) {
+        setReadingReminder(JSON.parse(savedReadingReminder));
       }
     } catch (error) {
       console.error('Error loading app settings:', error);
@@ -223,6 +229,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateReadingReminder = async (value) => {
+    try {
+      setReadingReminder(value);
+      await AsyncStorage.setItem('readingReminder', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving readingReminder setting:', error);
+    }
+  };
+
   const value = {
     showImages,
     autoRefresh,
@@ -237,6 +252,7 @@ export function AppSettingsProvider({ children }) {
     readerHeaderActions,
     hasSeenOnboarding,
     reduceMotion,
+    readingReminder,
     isLoading,
     updateShowImages,
     updateAutoRefresh,
@@ -252,6 +268,7 @@ export function AppSettingsProvider({ children }) {
     completeOnboarding,
     resetOnboarding,
     updateReduceMotion,
+    updateReadingReminder,
   };
 
   return (

@@ -1,1 +1,11 @@
-<resources/>
+<resources>
+  <!-- Widget colors (dark mode) -->
+  <color name="widget_bg">#1C1C1E</color>
+  <color name="widget_stroke">#38383A</color>
+  <color name="widget_title">#F0E6DE</color>
+  <color name="widget_header">#CDADA0</color>
+  <color name="widget_feed">#B09A85</color>
+  <color name="widget_date">#8B7355</color>
+  <color name="widget_indicator">#6B5B4F</color>
+  <color name="widget_icon">#CDADA0</color>
+</resources>

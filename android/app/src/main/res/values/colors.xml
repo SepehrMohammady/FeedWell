@@ -3,4 +3,13 @@
   <color name="iconBackground">#ffffff</color>
   <color name="colorPrimary">#023c69</color>
   <color name="colorPrimaryDark">#ffffff</color>
+  <!-- Widget colors (light mode) -->
+  <color name="widget_bg">#FFF8F4</color>
+  <color name="widget_stroke">#E8D5C8</color>
+  <color name="widget_title">#3C2A1E</color>
+  <color name="widget_header">#A17F66</color>
+  <color name="widget_feed">#8B7355</color>
+  <color name="widget_date">#B09A85</color>
+  <color name="widget_indicator">#C4AA94</color>
+  <color name="widget_icon">#A17F66</color>
 </resources>

@@ -48,7 +48,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, reduceMotion, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReduceMotion, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const insets = useSafeAreaInsets();
@@ -283,6 +283,7 @@ export default function SettingsScreen({ navigation }) {
           isDarkMode,
           maxArticleAge,
           reduceMotion,
+          readingReminder,
         },
       };
 
@@ -448,6 +449,9 @@ export default function SettingsScreen({ navigation }) {
         }
         if (typeof backupData.settings.reduceMotion === 'boolean') {
           await updateReduceMotion(backupData.settings.reduceMotion);
+        }
+        if (typeof backupData.settings.readingReminder === 'boolean') {
+          await updateReadingReminder(backupData.settings.readingReminder);
         }
       }
 
@@ -885,6 +889,18 @@ export default function SettingsScreen({ navigation }) {
                 onValueChange={updateReduceMotion}
                 trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={reduceMotion ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
+            title="Reading Reminder"
+            description={readingReminder ? 'Get notified if you haven\'t read in a while' : 'No reading reminders'}
+            rightElement={
+              <Switch
+                value={readingReminder}
+                onValueChange={updateReadingReminder}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={readingReminder ? '#fff' : '#f4f3f4'}
               />
             }
           />
