@@ -20,15 +20,20 @@ import { setupNotificationChannel, scheduleReminderNotification, cancelReminderN
 
 const NAV_STATE_KEY = 'feedwell_nav_state';
 const navigationRef = createNavigationContainerRef();
+let pendingDeepLinkUrl = null;
 
 function handleDeepLink(url) {
-  if (!url || !navigationRef.isReady()) return;
+  if (!url) return;
+  if (!navigationRef.isReady()) {
+    pendingDeepLinkUrl = url;
+    return;
+  }
+  pendingDeepLinkUrl = null;
   try {
-    const parsed = new URL(url);
-    if (parsed.protocol === 'feedwell:' && parsed.pathname === '//article') {
-      const articleUrl = parsed.searchParams?.get('url') || decodeURIComponent(url.split('url=')[1] || '');
+    if (url.startsWith('feedwell://article')) {
+      const parts = url.split('?url=');
+      const articleUrl = parts.length > 1 ? decodeURIComponent(parts[1]) : '';
       if (articleUrl) {
-        // Navigate to Feeds tab, then push ArticleReader with the article link
         navigationRef.navigate('Feeds', {
           screen: 'ArticleReader',
           params: { articleLink: articleUrl },
@@ -127,6 +132,11 @@ function AppContent() {
         ref={navigationRef}
         initialState={initialNavState}
         onStateChange={onNavStateChange}
+        onReady={() => {
+          if (pendingDeepLinkUrl) {
+            handleDeepLink(pendingDeepLinkUrl);
+          }
+        }}
       >
         <AppNavigator />
         <KinetosisOverlay />
