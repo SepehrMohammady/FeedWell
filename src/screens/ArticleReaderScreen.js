@@ -77,7 +77,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   
   // Resolve article from deep link if needed
   const article = passedArticle || (articleLink ? allArticles.find(a => a.link === articleLink || a.links?.[0]?.url === articleLink) : null)
-    || (articleLink ? { title: 'Article', link: articleLink, links: [{ url: articleLink }], content: '', feedTitle: '' } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
+    || (articleLink ? { title: 'Loading…', link: articleLink, url: articleLink, links: [{ url: articleLink }], content: '', feedTitle: '' } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
   
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
@@ -471,7 +471,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     return () => {
       hasMarkedReadRef.current = false;
     };
-  }, []);
+  }, [article?.id ?? article?.link]);
 
   // Mark article as read when the screen is viewed - only once
   useEffect(() => {
