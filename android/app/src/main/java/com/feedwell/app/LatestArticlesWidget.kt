@@ -5,11 +5,11 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import org.json.JSONArray
-import org.json.JSONObject
 
 class LatestArticlesWidget : AppWidgetProvider() {
 
@@ -20,6 +20,10 @@ class LatestArticlesWidget : AppWidgetProvider() {
         const val PREFS_NAME = "FeedWellWidgetPrefs"
         const val KEY_ARTICLES = "widget_articles"
         const val KEY_CURRENT_INDEX = "widget_current_index"
+
+        // Height thresholds in dp
+        const val HEIGHT_COMPACT = 100  // 1-row: title only
+        const val HEIGHT_LIST = 200     // 4+ rows: scrollable list
 
         fun getArticles(context: Context): JSONArray {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -86,8 +90,8 @@ class LatestArticlesWidget : AppWidgetProvider() {
                 val articleUrl = intent.getStringExtra("article_url")
                 val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                if (articleUrl != null) {
-                    launchIntent?.data = android.net.Uri.parse("feedwell://article?url=${android.net.Uri.encode(articleUrl)}")
+                if (!articleUrl.isNullOrEmpty()) {
+                    launchIntent?.data = Uri.parse("feedwell://article?url=${Uri.encode(articleUrl)}")
                 }
                 if (launchIntent != null) {
                     context.startActivity(launchIntent)
@@ -114,64 +118,99 @@ class LatestArticlesWidget : AppWidgetProvider() {
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val views = RemoteViews(context.packageName, R.layout.widget_latest_articles)
 
-        // Get widget dimensions to adapt layout
         val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
         val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
-        val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250)
-
-        // Size thresholds
-        val isNarrow = minWidth < 200
-        val isTall = minHeight > 160
-
-        // Adjust title text size based on width
-        val titleSize = when {
-            isNarrow -> 12f
-            else -> 14f
-        }
-        views.setFloat(R.id.widget_article_title, "setTextSize", titleSize)
 
         val articles = getArticles(context)
+
+        when {
+            // ── LIST MODE: tall widget → scrollable list ──
+            minHeight >= HEIGHT_LIST -> {
+                views.setViewVisibility(R.id.widget_article_container, View.GONE)
+                views.setViewVisibility(R.id.widget_page_indicator, View.GONE)
+                views.setViewVisibility(R.id.widget_prev_button, View.GONE)
+                views.setViewVisibility(R.id.widget_next_button, View.GONE)
+                views.setViewVisibility(R.id.widget_article_list, View.VISIBLE)
+
+                // Set up the ListView with RemoteViewsService
+                val serviceIntent = Intent(context, WidgetArticleListService::class.java).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                    data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                }
+                views.setRemoteAdapter(R.id.widget_article_list, serviceIntent)
+
+                // Set up the pending intent template for list item clicks
+                val openTemplate = Intent(context, LatestArticlesWidget::class.java).apply {
+                    action = ACTION_OPEN
+                }
+                val openTemplatePending = PendingIntent.getBroadcast(
+                    context, 10 + appWidgetId, openTemplate,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+                views.setPendingIntentTemplate(R.id.widget_article_list, openTemplatePending)
+
+                // Notify data changed so the list refreshes
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_article_list)
+            }
+            // ── COMPACT MODE: very short widget → title only ──
+            minHeight < HEIGHT_COMPACT -> {
+                views.setViewVisibility(R.id.widget_article_container, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_list, View.GONE)
+                views.setViewVisibility(R.id.widget_page_indicator, View.GONE)
+                views.setViewVisibility(R.id.widget_article_description, View.GONE)
+                views.setViewVisibility(R.id.widget_article_feed, View.GONE)
+                views.setViewVisibility(R.id.widget_article_date, View.GONE)
+                views.setViewVisibility(R.id.widget_article_title, View.VISIBLE)
+
+                views.setFloat(R.id.widget_article_title, "setTextSize", 12f)
+                views.setInt(R.id.widget_article_title, "setMaxLines", 1)
+
+                setupSingleArticle(context, views, articles)
+            }
+            // ── NORMAL MODE: standard prev/next single article ──
+            else -> {
+                views.setViewVisibility(R.id.widget_article_container, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_list, View.GONE)
+                views.setViewVisibility(R.id.widget_page_indicator, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_prev_button, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_next_button, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_feed, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_date, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_description, View.GONE)
+                views.setViewVisibility(R.id.widget_article_title, View.VISIBLE)
+
+                views.setFloat(R.id.widget_article_title, "setTextSize", 14f)
+                views.setInt(R.id.widget_article_title, "setMaxLines", 3)
+
+                setupSingleArticle(context, views, articles)
+            }
+        }
+
+        // Next/Prev buttons (always wired, visible only in compact/normal)
+        val nextIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_NEXT }
+        val nextPending = PendingIntent.getBroadcast(context, 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_next_button, nextPending)
+
+        val prevIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_PREV }
+        val prevPending = PendingIntent.getBroadcast(context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_prev_button, prevPending)
+
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    private fun setupSingleArticle(context: Context, views: RemoteViews, articles: JSONArray) {
         val currentIndex = getCurrentIndex(context)
 
         if (articles.length() > 0) {
             val safeIndex = currentIndex.coerceIn(0, articles.length() - 1)
             val article = articles.getJSONObject(safeIndex)
 
-            val title = article.optString("title", "Untitled")
-            val feedName = article.optString("feedName", "")
-            val pubDate = article.optString("pubDate", "")
-            val link = article.optString("link", "")
-            val description = article.optString("description", "")
-
-            views.setTextViewText(R.id.widget_article_title, title)
-            views.setTextViewText(R.id.widget_article_feed, feedName)
-            views.setTextViewText(R.id.widget_article_date, formatDate(pubDate))
+            views.setTextViewText(R.id.widget_article_title, article.optString("title", "Untitled"))
+            views.setTextViewText(R.id.widget_article_feed, article.optString("feedName", ""))
+            views.setTextViewText(R.id.widget_article_date, formatDate(article.optString("pubDate", "")))
             views.setTextViewText(R.id.widget_page_indicator, "${safeIndex + 1} / ${articles.length()}")
 
-            // Show description only when widget is tall enough
-            if (isTall && description.isNotEmpty()) {
-                // Strip HTML tags for clean display
-                val cleanDesc = description.replace(Regex("<[^>]*>"), "").trim()
-                if (cleanDesc.isNotEmpty()) {
-                    views.setViewVisibility(R.id.widget_article_description, View.VISIBLE)
-                    views.setTextViewText(R.id.widget_article_description, cleanDesc)
-                } else {
-                    views.setViewVisibility(R.id.widget_article_description, View.GONE)
-                }
-            } else {
-                views.setViewVisibility(R.id.widget_article_description, View.GONE)
-            }
-
-            // Hide feed/date when narrow to prioritize title
-            if (isNarrow) {
-                views.setViewVisibility(R.id.widget_article_feed, View.GONE)
-                views.setViewVisibility(R.id.widget_article_date, View.GONE)
-            } else {
-                views.setViewVisibility(R.id.widget_article_feed, View.VISIBLE)
-                views.setViewVisibility(R.id.widget_article_date, View.VISIBLE)
-            }
-
-            // Open app on article tap — deep link to specific article
+            val link = article.optString("link", "")
             val openIntent = Intent(context, LatestArticlesWidget::class.java).apply {
                 action = ACTION_OPEN
                 putExtra("article_url", link)
@@ -185,28 +224,7 @@ class LatestArticlesWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_article_feed, "Open FeedWell to load feeds")
             views.setTextViewText(R.id.widget_article_date, "")
             views.setTextViewText(R.id.widget_page_indicator, "")
-            views.setViewVisibility(R.id.widget_article_description, View.GONE)
         }
-
-        // Next button
-        val nextIntent = Intent(context, LatestArticlesWidget::class.java).apply {
-            action = ACTION_NEXT
-        }
-        val nextPending = PendingIntent.getBroadcast(
-            context, 1, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_next_button, nextPending)
-
-        // Previous button
-        val prevIntent = Intent(context, LatestArticlesWidget::class.java).apply {
-            action = ACTION_PREV
-        }
-        val prevPending = PendingIntent.getBroadcast(
-            context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        views.setOnClickPendingIntent(R.id.widget_prev_button, prevPending)
-
-        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
     private fun formatDate(dateString: String): String {

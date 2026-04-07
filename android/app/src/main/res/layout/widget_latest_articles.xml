@@ -9,6 +9,7 @@
 
     <!-- Header -->
     <LinearLayout
+        android:id="@+id/widget_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -47,7 +48,7 @@
             android:tint="@color/widget_icon" />
     </LinearLayout>
 
-    <!-- Article Content -->
+    <!-- Single Article Content (compact mode) -->
     <LinearLayout
         android:id="@+id/widget_article_container"
         android:layout_width="match_parent"
@@ -101,7 +102,17 @@
             android:maxLines="1" />
     </LinearLayout>
 
-    <!-- Page indicator -->
+    <!-- Scrollable Article List (tall mode) -->
+    <ListView
+        android:id="@+id/widget_article_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@color/widget_stroke"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone" />
+
+    <!-- Page indicator (compact mode only) -->
     <TextView
         android:id="@+id/widget_page_indicator"
         android:layout_width="match_parent"
