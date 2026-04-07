@@ -88,13 +88,21 @@ class LatestArticlesWidget : AppWidgetProvider() {
             }
             ACTION_OPEN -> {
                 val articleUrl = intent.getStringExtra("article_url")
-                val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 if (!articleUrl.isNullOrEmpty()) {
-                    launchIntent?.data = Uri.parse("feedwell://article?url=${Uri.encode(articleUrl)}")
-                }
-                if (launchIntent != null) {
-                    context.startActivity(launchIntent)
+                    // Use ACTION_VIEW with the feedwell:// scheme so Android delivers it as a
+                    // deep link to MainActivity and React Native's Linking module picks it up.
+                    val deepLinkIntent = Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("feedwell://article?url=${Uri.encode(articleUrl)}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        setPackage(context.packageName)
+                    }
+                    context.startActivity(deepLinkIntent)
+                } else {
+                    // No URL — just open the app
+                    val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    if (launchIntent != null) context.startActivity(launchIntent)
                 }
             }
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
