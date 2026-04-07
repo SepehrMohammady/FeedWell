@@ -70,14 +70,30 @@ function cleanTextForTTS(text) {
 
 // Main component wrapped with error boundary
 function ArticleReaderScreenContent({ route, navigation }) {
-  const { article: passedArticle, articleLink, currentFilter = 'all', currentSortOrder = 'newest' } = route.params;
+  const { 
+    article: passedArticle, 
+    articleLink, 
+    articleTitle = 'Loading…', 
+    articleFeedName = '', 
+    articlePubDate = '',
+    currentFilter = 'all', 
+    currentSortOrder = 'newest' 
+  } = route.params;
   const { theme } = useTheme();
   const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
   // Resolve article from deep link if needed
-  const article = passedArticle || (articleLink ? allArticles.find(a => a.link === articleLink || a.links?.[0]?.url === articleLink) : null)
-    || (articleLink ? { title: 'Loading…', link: articleLink, url: articleLink, links: [{ url: articleLink }], content: '', feedTitle: '' } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
+  const article = passedArticle || (articleLink ? allArticles.find(a => a.link === articleLink || a.url === articleLink || a.links?.[0]?.url === articleLink) : null)
+    || (articleLink ? { 
+        title: articleTitle, 
+        link: articleLink, 
+        url: articleLink, 
+        pubDate: articlePubDate,
+        feedTitle: articleFeedName,
+        links: [{ url: articleLink }], 
+        content: '' 
+      } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
   
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();

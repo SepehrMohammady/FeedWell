@@ -43,6 +43,9 @@ class WidgetArticleListFactory(private val context: Context) : RemoteViewsServic
             // Set fill-in intent for item click (deep link)
             val fillIntent = Intent().apply {
                 putExtra("article_url", link)
+                putExtra("article_title", title)
+                putExtra("article_feed", feedName)
+                putExtra("article_date", pubDate)
             }
             views.setOnClickFillInIntent(R.id.widget_list_item, fillIntent)
         }

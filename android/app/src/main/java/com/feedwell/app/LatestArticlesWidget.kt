@@ -88,11 +88,16 @@ class LatestArticlesWidget : AppWidgetProvider() {
             }
             ACTION_OPEN -> {
                 val articleUrl = intent.getStringExtra("article_url")
+                val articleTitle = intent.getStringExtra("article_title") ?: ""
+                val articleFeed = intent.getStringExtra("article_feed") ?: ""
+                val articleDate = intent.getStringExtra("article_date") ?: ""
+                
                 if (!articleUrl.isNullOrEmpty()) {
                     // Use ACTION_VIEW with the feedwell:// scheme so Android delivers it as a
                     // deep link to MainActivity and React Native's Linking module picks it up.
                     val deepLinkIntent = Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse("feedwell://article?url=${Uri.encode(articleUrl)}")
+                        val uriStr = "feedwell://article?url=${Uri.encode(articleUrl)}&title=${Uri.encode(articleTitle)}&feed=${Uri.encode(articleFeed)}&date=${Uri.encode(articleDate)}"
+                        data = Uri.parse(uriStr)
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         setPackage(context.packageName)
                     }
@@ -213,15 +218,22 @@ class LatestArticlesWidget : AppWidgetProvider() {
             val safeIndex = currentIndex.coerceIn(0, articles.length() - 1)
             val article = articles.getJSONObject(safeIndex)
 
-            views.setTextViewText(R.id.widget_article_title, article.optString("title", "Untitled"))
-            views.setTextViewText(R.id.widget_article_feed, article.optString("feedName", ""))
-            views.setTextViewText(R.id.widget_article_date, formatDate(article.optString("pubDate", "")))
+            val title = article.optString("title", "Untitled")
+            val feedName = article.optString("feedName", "")
+            val pubDate = article.optString("pubDate", "")
+
+            views.setTextViewText(R.id.widget_article_title, title)
+            views.setTextViewText(R.id.widget_article_feed, feedName)
+            views.setTextViewText(R.id.widget_article_date, formatDate(pubDate))
             views.setTextViewText(R.id.widget_page_indicator, "${safeIndex + 1} / ${articles.length()}")
 
             val link = article.optString("link", "")
             val openIntent = Intent(context, LatestArticlesWidget::class.java).apply {
                 action = ACTION_OPEN
                 putExtra("article_url", link)
+                putExtra("article_title", title)
+                putExtra("article_feed", feedName)
+                putExtra("article_date", pubDate)
             }
             val openPending = PendingIntent.getBroadcast(
                 context, 3, openIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

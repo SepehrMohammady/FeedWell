@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AppState, Linking } from 'react-native';
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef, CommonActions } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -31,13 +31,67 @@ function handleDeepLink(url) {
   pendingDeepLinkUrl = null;
   try {
     if (url.startsWith('feedwell://article')) {
-      const parts = url.split('?url=');
-      const articleUrl = parts.length > 1 ? decodeURIComponent(parts[1]) : '';
-      if (articleUrl) {
-        navigationRef.navigate('Feeds', {
-          screen: 'ArticleReader',
-          params: { articleLink: articleUrl },
-        });
+      try {
+        const parsed = new URL(url);
+        const articleUrl = parsed.searchParams.get('url') || '';
+        const articleTitle = parsed.searchParams.get('title') || 'Loading…';
+        const articleFeed = parsed.searchParams.get('feed') || '';
+        const articleDate = parsed.searchParams.get('date') || '';
+        
+        if (articleUrl) {
+          // Send these as params so ArticleReaderScreen can use them even if article not found
+          navigationRef.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{
+                name: 'Feeds',
+                state: {
+                  routes: [
+                    { name: 'FeedList' },
+                    { 
+                      name: 'ArticleReader', 
+                      params: { 
+                        articleLink: articleUrl,
+                        articleTitle,
+                        articleFeedName: articleFeed,
+                        articlePubDate: articleDate
+                      } 
+                    }
+                  ],
+                },
+              }],
+            })
+          );
+        }
+      } catch (e) {
+        // Fallback for tricky URLs
+        const parts = url.split('?url=');
+        const urlPart = parts.length > 1 ? parts[1].split('&')[0] : '';
+        const articleUrl = decodeURIComponent(urlPart);
+        if (articleUrl) {
+          navigationRef.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{
+                name: 'Feeds',
+                state: {
+                  routes: [
+                    { name: 'FeedList' },
+                    { 
+                      name: 'ArticleReader', 
+                      params: { 
+                        articleLink: articleUrl, 
+                        articleTitle: 'Loading…', 
+                        articleFeedName: '', 
+                        articlePubDate: '' 
+                      } 
+                    }
+                  ],
+                },
+              }],
+            })
+          );
+        }
       }
     }
   } catch (e) {
