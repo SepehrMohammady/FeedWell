@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.view.View
 import android.widget.RemoteViews
 import org.json.JSONArray
 import org.json.JSONObject
@@ -51,6 +53,11 @@ class LatestArticlesWidget : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             updateWidget(context, appWidgetManager, appWidgetId)
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        updateWidget(context, appWidgetManager, appWidgetId)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -107,6 +114,22 @@ class LatestArticlesWidget : AppWidgetProvider() {
     private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         val views = RemoteViews(context.packageName, R.layout.widget_latest_articles)
 
+        // Get widget dimensions to adapt layout
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
+        val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 250)
+
+        // Size thresholds
+        val isNarrow = minWidth < 200
+        val isTall = minHeight > 160
+
+        // Adjust title text size based on width
+        val titleSize = when {
+            isNarrow -> 12f
+            else -> 14f
+        }
+        views.setFloat(R.id.widget_article_title, "setTextSize", titleSize)
+
         val articles = getArticles(context)
         val currentIndex = getCurrentIndex(context)
 
@@ -118,11 +141,35 @@ class LatestArticlesWidget : AppWidgetProvider() {
             val feedName = article.optString("feedName", "")
             val pubDate = article.optString("pubDate", "")
             val link = article.optString("link", "")
+            val description = article.optString("description", "")
 
             views.setTextViewText(R.id.widget_article_title, title)
             views.setTextViewText(R.id.widget_article_feed, feedName)
             views.setTextViewText(R.id.widget_article_date, formatDate(pubDate))
             views.setTextViewText(R.id.widget_page_indicator, "${safeIndex + 1} / ${articles.length()}")
+
+            // Show description only when widget is tall enough
+            if (isTall && description.isNotEmpty()) {
+                // Strip HTML tags for clean display
+                val cleanDesc = description.replace(Regex("<[^>]*>"), "").trim()
+                if (cleanDesc.isNotEmpty()) {
+                    views.setViewVisibility(R.id.widget_article_description, View.VISIBLE)
+                    views.setTextViewText(R.id.widget_article_description, cleanDesc)
+                } else {
+                    views.setViewVisibility(R.id.widget_article_description, View.GONE)
+                }
+            } else {
+                views.setViewVisibility(R.id.widget_article_description, View.GONE)
+            }
+
+            // Hide feed/date when narrow to prioritize title
+            if (isNarrow) {
+                views.setViewVisibility(R.id.widget_article_feed, View.GONE)
+                views.setViewVisibility(R.id.widget_article_date, View.GONE)
+            } else {
+                views.setViewVisibility(R.id.widget_article_feed, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_article_date, View.VISIBLE)
+            }
 
             // Open app on article tap — deep link to specific article
             val openIntent = Intent(context, LatestArticlesWidget::class.java).apply {
@@ -138,6 +185,7 @@ class LatestArticlesWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_article_feed, "Open FeedWell to load feeds")
             views.setTextViewText(R.id.widget_article_date, "")
             views.setTextViewText(R.id.widget_page_indicator, "")
+            views.setViewVisibility(R.id.widget_article_description, View.GONE)
         }
 
         // Next button

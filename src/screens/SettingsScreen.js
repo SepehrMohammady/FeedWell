@@ -288,11 +288,14 @@ export default function SettingsScreen({ navigation }) {
       };
 
       const jsonString = JSON.stringify(backupData, null, 2);
-      const fileName = `FeedWell_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+      const fileName = `FeedWell_Backup_${dateStr}_${timeStr}.feedwell`;
 
       if (Platform.OS === 'web') {
         // Web platform: Download file
-        const blob = new Blob([jsonString], { type: 'application/json' });
+        const blob = new Blob([jsonString], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -311,9 +314,9 @@ export default function SettingsScreen({ navigation }) {
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
           await Sharing.shareAsync(fileUri, {
-            mimeType: 'application/json',
+            mimeType: 'application/octet-stream',
             dialogTitle: 'Save FeedWell Backup',
-            UTI: 'public.json',
+            UTI: 'public.data',
           });
         } else {
           setAlertConfig({ visible: true, title: 'Success', message: `Backup saved to: ${fileUri}`, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
@@ -331,12 +334,12 @@ export default function SettingsScreen({ navigation }) {
 
       if (Platform.OS === 'web') {
         // Web platform: Use file input
-        setAlertConfig({ visible: true, title: 'Restore Backup', message: 'Please select a FeedWell backup JSON file', icon: 'cloud-upload-outline', buttons: [{ text: 'OK' }] });
+        setAlertConfig({ visible: true, title: 'Restore Backup', message: 'Please select a FeedWell backup file (.feedwell or .json)', icon: 'cloud-upload-outline', buttons: [{ text: 'OK' }] });
         
         // Create file input dynamically
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.json,application/json';
+        input.accept = '.feedwell,.json,application/json,application/octet-stream';
         
         input.onchange = async (e) => {
           const file = e.target.files[0];
@@ -358,7 +361,7 @@ export default function SettingsScreen({ navigation }) {
       } else {
         // Mobile: Use document picker
         const result = await DocumentPicker.getDocumentAsync({
-          type: 'application/json',
+          type: '*/*',
           copyToCacheDirectory: true,
         });
 

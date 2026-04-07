@@ -371,7 +371,7 @@ export default function FeedListScreen({ navigation, route }) {
               </View>
             </View>
             
-            <Text style={styles.articleTitle} numberOfLines={2}>
+            <Text style={styles.articleTitle} numberOfLines={3}>
               {item.title}
             </Text>
             
@@ -669,11 +669,11 @@ export default function FeedListScreen({ navigation, route }) {
       borderLeftColor: theme.colors.accent,
     },
     articleTitle: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: '600',
       color: theme.colors.text,
       marginBottom: 6,
-      lineHeight: 22,
+      lineHeight: 21,
     },
     articleDescription: {
       fontSize: 14,

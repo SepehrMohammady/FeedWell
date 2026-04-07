@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/widget_background"
-    android:padding="14dp">
+    android:padding="12dp">
 
     <!-- Header -->
     <LinearLayout
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingBottom="8dp">
+        android:paddingBottom="6dp">
 
         <TextView
             android:id="@+id/widget_app_name"
@@ -22,23 +22,24 @@
             android:layout_weight="1"
             android:text="FeedWell"
             android:textColor="@color/widget_header"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/widget_prev_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_media_previous"
             android:contentDescription="Previous article"
             android:scaleType="centerInside"
-            android:tint="@color/widget_icon" />
+            android:tint="@color/widget_icon"
+            android:layout_marginEnd="2dp" />
 
         <ImageButton
             android:id="@+id/widget_next_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_media_next"
             android:contentDescription="Next article"
@@ -61,10 +62,22 @@
             android:layout_height="wrap_content"
             android:text="No articles yet"
             android:textColor="@color/widget_title"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:maxLines="3"
             android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_article_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text=""
+            android:textColor="@color/widget_feed"
+            android:textSize="12sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/widget_article_feed"
@@ -73,7 +86,7 @@
             android:layout_marginTop="4dp"
             android:text=""
             android:textColor="@color/widget_feed"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:maxLines="1"
             android:ellipsize="end" />
 
@@ -84,7 +97,7 @@
             android:layout_marginTop="2dp"
             android:text=""
             android:textColor="@color/widget_date"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:maxLines="1" />
     </LinearLayout>
 
@@ -96,7 +109,7 @@
         android:gravity="center"
         android:text=""
         android:textColor="@color/widget_indicator"
-        android:textSize="10sp"
-        android:paddingTop="4dp" />
+        android:textSize="9sp"
+        android:paddingTop="2dp" />
 
 </LinearLayout>

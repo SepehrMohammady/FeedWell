@@ -27,6 +27,7 @@ export function updateWidget(articles, feeds) {
       feedName: feedMap[article.feedId] || article.feedTitle || '',
       pubDate: article.pubDate || article.publishedDate || '',
       link: article.link || article.url || '',
+      description: article.description || '',
     }));
 
     WidgetBridge.updateArticles(JSON.stringify(widgetArticles));

@@ -5,10 +5,9 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useTheme } from '../context/ThemeContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const NUM_DOTS = 8;
 const DOT_SIZE = 10;
-const MAX_OFFSET = 30; // max pixels a dot moves from its base position
-const DAMPING = 0.85; // smoothing factor
+const MAX_OFFSET = 30;
+const DAMPING = 0.85;
 
 // Distribute dots around the screen edges/corners
 const DOT_POSITIONS = [
@@ -25,18 +24,16 @@ const DOT_POSITIONS = [
 export default function KinetosisOverlay() {
   const { reduceMotion } = useAppSettings();
   const { isDarkMode } = useTheme();
-  const offsetX = useRef(new Animated.Value(0)).current;
-  const offsetY = useRef(new Animated.Value(0)).current;
+  const animX = useRef(new Animated.Value(0)).current;
+  const animY = useRef(new Animated.Value(0)).current;
   const velocityRef = useRef({ x: 0, y: 0 });
+  const runningAnimRef = useRef(null);
 
   useEffect(() => {
     if (!reduceMotion) return;
 
-    Gyroscope.setUpdateInterval(50);
+    Gyroscope.setUpdateInterval(16); // ~60 fps input sampling
     const subscription = Gyroscope.addListener(({ x, y }) => {
-      // Gyroscope gives rotation rate; integrate for position offset
-      // y rotation = tilt left/right (moves dots horizontally)
-      // x rotation = tilt forward/back (moves dots vertically)
       const vx = velocityRef.current.x * DAMPING + y * 8;
       const vy = velocityRef.current.y * DAMPING + x * 8;
       velocityRef.current = { x: vx, y: vy };
@@ -44,11 +41,37 @@ export default function KinetosisOverlay() {
       const clampedX = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, vx));
       const clampedY = Math.max(-MAX_OFFSET, Math.min(MAX_OFFSET, vy));
 
-      offsetX.setValue(clampedX);
-      offsetY.setValue(clampedY);
+      // Stop any running animation before starting new one
+      if (runningAnimRef.current) {
+        runningAnimRef.current.stop();
+      }
+
+      // Use spring animation with native driver for smooth interpolation
+      runningAnimRef.current = Animated.parallel([
+        Animated.spring(animX, {
+          toValue: clampedX,
+          useNativeDriver: true,
+          stiffness: 150,
+          damping: 15,
+          mass: 0.5,
+        }),
+        Animated.spring(animY, {
+          toValue: clampedY,
+          useNativeDriver: true,
+          stiffness: 150,
+          damping: 15,
+          mass: 0.5,
+        }),
+      ]);
+      runningAnimRef.current.start();
     });
 
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      if (runningAnimRef.current) {
+        runningAnimRef.current.stop();
+      }
+    };
   }, [reduceMotion]);
 
   if (!reduceMotion) return null;
@@ -67,8 +90,8 @@ export default function KinetosisOverlay() {
               left: pos.x - DOT_SIZE / 2,
               top: pos.y - DOT_SIZE / 2,
               transform: [
-                { translateX: offsetX },
-                { translateY: offsetY },
+                { translateX: animX },
+                { translateY: animY },
               ],
             },
           ]}
