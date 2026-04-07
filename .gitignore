@@ -19,8 +19,16 @@ expo-env.d.ts
 *.mobileprovision
 
 # Generated native projects (use expo prebuild to regenerate)
-android/
+# android/ — tracked for native customizations (widget, manifest, etc.)
+# ios/ — not tracked (no native iOS customizations yet)
 ios/
+
+# Android build artifacts
+android/app/build/
+android/build/
+android/.gradle/
+android/.kotlin/
+android/local.properties
 
 # Debug and log files
 *.log

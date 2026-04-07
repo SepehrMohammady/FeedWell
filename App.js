@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { AppState } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -14,6 +15,8 @@ import { AmbientSoundProvider } from './src/context/AmbientSoundContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
+import KinetosisOverlay from './src/components/KinetosisOverlay';
+import { setupNotificationChannel, scheduleReminderNotification } from './src/utils/notificationService';
 
 const NAV_STATE_KEY = 'feedwell_nav_state';
 
@@ -54,6 +57,20 @@ function AppContent() {
     }
   }, [allowRotation, isLoading]);
 
+  // Set up notification channel and schedule reminder on app open/foreground
+  useEffect(() => {
+    setupNotificationChannel();
+    scheduleReminderNotification();
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        scheduleReminderNotification();
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
+
   useEffect(() => {
     if (!isLoading && !hasSeenOnboarding) {
       setShowOnboarding(true);
@@ -76,6 +93,7 @@ function AppContent() {
         onStateChange={onNavStateChange}
       >
         <AppNavigator />
+        <KinetosisOverlay />
         <StatusBar style={isDarkMode ? "light" : "dark"} />
       </NavigationContainer>
       <OnboardingTutorial 

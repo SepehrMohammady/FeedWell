@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeStorage } from '../utils/SafeStorage';
+import { updateWidget } from '../utils/widgetService';
 
 const FeedContext = createContext();
 
@@ -166,6 +167,13 @@ export function FeedProvider({ children }) {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Update Android widget whenever articles or feeds change
+  useEffect(() => {
+    if (isInitialized && state.articles.length > 0) {
+      updateWidget(state.articles, state.feeds);
+    }
+  }, [isInitialized, state.articles, state.feeds]);
 
   // Auto refresh on app start - only once after initial load is complete AND articles are loaded
   useEffect(() => {

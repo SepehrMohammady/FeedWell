@@ -48,7 +48,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, reduceMotion, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReduceMotion, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const insets = useSafeAreaInsets();
@@ -282,6 +282,7 @@ export default function SettingsScreen({ navigation }) {
           autoRefresh,
           isDarkMode,
           maxArticleAge,
+          reduceMotion,
         },
       };
 
@@ -444,6 +445,9 @@ export default function SettingsScreen({ navigation }) {
         }
         if (typeof backupData.settings.maxArticleAge === 'number') {
           await updateMaxArticleAge(backupData.settings.maxArticleAge);
+        }
+        if (typeof backupData.settings.reduceMotion === 'boolean') {
+          await updateReduceMotion(backupData.settings.reduceMotion);
         }
       }
 
@@ -869,6 +873,18 @@ export default function SettingsScreen({ navigation }) {
                 onValueChange={updateAllowRotation}
                 trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={allowRotation ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
+            title="Reduce Motion (Kinetosis)"
+            description="Minimize animations and show a fixed dot to reduce motion sickness"
+            rightElement={
+              <Switch
+                value={reduceMotion}
+                onValueChange={updateReduceMotion}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={reduceMotion ? '#fff' : '#f4f3f4'}
               />
             }
           />

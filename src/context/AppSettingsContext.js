@@ -16,6 +16,7 @@ export function AppSettingsProvider({ children }) {
   const [speechRate, setSpeechRate] = useState(1.0);
   const [readerHeaderActions, setReaderHeaderActions] = useState(['bookmark', 'translate', 'readAloud']);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export function AppSettingsProvider({ children }) {
       const savedSpeechRate = await AsyncStorage.getItem('speechRate');
       const savedReaderHeaderActions = await AsyncStorage.getItem('readerHeaderActions');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
+      const savedReduceMotion = await AsyncStorage.getItem('reduceMotion');
       
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -83,6 +85,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedHasSeenOnboarding !== null) {
         setHasSeenOnboarding(JSON.parse(savedHasSeenOnboarding));
+      }
+
+      if (savedReduceMotion !== null) {
+        setReduceMotion(JSON.parse(savedReduceMotion));
       }
     } catch (error) {
       console.error('Error loading app settings:', error);
@@ -208,6 +214,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateReduceMotion = async (value) => {
+    try {
+      setReduceMotion(value);
+      await AsyncStorage.setItem('reduceMotion', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving reduceMotion setting:', error);
+    }
+  };
+
   const value = {
     showImages,
     autoRefresh,
@@ -221,6 +236,7 @@ export function AppSettingsProvider({ children }) {
     speechRate,
     readerHeaderActions,
     hasSeenOnboarding,
+    reduceMotion,
     isLoading,
     updateShowImages,
     updateAutoRefresh,
@@ -235,6 +251,7 @@ export function AppSettingsProvider({ children }) {
     updateReaderHeaderActions,
     completeOnboarding,
     resetOnboarding,
+    updateReduceMotion,
   };
 
   return (

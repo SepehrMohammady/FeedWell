@@ -2,7 +2,7 @@
   "expo": {
     "name": "FeedWell",
     "slug": "feedwell",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "sdkVersion": "54.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -29,9 +29,10 @@
       "package": "com.feedwell.app",
       "permissions": [
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "POST_NOTIFICATIONS"
       ],
-      "versionCode": 64
+      "versionCode": 65
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -46,7 +47,13 @@
     },
     "scheme": "feedwell",
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "sounds": []
+        }
+      ]
     ]
   }
 }

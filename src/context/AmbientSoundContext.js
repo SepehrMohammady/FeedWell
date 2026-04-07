@@ -7,6 +7,7 @@ const AmbientSoundContext = createContext();
 const STORAGE_KEY_SOUND = 'ambient_current_sound';
 const STORAGE_KEY_LAST_SOUND = 'ambient_last_sound';
 const STORAGE_KEY_VOLUME = 'ambient_volume';
+const STORAGE_KEY_VOLUMES_PER_SOUND = 'ambient_volumes_per_sound';
 const STORAGE_KEY_AUTOPLAY = 'ambient_autoplay';
 
 export const AMBIENT_SOUNDS = [
@@ -35,6 +36,7 @@ export function AmbientSoundProvider({ children }) {
   const [currentSoundId, setCurrentSoundId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(0.5);
+  const [volumesPerSound, setVolumesPerSound] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [autoPlay, setAutoPlayState] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
@@ -63,10 +65,20 @@ export function AmbientSoundProvider({ children }) {
       const savedSoundId = await AsyncStorage.getItem(STORAGE_KEY_SOUND);
       const savedAutoPlay = await AsyncStorage.getItem(STORAGE_KEY_AUTOPLAY);
       const savedLastSound = await AsyncStorage.getItem(STORAGE_KEY_LAST_SOUND);
+      const savedVolumesPerSound = await AsyncStorage.getItem(STORAGE_KEY_VOLUMES_PER_SOUND);
       if (savedVolume !== null) setVolumeState(parseFloat(savedVolume));
       if (savedSoundId !== null) setCurrentSoundId(savedSoundId);
       if (savedAutoPlay !== null) setAutoPlayState(savedAutoPlay === 'true');
       if (savedLastSound !== null) setLastSoundId(savedLastSound);
+      if (savedVolumesPerSound !== null) {
+        const parsed = JSON.parse(savedVolumesPerSound);
+        setVolumesPerSound(parsed);
+        // If we have a saved sound, load its specific volume
+        const soundToCheck = savedSoundId || savedLastSound;
+        if (soundToCheck && parsed[soundToCheck] !== undefined) {
+          setVolumeState(parsed[soundToCheck]);
+        }
+      }
     } catch (error) {
       console.error('Error loading ambient sound preferences:', error);
     }
@@ -84,12 +96,16 @@ export function AmbientSoundProvider({ children }) {
         soundRef.current = null;
       }
 
+      // Use per-sound volume if available, otherwise use current volume
+      const soundVolume = volumesPerSound[soundId] !== undefined ? volumesPerSound[soundId] : volume;
+      setVolumeState(soundVolume);
+
       const { sound } = await Audio.Sound.createAsync(
         soundData.file,
         {
           shouldPlay: true,
           isLooping: true,
-          volume: volume,
+          volume: soundVolume,
         }
       );
 
@@ -113,7 +129,7 @@ export function AmbientSoundProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  }, [volume]);
+  }, [volume, volumesPerSound]);
 
   const togglePlayPause = useCallback(async () => {
     if (!soundRef.current) {
@@ -161,10 +177,16 @@ export function AmbientSoundProvider({ children }) {
         await soundRef.current.setVolumeAsync(clamped);
       }
       await AsyncStorage.setItem(STORAGE_KEY_VOLUME, clamped.toString());
+      // Save per-sound volume
+      if (currentSoundId) {
+        const updated = { ...volumesPerSound, [currentSoundId]: clamped };
+        setVolumesPerSound(updated);
+        await AsyncStorage.setItem(STORAGE_KEY_VOLUMES_PER_SOUND, JSON.stringify(updated));
+      }
     } catch (error) {
       console.error('Error setting volume:', error);
     }
-  }, []);
+  }, [currentSoundId, volumesPerSound]);
 
   const selectSound = useCallback(async (soundId) => {
     if (soundId === currentSoundId && isPlaying) {

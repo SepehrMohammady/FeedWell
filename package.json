@@ -1,6 +1,6 @@
 {
   "name": "feedwell",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -25,6 +25,7 @@
     "expo-document-picker": "~14.0.7",
     "expo-file-system": "~19.0.17",
     "expo-font": "~14.0.8",
+    "expo-notifications": "^0.32.16",
     "expo-screen-orientation": "~9.0.7",
     "expo-sharing": "~14.0.7",
     "expo-speech": "~14.0.8",
