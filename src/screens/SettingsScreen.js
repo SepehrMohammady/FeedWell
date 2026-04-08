@@ -74,13 +74,15 @@ export default function SettingsScreen({ navigation }) {
   // Widget settings state
   const [widgetTheme, setWidgetTheme] = useState('app'); // 'app', 'light', 'dark'
   const [showWidgetThemePicker, setShowWidgetThemePicker] = useState(false);
+  const [widgetOpacity, setWidgetOpacity] = useState(100); // 0-100%
 
   // Load target language and translation mode on mount
   useEffect(() => {
     loadTargetLanguage().then(code => setTargetLangCode(code));
     loadTranslationMode().then(mode => setTranslationMode(mode));
-    // Load widget theme preference
+    // Load widget preferences
     AsyncStorage.getItem('widget_theme').then(v => { if (v) setWidgetTheme(v); });
+    AsyncStorage.getItem('widget_opacity').then(v => { if (v) setWidgetOpacity(parseInt(v, 10)); });
   }, []);
 
   const handleChangeDefaultLang = async (langCode) => {
@@ -143,6 +145,15 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const widgetThemeLabel = widgetTheme === 'app' ? 'App Theme' : widgetTheme === 'light' ? 'Light' : 'Dark';
+
+  const handleWidgetOpacityChange = async (value) => {
+    const rounded = Math.round(value);
+    setWidgetOpacity(rounded);
+    await AsyncStorage.setItem('widget_opacity', String(rounded));
+    if (Platform.OS === 'android' && WidgetBridge) {
+      try { WidgetBridge.setWidgetOpacity(Math.round(rounded * 2.55)); } catch (e) {}
+    }
+  };
 
   const handleOpenModelManager = async () => {
     setShowModelManager(true);
@@ -1010,9 +1021,24 @@ export default function SettingsScreen({ navigation }) {
                 title="Widget Theme"
                 description={widgetThemeLabel}
                 onPress={() => setShowWidgetThemePicker(true)}
-                isLast={true}
                 rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
               />
+              <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 15, color: theme.colors.text }}>Widget Opacity</Text>
+                  <Text style={{ fontSize: 14, color: theme.colors.textSecondary }}>{widgetOpacity}%</Text>
+                </View>
+                <Slider
+                  minimumValue={20}
+                  maximumValue={100}
+                  step={5}
+                  value={widgetOpacity}
+                  onSlidingComplete={handleWidgetOpacityChange}
+                  minimumTrackTintColor={theme.colors.primary}
+                  maximumTrackTintColor={theme.colors.border}
+                  thumbTintColor={theme.colors.primary}
+                />
+              </View>
             </View>
           </>
         )}
