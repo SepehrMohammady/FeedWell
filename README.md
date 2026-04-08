@@ -56,10 +56,10 @@ No accounts. No tracking. No ads. Everything stays on your device.
 
 ### 📖 Beautiful Reader
 - In-app article reader with clean typography
-- **Translate articles** — Google Translate (online) + ML Kit (offline)
+- Translate articles — Google Translate (online) + ML Kit (offline)
 - Default translation language matches your device language
-- **Read aloud (TTS)** with adjustable speed
-- **Reading position bookmark** — save and restore your scroll position
+- Read aloud (TTS) with adjustable speed
+- Reading position bookmark — save and restore your scroll position
 - RTL language support (Farsi, Arabic, Hebrew)
 - Selectable text for copying
 - Open in browser or read in-app
@@ -79,7 +79,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 <td width="50%">
 
 ### 🎵 Ambient Sounds
-- **Background audio** while reading — white noise, lo-fi beats, nature sounds, and more
+- Background audio while reading — white noise, lo-fi beats, nature sounds, and more
 - Per-sound volume control
 - Auto-play on app launch (optional)
 - Access from the header icon or reader menu
@@ -88,10 +88,10 @@ No accounts. No tracking. No ads. Everything stays on your device.
 <td width="50%">
 
 ### 📱 Home Screen Widget
-- **Scrollable article list** or compact single-article view
-- **Dark / Light theme** — follows app theme or set independently
-- **Refresh button** to update articles
+- Scrollable article list or compact single-article view
+- Dark / Light theme — follows app theme or set independently
 - Quick-add shortcut from Settings
+- Change opacity from Settings
 
 </td>
 </tr>
@@ -99,22 +99,21 @@ No accounts. No tracking. No ads. Everything stays on your device.
 <td width="50%">
 
 ### 🎨 Personalized Experience
-- Dark mode & light mode (**follows device theme** on first install)
-- Adjustable font size
+- Dark mode & light mode (follows device theme on first install)
 - Toggle article images on/off
 - Choose your theme accent color
 - Responsive layout for any screen size
-- **Full backup & restore** — export/import feeds, articles, saved items, and all settings
+- Full backup & restore — export/import feeds, articles, saved items, and all settings
 
 </td>
 <td width="50%">
 
 ### 🛡️ Privacy First
-- **Zero data collection** — all data stays on your device
-- **No analytics** — no tracking whatsoever
-- **Local storage** — feeds & articles stored securely
-- **Reading reminder** — gentle notification if you haven't read in a while
-- **Open source** — inspect every line of code
+- Zero data collection — all data stays on your device
+- No analytics — no tracking whatsoever
+- Local storage — feeds & articles stored securely
+- Reading reminder — gentle notification if you haven't read in a while
+- Open source — inspect every line of code
 
 </td>
 </tr>
