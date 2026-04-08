@@ -10,12 +10,14 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from './VolumeSlider';
 import { useTheme } from '../context/ThemeContext';
 import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext';
 
 export default function MiniPlayer() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const { currentSound, currentSoundId, isPlaying, isLoading, volume, togglePlayPause, stopSound, setVolume, selectSound, showPlaylist, setShowPlaylist } = useAmbientSound();
   const [expanded, setExpanded] = useState(false);
   const [showSoundInfo, setShowSoundInfo] = useState(null);
@@ -97,7 +99,7 @@ export default function MiniPlayer() {
       onRequestClose={() => setShowPlaylist(false)}
     >
       <View style={styles.playlistOverlay}>
-        <View style={[styles.playlistContainer, { backgroundColor: theme.colors.surface }]}>
+        <View style={[styles.playlistContainer, { backgroundColor: theme.colors.surface, paddingBottom: Math.max(24, insets.bottom + 16) }]}>
           <View style={[styles.playlistHeader, { borderBottomColor: theme.colors.border }]}>
             <Text style={[styles.playlistTitle, { color: theme.colors.text }]}>Ambient Sounds</Text>
             <TouchableOpacity onPress={() => setShowPlaylist(false)} style={styles.playlistClose}>
