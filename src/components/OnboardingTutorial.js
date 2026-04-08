@@ -34,7 +34,7 @@ const ONBOARDING_SLIDES = [
     id: 3,
     icon: 'add-circle-outline',
     title: 'Manage Your Feeds',
-    description: 'Add RSS or Atom feeds from any website and manage all sources in one place. Filter by All, Unread, or Read. Sort by newest or oldest. Mark all as read with one tap. Share articles with friends.',
+    description: 'Add RSS or Atom feeds from any website and manage all sources in one place. Filter by All, Unread, or Read. Sort by newest or oldest. Mark all as read with one tap. Share articles with others.',
     color: '#5F758E',
   },
   {
@@ -55,14 +55,14 @@ const ONBOARDING_SLIDES = [
     id: 6,
     icon: 'sparkles-outline',
     title: 'Reader Features',
-    description: 'Translate articles into 50+ languages (online or offline). Listen with Read Aloud (TTS) at adjustable speed. Play ambient background sounds while reading. Take notes on any article — saved locally.',
+    description: 'Translate articles into 50+ languages (online or offline). Listen with Read Aloud (TTS) at adjustable speed. Play ambient background sounds while reading. Take notes on any article.',
     color: '#7B8E6B',
   },
   {
     id: 7,
     icon: 'grid-outline',
     title: 'Home Screen Widget',
-    description: 'Add the FeedWell widget to your home screen for quick access to latest articles. Choose between a scrollable list or compact view. Customize the theme and opacity from Settings.',
+    description: 'Add the FeedWell widget to your home screen for quick access to latest articles. Customize the theme and opacity from Settings.',
     color: '#6B8E9B',
   },
   {
