@@ -57,6 +57,8 @@ No accounts. No tracking. No ads. Everything stays on your device.
 ### 📖 Beautiful Reader
 - In-app article reader with clean typography
 - **Translate articles** — Google Translate (online) + ML Kit (offline)
+- Default translation language matches your device language
+- **Read aloud (TTS)** with adjustable speed
 - RTL language support (Farsi, Arabic, Hebrew)
 - Selectable text for copying
 - Open in browser or read in-app
@@ -69,6 +71,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - Search & sort saved articles
 - Sort by newest or oldest
 - Share articles with preview images
+- **Ambient sounds** — customizable background audio while reading
 
 </td>
 </tr>
@@ -76,11 +79,12 @@ No accounts. No tracking. No ads. Everything stays on your device.
 <td width="50%">
 
 ### 🎨 Personalized Experience
-- Dark mode & light mode
+- Dark mode & light mode (**follows device theme** on first install)
 - Adjustable font size
 - Toggle article images on/off
 - Choose your theme accent color
 - Responsive layout for any screen size
+- **Home screen widget** — scrollable article list or compact single-article view
 
 </td>
 <td width="50%">
@@ -89,7 +93,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - **Zero data collection** — all data stays on your device
 - **No analytics** — no tracking whatsoever
 - **Local storage** — feeds & articles stored securely
-- **Backup & restore** — export/import your data anytime
+- **Full backup & restore** — export/import feeds, articles, saved items, and all settings
 - **Open source** — inspect every line of code
 
 </td>

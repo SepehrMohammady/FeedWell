@@ -48,7 +48,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const insets = useSafeAreaInsets();
@@ -284,6 +284,14 @@ export default function SettingsScreen({ navigation }) {
           maxArticleAge,
           reduceMotion,
           readingReminder,
+          showBookmarkIndicators,
+          skipArticleView,
+          showReadingPositionInFeeds,
+          allowRotation,
+          speechRate,
+          readerHeaderActions,
+          targetLangCode,
+          translationMode,
         },
       };
 
@@ -455,6 +463,32 @@ export default function SettingsScreen({ navigation }) {
         }
         if (typeof backupData.settings.readingReminder === 'boolean') {
           await updateReadingReminder(backupData.settings.readingReminder);
+        }
+        if (typeof backupData.settings.showBookmarkIndicators === 'boolean') {
+          await updateShowBookmarkIndicators(backupData.settings.showBookmarkIndicators);
+        }
+        if (typeof backupData.settings.skipArticleView === 'boolean') {
+          await updateSkipArticleView(backupData.settings.skipArticleView);
+        }
+        if (typeof backupData.settings.showReadingPositionInFeeds === 'boolean') {
+          await updateShowReadingPositionInFeeds(backupData.settings.showReadingPositionInFeeds);
+        }
+        if (typeof backupData.settings.allowRotation === 'boolean') {
+          await updateAllowRotation(backupData.settings.allowRotation);
+        }
+        if (typeof backupData.settings.speechRate === 'number') {
+          await updateSpeechRate(backupData.settings.speechRate);
+        }
+        if (Array.isArray(backupData.settings.readerHeaderActions)) {
+          await updateReaderHeaderActions(backupData.settings.readerHeaderActions);
+        }
+        if (backupData.settings.targetLangCode) {
+          await saveTargetLanguage(backupData.settings.targetLangCode);
+          setTargetLangCode(backupData.settings.targetLangCode);
+        }
+        if (backupData.settings.translationMode) {
+          await saveTranslationMode(backupData.settings.translationMode);
+          setTranslationMode(backupData.settings.translationMode);
         }
       }
 

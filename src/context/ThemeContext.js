@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ThemeContext = createContext();
@@ -76,6 +77,10 @@ export function ThemeProvider({ children }) {
       const savedTheme = await AsyncStorage.getItem('theme');
       if (savedTheme !== null) {
         setIsDarkMode(savedTheme === 'dark');
+      } else {
+        // First install: use device theme
+        const colorScheme = Appearance.getColorScheme();
+        setIsDarkMode(colorScheme === 'dark');
       }
     } catch (error) {
       console.error('Error loading theme preference:', error);

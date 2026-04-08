@@ -272,7 +272,7 @@ export default function ReadLaterScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {renderHeader()}
-      {renderSearchBar()}
+      {articles.length > 0 && renderSearchBar()}
       <FlatList
         data={filteredAndSortedArticles}
         keyExtractor={(item) => item.id}

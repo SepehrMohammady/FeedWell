@@ -4,6 +4,7 @@
 
 import FastTranslator from 'fast-mlkit-translate-text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform, NativeModules } from 'react-native';
 
 // Storage keys
 const TARGET_LANGUAGE_KEY = 'feedwell_translation_target_language';
@@ -313,7 +314,20 @@ export async function saveTargetLanguage(langCode) {
 }
 
 export async function loadTargetLanguage() {
-  try { const saved = await AsyncStorage.getItem(TARGET_LANGUAGE_KEY); return saved || 'en'; }
+  try {
+    const saved = await AsyncStorage.getItem(TARGET_LANGUAGE_KEY);
+    if (saved) return saved;
+    // First use: detect device language
+    let deviceLang = 'en';
+    try {
+      const locale = Platform.OS === 'ios'
+        ? (NativeModules.SettingsManager?.settings?.AppleLocale || NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] || 'en')
+        : NativeModules.I18nManager?.localeIdentifier || 'en';
+      deviceLang = locale.split(/[-_]/)[0].toLowerCase();
+    } catch (e) { /* ignore */ }
+    // Only use if it's a supported language
+    return CODE_TO_MLKIT[deviceLang] ? deviceLang : 'en';
+  }
   catch (error) { console.error('Error loading target language:', error); return 'en'; }
 }
 
