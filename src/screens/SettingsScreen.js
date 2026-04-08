@@ -1033,6 +1033,7 @@ export default function SettingsScreen({ navigation }) {
                   maximumValue={100}
                   step={5}
                   value={widgetOpacity}
+                  onValueChange={(v) => setWidgetOpacity(Math.round(v))}
                   onSlidingComplete={handleWidgetOpacityChange}
                   minimumTrackTintColor={theme.colors.primary}
                   maximumTrackTintColor={theme.colors.border}
