@@ -59,6 +59,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - **Translate articles** — Google Translate (online) + ML Kit (offline)
 - Default translation language matches your device language
 - **Read aloud (TTS)** with adjustable speed
+- **Reading position bookmark** — save and restore your scroll position
 - RTL language support (Farsi, Arabic, Hebrew)
 - Selectable text for copying
 - Open in browser or read in-app
@@ -71,7 +72,26 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - Search & sort saved articles
 - Sort by newest or oldest
 - Share articles with preview images
-- **Ambient sounds** — customizable background audio while reading
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🎵 Ambient Sounds
+- **Background audio** while reading — white noise, lo-fi beats, nature sounds, and more
+- Per-sound volume control
+- Auto-play on app launch (optional)
+- Access from the header icon or reader menu
+
+</td>
+<td width="50%">
+
+### 📱 Home Screen Widget
+- **Scrollable article list** or compact single-article view
+- **Dark / Light theme** — follows app theme or set independently
+- **Refresh button** to update articles
+- Quick-add shortcut from Settings
 
 </td>
 </tr>
@@ -84,7 +104,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - Toggle article images on/off
 - Choose your theme accent color
 - Responsive layout for any screen size
-- **Home screen widget** — scrollable article list or compact single-article view
+- **Full backup & restore** — export/import feeds, articles, saved items, and all settings
 
 </td>
 <td width="50%">
@@ -93,7 +113,7 @@ No accounts. No tracking. No ads. Everything stays on your device.
 - **Zero data collection** — all data stays on your device
 - **No analytics** — no tracking whatsoever
 - **Local storage** — feeds & articles stored securely
-- **Full backup & restore** — export/import feeds, articles, saved items, and all settings
+- **Reading reminder** — gentle notification if you haven't read in a while
 - **Open source** — inspect every line of code
 
 </td>

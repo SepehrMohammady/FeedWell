@@ -27,6 +27,17 @@
             android:textStyle="bold" />
 
         <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/stat_notify_sync"
+            android:contentDescription="Refresh articles"
+            android:scaleType="centerInside"
+            android:tint="@color/widget_icon"
+            android:layout_marginEnd="4dp" />
+
+        <ImageButton
             android:id="@+id/widget_prev_button"
             android:layout_width="26dp"
             android:layout_height="26dp"

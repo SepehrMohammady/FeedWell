@@ -19,7 +19,7 @@ const ONBOARDING_SLIDES = [
     id: 1,
     icon: 'newspaper-outline',
     title: 'Welcome to FeedWell',
-    description: 'Your ad-free RSS reader for a clean, distraction-free reading experience across Android, iOS, and Windows.',
+    description: 'Your ad-free RSS reader for a clean, distraction-free reading experience.',
     color: '#A17F66',
     showLogo: true,
   },

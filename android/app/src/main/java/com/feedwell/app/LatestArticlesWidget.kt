@@ -17,9 +17,13 @@ class LatestArticlesWidget : AppWidgetProvider() {
         const val ACTION_NEXT = "com.feedwell.app.WIDGET_NEXT"
         const val ACTION_PREV = "com.feedwell.app.WIDGET_PREV"
         const val ACTION_OPEN = "com.feedwell.app.WIDGET_OPEN"
+        const val ACTION_REFRESH = "com.feedwell.app.WIDGET_REFRESH"
         const val PREFS_NAME = "FeedWellWidgetPrefs"
         const val KEY_ARTICLES = "widget_articles"
         const val KEY_CURRENT_INDEX = "widget_current_index"
+        const val KEY_WIDGET_THEME = "widget_theme"
+        const val KEY_WIDGET_OPACITY = "widget_opacity"
+        const val KEY_APP_THEME = "app_theme"
 
         // Height thresholds in dp
         const val HEIGHT_COMPACT = 100  // 1-row: title only
@@ -50,6 +54,25 @@ class LatestArticlesWidget : AppWidgetProvider() {
                 action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             }
             context.sendBroadcast(intent)
+        }
+
+        /** Returns true if widget should use dark colors */
+        fun isWidgetDark(context: Context): Boolean {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val widgetTheme = prefs.getString(KEY_WIDGET_THEME, "app") ?: "app"
+            return when (widgetTheme) {
+                "light" -> false
+                "dark" -> true
+                else -> { // "app" — follow app theme
+                    val appTheme = prefs.getString(KEY_APP_THEME, "light") ?: "light"
+                    appTheme == "dark"
+                }
+            }
+        }
+
+        fun getWidgetOpacity(context: Context): Int {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            return prefs.getInt(KEY_WIDGET_OPACITY, 255) // 0-255
         }
     }
 
@@ -110,6 +133,14 @@ class LatestArticlesWidget : AppWidgetProvider() {
                     if (launchIntent != null) context.startActivity(launchIntent)
                 }
             }
+            ACTION_REFRESH -> {
+                // Open the app so it refreshes feeds, then widget data gets updated
+                val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                if (launchIntent != null) context.startActivity(launchIntent)
+                refreshAllWidgets(context)
+            }
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val thisWidget = android.content.ComponentName(context, LatestArticlesWidget::class.java)
@@ -135,6 +166,23 @@ class LatestArticlesWidget : AppWidgetProvider() {
         val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
 
         val articles = getArticles(context)
+
+        // ── Apply theme colors programmatically ──
+        val dark = isWidgetDark(context)
+        val titleColor = if (dark) 0xFFF0E6DE.toInt() else 0xFF3C2A1E.toInt()
+        val headerColor = if (dark) 0xFFCDADA0.toInt() else 0xFFA17F66.toInt()
+        val feedColor = if (dark) 0xFFB09A85.toInt() else 0xFF8B7355.toInt()
+        val dateColor = if (dark) 0xFF8B7355.toInt() else 0xFFB09A85.toInt()
+        val indicatorColor = if (dark) 0xFF6B5B4F.toInt() else 0xFFC4AA94.toInt()
+
+        val bgRes = if (dark) R.drawable.widget_background_dark else R.drawable.widget_background_light
+        views.setInt(R.id.widget_container, "setBackgroundResource", bgRes)
+        views.setTextColor(R.id.widget_app_name, headerColor)
+        views.setTextColor(R.id.widget_article_title, titleColor)
+        views.setTextColor(R.id.widget_article_feed, feedColor)
+        views.setTextColor(R.id.widget_article_date, dateColor)
+        views.setTextColor(R.id.widget_article_description, feedColor)
+        views.setTextColor(R.id.widget_page_indicator, indicatorColor)
 
         when {
             // ── LIST MODE: tall widget → scrollable list ──
@@ -207,6 +255,11 @@ class LatestArticlesWidget : AppWidgetProvider() {
         val prevIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_PREV }
         val prevPending = PendingIntent.getBroadcast(context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         views.setOnClickPendingIntent(R.id.widget_prev_button, prevPending)
+
+        // Refresh button
+        val refreshIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_REFRESH }
+        val refreshPending = PendingIntent.getBroadcast(context, 4, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_refresh_button, refreshPending)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }

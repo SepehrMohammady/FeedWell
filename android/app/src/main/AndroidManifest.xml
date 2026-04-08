@@ -36,6 +36,7 @@
         <action android:name="com.feedwell.app.WIDGET_NEXT" />
         <action android:name="com.feedwell.app.WIDGET_PREV" />
         <action android:name="com.feedwell.app.WIDGET_OPEN" />
+        <action android:name="com.feedwell.app.WIDGET_REFRESH" />
       </intent-filter>
       <meta-data
           android:name="android.appwidget.provider"

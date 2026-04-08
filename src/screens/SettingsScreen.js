@@ -12,6 +12,7 @@ import {
   FlatList,
   TextInput,
   ActivityIndicator,
+  NativeModules,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -70,10 +71,16 @@ export default function SettingsScreen({ navigation }) {
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
+  // Widget settings state
+  const [widgetTheme, setWidgetTheme] = useState('app'); // 'app', 'light', 'dark'
+  const [showWidgetThemePicker, setShowWidgetThemePicker] = useState(false);
+
   // Load target language and translation mode on mount
   useEffect(() => {
     loadTargetLanguage().then(code => setTargetLangCode(code));
     loadTranslationMode().then(mode => setTranslationMode(mode));
+    // Load widget theme preference
+    AsyncStorage.getItem('widget_theme').then(v => { if (v) setWidgetTheme(v); });
   }, []);
 
   const handleChangeDefaultLang = async (langCode) => {
@@ -97,6 +104,45 @@ export default function SettingsScreen({ navigation }) {
     const option = articleAgeOptions.find(o => o.value === months);
     return option ? option.label : `${months} months`;
   };
+
+  // Widget settings handlers
+  const { WidgetBridge } = NativeModules;
+
+  const handleWidgetThemeChange = async (theme) => {
+    setWidgetTheme(theme);
+    setShowWidgetThemePicker(false);
+    await AsyncStorage.setItem('widget_theme', theme);
+    if (Platform.OS === 'android' && WidgetBridge) {
+      try { WidgetBridge.setWidgetTheme(theme); } catch (e) {}
+    }
+  };
+
+  const handleAddWidget = async () => {
+    if (Platform.OS === 'android' && WidgetBridge) {
+      try {
+        const result = await WidgetBridge.requestPinWidget();
+        if (!result) {
+          setAlertConfig({
+            visible: true,
+            title: 'Widget',
+            message: 'Your launcher does not support adding widgets this way. Please add the FeedWell widget manually from your home screen.',
+            icon: 'information-circle',
+            buttons: [{ text: 'OK', style: 'cancel' }],
+          });
+        }
+      } catch (e) {
+        setAlertConfig({
+          visible: true,
+          title: 'Widget',
+          message: 'Could not add widget. Please add it manually from your home screen.',
+          icon: 'information-circle',
+          buttons: [{ text: 'OK', style: 'cancel' }],
+        });
+      }
+    }
+  };
+
+  const widgetThemeLabel = widgetTheme === 'app' ? 'App Theme' : widgetTheme === 'light' ? 'Light' : 'Dark';
 
   const handleOpenModelManager = async () => {
     setShowModelManager(true);
@@ -950,6 +996,27 @@ export default function SettingsScreen({ navigation }) {
           />
         </View>
 
+        {Platform.OS === 'android' && (
+          <>
+            <SectionHeader title="Home Screen Widget" />
+            <View style={styles.section}>
+              <SettingItem
+                title="Add Widget to Home Screen"
+                description="Place the FeedWell widget on your home screen"
+                onPress={handleAddWidget}
+                rightElement={<Ionicons name="add-circle-outline" size={22} color={theme.colors.primary} />}
+              />
+              <SettingItem
+                title="Widget Theme"
+                description={widgetThemeLabel}
+                onPress={() => setShowWidgetThemePicker(true)}
+                isLast={true}
+                rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
+              />
+            </View>
+          </>
+        )}
+
         <SectionHeader title="Ambient Sounds" />
         <View style={styles.section}>
           <SettingItem
@@ -1404,6 +1471,61 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                 </View>
                 {maxArticleAge === option.value && (
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Widget Theme Picker Modal */}
+      <Modal
+        visible={showWidgetThemePicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowWidgetThemePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Widget Theme</Text>
+              <TouchableOpacity
+                onPress={() => setShowWidgetThemePicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {[
+              { value: 'app', label: 'App Theme', desc: 'Follow the app\'s light/dark setting', icon: 'phone-portrait-outline' },
+              { value: 'light', label: 'Light', desc: 'Always use light colors', icon: 'sunny-outline' },
+              { value: 'dark', label: 'Dark', desc: 'Always use dark colors', icon: 'moon-outline' },
+            ].map((option, index) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.modeItem,
+                  widgetTheme === option.value && styles.langItemSelected,
+                  index === 2 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => handleWidgetThemeChange(option.value)}
+              >
+                <View style={styles.modeItemContent}>
+                  <Ionicons
+                    name={option.icon}
+                    size={22}
+                    color={widgetTheme === option.value ? theme.colors.primary : theme.colors.text}
+                  />
+                  <View style={styles.modeItemText}>
+                    <Text style={[styles.modeItemTitle, widgetTheme === option.value && { color: theme.colors.primary }]}>
+                      {option.label}
+                    </Text>
+                    <Text style={styles.modeItemDesc}>{option.desc}</Text>
+                  </View>
+                </View>
+                {widgetTheme === option.value && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>

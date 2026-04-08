@@ -1596,12 +1596,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Fixed aim line - tappable to save/remove bookmark */}
+      {/* Fixed aim line - tappable to save/update bookmark position */}
       {showBookmarkIndicators && showScrollToTop && (
         <TouchableOpacity
           activeOpacity={0.6}
           hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-          onPress={hasBookmark ? handleIndicatorPress : saveBookmark}
+          onPress={saveBookmark}
           style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
           <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>

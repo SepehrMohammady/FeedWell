@@ -29,6 +29,15 @@ class WidgetArticleListFactory(private val context: Context) : RemoteViewsServic
     override fun getViewAt(position: Int): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_article_item)
 
+        // Apply theme colors
+        val dark = LatestArticlesWidget.isWidgetDark(context)
+        val titleColor = if (dark) 0xFFF0E6DE.toInt() else 0xFF3C2A1E.toInt()
+        val feedColor = if (dark) 0xFFB09A85.toInt() else 0xFF8B7355.toInt()
+        val dateColor = if (dark) 0xFF8B7355.toInt() else 0xFFB09A85.toInt()
+        views.setTextColor(R.id.widget_item_title, titleColor)
+        views.setTextColor(R.id.widget_item_feed, feedColor)
+        views.setTextColor(R.id.widget_item_date, dateColor)
+
         if (position < articles.length()) {
             val article = articles.getJSONObject(position)
             val title = article.optString("title", "Untitled")

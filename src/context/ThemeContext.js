@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Appearance } from 'react-native';
+import { Appearance, NativeModules, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { WidgetBridge } = NativeModules;
 
 const ThemeContext = createContext();
 
@@ -72,15 +74,23 @@ export function ThemeProvider({ children }) {
     loadThemePreference();
   }, []);
 
+  const syncWidgetTheme = (dark) => {
+    if (Platform.OS === 'android' && WidgetBridge) {
+      try { WidgetBridge.setAppTheme(dark ? 'dark' : 'light'); } catch (e) {}
+    }
+  };
+
   const loadThemePreference = async () => {
     try {
       const savedTheme = await AsyncStorage.getItem('theme');
       if (savedTheme !== null) {
         setIsDarkMode(savedTheme === 'dark');
+        syncWidgetTheme(savedTheme === 'dark');
       } else {
         // First install: use device theme
         const colorScheme = Appearance.getColorScheme();
         setIsDarkMode(colorScheme === 'dark');
+        syncWidgetTheme(colorScheme === 'dark');
       }
     } catch (error) {
       console.error('Error loading theme preference:', error);
@@ -94,6 +104,7 @@ export function ThemeProvider({ children }) {
       const newTheme = !isDarkMode;
       setIsDarkMode(newTheme);
       await AsyncStorage.setItem('theme', newTheme ? 'dark' : 'light');
+      syncWidgetTheme(newTheme);
     } catch (error) {
       console.error('Error saving theme preference:', error);
     }
