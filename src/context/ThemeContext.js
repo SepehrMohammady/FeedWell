@@ -81,8 +81,7 @@ export const darkTheme  = buildTheme(baseDarkColors,  darkShadows,  DARK_PALETTE
 
 export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [lightPaletteIndex, setLightPaletteIndex] = useState(0);
-  const [darkPaletteIndex, setDarkPaletteIndex] = useState(0);
+  const [paletteIndex, setPaletteIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -97,10 +96,9 @@ export function ThemeProvider({ children }) {
 
   const loadThemePreference = async () => {
     try {
-      const [savedTheme, savedLight, savedDark] = await Promise.all([
+      const [savedTheme, savedPalette] = await Promise.all([
         AsyncStorage.getItem('theme'),
-        AsyncStorage.getItem('lightPaletteIndex'),
-        AsyncStorage.getItem('darkPaletteIndex'),
+        AsyncStorage.getItem('paletteIndex'),
       ]);
       if (savedTheme !== null) {
         setIsDarkMode(savedTheme === 'dark');
@@ -110,8 +108,7 @@ export function ThemeProvider({ children }) {
         setIsDarkMode(colorScheme === 'dark');
         syncWidgetTheme(colorScheme === 'dark');
       }
-      if (savedLight !== null) setLightPaletteIndex(parseInt(savedLight, 10));
-      if (savedDark  !== null) setDarkPaletteIndex(parseInt(savedDark, 10));
+      if (savedPalette !== null) setPaletteIndex(parseInt(savedPalette, 10));
     } catch (error) {
       console.error('Error loading theme preference:', error);
     } finally {
@@ -130,37 +127,26 @@ export function ThemeProvider({ children }) {
     }
   };
 
-  const setLightPalette = async (index) => {
+  const setPalette = async (index) => {
     try {
-      setLightPaletteIndex(index);
-      await AsyncStorage.setItem('lightPaletteIndex', String(index));
+      setPaletteIndex(index);
+      await AsyncStorage.setItem('paletteIndex', String(index));
     } catch (error) {
-      console.error('Error saving light palette:', error);
-    }
-  };
-
-  const setDarkPalette = async (index) => {
-    try {
-      setDarkPaletteIndex(index);
-      await AsyncStorage.setItem('darkPaletteIndex', String(index));
-    } catch (error) {
-      console.error('Error saving dark palette:', error);
+      console.error('Error saving palette:', error);
     }
   };
 
   const theme = isDarkMode
-    ? buildTheme(baseDarkColors,  darkShadows,  DARK_PALETTES[darkPaletteIndex])
-    : buildTheme(baseLightColors, lightShadows, LIGHT_PALETTES[lightPaletteIndex]);
+    ? buildTheme(baseDarkColors,  darkShadows,  DARK_PALETTES[paletteIndex])
+    : buildTheme(baseLightColors, lightShadows, LIGHT_PALETTES[paletteIndex]);
 
   const value = {
     theme,
     isDarkMode,
     toggleTheme,
     isLoading,
-    lightPaletteIndex,
-    darkPaletteIndex,
-    setLightPalette,
-    setDarkPalette,
+    paletteIndex,
+    setPalette,
     LIGHT_PALETTES,
     DARK_PALETTES,
   };
