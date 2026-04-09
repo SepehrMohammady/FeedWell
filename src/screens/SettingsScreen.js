@@ -48,7 +48,7 @@ import {
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
-  const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { theme, isDarkMode, toggleTheme, lightPaletteIndex, darkPaletteIndex, setLightPalette, setDarkPalette, LIGHT_PALETTES, DARK_PALETTES } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
@@ -924,6 +924,42 @@ export default function SettingsScreen({ navigation }) {
                 trackColor={{ false: '#767577', true: theme.colors.primary }}
                 thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
               />
+            }
+          />
+          <SettingItem
+            title="Light Theme Color"
+            description={LIGHT_PALETTES[lightPaletteIndex].name}
+            rightElement={
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {LIGHT_PALETTES.map((p, i) => (
+                  <TouchableOpacity key={i} onPress={() => setLightPalette(i)} style={{ marginLeft: i > 0 ? 6 : 0 }}>
+                    <View style={{
+                      width: 26, height: 26, borderRadius: 13,
+                      backgroundColor: p.primary,
+                      borderWidth: lightPaletteIndex === i ? 2.5 : 1.5,
+                      borderColor: lightPaletteIndex === i ? theme.colors.text : theme.colors.border,
+                    }} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            }
+          />
+          <SettingItem
+            title="Dark Theme Color"
+            description={DARK_PALETTES[darkPaletteIndex].name}
+            rightElement={
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {DARK_PALETTES.map((p, i) => (
+                  <TouchableOpacity key={i} onPress={() => setDarkPalette(i)} style={{ marginLeft: i > 0 ? 6 : 0 }}>
+                    <View style={{
+                      width: 26, height: 26, borderRadius: 13,
+                      backgroundColor: p.primary,
+                      borderWidth: darkPaletteIndex === i ? 2.5 : 1.5,
+                      borderColor: darkPaletteIndex === i ? theme.colors.text : theme.colors.border,
+                    }} />
+                  </TouchableOpacity>
+                ))}
+              </View>
             }
           />
           <SettingItem

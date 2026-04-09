@@ -5,8 +5,8 @@ import { Platform } from 'react-native';
 const NOTIFICATION_ID_KEY = 'feedwell_reminder_notification_id';
 const LAST_OPEN_KEY = 'feedwell_last_open_time';
 
-// 11 hours and 45 minutes in seconds
-const REMINDER_DELAY_SECONDS = 11 * 3600 + 45 * 60;
+// 23 hours and 45 minutes in seconds (resets every time the app is opened)
+const REMINDER_DELAY_SECONDS = 23 * 3600 + 45 * 60;
 
 // Configure how notifications appear when app is in foreground
 Notifications.setNotificationHandler({
