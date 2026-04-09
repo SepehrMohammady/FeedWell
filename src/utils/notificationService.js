@@ -34,7 +34,7 @@ export async function requestNotificationPermissions() {
 }
 
 /**
- * Schedule a reminder notification 11h45m from now.
+ * Schedule a reminder notification 23h45m from now.
  * Cancels any previously scheduled reminder first.
  */
 export async function scheduleReminderNotification() {
@@ -73,11 +73,8 @@ export async function scheduleReminderNotification() {
  */
 export async function cancelReminderNotification() {
   try {
-    const existingId = await AsyncStorage.getItem(NOTIFICATION_ID_KEY);
-    if (existingId) {
-      await Notifications.cancelScheduledNotificationAsync(existingId);
-      await AsyncStorage.removeItem(NOTIFICATION_ID_KEY);
-    }
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await AsyncStorage.removeItem(NOTIFICATION_ID_KEY);
   } catch (error) {
     console.error('Error cancelling reminder notification:', error);
   }
