@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 // 24 hours in seconds — remind user at the same time tomorrow
-const REMINDER_DELAY_SECONDS = 30; // 24 * 3600; // 30 seconds for testing
+const REMINDER_DELAY_SECONDS = 24 * 3600;
 
 // Configure how notifications appear when app is in foreground
 Notifications.setNotificationHandler({
