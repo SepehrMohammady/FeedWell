@@ -35,7 +35,6 @@ import CustomAlert from '../components/CustomAlert';
 import {
   translateText,
   identifyLanguage,
-  localCodeToMLKit,
   loadTargetLanguage,
   saveTargetLanguage,
   loadTranslationMode,
@@ -1601,13 +1600,24 @@ function ArticleReaderScreenContent({ route, navigation }) {
         <TouchableOpacity
           activeOpacity={0.6}
           hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-          onPress={saveBookmark}
+          onPress={hasBookmark ? handleIndicatorPress : saveBookmark}
           style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
-          <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
-            <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
-          </View>
-          <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
+          {hasBookmark ? (
+            <>
+              <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
+                <Ionicons name="bookmark" size={10} color="#fff" />
+              </View>
+              <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary + '50' }]} />
+            </>
+          ) : (
+            <>
+              <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
+                <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
+              </View>
+              <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
+            </>
+          )}
         </TouchableOpacity>
       )}
 

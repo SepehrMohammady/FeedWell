@@ -75,10 +75,6 @@ const buildTheme = (baseColors, shadows, palette) => ({
   shadows,
 });
 
-// Default exports for legacy imports
-export const lightTheme = buildTheme(baseLightColors, lightShadows, LIGHT_PALETTES[0]);
-export const darkTheme  = buildTheme(baseDarkColors,  darkShadows,  DARK_PALETTES[0]);
-
 export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [paletteIndex, setPaletteIndex] = useState(0);
