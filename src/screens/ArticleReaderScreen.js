@@ -1595,29 +1595,18 @@ function ArticleReaderScreenContent({ route, navigation }) {
         )}
       </ScrollView>
 
-      {/* Fixed aim line - tappable to save/update bookmark position */}
+      {/* Fixed aim line - always on top, tappable to save/update bookmark position */}
       {showBookmarkIndicators && showScrollToTop && (
         <TouchableOpacity
           activeOpacity={0.6}
           hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-          onPress={hasBookmark ? handleIndicatorPress : saveBookmark}
+          onPress={saveBookmark}
           style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
-          {hasBookmark ? (
-            <>
-              <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
-                <Ionicons name="bookmark" size={10} color="#fff" />
-              </View>
-              <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary + '50' }]} />
-            </>
-          ) : (
-            <>
-              <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
-                <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
-              </View>
-              <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
-            </>
-          )}
+          <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
+            <Ionicons name="bookmark-outline" size={11} color={theme.colors.textSecondary + '70'} />
+          </View>
+          <View style={[styles.aimLineBar, { borderColor: theme.colors.textSecondary + '40' }]} />
         </TouchableOpacity>
       )}
 

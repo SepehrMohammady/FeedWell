@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Linking } from 'react-native';
+import { AppState, Linking } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef, CommonActions } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -136,7 +136,7 @@ function AppContent() {
     }
   }, [allowRotation, isLoading]);
 
-  // Set up notification channel and schedule reminder on app open
+  // Set up notification channel and schedule reminder on app open/foreground
   useEffect(() => {
     setupNotificationChannel();
     if (readingReminder) {
@@ -144,6 +144,16 @@ function AppContent() {
     } else {
       cancelReminderNotification();
     }
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        if (readingReminder) {
+          scheduleReminderNotification();
+        }
+      }
+    });
+
+    return () => subscription.remove();
   }, [readingReminder]);
 
   // Handle deep links from widget
