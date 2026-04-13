@@ -429,6 +429,22 @@ function ArticleReaderScreenContent({ route, navigation }) {
     });
   }, [removeBookmark]);
 
+  const handleAimLinePress = useCallback(() => {
+    if (hasBookmark && bookmarkScrollPercent != null && viewportHeightRef.current > 0) {
+      const cH = contentHeightRef.current;
+      const vH = viewportHeightRef.current;
+      const savedY = bookmarkScrollPercent * cH;
+      const aimY = currentScrollY.current + (vH / 2);
+      
+      // If the aim line and saved bookmark overlap (within ~40px)
+      if (Math.abs(savedY - aimY) < 40) {
+        handleIndicatorPress();
+        return;
+      }
+    }
+    saveBookmark();
+  }, [hasBookmark, bookmarkScrollPercent, handleIndicatorPress, saveBookmark]);
+
   // Compute the Y position of the saved bookmark inside the ScrollView content
   const bookmarkLineY = useMemo(() => {
     if (!hasBookmark || bookmarkScrollPercent == null || measuredContentHeight === 0) return null;
@@ -1600,7 +1616,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         <TouchableOpacity
           activeOpacity={0.6}
           hitSlop={{ top: 16, bottom: 16, left: 8, right: 8 }}
-          onPress={saveBookmark}
+          onPress={handleAimLinePress}
           style={[styles.aimLineContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
           <View style={[styles.aimLineIcon, { borderColor: theme.colors.textSecondary + '50' }]}>
