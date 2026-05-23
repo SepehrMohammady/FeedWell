@@ -288,7 +288,7 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const handleOpenWebsite = async () => {
-    const url = 'https://SepehrMohammady.ir';
+    const url = 'https://semo-lab.com/feedwell/';
     try {
       if (Platform.OS === 'web') {
         window.open(url, '_blank');
@@ -306,8 +306,8 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const handleOpenGitHub = async () => {
-    const url = 'https://github.com/SepehrMohammady/FeedWell';
+  const handleOpenWebpage = async () => {
+    const url = 'https://semo-lab.com/feedwell/';
     try {
       if (Platform.OS === 'web') {
         window.open(url, '_blank');
@@ -320,8 +320,8 @@ export default function SettingsScreen({ navigation }) {
         }
       }
     } catch (error) {
-      console.error('Error opening GitHub:', error);
-      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to open GitHub repository', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
+      console.error('Error opening webpage:', error);
+      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to open webpage', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
     }
   };
 
@@ -1185,19 +1185,19 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title="Version"
-            description={APP_VERSION.fullVersion}
+            description={APP_VERSION.version}
           />
           <SettingItem
             title="Developer"
-            description="Sepehr Mohammady"
+            description="SeMo Lab"
             onPress={handleOpenWebsite}
             rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
-            title="Source Code"
-            description="github.com/SepehrMohammady/FeedWell"
-            onPress={handleOpenGitHub}
-            rightElement={<Ionicons name="logo-github" size={20} color={theme.colors.primary} />}
+            title="Webpage"
+            description="semo-lab.com/feedwell"
+            onPress={handleOpenWebpage}
+            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
             title="Privacy"
@@ -1211,7 +1211,7 @@ export default function SettingsScreen({ navigation }) {
             FeedWell automatically blocks ads and tracking from RSS feeds to provide a clean reading experience.
           </Text>
           <Text style={styles.copyrightText}>
-            © 2026 Sepehr Mohammady. Open source under MIT License.
+            © 2026 SeMo Lab.
           </Text>
         </View>
       </ScrollView>
