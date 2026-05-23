@@ -29,6 +29,7 @@ android/build/
 android/.gradle/
 android/.kotlin/
 android/local.properties
+android/keystore.properties
 
 # Debug and log files
 *.log
