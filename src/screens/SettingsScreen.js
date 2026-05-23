@@ -306,25 +306,6 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const handleOpenWebpage = async () => {
-    const url = 'https://semo-lab.com/feedwell/';
-    try {
-      if (Platform.OS === 'web') {
-        window.open(url, '_blank');
-      } else {
-        const supported = await Linking.canOpenURL(url);
-        if (supported) {
-          await Linking.openURL(url);
-        } else {
-          setAlertConfig({ visible: true, title: 'Error', message: 'Cannot open URL', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
-        }
-      }
-    } catch (error) {
-      console.error('Error opening webpage:', error);
-      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to open webpage', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
-    }
-  };
-
   const handleBackupData = async () => {
     try {
       // Gather all data
@@ -1191,12 +1172,6 @@ export default function SettingsScreen({ navigation }) {
             title="Developer"
             description="SeMo Lab"
             onPress={handleOpenWebsite}
-            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
-          />
-          <SettingItem
-            title="Webpage"
-            description="semo-lab.com/feedwell"
-            onPress={handleOpenWebpage}
             rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
           />
           <SettingItem
