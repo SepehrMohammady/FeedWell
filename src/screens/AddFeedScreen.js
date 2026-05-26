@@ -54,7 +54,7 @@ export default function AddFeedScreen({ navigation }) {
       title: 'Sports',
       feeds: [
         { name: 'ESPN', url: 'https://www.espn.com/espn/rss/news' },
-        { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
+        { name: 'CBS Sports', url: 'https://www.cbssports.com/rss/headlines/' },
         { name: 'Yahoo Sports', url: 'https://sports.yahoo.com/rss/' },
         { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040' },
         { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
