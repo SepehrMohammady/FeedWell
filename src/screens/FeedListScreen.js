@@ -491,14 +491,19 @@ export default function FeedListScreen({ navigation, route }) {
 
   const filteredAndSortedArticles = getFilteredArticles();
 
-  const toggleFilter = () => {
-    if (articleFilter === 'all') {
-      updateArticleFilter('unread');
-    } else if (articleFilter === 'unread') {
-      updateArticleFilter('read');
-    } else {
-      updateArticleFilter('all');
-    }
+  const openFilterMenu = () => {
+    setAlertConfig({
+      visible: true,
+      title: 'Filter Articles',
+      message: 'Choose which articles to show.',
+      icon: 'filter-outline',
+      buttons: [
+        { text: articleFilter === 'all' ? 'All (Current)' : 'All', onPress: () => updateArticleFilter('all') },
+        { text: articleFilter === 'unread' ? `Unread (${getAgeFilteredUnreadCount()}) (Current)` : `Unread (${getAgeFilteredUnreadCount()})`, onPress: () => updateArticleFilter('unread') },
+        { text: articleFilter === 'read' ? `Read (${getAgeFilteredReadCount()}) (Current)` : `Read (${getAgeFilteredReadCount()})`, onPress: () => updateArticleFilter('read') },
+        { text: 'Cancel', style: 'cancel' },
+      ],
+    });
   };
 
   const toggleSort = () => {
@@ -520,7 +525,7 @@ export default function FeedListScreen({ navigation, route }) {
       case 'read':
         return `Read (${getAgeFilteredReadCount()})`;
       default:
-        return 'All';
+        return `All (${filterByAge(articles).length})`;
     }
   };
 
@@ -586,10 +591,15 @@ export default function FeedListScreen({ navigation, route }) {
       fontSize: 12,
       color: theme.colors.text,
       fontWeight: '600',
-      paddingHorizontal: 8,
-      paddingVertical: 4,
+    },
+    filterButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
       backgroundColor: theme.colors.background,
-      borderRadius: 8,
+      borderRadius: 10,
       borderWidth: 1,
       borderColor: theme.colors.text,
     },
@@ -899,10 +909,11 @@ export default function FeedListScreen({ navigation, route }) {
         ) : (
           <View style={styles.headerRightGroup}>
             <TouchableOpacity
-              style={styles.filterPill}
-              onPress={toggleFilter}
+              style={[styles.filterPill, styles.filterButton]}
+              onPress={openFilterMenu}
             >
               <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
+              <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} />
             </TouchableOpacity>
             <View style={styles.headerButtons}>
               <TouchableOpacity
