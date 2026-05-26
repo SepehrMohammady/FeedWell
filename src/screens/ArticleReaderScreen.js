@@ -16,7 +16,9 @@ import {
   TextInput,
   Animated,
   KeyboardAvoidingView,
+  BackHandler,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -773,6 +775,36 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
   };
 
+  const handleBackNavigation = useCallback(() => {
+    const stackState = navigation.getState?.();
+
+    if (stackState?.routeNames?.includes('FeedList')) {
+      navigation.navigate('FeedList');
+      return true;
+    }
+
+    if (stackState?.routeNames?.includes('ReadLaterList')) {
+      navigation.navigate('ReadLaterList');
+      return true;
+    }
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return true;
+    }
+
+    navigation.navigate('Feeds', { screen: 'FeedList' });
+    return true;
+  }, [navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onHardwareBackPress = () => handleBackNavigation();
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onHardwareBackPress);
+      return () => subscription.remove();
+    }, [handleBackNavigation])
+  );
+
   // All reader actions definition (order defines overflow menu order)
   // MUST be placed after all handler definitions to avoid undefined references
   const MAX_PINNED = 4;
@@ -1418,7 +1450,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.headerButton}
-          onPress={() => navigation.goBack()}
+          onPress={handleBackNavigation}
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
