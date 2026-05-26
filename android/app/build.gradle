@@ -197,3 +197,26 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+def stripExpoSensorsActivityRecognition = tasks.register("stripExpoSensorsActivityRecognition") {
+    doLast {
+        def cacheRoot = gradle.gradleUserHomeDir
+        def manifestFiles = fileTree(cacheRoot).matching {
+            include "**/transformed/expo.modules.sensors-*/AndroidManifest.xml"
+        }
+
+        manifestFiles.each { manifestFile ->
+            def original = manifestFile.getText("UTF-8")
+            def updated = original.replaceAll(/(?m)^\s*<uses-permission android:name="android\.permission\.ACTIVITY_RECOGNITION"\s*\/?>\s*\r?\n?/, "")
+            if (updated != original) {
+                manifestFile.write(updated, "UTF-8")
+            }
+        }
+    }
+}
+
+["processReleaseMainManifest", "processReleaseManifestForPackage", "processApplicationManifestReleaseForBundle", "processDebugMainManifest"].each { taskName ->
+    tasks.matching { it.name == taskName }.configureEach {
+        dependsOn(stripExpoSensorsActivityRecognition)
+    }
+}
