@@ -784,7 +784,7 @@ export default function FeedListScreen({ navigation, route }) {
 
   if (feeds.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>FeedWell</Text>
           <TouchableOpacity
@@ -829,7 +829,7 @@ export default function FeedListScreen({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>FeedWell</Text>
         {selectionMode ? (

@@ -269,7 +269,7 @@ export default function ReadLaterScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {renderHeader()}
       {articles.length > 0 && renderSearchBar()}
       <FlatList
