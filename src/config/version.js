@@ -5,10 +5,10 @@
 
 export const APP_VERSION = {
   // Main version number (semantic versioning: major.minor.patch)
-  version: '1.6.25',
+  version: '1.6.26',
   
   // Build/version code for app stores (increment for each release)
-  buildNumber: 101,
+  buildNumber: 102,
   
   // Release stage
   stage: 'RC', // 'Alpha', 'Beta', 'RC', or empty for stable

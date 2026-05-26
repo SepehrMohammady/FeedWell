@@ -7,8 +7,9 @@ import {
   Dimensions,
   Image,
   FlatList,
+  Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
@@ -76,6 +77,7 @@ const ONBOARDING_SLIDES = [
 
 export default function OnboardingTutorial({ visible, onComplete }) {
   const { theme, isDarkMode } = useTheme();
+  const insets = useSafeAreaInsets();
   const [currentSlide, setCurrentSlide] = useState(0);
   const flatListRef = useRef(null);
   const onViewableItemsChangedRef = useRef(null);
@@ -95,6 +97,10 @@ export default function OnboardingTutorial({ visible, onComplete }) {
   if (!visible) return null;
 
   const isLastSlide = currentSlide === ONBOARDING_SLIDES.length - 1;
+  const navBottom = Platform.OS === 'android'
+    ? Math.max(insets.bottom + 24, 32)
+    : Math.max(insets.bottom + 16, 32);
+  const paginationBottom = navBottom + 88;
 
   const handleNext = () => {
     if (isLastSlide) {
@@ -191,7 +197,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         />
 
         {/* Pagination Dots */}
-        <View style={styles.pagination}>
+        <View style={[styles.pagination, { bottom: paginationBottom }]}>
           {ONBOARDING_SLIDES.map((_, index) => (
             <View
               key={index}
@@ -209,7 +215,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         </View>
 
         {/* Navigation Buttons */}
-        <View style={styles.navigation}>
+        <View style={[styles.navigation, { bottom: navBottom }]}>
           {/* Previous Button */}
           {currentSlide > 0 && (
             <TouchableOpacity 
