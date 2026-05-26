@@ -558,15 +558,16 @@ export default function FeedListScreen({ navigation, route }) {
       flexDirection: 'row',
       alignItems: 'center',
       flex: 1,
-      justifyContent: 'flex-end',
-      gap: 4,
+      justifyContent: 'space-between',
+      gap: 8,
     },
     filterPill: {
-      marginRight: 4,
+      marginRight: 8,
     },
     headerButtons: {
       flexDirection: 'row',
       alignItems: 'center',
+      flexShrink: 1,
     },
     headerButton: {
       alignItems: 'center',
@@ -831,7 +832,6 @@ export default function FeedListScreen({ navigation, route }) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>FeedWell</Text>
         {selectionMode ? (
           <View style={styles.headerButtons}>
             <TouchableOpacity
