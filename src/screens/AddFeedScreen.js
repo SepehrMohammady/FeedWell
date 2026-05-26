@@ -37,7 +37,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml' },
         { name: 'Wired', url: 'https://www.wired.com/feed/rss' },
         { name: 'Engadget', url: 'https://www.engadget.com/rss.xml' },
-        { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
+        { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index' },
       ]
     },
     {
@@ -57,7 +57,7 @@ export default function AddFeedScreen({ navigation }) {
         { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
         { name: 'Yahoo Sports', url: 'https://sports.yahoo.com/rss/' },
         { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040' },
-        { name: 'CBS Sports', url: 'https://www.cbssports.com/rss/headlines/' },
+        { name: 'BBC Sport', url: 'https://feeds.bbci.co.uk/sport/rss.xml' },
       ]
     },
     {
@@ -85,9 +85,9 @@ export default function AddFeedScreen({ navigation }) {
       feeds: [
         { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
         { name: 'Bloomberg', url: 'https://feeds.bloomberg.com/markets/news.rss' },
-        { name: 'MarketWatch', url: 'https://feeds.marketwatch.com/marketwatch/topstories/' },
-        { name: 'Financial Times', url: 'https://www.ft.com/rss/home' },
-        { name: 'The Economist', url: 'https://www.economist.com/international/rss.xml' },
+        { name: 'Forbes Business', url: 'https://www.forbes.com/business/feed/' },
+        { name: 'Fortune', url: 'https://fortune.com/feed/' },
+        { name: 'Yahoo Finance', url: 'https://finance.yahoo.com/news/rssindex' },
       ]
     },
     {
@@ -103,10 +103,10 @@ export default function AddFeedScreen({ navigation }) {
     {
       title: 'Lifestyle',
       feeds: [
-        { name: 'Lifehacker', url: 'https://lifehacker.com/rss' },
-        { name: 'Mashable', url: 'https://mashable.com/feeds/rss/all' },
+        { name: 'The Guardian Life and Style', url: 'https://www.theguardian.com/lifeandstyle/rss' },
+        { name: 'The Guardian Food', url: 'https://www.theguardian.com/food/rss' },
         { name: 'BuzzFeed', url: 'https://www.buzzfeed.com/index.xml' },
-        { name: 'The Guardian Culture', url: 'https://www.theguardian.com/culture/rss' },
+        { name: 'The Guardian Fashion', url: 'https://www.theguardian.com/fashion/rss' },
         { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
       ]
     }
