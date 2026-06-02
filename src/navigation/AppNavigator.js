@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomTabBar } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import MiniPlayer from '../components/MiniPlayer';
 
@@ -19,8 +20,9 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function ReadLaterStack() {
+  const { theme } = useTheme();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: theme.colors.background } }}>
       <Stack.Screen 
         name="ReadLaterList" 
         component={ReadLaterScreen} 
@@ -34,8 +36,9 @@ function ReadLaterStack() {
 }
 
 function FeedStack() {
+  const { theme } = useTheme();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: theme.colors.background } }}>
       <Stack.Screen 
         name="FeedList" 
         component={FeedListScreen} 
@@ -58,6 +61,8 @@ function FeedStack() {
 
 export default function AppNavigator() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, 6);
   
   return (
     <Tab.Navigator
@@ -89,11 +94,11 @@ export default function AppNavigator() {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           paddingHorizontal: 8,
-          paddingBottom: 10,
-          height: 64,
+          paddingBottom: bottomPadding,
+          height: 52 + bottomPadding,
         },
         tabBarItemStyle: {
-          paddingVertical: 6,
+          paddingVertical: 4,
         },
         headerShown: false,
       })}
