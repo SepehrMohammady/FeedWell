@@ -94,11 +94,12 @@ export default function AppNavigator() {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           paddingHorizontal: 8,
+          paddingTop: 10,
           paddingBottom: bottomPadding,
-          height: 52 + bottomPadding,
+          height: 64 + bottomPadding,
         },
         tabBarItemStyle: {
-          paddingVertical: 8,
+          paddingVertical: 6,
         },
         headerShown: false,
       })}
