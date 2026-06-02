@@ -37,7 +37,10 @@ export class SafeStorage {
   static async setItem(key, value) {
     try {
       // Check if data needs chunking
-      const dataSize = new Blob([value]).size;
+      // Blob may not be available on all Android versions — fallback to byte estimation
+      const dataSize = (typeof Blob !== 'undefined')
+        ? new Blob([value]).size
+        : value.length * 3; // UTF-8 worst-case estimation
       
       if (dataSize > this.MAX_CHUNK_SIZE) {
         // Clear any existing chunks

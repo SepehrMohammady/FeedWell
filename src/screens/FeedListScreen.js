@@ -45,12 +45,6 @@ export default function FeedListScreen({ navigation, route }) {
     }
   }, [route?.params?.filter]);
 
-  useEffect(() => {
-    if (feeds.length > 0) {
-      refreshFeeds();
-    }
-  }, [feeds.length]);
-
   // Force re-render when screen comes into focus to update read status
   useFocusEffect(
     React.useCallback(() => {
@@ -482,11 +476,21 @@ export default function FeedListScreen({ navigation, route }) {
     }
 
     // Sort articles
+    let sortedArticles;
     if (sortOrder === 'newest') {
-      return filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+      sortedArticles = filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
     } else {
-      return filtered.sort((a, b) => new Date(a.publishedDate) - new Date(b.publishedDate));
+      sortedArticles = filtered.sort((a, b) => new Date(a.publishedDate) - new Date(b.publishedDate));
     }
+
+    // Priority feeds: articles from pinned feeds appear at the top
+    const priorityFeedUrls = new Set(feeds.filter(f => f.isPriority).map(f => f.url));
+    if (priorityFeedUrls.size > 0) {
+      const priorityArticles = sortedArticles.filter(a => priorityFeedUrls.has(a.feedUrl));
+      const regularArticles = sortedArticles.filter(a => !priorityFeedUrls.has(a.feedUrl));
+      return [...priorityArticles, ...regularArticles];
+    }
+    return sortedArticles;
   };
 
   const filteredAndSortedArticles = getFilteredArticles();

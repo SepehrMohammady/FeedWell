@@ -145,6 +145,15 @@ function feedReducer(state, action) {
       return { ...state, feeds: [], articles: [] };
     case 'SET_READING_POSITION':
       return { ...state, readingPosition: action.payload };
+    case 'TOGGLE_FEED_PRIORITY':
+      return {
+        ...state,
+        feeds: state.feeds.map(feed =>
+          feed.id === action.payload
+            ? { ...feed, isPriority: !feed.isPriority }
+            : feed
+        )
+      };
     case 'CLEAR_READING_POSITION':
       return { ...state, readingPosition: null };
     default:
@@ -194,10 +203,18 @@ export function FeedProvider({ children }) {
       console.log('StateRef explicitly synced with articles:', stateRef.current.articles.length);
       
       hasAutoRefreshed.current = true;
-      // Add delay to ensure React state updates have propagated
-      setTimeout(() => {
-        autoRefreshFeeds();
-      }, 500);
+      // Gate auto-refresh on the user's autoRefresh setting
+      AsyncStorage.getItem('autoRefresh').then(value => {
+        const shouldAutoRefresh = value === null ? true : JSON.parse(value);
+        if (shouldAutoRefresh) {
+          setTimeout(() => autoRefreshFeeds(), 500);
+        } else {
+          console.log('Auto-refresh skipped: disabled in settings');
+        }
+      }).catch(() => {
+        // Default to auto-refresh if setting can't be read
+        setTimeout(() => autoRefreshFeeds(), 500);
+      });
     }
   }, [isInitialized, state.feeds.length, state.articles.length]);
 
@@ -621,6 +638,14 @@ export function FeedProvider({ children }) {
     console.log('=== AUTO-REFRESH FUNCTION END ===');
   };
 
+  const toggleFeedPriority = async (feedId) => {
+    dispatch({ type: 'TOGGLE_FEED_PRIORITY', payload: feedId });
+    const updatedFeeds = state.feeds.map(feed =>
+      feed.id === feedId ? { ...feed, isPriority: !feed.isPriority } : feed
+    );
+    await saveFeeds(updatedFeeds);
+  };
+
   const clearAllData = async () => {
     console.log('FeedContext: clearAllData called');
     console.log('Current state before clearing:', { feeds: state.feeds.length, articles: state.articles.length });
@@ -1002,6 +1027,7 @@ export function FeedProvider({ children }) {
     getReadArticles,
     getReadCount,
     autoRefreshFeeds,
+    toggleFeedPriority,
     setReadingPosition,
     clearReadingPosition,
     loadReadingPosition,

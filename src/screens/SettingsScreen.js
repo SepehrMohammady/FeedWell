@@ -1153,8 +1153,11 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
           <TesterItem>Chris (few-thoughts)</TesterItem>
+          <TesterItem>Danoush Faryar</TesterItem>
           <TesterItem>Houriyeh Emadoleslami</TesterItem>
           <TesterItem>Mohammad Torabi</TesterItem>
+          <TesterItem>Mojtaba Alehosseini</TesterItem>
+          <TesterItem>Sadeq Hayati</TesterItem>
           <TesterItem isLast={true}>Saeed Abdollahi Taromsari</TesterItem>
         </View>
 

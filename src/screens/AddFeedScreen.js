@@ -24,7 +24,7 @@ import CustomAlert from '../components/CustomAlert';
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const { addFeed, addArticles, feeds, removeFeed } = useFeed();
+  const { addFeed, addArticles, feeds, removeFeed, toggleFeedPriority } = useFeed();
   const { theme } = useTheme();
   const { maxArticleAge } = useAppSettings();
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
@@ -583,6 +583,10 @@ export default function AddFeedScreen({ navigation }) {
       padding: 8,
       marginLeft: 8,
     },
+    priorityButton: {
+      padding: 8,
+      marginLeft: 4,
+    },
     emptyState: {
       alignItems: 'center',
       justifyContent: 'center',
@@ -682,6 +686,16 @@ export default function AddFeedScreen({ navigation }) {
                       Added {formatDate(feed.addedAt)}
                     </Text>
                   </View>
+                  <TouchableOpacity
+                    onPress={() => toggleFeedPriority(feed.id)}
+                    style={styles.priorityButton}
+                  >
+                    <Ionicons
+                      name={feed.isPriority ? 'star' : 'star-outline'}
+                      size={20}
+                      color={feed.isPriority ? theme.colors.warning : theme.colors.textSecondary}
+                    />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
                       console.log('Trash icon pressed for feed:', feed);
