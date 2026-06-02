@@ -98,7 +98,7 @@ export default function AppNavigator() {
           height: 52 + bottomPadding,
         },
         tabBarItemStyle: {
-          paddingVertical: 4,
+          paddingVertical: 8,
         },
         headerShown: false,
       })}

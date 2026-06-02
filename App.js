@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AppState, Linking } from 'react-native';
-import { NavigationContainer, createNavigationContainerRef, CommonActions } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef, CommonActions, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -186,6 +186,10 @@ function AppContent() {
         ref={navigationRef}
         initialState={initialNavState}
         onStateChange={onNavStateChange}
+        theme={isDarkMode
+          ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: theme.colors.background } }
+          : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: theme.colors.background } }
+        }
         onReady={() => {
           if (pendingDeepLinkUrl) {
             handleDeepLink(pendingDeepLinkUrl);

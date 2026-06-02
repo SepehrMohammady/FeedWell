@@ -1,6 +1,6 @@
 {
   "name": "feedwell",
-  "version": "1.6.35",
+  "version": "1.6.36",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
