@@ -964,10 +964,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     content: {
       flex: 1,
+      backgroundColor: theme.colors.background,
     },
     contentInner: {
       paddingVertical: 20,
       paddingHorizontal: 32,
+      backgroundColor: theme.colors.background,
     },
     articleHeader: {
       marginBottom: 16,
@@ -1482,7 +1484,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         </View>
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView 
         ref={scrollViewRef}
         style={styles.content} 
