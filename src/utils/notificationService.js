@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Platform, AppState } from 'react-native';
 
 // 24 hours in seconds — remind user at the same time tomorrow
 const REMINDER_DELAY_SECONDS = 24 * 3600;
@@ -20,6 +20,12 @@ export async function requestNotificationPermissions() {
   try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     if (existingStatus === 'granted') return true;
+
+    // Android 16 (API 36) enforces strict Background Activity Launch (BAL) restrictions.
+    // Requesting permissions while the Activity is not yet visible triggers a BAL block
+    // on Samsung OneUI 8/8.5, which destroys the Activity and appears as a crash.
+    // Only show the permission dialog when the app is confirmed active/foreground.
+    if (AppState.currentState !== 'active') return false;
 
     const { status } = await Notifications.requestPermissionsAsync();
     return status === 'granted';
