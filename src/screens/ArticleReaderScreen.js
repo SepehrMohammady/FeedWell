@@ -97,7 +97,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
   
   const { getNote, setNote, hasNote } = useNotes();
-  const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
+  const { addToReadLater, removeFromReadLater, updateReadLaterArticle, isInReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist, isPlaying: isSoundPlaying } = useAmbientSound();
   const [fullContent, setFullContent] = useState(null);
   const [contentBlocks, setContentBlocks] = useState(null); // Readability content blocks (text + images)
@@ -115,6 +115,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const contentHeightRef = useRef(0);
   const viewportHeightRef = useRef(0);
   const hasAutoScrolled = useRef(false);
+  const userInteractedRef = useRef(false); // user grabbed the scroll — stop auto-restoring
+  const bookmarkSettleTimer = useRef(null); // debounce until content height stops growing
   const bookmarkFlashAnim = useRef(new Animated.Value(0)).current;
   const [contentReady, setContentReady] = useState(false);
   const [measuredContentHeight, setMeasuredContentHeight] = useState(0);
@@ -130,6 +132,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const [translationProgress, setTranslationProgress] = useState('');
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
   const [targetLangCode, setTargetLangCode] = useState('en');
+  const [targetLangLoaded, setTargetLangLoaded] = useState(false); // true once the real saved target is loaded (not the 'en' placeholder)
   const [detectedSourceLang, setDetectedSourceLang] = useState(null); // BCP-47 code
   const [languageSearchQuery, setLanguageSearchQuery] = useState('');
   const [translationMode, setTranslationMode] = useState(TRANSLATION_MODES.AUTO);
@@ -290,12 +293,23 @@ function ArticleReaderScreenContent({ route, navigation }) {
             }
           } catch (e) { /* use existing content */ }
         }
+        // Persist an already-loaded online translation so it survives offline.
+        if (translatedContent && translationMethod === 'online') {
+          enhanced.cachedTranslation = {
+            targetLangCode,
+            translatedTitle: translatedTitle || null,
+            translatedContent,
+            method: 'online',
+            sourceLangCode: detectedSourceLang || null,
+            cachedAt: new Date().toISOString(),
+          };
+        }
         addToReadLater(enhanced);
       } finally {
         setIsSaving(false);
       }
     }
-  }, [isSaved, article, addToReadLater, removeFromReadLater]);
+  }, [isSaved, article, addToReadLater, removeFromReadLater, translatedContent, translationMethod, translatedTitle, targetLangCode, detectedSourceLang]);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -315,6 +329,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
           const data = JSON.parse(saved);
           setHasBookmark(true);
           setBookmarkScrollPercent(data.scrollPercent);
+        } else {
+          // No bookmark for this article — clear any leftover state from a
+          // previously viewed article (this screen instance can be reused when
+          // navigating between articles without remounting).
+          setHasBookmark(false);
+          setBookmarkScrollPercent(null);
         }
       } catch (e) {
         console.warn('Failed to load bookmark:', e);
@@ -323,47 +343,67 @@ function ArticleReaderScreenContent({ route, navigation }) {
     loadBookmark();
   }, [bookmarkKey]);
 
-  // Auto-scroll to bookmark when content finishes loading
+  // Restore the saved reading position once the content height has settled.
+  // On long / image-heavy articles the ScrollView's content height keeps growing
+  // as images load, so scrolling immediately lands short ("stops in the middle").
+  // We debounce until the height stops changing, then scroll once to the final spot.
+  const tryRestoreBookmark = useCallback(() => {
+    if (bookmarkScrollPercent == null || hasAutoScrolled.current || userInteractedRef.current || loading) return;
+    const vH = viewportHeightRef.current;
+    const cH = contentHeightRef.current;
+    if (vH <= 0 || cH <= vH) return;
+    // (Re)arm the settle timer: every content-size change pushes it back, so it
+    // only fires once the layout has been stable for a beat (final height).
+    if (bookmarkSettleTimer.current) clearTimeout(bookmarkSettleTimer.current);
+    bookmarkSettleTimer.current = setTimeout(() => {
+      bookmarkSettleTimer.current = null;
+      // Re-check guards: the user may have grabbed the scroll while we waited.
+      if (hasAutoScrolled.current || userInteractedRef.current) return;
+      const finalVH = viewportHeightRef.current;
+      const finalCH = contentHeightRef.current;
+      if (finalVH <= 0 || finalCH <= finalVH) return;
+      hasAutoScrolled.current = true;
+      // scrollPercent is the center of the viewport as a fraction of content height
+      const targetY = Math.max(0, bookmarkScrollPercent * finalCH - finalVH / 2);
+      scrollViewRef.current?.scrollTo({ y: targetY, animated: true });
+      Animated.sequence([
+        Animated.timing(bookmarkFlashAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.delay(1500),
+        Animated.timing(bookmarkFlashAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+      ]).start();
+    }, 500);
+  }, [bookmarkScrollPercent, loading, bookmarkFlashAnim]);
+
   const handleContentSizeChange = useCallback((w, h) => {
     contentHeightRef.current = h;
     setMeasuredContentHeight(h);
     if (h > 0 && viewportHeightRef.current > 0) {
       setContentReady(true);
     }
-  }, []);
+    // Content grew (e.g. an image loaded) — keep waiting for it to settle.
+    tryRestoreBookmark();
+  }, [tryRestoreBookmark]);
 
-  // Effect to auto-scroll when all conditions are met
+  // Re-attempt the restore whenever its inputs become available (bookmark loaded
+  // from storage, fetch finished, viewport/content first measured).
   useEffect(() => {
-    if (
-      bookmarkScrollPercent != null &&
-      !hasAutoScrolled.current &&
-      !loading &&
-      contentReady
-    ) {
-      hasAutoScrolled.current = true;
-      const cH = contentHeightRef.current;
-      const vH = viewportHeightRef.current;
-      if (cH > vH) {
-        // scrollPercent is the center of viewport as fraction of content height
-        const targetY = Math.max(0, bookmarkScrollPercent * cH - vH / 2);
-        setTimeout(() => {
-          scrollViewRef.current?.scrollTo({ y: targetY, animated: true });
-          Animated.sequence([
-            Animated.timing(bookmarkFlashAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-            Animated.delay(1500),
-            Animated.timing(bookmarkFlashAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
-          ]).start();
-        }, 400);
-      }
-    }
-  }, [bookmarkScrollPercent, loading, contentReady, bookmarkFlashAnim]);
+    tryRestoreBookmark();
+  }, [bookmarkScrollPercent, loading, contentReady, tryRestoreBookmark]);
+
+  // Cancel any pending restore when leaving the screen.
+  useEffect(() => {
+    return () => {
+      if (bookmarkSettleTimer.current) clearTimeout(bookmarkSettleTimer.current);
+    };
+  }, []);
 
   const handleScrollViewLayout = useCallback((event) => {
     viewportHeightRef.current = event.nativeEvent.layout.height;
     if (contentHeightRef.current > 0 && event.nativeEvent.layout.height > 0) {
       setContentReady(true);
     }
-  }, []);
+    tryRestoreBookmark();
+  }, [tryRestoreBookmark]);
 
   const saveBookmark = useCallback(async () => {
     const cH = contentHeightRef.current;
@@ -490,16 +530,39 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   // Load saved target language and translation mode on mount
   useEffect(() => {
-    loadTargetLanguage().then(code => setTargetLangCode(code));
+    loadTargetLanguage().then(code => { setTargetLangCode(code); setTargetLangLoaded(true); });
     loadTranslationMode().then(mode => setTranslationMode(mode));
   }, []);
+
+  // Restore a previously cached (online) translation for saved articles so it can
+  // be re-read without translating again. Only applies when the cached target
+  // language matches the user's current target language. Gated on targetLangLoaded
+  // so we never match against the initial 'en' placeholder before the real target
+  // language has been read from storage.
+  useEffect(() => {
+    if (!targetLangLoaded) return;
+    const cached = article?.cachedTranslation;
+    if (cached && cached.translatedContent && cached.targetLangCode === targetLangCode) {
+      setTranslatedTitle(cached.translatedTitle || null);
+      setTranslatedContent(cached.translatedContent);
+      setTranslationMethod(cached.method || 'online');
+      if (cached.sourceLangCode) setDetectedSourceLang(cached.sourceLangCode);
+    }
+  }, [article?.id, targetLangCode, targetLangLoaded]);
 
   // Track if we've already marked this article as read
   const hasMarkedReadRef = useRef(false);
 
   useEffect(() => {
+    // Reset bookmark-restore state for the newly opened article.
+    hasAutoScrolled.current = false;
+    userInteractedRef.current = false;
+    if (bookmarkSettleTimer.current) {
+      clearTimeout(bookmarkSettleTimer.current);
+      bookmarkSettleTimer.current = null;
+    }
     fetchFullArticle();
-    
+
     // Cleanup function
     return () => {
       hasMarkedReadRef.current = false;
@@ -707,6 +770,21 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setTranslatedContent(contentResult.text);
       setTranslationMethod(contentResult.method);
       setIsTranslated(true);
+
+      // Cache the online translation onto the saved article so it can be read
+      // again (even offline) without re-translating.
+      if (contentResult.method === 'online' && isInReadLater(article.id)) {
+        updateReadLaterArticle(article.id, {
+          cachedTranslation: {
+            targetLangCode,
+            translatedTitle: titleResult.text || null,
+            translatedContent: contentResult.text,
+            method: 'online',
+            sourceLangCode: sourceLangCode || null,
+            cachedAt: new Date().toISOString(),
+          },
+        });
+      }
     } catch (error) {
       console.error('Translation error:', error);
       setAlertConfig({
@@ -908,6 +986,15 @@ function ArticleReaderScreenContent({ route, navigation }) {
     // Show button when user scrolls down more than 200 pixels
     setShowScrollToTop(offsetY > 200);
   };
+
+  const handleScrollBeginDrag = useCallback(() => {
+    // The user took over scrolling — don't yank them back to the bookmark.
+    userInteractedRef.current = true;
+    if (bookmarkSettleTimer.current) {
+      clearTimeout(bookmarkSettleTimer.current);
+      bookmarkSettleTimer.current = null;
+    }
+  }, []);
 
   const handleScrollToTop = () => {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
@@ -1490,6 +1577,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         style={styles.content} 
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
+        onScrollBeginDrag={handleScrollBeginDrag}
         scrollEventThrottle={16}
         onContentSizeChange={handleContentSizeChange}
         onLayout={handleScrollViewLayout}

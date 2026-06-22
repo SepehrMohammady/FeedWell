@@ -6,6 +6,7 @@ const ReadLaterContext = createContext();
 // Action types
 const SET_READ_LATER_ARTICLES = 'SET_READ_LATER_ARTICLES';
 const ADD_TO_READ_LATER = 'ADD_TO_READ_LATER';
+const UPDATE_READ_LATER = 'UPDATE_READ_LATER';
 const REMOVE_FROM_READ_LATER = 'REMOVE_FROM_READ_LATER';
 const CLEAR_READ_LATER = 'CLEAR_READ_LATER';
 const SET_LOADING = 'SET_LOADING';
@@ -36,6 +37,19 @@ function readLaterReducer(state, action) {
         articles: newArticles,
       };
     
+    case UPDATE_READ_LATER: {
+      const updatedArticles = state.articles.map(article =>
+        article.id === action.payload.id
+          ? { ...article, ...action.payload.updates }
+          : article
+      );
+      console.log('Updating read later article:', action.payload.id);
+      return {
+        ...state,
+        articles: updatedArticles,
+      };
+    }
+
     case REMOVE_FROM_READ_LATER:
       const filteredArticles = state.articles.filter(article => article.id !== action.payload);
       console.log('Removing article from read later. Remaining articles:', filteredArticles.length);
@@ -171,6 +185,13 @@ export function ReadLaterProvider({ children }) {
     dispatch({ type: REMOVE_FROM_READ_LATER, payload: articleId });
   }, []);
 
+  // Merge `updates` into an existing saved article (e.g. cache a translation).
+  // No-op if the article isn't currently saved.
+  const updateReadLaterArticle = useCallback((articleId, updates) => {
+    if (!articleId || !updates) return;
+    dispatch({ type: UPDATE_READ_LATER, payload: { id: articleId, updates } });
+  }, []);
+
   const clearReadLater = useCallback(async () => {
     try {
       await SafeStorage.removeItem(READ_LATER_STORAGE_KEY);
@@ -193,6 +214,7 @@ export function ReadLaterProvider({ children }) {
     loading: state.loading,
     addToReadLater,
     removeFromReadLater,
+    updateReadLaterArticle,
     clearReadLater,
     isInReadLater,
     getReadLaterCount,

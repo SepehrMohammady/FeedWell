@@ -359,13 +359,19 @@ export default function SettingsScreen({ navigation }) {
 
         const isAvailable = await Sharing.isAvailableAsync();
         if (isAvailable) {
-          await Sharing.shareAsync(fileUri, {
-            mimeType: 'application/octet-stream',
-            dialogTitle: 'Save FeedWell Backup',
-            UTI: 'public.data',
-          });
+          try {
+            await Sharing.shareAsync(fileUri, {
+              mimeType: 'application/octet-stream',
+              dialogTitle: 'Save FeedWell Backup',
+              UTI: 'public.data',
+            });
+          } catch (shareError) {
+            // Share sheet dismissed/failed — the backup file is already written, so still a success.
+            console.log('Share dismissed (backup file already saved):', shareError?.message);
+          }
+          setAlertConfig({ visible: true, title: 'Backup Successful', message: 'Your backup was created successfully.', icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
         } else {
-          setAlertConfig({ visible: true, title: 'Success', message: `Backup saved to: ${fileUri}`, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
+          setAlertConfig({ visible: true, title: 'Backup Successful', message: `Backup saved to: ${fileUri}`, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
         }
       }
     } catch (error) {
