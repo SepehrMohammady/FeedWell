@@ -2,7 +2,7 @@
   "expo": {
     "name": "FeedWell",
     "slug": "feedwell",
-    "version": "1.7.4",
+    "version": "1.7.5",
     "sdkVersion": "54.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -32,7 +32,7 @@
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS"
       ],
-      "versionCode": 121
+      "versionCode": 122
     },
     "web": {
       "favicon": "./assets/favicon.png",
