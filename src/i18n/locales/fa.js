@@ -447,5 +447,10 @@ export default {
   "sound.nature.name": "فضای طبیعت",
   "sound.nature.desc": "صداهای طبیعت در فضای باز",
   "sound.nature.brain": "صداهای طبیعی کورتیزول را کاهش داده و آرامش را تقویت می‌کنند",
-  "sound.nature.study": "به بازیابی از استرس در زمان استراحت‌های مطالعه کمک می‌کند"
+  "sound.nature.study": "به بازیابی از استرس در زمان استراحت‌های مطالعه کمک می‌کند",
+  "color.warmBeige": "بژ گرم",
+  "color.sage": "مریم‌گلی",
+  "color.sky": "آسمانی",
+  "color.lavender": "یاسی",
+  "color.rose": "رز",
 };

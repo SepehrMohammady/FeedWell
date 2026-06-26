@@ -964,7 +964,7 @@ export default function SettingsScreen({ navigation }) {
           />
           <SettingItem
             title={t('settings.themeColor')}
-            description={LIGHT_PALETTES[paletteIndex].name}
+            description={t(LIGHT_PALETTES[paletteIndex].nameKey)}
             rightElement={
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 {LIGHT_PALETTES.map((p, i) => (
@@ -1240,7 +1240,9 @@ export default function SettingsScreen({ navigation }) {
         </View>
 
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }]}>
+          {/* Centered like every language; explicit writingDirection keeps the bidi
+              base stable so the line doesn't flip when it starts with a Latin word. */}
+          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: 'center' }]}>
             {t('settings.footerText')}
           </Text>
           {/* Keep the copyright in English + LTR for RTL languages (it's brand + year). */}

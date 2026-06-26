@@ -493,4 +493,11 @@ export default {
   'sound.nature.desc': 'Outdoor nature sounds',
   'sound.nature.brain': 'Natural sounds reduce cortisol and promote relaxation',
   'sound.nature.study': 'Helps with stress recovery during reading breaks',
+
+  // --- Theme color names ---
+  'color.warmBeige': 'Warm Beige',
+  'color.sage': 'Sage',
+  'color.sky': 'Sky',
+  'color.lavender': 'Lavender',
+  'color.rose': 'Rose',
 };

@@ -447,5 +447,10 @@ export default {
   "sound.nature.name": "บรรยากาศธรรมชาติ",
   "sound.nature.desc": "เสียงธรรมชาติกลางแจ้ง",
   "sound.nature.brain": "เสียงธรรมชาติช่วยลดคอร์ติซอลและส่งเสริมการผ่อนคลาย",
-  "sound.nature.study": "ช่วยฟื้นฟูจากความเครียดระหว่างพักการอ่าน"
+  "sound.nature.study": "ช่วยฟื้นฟูจากความเครียดระหว่างพักการอ่าน",
+  "color.warmBeige": "เบจอุ่น",
+  "color.sage": "เสจ",
+  "color.sky": "ฟ้า",
+  "color.lavender": "ลาเวนเดอร์",
+  "color.rose": "กุหลาบ",
 };

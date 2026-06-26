@@ -447,5 +447,10 @@ export default {
   "sound.nature.name": "Doğa Ortamı",
   "sound.nature.desc": "Açık hava doğa sesleri",
   "sound.nature.brain": "Doğal sesler kortizolü azaltır ve rahatlamayı teşvik eder",
-  "sound.nature.study": "Okuma molalarında stresten kurtulmaya yardımcı olur"
+  "sound.nature.study": "Okuma molalarında stresten kurtulmaya yardımcı olur",
+  "color.warmBeige": "Sıcak Bej",
+  "color.sage": "Adaçayı",
+  "color.sky": "Gökyüzü",
+  "color.lavender": "Lavanta",
+  "color.rose": "Gül",
 };

@@ -447,5 +447,10 @@ export default {
   "sound.nature.name": "Atmosfera natury",
   "sound.nature.desc": "Dźwięki natury na świeżym powietrzu",
   "sound.nature.brain": "Naturalne dźwięki obniżają poziom kortyzolu i sprzyjają relaksowi",
-  "sound.nature.study": "Pomaga zregenerować się po stresie podczas przerw w czytaniu"
+  "sound.nature.study": "Pomaga zregenerować się po stresie podczas przerw w czytaniu",
+  "color.warmBeige": "Ciepły beż",
+  "color.sage": "Szałwia",
+  "color.sky": "Niebo",
+  "color.lavender": "Lawenda",
+  "color.rose": "Róża",
 };

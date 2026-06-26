@@ -467,5 +467,10 @@ export default {
   "sound.nature.name": "प्रकृति का माहौल",
   "sound.nature.desc": "बाहरी प्रकृति की ध्वनियाँ",
   "sound.nature.brain": "प्राकृतिक ध्वनियाँ कॉर्टिसोल को कम करती हैं और विश्राम को बढ़ावा देती हैं",
-  "sound.nature.study": "पढ़ने के विश्राम के दौरान तनाव से उबरने में मदद करती है"
+  "sound.nature.study": "पढ़ने के विश्राम के दौरान तनाव से उबरने में मदद करती है",
+  "color.warmBeige": "गर्म बेज",
+  "color.sage": "सेज",
+  "color.sky": "आसमानी",
+  "color.lavender": "लैवेंडर",
+  "color.rose": "गुलाबी",
 };

@@ -447,5 +447,10 @@ export default {
   "sound.nature.name": "Atmosfera naturale",
   "sound.nature.desc": "Suoni della natura all'aperto",
   "sound.nature.brain": "I suoni naturali riducono il cortisolo e favoriscono il rilassamento",
-  "sound.nature.study": "Aiuta a recuperare dallo stress durante le pause di lettura"
+  "sound.nature.study": "Aiuta a recuperare dallo stress durante le pause di lettura",
+  "color.warmBeige": "Beige caldo",
+  "color.sage": "Salvia",
+  "color.sky": "Cielo",
+  "color.lavender": "Lavanda",
+  "color.rose": "Rosa",
 };
