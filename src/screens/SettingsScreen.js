@@ -27,6 +27,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 import { APP_LANGUAGES, getAppLanguage } from '../i18n/appLanguages';
+import { tStatic } from '../i18n';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
@@ -116,14 +117,17 @@ export default function SettingsScreen({ navigation }) {
         const mlName = getMLKitName(code);
         const downloaded = await isModelDownloaded(mlName);
         if (!downloaded) {
+          // Use tStatic with the NEW code: `t` from this render still points at the
+          // previous language until the re-render, so the prompt would otherwise
+          // appear in the old language.
           setAlertConfig({
             visible: true,
-            title: t('language.offlineModelTitle'),
-            message: t('language.offlineModelBody', { language: getDisplayName(code) }),
+            title: tStatic('language.offlineModelTitle', code),
+            message: tStatic('language.offlineModelBody', code, { language: getDisplayName(code) }),
             icon: 'cloud-download-outline',
             buttons: [
-              { text: t('common.download'), onPress: () => { downloadModel(mlName); } },
-              { text: t('common.later'), style: 'cancel' },
+              { text: tStatic('common.download', code), onPress: () => { downloadModel(mlName); } },
+              { text: tStatic('common.later', code), style: 'cancel' },
             ],
           });
         }
@@ -1097,7 +1101,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <SettingItem
             title={t('settings.autoPlayStartup')}
-            description={autoPlay ? t('settings.autoPlayOnDesc', { sound: currentSound?.name || t('settings.lastSound') }) : t('settings.autoPlayOffDesc')}
+            description={autoPlay ? t('settings.autoPlayOnDesc', { sound: currentSound ? t(currentSound.nameKey) : t('settings.lastSound') }) : t('settings.autoPlayOffDesc')}
             onPress={() => setAutoPlay(!autoPlay)}
             isLast={true}
             rightElement={
@@ -1235,10 +1239,10 @@ export default function SettingsScreen({ navigation }) {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
             {t('settings.footerText')}
           </Text>
-          <Text style={styles.copyrightText}>
+          <Text style={[styles.copyrightText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
             {t('settings.copyright')}
           </Text>
         </View>

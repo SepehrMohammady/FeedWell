@@ -8,14 +8,15 @@ export const CATEGORY_ORDER = [
   'technology', 'news', 'sports', 'entertainment', 'gaming', 'business', 'science', 'lifestyle',
 ];
 
+// Global first, then alphabetical by English language name (standard ordering).
 export const FEED_REGIONS = [
   { code: 'global', labelKey: 'region.global' },
-  { code: 'fa', labelKey: 'region.fa' },
-  { code: 'it', labelKey: 'region.it' },
   { code: 'hi', labelKey: 'region.hi' },
-  { code: 'tr', labelKey: 'region.tr' },
-  { code: 'th', labelKey: 'region.th' },
+  { code: 'it', labelKey: 'region.it' },
+  { code: 'fa', labelKey: 'region.fa' },
   { code: 'pl', labelKey: 'region.pl' },
+  { code: 'th', labelKey: 'region.th' },
+  { code: 'tr', labelKey: 'region.tr' },
 ];
 
 export const CURATED_FEEDS = {

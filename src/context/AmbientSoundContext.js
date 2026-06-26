@@ -10,25 +10,26 @@ const STORAGE_KEY_VOLUME = 'ambient_volume';
 const STORAGE_KEY_VOLUMES_PER_SOUND = 'ambient_volumes_per_sound';
 const STORAGE_KEY_AUTOPLAY = 'ambient_autoplay';
 
+// name/description/info are i18n KEYS resolved via t() at render time (see MiniPlayer).
 export const AMBIENT_SOUNDS = [
-  { id: 'brown_noise', name: 'Brown Noise', description: 'Deep low-frequency noise', file: require('../../assets/Sounds/Brown Noise.mp3'), icon: 'radio-outline',
-    info: { brain: 'Masks distracting sounds with deep, rumbling frequencies', study: 'Great for deep work and concentration in noisy environments', focus: 'High', distract: 'Very Low' } },
-  { id: 'grey_noise', name: 'Grey Noise', description: 'Balanced frequency noise', file: require('../../assets/Sounds/Grey Noise.mp3'), icon: 'radio-outline',
-    info: { brain: 'Psychoacoustically balanced — perceived as equally loud across all frequencies', study: 'Good for extended reading sessions without ear fatigue', focus: 'High', distract: 'Very Low' } },
-  { id: 'pink_noise', name: 'Pink Noise', description: 'Balanced soothing noise', file: require('../../assets/Sounds/Pink Noise.mp3'), icon: 'radio-outline',
-    info: { brain: 'Enhances deep sleep and memory consolidation', study: 'Excellent for memorization tasks and long study sessions', focus: 'High', distract: 'Very Low' } },
-  { id: 'white_noise', name: 'White Noise', description: 'Consistent background noise', file: require('../../assets/Sounds/White Noise.mp3'), icon: 'radio-outline',
-    info: { brain: 'Equal energy across all frequencies — strong masking effect', study: 'Best for blocking out unpredictable environmental noise', focus: 'Medium-High', distract: 'Very Low' } },
-  { id: 'brainwave', name: 'Brainwave Binaural', description: '10 Hz Alpha Waves', file: require('../../assets/Sounds/Brainwave Binaural (10 Hz Alpha Waves).mp3'), icon: 'pulse-outline',
-    info: { brain: 'Stimulates alpha brainwaves (8-12 Hz) associated with relaxed alertness', study: 'Enhances focus during study sessions by promoting flow state', focus: 'High', distract: 'Low' } },
-  { id: 'cafe', name: 'Café Ambience', description: 'Coffee shop background', file: require('../../assets/Sounds/Café Ambience.mp3'), icon: 'cafe-outline',
-    info: { brain: 'Moderate ambient noise (70 dB) boosts creative thinking', study: 'Ideal for creative tasks, brainstorming, and light reading', focus: 'Medium', distract: 'Medium' } },
-  { id: 'library', name: 'Library Ambience', description: 'Quiet library atmosphere', file: require('../../assets/Sounds/Library Ambience.mp3'), icon: 'library-outline',
-    info: { brain: 'Subtle ambient cues promote a studious mindset', study: 'Creates a mental "study environment" even at home', focus: 'Medium-High', distract: 'Low' } },
-  { id: 'lofi', name: 'Lo-Fi Beats', description: 'Chill study beats', file: require('../../assets/Sounds/Lo-Fi Beats.mp3'), icon: 'musical-notes-outline',
-    info: { brain: 'Repetitive melodies reduce cognitive load and anxiety', study: 'Popular for study sessions — maintains steady pace without distraction', focus: 'Medium', distract: 'Low-Medium' } },
-  { id: 'nature', name: 'Nature Ambience', description: 'Outdoor nature sounds', file: require('../../assets/Sounds/Nature Ambience.mp3'), icon: 'leaf-outline',
-    info: { brain: 'Natural sounds reduce cortisol and promote relaxation', study: 'Helps with stress recovery during reading breaks', focus: 'Medium', distract: 'Low' } },
+  { id: 'brown_noise', nameKey: 'sound.brown_noise.name', descKey: 'sound.brown_noise.desc', file: require('../../assets/Sounds/Brown Noise.mp3'), icon: 'radio-outline',
+    info: { brainKey: 'sound.brown_noise.brain', studyKey: 'sound.brown_noise.study', focusKey: 'sound.level.high', distractKey: 'sound.level.veryLow' } },
+  { id: 'grey_noise', nameKey: 'sound.grey_noise.name', descKey: 'sound.grey_noise.desc', file: require('../../assets/Sounds/Grey Noise.mp3'), icon: 'radio-outline',
+    info: { brainKey: 'sound.grey_noise.brain', studyKey: 'sound.grey_noise.study', focusKey: 'sound.level.high', distractKey: 'sound.level.veryLow' } },
+  { id: 'pink_noise', nameKey: 'sound.pink_noise.name', descKey: 'sound.pink_noise.desc', file: require('../../assets/Sounds/Pink Noise.mp3'), icon: 'radio-outline',
+    info: { brainKey: 'sound.pink_noise.brain', studyKey: 'sound.pink_noise.study', focusKey: 'sound.level.high', distractKey: 'sound.level.veryLow' } },
+  { id: 'white_noise', nameKey: 'sound.white_noise.name', descKey: 'sound.white_noise.desc', file: require('../../assets/Sounds/White Noise.mp3'), icon: 'radio-outline',
+    info: { brainKey: 'sound.white_noise.brain', studyKey: 'sound.white_noise.study', focusKey: 'sound.level.mediumHigh', distractKey: 'sound.level.veryLow' } },
+  { id: 'brainwave', nameKey: 'sound.brainwave.name', descKey: 'sound.brainwave.desc', file: require('../../assets/Sounds/Brainwave Binaural (10 Hz Alpha Waves).mp3'), icon: 'pulse-outline',
+    info: { brainKey: 'sound.brainwave.brain', studyKey: 'sound.brainwave.study', focusKey: 'sound.level.high', distractKey: 'sound.level.low' } },
+  { id: 'cafe', nameKey: 'sound.cafe.name', descKey: 'sound.cafe.desc', file: require('../../assets/Sounds/Café Ambience.mp3'), icon: 'cafe-outline',
+    info: { brainKey: 'sound.cafe.brain', studyKey: 'sound.cafe.study', focusKey: 'sound.level.medium', distractKey: 'sound.level.medium' } },
+  { id: 'library', nameKey: 'sound.library.name', descKey: 'sound.library.desc', file: require('../../assets/Sounds/Library Ambience.mp3'), icon: 'library-outline',
+    info: { brainKey: 'sound.library.brain', studyKey: 'sound.library.study', focusKey: 'sound.level.mediumHigh', distractKey: 'sound.level.low' } },
+  { id: 'lofi', nameKey: 'sound.lofi.name', descKey: 'sound.lofi.desc', file: require('../../assets/Sounds/Lo-Fi Beats.mp3'), icon: 'musical-notes-outline',
+    info: { brainKey: 'sound.lofi.brain', studyKey: 'sound.lofi.study', focusKey: 'sound.level.medium', distractKey: 'sound.level.lowMedium' } },
+  { id: 'nature', nameKey: 'sound.nature.name', descKey: 'sound.nature.desc', file: require('../../assets/Sounds/Nature Ambience.mp3'), icon: 'leaf-outline',
+    info: { brainKey: 'sound.nature.brain', studyKey: 'sound.nature.study', focusKey: 'sound.level.medium', distractKey: 'sound.level.low' } },
 ];
 
 export function AmbientSoundProvider({ children }) {

@@ -40,6 +40,7 @@ export default function AddFeedScreen({ navigation }) {
       ? 'global'
       : (CURATED_FEEDS[language] && CURATED_FEEDS[language].length > 0 ? language : 'global'));
   const [selectedRegion, setSelectedRegion] = useState(effectiveRegion);
+  const [showRegionPicker, setShowRegionPicker] = useState(false);
   useEffect(() => { setSelectedRegion(effectiveRegion); }, [effectiveRegion]);
 
   const handleSelectRegion = (code) => {
@@ -708,36 +709,26 @@ export default function AddFeedScreen({ navigation }) {
             <Text style={{ color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', fontSize: 13, fontWeight: '600', marginTop: 12, marginBottom: 8 }}>
               {t('region.label')}
             </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{ marginBottom: 14 }}
-              contentContainerStyle={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+            <TouchableOpacity
+              onPress={() => setShowRegionPicker(true)}
+              style={{
+                flexDirection: isRTL ? 'row-reverse' : 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: theme.colors.surface,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+                borderRadius: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                marginBottom: 14,
+              }}
             >
-              {FEED_REGIONS.map((r) => {
-                const active = selectedRegion === r.code;
-                return (
-                  <TouchableOpacity
-                    key={r.code}
-                    onPress={() => handleSelectRegion(r.code)}
-                    style={{
-                      paddingHorizontal: 14,
-                      paddingVertical: 8,
-                      borderRadius: 20,
-                      marginRight: isRTL ? 0 : 8,
-                      marginLeft: isRTL ? 8 : 0,
-                      backgroundColor: active ? theme.colors.primary : theme.colors.surface,
-                      borderWidth: 1,
-                      borderColor: active ? theme.colors.primary : theme.colors.border,
-                    }}
-                  >
-                    <Text style={{ color: active ? '#fff' : theme.colors.text, fontWeight: active ? '700' : '500', fontSize: 13 }}>
-                      {t(r.labelKey)}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
+              <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: '600' }}>
+                {t((FEED_REGIONS.find((r) => r.code === selectedRegion) || FEED_REGIONS[0]).labelKey)}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
 
             {feedCategories.map((category, index) => (
               <View key={index} style={styles.categoryContainer}>
@@ -796,6 +787,53 @@ export default function AddFeedScreen({ navigation }) {
             <Text style={styles.loadingSubtext}>{t('addFeed.fetchingArticles')}</Text>
           </View>
         </View>
+      </Modal>
+
+      {/* Feed-region picker (dropdown) */}
+      <Modal
+        visible={showRegionPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowRegionPicker(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setShowRegionPicker(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+        >
+          <View style={{ backgroundColor: theme.colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 24, maxHeight: '70%' }}>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
+              <Text style={{ color: theme.colors.text, fontSize: 17, fontWeight: '700' }}>{t('region.label')}</Text>
+              <TouchableOpacity onPress={() => setShowRegionPicker(false)}>
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {FEED_REGIONS.map((r) => {
+                const active = selectedRegion === r.code;
+                return (
+                  <TouchableOpacity
+                    key={r.code}
+                    onPress={() => { handleSelectRegion(r.code); setShowRegionPicker(false); }}
+                    style={{
+                      flexDirection: isRTL ? 'row-reverse' : 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 20,
+                      paddingVertical: 16,
+                      backgroundColor: active ? theme.colors.primary + '15' : 'transparent',
+                    }}
+                  >
+                    <Text style={{ color: active ? theme.colors.primary : theme.colors.text, fontSize: 16, fontWeight: active ? '700' : '500' }}>
+                      {t(r.labelKey)}
+                    </Text>
+                    {active && <Ionicons name="checkmark" size={20} color={theme.colors.primary} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
       </Modal>
 
       <CustomAlert
