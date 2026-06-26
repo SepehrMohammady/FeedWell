@@ -24,10 +24,13 @@ import SaveButton from '../components/SaveButton';
 import ReadingPositionIndicator from '../components/ReadingPositionIndicator';
 import CustomAlert from '../components/CustomAlert';
 import { useAmbientSound } from '../context/AmbientSoundContext';
+import { useTranslation } from '../context/LanguageContext';
+import { formatRelativeDate } from '../utils/formatDate';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
+  const { t, isRTL, formatNumber } = useTranslation();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds } = useAppSettings();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
@@ -114,7 +117,7 @@ export default function FeedListScreen({ navigation, route }) {
       console.log('=== REFRESH FEEDS DEBUG END ===');
     } catch (error) {
       setError('Failed to refresh feeds');
-      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to refresh feeds. Please check your internet connection.', icon: 'wifi-outline', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('common.error'), message: t('feedList.refreshFailed'), icon: 'wifi-outline', buttons: [{ text: t('common.ok') }] });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -129,23 +132,23 @@ export default function FeedListScreen({ navigation, route }) {
   const handleMarkAllRead = async () => {
     const unreadCount = getUnreadCount();
     if (unreadCount === 0) {
-      setAlertConfig({ visible: true, title: 'Info', message: 'No unread articles to mark as read.', icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noUnreadToMark'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     const confirmAction = () => {
       markAllRead();
-      setAlertConfig({ visible: true, title: 'Success', message: `Marked ${unreadCount} articles as read.`, icon: 'checkmark-circle', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('common.success'), message: t('feedList.markedReadSuccess', { count: formatNumber(unreadCount) }), icon: 'checkmark-circle', buttons: [{ text: t('common.ok') }] });
     };
 
     setAlertConfig({
       visible: true,
-      title: 'Mark All Read',
-      message: `Mark all ${unreadCount} unread articles as read?`,
+      title: t('feedList.markAllReadTitle'),
+      message: t('feedList.markAllReadConfirm', { count: formatNumber(unreadCount) }),
       icon: 'checkmark-done-outline',
       buttons: [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Mark All Read', onPress: confirmAction, style: 'destructive' },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('feedList.markAllReadTitle'), onPress: confirmAction, style: 'destructive' },
       ],
     });
   };
@@ -153,23 +156,23 @@ export default function FeedListScreen({ navigation, route }) {
   const handleMarkAllUnread = async () => {
     const readCount = getReadCount();
     if (readCount === 0) {
-      setAlertConfig({ visible: true, title: 'Info', message: 'No read articles to mark as unread.', icon: 'information-circle-outline', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noReadToMark'), icon: 'information-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     const confirmAction = () => {
       markAllUnread();
-      setAlertConfig({ visible: true, title: 'Success', message: `Marked ${readCount} articles as unread.`, icon: 'checkmark-circle', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('common.success'), message: t('feedList.markedUnreadSuccess', { count: formatNumber(readCount) }), icon: 'checkmark-circle', buttons: [{ text: t('common.ok') }] });
     };
 
     setAlertConfig({
       visible: true,
-      title: 'Mark All Unread',
-      message: `Mark all ${readCount} read articles as unread?`,
+      title: t('feedList.markAllUnreadTitle'),
+      message: t('feedList.markAllUnreadConfirm', { count: formatNumber(readCount) }),
       icon: 'mail-unread-outline',
       buttons: [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Mark All Unread', onPress: confirmAction, style: 'destructive' },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('feedList.markAllUnreadTitle'), onPress: confirmAction, style: 'destructive' },
       ],
     });
   };
@@ -191,21 +194,7 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffHours < 1) {
-      return 'Just now';
-    } else if (diffHours < 24) {
-      return `${diffHours}h ago`;
-    } else if (diffDays < 7) {
-      return `${diffDays}d ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
+    return formatRelativeDate(dateString, t, formatNumber);
   };
 
   const handleArticlePress = (article) => {
@@ -244,10 +233,10 @@ export default function FeedListScreen({ navigation, route }) {
             viewPosition: 0.3,
           });
         } catch (error) {
-          setAlertConfig({ visible: true, title: 'Reading Position', message: 'You can see your reading position marked in the list below.', icon: 'location-outline', buttons: [{ text: 'OK' }] });
+          setAlertConfig({ visible: true, title: t('feedList.readingPositionTitle'), message: t('feedList.readingPositionMarkedBelow'), icon: 'location-outline', buttons: [{ text: t('common.ok') }] });
         }
       } else {
-        setAlertConfig({ visible: true, title: 'Reading Position', message: 'The reading position article is not visible in the current filter/sort view.', icon: 'location-outline', buttons: [{ text: 'OK' }] });
+        setAlertConfig({ visible: true, title: t('feedList.readingPositionTitle'), message: t('feedList.readingPositionNotVisible'), icon: 'location-outline', buttons: [{ text: t('common.ok') }] });
       }
     }
   };
@@ -255,12 +244,12 @@ export default function FeedListScreen({ navigation, route }) {
   const handleClearReadingPosition = () => {
     setAlertConfig({
       visible: true,
-      title: 'Clear Reading Position',
-      message: 'Are you sure you want to remove the reading position line?',
+      title: t('feedList.clearReadingPositionTitle'),
+      message: t('feedList.clearReadingPositionConfirm'),
       icon: 'bookmark-outline',
       buttons: [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear', style: 'destructive', onPress: clearReadingPosition },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('feedList.clearAction'), style: 'destructive', onPress: clearReadingPosition },
       ],
     });
   };
@@ -498,14 +487,14 @@ export default function FeedListScreen({ navigation, route }) {
   const openFilterMenu = () => {
     setAlertConfig({
       visible: true,
-      title: 'Filter Articles',
-      message: 'Choose which articles to show.',
+      title: t('feedList.filterArticlesTitle'),
+      message: t('feedList.filterArticlesMessage'),
       icon: 'filter-outline',
       buttons: [
-        { text: articleFilter === 'all' ? 'All (Current)' : 'All', onPress: () => updateArticleFilter('all') },
-        { text: articleFilter === 'unread' ? `Unread (${getAgeFilteredUnreadCount()}) (Current)` : `Unread (${getAgeFilteredUnreadCount()})`, onPress: () => updateArticleFilter('unread') },
-        { text: articleFilter === 'read' ? `Read (${getAgeFilteredReadCount()}) (Current)` : `Read (${getAgeFilteredReadCount()})`, onPress: () => updateArticleFilter('read') },
-        { text: 'Cancel', style: 'cancel' },
+        { text: articleFilter === 'all' ? t('feedList.filterAllCurrent') : t('feedList.filterAll'), onPress: () => updateArticleFilter('all') },
+        { text: articleFilter === 'unread' ? t('feedList.filterUnreadCurrent', { count: formatNumber(getAgeFilteredUnreadCount()) }) : t('feedList.filterUnread', { count: formatNumber(getAgeFilteredUnreadCount()) }), onPress: () => updateArticleFilter('unread') },
+        { text: articleFilter === 'read' ? t('feedList.filterReadCurrent', { count: formatNumber(getAgeFilteredReadCount()) }) : t('feedList.filterRead', { count: formatNumber(getAgeFilteredReadCount()) }), onPress: () => updateArticleFilter('read') },
+        { text: t('common.cancel'), style: 'cancel' },
       ],
     });
   };
@@ -525,11 +514,11 @@ export default function FeedListScreen({ navigation, route }) {
   const getFilterButtonText = () => {
     switch (articleFilter) {
       case 'unread':
-        return `Unread (${getAgeFilteredUnreadCount()})`;
+        return t('feedList.filterUnread', { count: formatNumber(getAgeFilteredUnreadCount()) });
       case 'read':
-        return `Read (${getAgeFilteredReadCount()})`;
+        return t('feedList.filterRead', { count: formatNumber(getAgeFilteredReadCount()) });
       default:
-        return `All (${filterByAge(articles).length})`;
+        return t('feedList.filterAllCount', { count: formatNumber(filterByAge(articles).length) });
     }
   };
 
@@ -543,7 +532,7 @@ export default function FeedListScreen({ navigation, route }) {
       backgroundColor: theme.colors.background,
     },
     header: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: 16,
@@ -555,6 +544,8 @@ export default function FeedListScreen({ navigation, route }) {
       fontSize: 24,
       fontWeight: 'bold',
       color: theme.colors.text,
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     addButton: {
       alignItems: 'center',
@@ -564,7 +555,7 @@ export default function FeedListScreen({ navigation, route }) {
       minWidth: 40,
     },
     headerRightGroup: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       flex: 1,
       justifyContent: 'space-between',
@@ -574,7 +565,7 @@ export default function FeedListScreen({ navigation, route }) {
       marginRight: 8,
     },
     headerButtons: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       flexShrink: 1,
     },
@@ -597,7 +588,7 @@ export default function FeedListScreen({ navigation, route }) {
       fontWeight: '600',
     },
     filterButton: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       gap: 6,
       paddingHorizontal: 10,
@@ -608,7 +599,7 @@ export default function FeedListScreen({ navigation, route }) {
       borderColor: theme.colors.text,
     },
     searchContainer: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       backgroundColor: theme.colors.surface,
       marginHorizontal: 16,
@@ -620,13 +611,16 @@ export default function FeedListScreen({ navigation, route }) {
       borderColor: theme.colors.border,
     },
     searchIcon: {
-      marginRight: 8,
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
     },
     searchInput: {
       flex: 1,
       fontSize: 16,
       color: theme.colors.text,
       paddingVertical: 4,
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     clearSearch: {
       padding: 4,
@@ -637,22 +631,23 @@ export default function FeedListScreen({ navigation, route }) {
       marginVertical: 8,
       borderRadius: 12,
       padding: 16,
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'flex-start',
       ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
     },
     articleContent: {
       flex: 1,
-      marginRight: 12,
+      marginRight: isRTL ? 0 : 12,
+      marginLeft: isRTL ? 12 : 0,
     },
     articleHeader: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 8,
     },
     titleRow: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       flex: 1,
     },
@@ -661,16 +656,19 @@ export default function FeedListScreen({ navigation, route }) {
       height: 8,
       borderRadius: 4,
       backgroundColor: theme.colors.primary,
-      marginRight: 8,
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
     },
     feedTitle: {
       fontSize: 12,
       color: theme.colors.primary,
       fontWeight: '600',
       flex: 1,
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     articleMeta: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       gap: 8,
     },
@@ -689,14 +687,19 @@ export default function FeedListScreen({ navigation, route }) {
       color: theme.colors.text,
       marginBottom: 6,
       lineHeight: 21,
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     articleDescription: {
       fontSize: 14,
       color: theme.colors.textSecondary,
       lineHeight: 20,
+      textAlign: isRTL ? 'right' : 'left',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     imageContainer: {
-      marginLeft: 12,
+      marginLeft: isRTL ? 0 : 12,
+      marginRight: isRTL ? 12 : 0,
     },
     articleImage: {
       width: 80,
@@ -709,7 +712,7 @@ export default function FeedListScreen({ navigation, route }) {
       alignItems: 'center',
     },
     imageActions: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       justifyContent: 'space-around',
       alignItems: 'center',
       marginTop: 4,
@@ -744,7 +747,7 @@ export default function FeedListScreen({ navigation, route }) {
       marginBottom: 24,
     },
     primaryButton: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.colors.primary,
@@ -760,7 +763,7 @@ export default function FeedListScreen({ navigation, route }) {
       fontWeight: '600',
     },
     featuresContainer: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       justifyContent: 'space-around',
       width: '100%',
       paddingHorizontal: 20,
@@ -788,7 +791,8 @@ export default function FeedListScreen({ navigation, route }) {
       height: 28,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 12,
+      marginRight: isRTL ? 0 : 12,
+      marginLeft: isRTL ? 12 : 0,
     },
     selectedArticle: {
       backgroundColor: theme.colors.primary + '20',
@@ -812,30 +816,30 @@ export default function FeedListScreen({ navigation, route }) {
         
         <View style={styles.emptyState}>
           <Ionicons name="newspaper-outline" size={100} color={theme.colors.border} />
-          <Text style={styles.emptyTitle}>Welcome to FeedWell</Text>
+          <Text style={styles.emptyTitle}>{t('feedList.welcomeTitle')}</Text>
           <Text style={styles.emptyDescription}>
-            Your ad-free RSS reader. Start by adding your first feed to get clean, distraction-free articles.
+            {t('feedList.welcomeDescription')}
           </Text>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
             <Ionicons name="add-circle-outline" size={20} color="#fff" />
-            <Text style={styles.primaryButtonText}>Add Your First Feed</Text>
+            <Text style={styles.primaryButtonText}>{t('feedList.addFirstFeed')}</Text>
           </TouchableOpacity>
-          
+
           <View style={styles.featuresContainer}>
             <View style={styles.featureItem}>
               <Ionicons name="shield-checkmark" size={24} color={theme.colors.success} />
-              <Text style={styles.featureText}>Ad-free reading</Text>
+              <Text style={styles.featureText}>{t('feedList.featureAdFree')}</Text>
             </View>
             <View style={styles.featureItem}>
               <Ionicons name="reader" size={24} color={theme.colors.primary} />
-              <Text style={styles.featureText}>Clean reader mode</Text>
+              <Text style={styles.featureText}>{t('feedList.featureReaderMode')}</Text>
             </View>
             <View style={styles.featureItem}>
               <Ionicons name="share" size={24} color={theme.colors.warning} />
-              <Text style={styles.featureText}>Easy sharing</Text>
+              <Text style={styles.featureText}>{t('feedList.featureSharing')}</Text>
             </View>
           </View>
         </View>
@@ -853,14 +857,14 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={selectAllArticles}
             >
               <Ionicons name="checkbox" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>All</Text>
+              <Text style={styles.headerButtonLabel}>{t('feedList.selectAll')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={deselectAllArticles}
             >
               <Ionicons name="square-outline" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>None</Text>
+              <Text style={styles.headerButtonLabel}>{t('feedList.selectNone')}</Text>
             </TouchableOpacity>
             {(() => {
               // Check if selection contains any unread articles
@@ -886,7 +890,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasUnread}
                     >
                       <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.text} />
-                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.textSecondary }]}>Read</Text>
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('feedList.markReadLabel')}</Text>
                     </TouchableOpacity>
                   )}
                   {showMarkUnread && (
@@ -896,7 +900,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasRead}
                     >
                       <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.text} />
-                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.textSecondary }]}>Unread</Text>
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('feedList.markUnreadLabel')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -907,7 +911,7 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={toggleSelectionMode}
             >
               <Ionicons name="close" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>Cancel</Text>
+              <Text style={styles.headerButtonLabel}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -925,14 +929,14 @@ export default function FeedListScreen({ navigation, route }) {
                 onPress={() => openSoundPlaylist(true)}
               >
                 <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>Sounds</Text>
+                <Text style={styles.headerButtonLabel}>{t('feedList.soundsLabel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.headerButton}
                 onPress={toggleSort}
               >
                 <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>Sort</Text>
+                <Text style={styles.headerButtonLabel}>{t('feedList.sortLabel')}</Text>
               </TouchableOpacity>
               {articleFilter !== 'read' && (
                 <TouchableOpacity
@@ -940,7 +944,7 @@ export default function FeedListScreen({ navigation, route }) {
                   onPress={handleMarkAllRead}
                 >
                   <Ionicons name="checkmark-done" size={20} color={theme.colors.text} />
-                  <Text style={styles.headerButtonLabel}>Read All</Text>
+                  <Text style={styles.headerButtonLabel}>{t('feedList.readAllLabel')}</Text>
                 </TouchableOpacity>
               )}
               {articleFilter !== 'unread' && (
@@ -949,7 +953,7 @@ export default function FeedListScreen({ navigation, route }) {
                   onPress={handleMarkAllUnread}
                 >
                   <Ionicons name="mail-unread-outline" size={20} color={theme.colors.text} />
-                  <Text style={styles.headerButtonLabel}>Unread All</Text>
+                  <Text style={styles.headerButtonLabel}>{t('feedList.unreadAllLabel')}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -957,7 +961,7 @@ export default function FeedListScreen({ navigation, route }) {
                 onPress={() => navigation.navigate('AddFeed')}
               >
                 <Ionicons name="add" size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>Add</Text>
+                <Text style={styles.headerButtonLabel}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -969,7 +973,7 @@ export default function FeedListScreen({ navigation, route }) {
         <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search articles..."
+          placeholder={t('feedList.searchPlaceholder')}
           placeholderTextColor={theme.colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -986,7 +990,7 @@ export default function FeedListScreen({ navigation, route }) {
       {loading && !refreshing && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Loading articles...</Text>
+          <Text style={styles.loadingText}>{t('feedList.loadingArticles')}</Text>
         </View>
       )}
 
@@ -1005,13 +1009,13 @@ export default function FeedListScreen({ navigation, route }) {
             <View style={styles.emptyState}>
               <Ionicons name="refresh-outline" size={60} color="#ccc" />
               <Text style={styles.emptyTitle}>
-                {articleFilter === 'unread' ? 'No Unread Articles' : 
-                 articleFilter === 'read' ? 'No Read Articles' : 'No Articles'}
+                {articleFilter === 'unread' ? t('feedList.emptyUnreadTitle') :
+                 articleFilter === 'read' ? t('feedList.emptyReadTitle') : t('feedList.emptyAllTitle')}
               </Text>
               <Text style={styles.emptyDescription}>
-                {articleFilter === 'unread' ? 'All articles have been read' :
-                 articleFilter === 'read' ? 'No articles have been read yet' :
-                 'Pull down to refresh your feeds'}
+                {articleFilter === 'unread' ? t('feedList.emptyUnreadDescription') :
+                 articleFilter === 'read' ? t('feedList.emptyReadDescription') :
+                 t('feedList.emptyAllDescription')}
               </Text>
             </View>
           )

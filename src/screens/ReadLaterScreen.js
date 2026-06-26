@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
@@ -19,6 +20,7 @@ import CustomAlert from '../components/CustomAlert';
 
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
+  const { t, isRTL, formatNumber } = useTranslation();
   const { showImages } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
@@ -64,7 +66,7 @@ export default function ReadLaterScreen({ navigation }) {
     // Use browser-compatible confirm dialog for web, Alert for mobile
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
-      const confirmed = window.confirm('Are you sure you want to remove all saved articles?');
+      const confirmed = window.confirm(t('readLater.clearAllConfirm'));
       if (confirmed) {
         clearReadLater();
       }
@@ -72,13 +74,13 @@ export default function ReadLaterScreen({ navigation }) {
       // Mobile environment - use Alert
       setAlertConfig({
         visible: true,
-        title: 'Clear All',
-        message: 'Are you sure you want to remove all saved articles?',
+        title: t('common.clearAll'),
+        message: t('readLater.clearAllConfirm'),
         icon: 'trash-outline',
         buttons: [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Clear All', 
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('common.clearAll'),
             style: 'destructive',
             onPress: clearReadLater
           },
@@ -91,7 +93,7 @@ export default function ReadLaterScreen({ navigation }) {
     // Use browser-compatible confirm dialog for web, Alert for mobile
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       // Web environment - use native confirm
-      const confirmed = window.confirm('Remove this article from saved articles?');
+      const confirmed = window.confirm(t('readLater.removeConfirm'));
       if (confirmed) {
         removeFromReadLater(articleId);
       }
@@ -99,13 +101,13 @@ export default function ReadLaterScreen({ navigation }) {
       // Mobile environment - use Alert
       setAlertConfig({
         visible: true,
-        title: 'Remove Article',
-        message: 'Remove this article from saved articles?',
+        title: t('readLater.removeArticle'),
+        message: t('readLater.removeConfirm'),
         icon: 'trash-outline',
         buttons: [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Remove', 
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('common.remove'),
             style: 'destructive',
             onPress: () => removeFromReadLater(articleId)
           },
@@ -122,10 +124,10 @@ export default function ReadLaterScreen({ navigation }) {
         color={theme.colors.textSecondary} 
       />
       <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-        No Saved Articles
+        {t('readLater.emptyTitle')}
       </Text>
       <Text style={[styles.emptyMessage, { color: theme.colors.textSecondary }]}>
-        Articles you save for later reading will appear here
+        {t('readLater.emptyMessage')}
       </Text>
     </View>
   );
@@ -133,35 +135,35 @@ export default function ReadLaterScreen({ navigation }) {
   const renderArticleItem = ({ item }) => (
     <View style={styles.articleContainer}>
       <TouchableOpacity
-        style={[styles.articleCard, { backgroundColor: theme.colors.surface }]}
+        style={[styles.articleCard, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface }]}
         onPress={() => handleArticlePress(item)}
         activeOpacity={0.7}
       >
         <View style={styles.articleContent}>
-          <View style={styles.articleHeader}>
-            <Text style={[styles.feedTitle, { color: theme.colors.primary }]} numberOfLines={1}>
+          <View style={[styles.articleHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Text style={[styles.feedTitle, { color: theme.colors.primary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
               {item.feedTitle}
             </Text>
             <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
               {formatDate(item.publishedDate)}
             </Text>
           </View>
-          
-          <Text style={[styles.title, { color: theme.colors.text }]} numberOfLines={2}>
+
+          <Text style={[styles.title, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={2}>
             {item.title}
           </Text>
-          
+
           {item.description && (
-            <Text style={[styles.description, { color: theme.colors.textSecondary }]} numberOfLines={2}>
+            <Text style={[styles.description, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={2}>
               {item.description}
             </Text>
           )}
 
-          <View style={styles.footer}>
+          <View style={[styles.footer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             {item.offlineCached && (
-              <View style={[styles.offlineIndicator, { backgroundColor: theme.colors.success || '#28a745' }]}>
+              <View style={[styles.offlineIndicator, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.success || '#28a745' }]}>
                 <Ionicons name="download" size={10} color="#fff" />
-                <Text style={styles.offlineText}>OFFLINE</Text>
+                <Text style={styles.offlineText}>{t('readLater.offline')}</Text>
               </View>
             )}
             <TouchableOpacity
@@ -194,34 +196,36 @@ export default function ReadLaterScreen({ navigation }) {
     if (!dateString) return '';
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
+      return formatNumber(date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-      });
+      }));
     } catch (error) {
       return '';
     }
   };
 
   const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+    <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface }]}>
       <View style={styles.headerContent}>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-          Saved Articles
+        <Text style={[styles.headerTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t('readLater.title')}
         </Text>
-        <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
-          {filteredAndSortedArticles.length} {filteredAndSortedArticles.length === 1 ? 'article' : 'articles'} {searchQuery ? 'found' : 'saved'}
+        <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {searchQuery
+            ? t(filteredAndSortedArticles.length === 1 ? 'readLater.subtitleFoundOne' : 'readLater.subtitleFoundOther', { count: formatNumber(filteredAndSortedArticles.length) })
+            : t(filteredAndSortedArticles.length === 1 ? 'readLater.subtitleSavedOne' : 'readLater.subtitleSavedOther', { count: formatNumber(filteredAndSortedArticles.length) })}
         </Text>
       </View>
-      <View style={styles.headerButtons}>
+      <View style={[styles.headerButtons, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <TouchableOpacity
           style={styles.sortButton}
           onPress={() => openSoundPlaylist(true)}
         >
           <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
-          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sounds</Text>
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>{t('readLater.sounds')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.sortButton}
@@ -232,7 +236,7 @@ export default function ReadLaterScreen({ navigation }) {
             size={20} 
             color={theme.colors.text} 
           />
-          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>Sort</Text>
+          <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>{t('readLater.sort')}</Text>
         </TouchableOpacity>
         {articles.length > 0 && (
           <TouchableOpacity
@@ -240,7 +244,7 @@ export default function ReadLaterScreen({ navigation }) {
             onPress={handleClearAll}
           >
             <Text style={[styles.clearButtonText, { color: theme.colors.error }]}>
-              Clear All
+              {t('common.clearAll')}
             </Text>
           </TouchableOpacity>
         )}
@@ -249,11 +253,11 @@ export default function ReadLaterScreen({ navigation }) {
   );
 
   const renderSearchBar = () => (
-    <View style={[styles.searchContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+    <View style={[styles.searchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
       <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
       <TextInput
-        style={[styles.searchInput, { color: theme.colors.text }]}
-        placeholder="Search saved articles..."
+        style={[styles.searchInput, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}
+        placeholder={t('readLater.searchPlaceholder')}
         placeholderTextColor={theme.colors.textSecondary}
         value={searchQuery}
         onChangeText={setSearchQuery}

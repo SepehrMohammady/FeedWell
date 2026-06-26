@@ -12,6 +12,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,64 +20,65 @@ const ONBOARDING_SLIDES = [
   {
     id: 1,
     icon: 'newspaper-outline',
-    title: 'Welcome to FeedWell',
-    description: 'Your ad-free RSS reader for a clean, distraction-free reading experience.',
+    titleKey: 'onboarding.welcomeTitle',
+    descriptionKey: 'onboarding.welcomeDescription',
     color: '#A17F66',
     showLogo: true,
   },
   {
     id: 2,
     icon: 'shield-checkmark-outline',
-    title: 'Ad-Free Reading',
-    description: 'Enjoy articles without ads, tracking scripts, or promotional content. We automatically clean and block unwanted elements.',
+    titleKey: 'onboarding.adFreeTitle',
+    descriptionKey: 'onboarding.adFreeDescription',
     color: '#A2A9A3',
   },
   {
     id: 3,
     icon: 'add-circle-outline',
-    title: 'Manage Your Feeds',
-    description: 'Add RSS or Atom feeds from any website and manage all sources in one place. Filter by All, Unread, or Read. Sort by newest or oldest. Mark all as read with one tap. Share articles with others.',
+    titleKey: 'onboarding.manageFeedsTitle',
+    descriptionKey: 'onboarding.manageFeedsDescription',
     color: '#5F758E',
   },
   {
     id: 4,
     icon: 'bookmark-outline',
-    title: 'Reading Position',
-    description: 'Set a bookmark line to mark your reading position. It adjusts based on your filter and actions.',
+    titleKey: 'onboarding.readingPositionTitle',
+    descriptionKey: 'onboarding.readingPositionDescription',
     color: '#CD9C8B',
   },
   {
     id: 5,
     icon: 'save-outline',
-    title: 'Save for Later',
-    description: 'Bookmark articles to read offline. Access them anytime from the Saved tab, even without internet.',
+    titleKey: 'onboarding.saveForLaterTitle',
+    descriptionKey: 'onboarding.saveForLaterDescription',
     color: '#758793',
   },
   {
     id: 6,
     icon: 'sparkles-outline',
-    title: 'Reader Features',
-    description: 'Translate articles into 50+ languages (online or offline). Listen with Read Aloud (TTS) at adjustable speed. Play ambient background sounds while reading. Take notes on any article.',
+    titleKey: 'onboarding.readerFeaturesTitle',
+    descriptionKey: 'onboarding.readerFeaturesDescription',
     color: '#7B8E6B',
   },
   {
     id: 7,
     icon: 'grid-outline',
-    title: 'Home Screen Widget',
-    description: 'Add the FeedWell widget to your home screen for quick access to latest articles. Customize the theme and opacity from Settings.',
+    titleKey: 'onboarding.widgetTitle',
+    descriptionKey: 'onboarding.widgetDescription',
     color: '#6B8E9B',
   },
   {
     id: 8,
     icon: 'checkmark-circle-outline',
-    title: 'You\'re All Set!',
-    description: 'Start by adding your first RSS feed and enjoy a better reading experience. Happy reading!',
+    titleKey: 'onboarding.allSetTitle',
+    descriptionKey: 'onboarding.allSetDescription',
     color: '#A2A9A3',
   },
 ];
 
 export default function OnboardingTutorial({ visible, onComplete }) {
   const { theme, isDarkMode } = useTheme();
+  const { t, isRTL } = useTranslation();
   const insets = useSafeAreaInsets();
   const [currentSlide, setCurrentSlide] = useState(0);
   const flatListRef = useRef(null);
@@ -144,13 +146,13 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         )}
 
         {/* Title */}
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {item.title}
+        <Text style={[styles.title, { color: theme.colors.text, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t(item.titleKey)}
         </Text>
 
         {/* Description */}
-        <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
-          {item.description}
+        <Text style={[styles.description, { color: theme.colors.textSecondary, writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t(item.descriptionKey)}
         </Text>
       </View>
     </View>
@@ -176,7 +178,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>
-              Skip
+              {t('onboarding.skip')}
             </Text>
           </TouchableOpacity>
         )}
@@ -215,7 +217,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
         </View>
 
         {/* Navigation Buttons */}
-        <View style={[styles.navigation, { bottom: navBottom }]}>
+        <View style={[styles.navigation, { bottom: navBottom, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           {/* Previous Button */}
           {currentSlide > 0 && (
             <TouchableOpacity 
@@ -225,7 +227,7 @@ export default function OnboardingTutorial({ visible, onComplete }) {
               delayPressIn={0}
               delayPressOut={0}
             >
-              <Ionicons name="arrow-back" size={20} color={theme.colors.primary} />
+              <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={20} color={theme.colors.primary} />
             </TouchableOpacity>
           )}
 
@@ -234,17 +236,17 @@ export default function OnboardingTutorial({ visible, onComplete }) {
             style={[
               styles.navButton, 
               styles.nextButton,
-              { backgroundColor: theme.colors.primary },
+              { backgroundColor: theme.colors.primary, flexDirection: isRTL ? 'row-reverse' : 'row' },
               currentSlide === 0 && styles.nextButtonFullWidth
             ]}
             onPress={handleNext}
             activeOpacity={0.7}
           >
             <Text style={styles.nextButtonText}>
-              {isLastSlide ? 'Get Started' : 'Next'}
+              {isLastSlide ? t('onboarding.getStarted') : t('onboarding.next')}
             </Text>
             {!isLastSlide && (
-              <Ionicons name="arrow-forward" size={24} color="#FFFFFF" />
+              <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={24} color="#FFFFFF" />
             )}
           </TouchableOpacity>
         </View>

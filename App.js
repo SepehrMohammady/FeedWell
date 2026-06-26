@@ -1,13 +1,14 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { AppState, Linking } from 'react-native';
+import { AppState, Linking, I18nManager } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef, CommonActions, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FeedProvider } from './src/context/FeedContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { LanguageProvider, useTranslation } from './src/context/LanguageContext';
 import { AppSettingsProvider, useAppSettings } from './src/context/AppSettingsContext';
 import { ReadLaterProvider } from './src/context/ReadLaterContext';
 import { NotesProvider } from './src/context/NotesContext';
@@ -15,8 +16,15 @@ import { AmbientSoundProvider } from './src/context/AmbientSoundContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
+import WhatsNewModal from './src/components/WhatsNewModal';
 import KinetosisOverlay from './src/components/KinetosisOverlay';
+import { APP_VERSION } from './src/config/version';
 import { setupNotificationChannel, scheduleReminderNotification, cancelReminderNotification } from './src/utils/notificationService';
+
+// Keep the native layer LTR so our per-component RTL (for Farsi) is the only
+// RTL source — prevents a Farsi/Arabic *system* locale from auto-mirroring the
+// native shell and double-flipping our manual row-reverse layouts.
+try { I18nManager.allowRTL(false); } catch (e) { /* no-op */ }
 
 const NAV_STATE_KEY = 'feedwell_nav_state';
 const navigationRef = createNavigationContainerRef();
@@ -100,9 +108,11 @@ function handleDeepLink(url) {
 }
 
 function AppContent() {
-  const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation, readingReminder } = useAppSettings();
+  const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation, readingReminder, lastSeenVersion, updateLastSeenVersion } = useAppSettings();
   const { theme, isDarkMode } = useTheme();
+  const { langLoading, language } = useTranslation();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [navStateReady, setNavStateReady] = useState(false);
   const [initialNavState, setInitialNavState] = useState(undefined);
 
@@ -154,7 +164,7 @@ function AppContent() {
     });
 
     return () => subscription.remove();
-  }, [readingReminder]);
+  }, [readingReminder, language]);
 
   // Handle deep links from widget
   useEffect(() => {
@@ -171,13 +181,33 @@ function AppContent() {
     }
   }, [isLoading, hasSeenOnboarding]);
 
+  // Show the "What's New" popup once after updating to a new version. Never on a
+  // fresh install (those see onboarding, which stamps lastSeenVersion on finish).
+  useEffect(() => {
+    if (!isLoading && hasSeenOnboarding && lastSeenVersion !== APP_VERSION.version) {
+      setShowWhatsNew(true);
+    }
+  }, [isLoading, hasSeenOnboarding, lastSeenVersion]);
+
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
     completeOnboarding();
   };
 
-  if (isLoading || !navStateReady) {
-    return null; // Or a loading screen
+  const handleWhatsNewClose = () => {
+    setShowWhatsNew(false);
+    updateLastSeenVersion(APP_VERSION.version);
+  };
+
+  const handleOpenLanguageSettings = () => {
+    handleWhatsNewClose();
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('Settings');
+    }
+  };
+
+  if (isLoading || langLoading || !navStateReady) {
+    return null; // Wait for settings + language so the first paint is correct (no flash)
   }
 
   return (
@@ -200,9 +230,14 @@ function AppContent() {
         <KinetosisOverlay />
         <StatusBar style={isDarkMode ? "light" : "dark"} />
       </NavigationContainer>
-      <OnboardingTutorial 
-        visible={showOnboarding} 
+      <OnboardingTutorial
+        visible={showOnboarding}
         onComplete={handleOnboardingComplete}
+      />
+      <WhatsNewModal
+        visible={showWhatsNew && !showOnboarding}
+        onClose={handleWhatsNewClose}
+        onOpenLanguageSettings={handleOpenLanguageSettings}
       />
     </>
   );
@@ -213,17 +248,19 @@ export default function App() {
     <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
-          <AppSettingsProvider>
-            <ReadLaterProvider>
-              <NotesProvider>
-                <AmbientSoundProvider>
-                  <FeedProvider>
-                    <AppContent />
-                  </FeedProvider>
-                </AmbientSoundProvider>
-              </NotesProvider>
-            </ReadLaterProvider>
-          </AppSettingsProvider>
+          <LanguageProvider>
+            <AppSettingsProvider>
+              <ReadLaterProvider>
+                <NotesProvider>
+                  <AmbientSoundProvider>
+                    <FeedProvider>
+                      <AppContent />
+                    </FeedProvider>
+                  </AmbientSoundProvider>
+                </NotesProvider>
+              </ReadLaterProvider>
+            </AppSettingsProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </ErrorBoundary>

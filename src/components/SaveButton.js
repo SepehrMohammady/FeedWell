@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
 import CustomAlert from './CustomAlert';
 
 export default function SaveButton({ article, size = 24, style, variant = 'default', label }) {
   const { theme } = useTheme();
+  const { t, isRTL } = useTranslation();
   const { addToReadLater, removeFromReadLater, isInReadLater } = useReadLater();
   const [isLoading, setIsLoading] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
@@ -76,7 +78,7 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
       // Remove from read later - use browser-compatible confirm dialog for web, Alert for mobile
       if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
         // Web environment - use native confirm
-        const confirmed = window.confirm('Remove this article from saved articles?');
+        const confirmed = window.confirm(t('saveButton.removeConfirmMessage'));
         if (confirmed) {
           removeFromReadLater(article.id);
         }
@@ -84,13 +86,13 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
         // Mobile environment - use Alert
         setAlertConfig({
           visible: true,
-          title: 'Remove from Saved',
-          message: 'Remove this article from saved articles?',
+          title: t('saveButton.removeTitle'),
+          message: t('saveButton.removeConfirmMessage'),
           icon: 'trash-outline',
           buttons: [
-            { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Remove', 
+            { text: t('common.cancel'), style: 'cancel' },
+            {
+              text: t('common.remove'),
               style: 'destructive',
               onPress: () => removeFromReadLater(article.id)
             },
@@ -111,28 +113,28 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
             console.log('Article saved for offline reading');
           } else {
             // Mobile environment - use Alert
-            const message = enhancedArticle.offlineCached 
-              ? 'Article downloaded and saved for offline reading!' 
-              : 'Article saved (limited offline content available)';
-            setAlertConfig({ visible: true, title: 'Saved!', message, icon: 'checkmark-circle-outline', buttons: [{ text: 'OK' }] });
+            const message = enhancedArticle.offlineCached
+              ? t('saveButton.savedOfflineMessage')
+              : t('saveButton.savedLimitedMessage');
+            setAlertConfig({ visible: true, title: t('saveButton.savedTitle'), message, icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
           }
         } else {
           // Use browser-compatible alert for web, Alert for mobile
           if (typeof window !== 'undefined') {
             // Web environment - use native alert
-            window.alert('This article is already saved');
+            window.alert(t('saveButton.alreadySavedMessage'));
           } else {
             // Mobile environment - use Alert
-            setAlertConfig({ visible: true, title: 'Already Saved', message: 'This article is already saved', icon: 'information-circle-outline', buttons: [{ text: 'OK' }] });
+            setAlertConfig({ visible: true, title: t('saveButton.alreadySavedTitle'), message: t('saveButton.alreadySavedMessage'), icon: 'information-circle-outline', buttons: [{ text: t('common.ok') }] });
           }
         }
       } catch (error) {
         console.error('Error saving article:', error);
-        const errorMessage = error.message.includes('fetch') 
-          ? 'Failed to download article content. Saved with limited offline content.'
-          : 'Failed to save article. Please try again.';
-        
-        setAlertConfig({ visible: true, title: 'Save Error', message: errorMessage, icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
+        const errorMessage = error.message.includes('fetch')
+          ? t('saveButton.saveErrorFetchMessage')
+          : t('saveButton.saveErrorMessage');
+
+        setAlertConfig({ visible: true, title: t('saveButton.saveErrorTitle'), message: errorMessage, icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
       }
     }
   };
@@ -162,8 +164,8 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
         />
       )}
       {label && (
-        <Text style={{ fontSize: 9, marginTop: 2, fontWeight: '500', color: theme.colors.textSecondary }} numberOfLines={1}>
-          {isBookmarked ? 'Unsave' : label}
+        <Text style={{ fontSize: 9, marginTop: 2, fontWeight: '500', color: theme.colors.textSecondary, writingDirection: isRTL ? 'rtl' : 'ltr' }} numberOfLines={1}>
+          {isBookmarked ? t('saveButton.unsave') : label}
         </Text>
       )}
     </TouchableOpacity>

@@ -16,9 +16,12 @@ import { useReadLater } from '../context/ReadLaterContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import CustomAlert from '../components/CustomAlert';
+import { useTranslation } from '../context/LanguageContext';
+import { formatRelativeDate } from '../utils/formatDate';
 
 export default function HomeScreen({ navigation }) {
   const { theme, isDarkMode } = useTheme();
+  const { t, isRTL, formatNumber } = useTranslation();
   const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
   const { maxArticleAge } = useAppSettings();
@@ -71,7 +74,7 @@ export default function HomeScreen({ navigation }) {
       }
     } catch (error) {
       setError('Failed to refresh feeds');
-      setAlertConfig({ visible: true, title: 'Error', message: 'Failed to refresh feeds. Please check your internet connection.', icon: 'alert-circle-outline', buttons: [{ text: 'OK' }] });
+      setAlertConfig({ visible: true, title: t('common.error'), message: t('home.refreshError'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -84,7 +87,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const renderOverviewCard = (title, value, icon, color, onPress) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.overviewCard, { backgroundColor: theme.colors.surface }]}
       onPress={onPress}
       activeOpacity={0.7}
@@ -94,7 +97,7 @@ export default function HomeScreen({ navigation }) {
       </View>
       <View style={styles.overviewContent}>
         <Text style={[styles.overviewValue, { color: theme.colors.text }]}>
-          {value}
+          {formatNumber(value)}
         </Text>
         <Text style={[styles.overviewTitle, { color: theme.colors.textSecondary }]}>
           {title}
@@ -106,47 +109,34 @@ export default function HomeScreen({ navigation }) {
   const renderRecentArticle = (article) => (
     <TouchableOpacity
       key={article.id}
-      style={[styles.recentArticle, { backgroundColor: theme.colors.surface }]}
-      onPress={() => navigation.navigate('Feeds', { 
-        screen: 'ArticleReader', 
-        params: { article } 
+      style={[styles.recentArticle, { backgroundColor: theme.colors.surface, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+      onPress={() => navigation.navigate('Feeds', {
+        screen: 'ArticleReader',
+        params: { article }
       })}
       activeOpacity={0.7}
     >
       <View style={styles.recentArticleContent}>
-        <Text 
-          style={[styles.recentArticleTitle, { color: theme.colors.text }]}
+        <Text
+          style={[styles.recentArticleTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}
           numberOfLines={2}
         >
           {article.title}
         </Text>
-        <Text style={[styles.recentArticleFeed, { color: theme.colors.textSecondary }]}>
+        <Text style={[styles.recentArticleFeed, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
           {article.feedTitle} • {formatTimeAgo(article.pubDate)}
         </Text>
       </View>
-      <Ionicons 
-        name="chevron-forward" 
-        size={16} 
-        color={theme.colors.textSecondary} 
+      <Ionicons
+        name={isRTL ? 'chevron-back' : 'chevron-forward'}
+        size={16}
+        color={theme.colors.textSecondary}
       />
     </TouchableOpacity>
   );
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-      
-      if (diffInHours < 1) return 'Just now';
-      if (diffInHours < 24) return `${diffInHours}h ago`;
-      const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays < 7) return `${diffInDays}d ago`;
-      return date.toLocaleDateString();
-    } catch (error) {
-      return '';
-    }
+    return formatRelativeDate(dateString, t, formatNumber);
   };
 
   return (
@@ -165,18 +155,18 @@ export default function HomeScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <Image 
-              source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')} 
+          <View style={[styles.headerContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Image
+              source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
               style={styles.logoIcon}
               resizeMode="contain"
             />
             <View style={styles.headerText}>
-              <Text style={[styles.welcomeText, { color: theme.colors.text }]}>
-                Welcome to FeedWell
+              <Text style={[styles.welcomeText, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t('home.welcome')}
               </Text>
-              <Text style={[styles.subtitleText, { color: theme.colors.textSecondary }]}>
-                Your RSS reading dashboard
+              <Text style={[styles.subtitleText, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+                {t('home.subtitle')}
               </Text>
             </View>
           </View>
@@ -184,21 +174,21 @@ export default function HomeScreen({ navigation }) {
 
         {/* Overview Cards */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-            Overview
+          <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+            {t('home.overview')}
           </Text>
-          <View style={styles.overviewGrid}>
-            {renderOverviewCard('Feeds', totalFeeds, 'newspaper', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'AddFeed' }))}
-            {renderOverviewCard('Unread', unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList', params: { filter: 'unread' } }))}
-            {renderOverviewCard('Saved', readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
+          <View style={[styles.overviewGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            {renderOverviewCard(t('home.feeds'), totalFeeds, 'newspaper', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'AddFeed' }))}
+            {renderOverviewCard(t('home.unread'), unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList', params: { filter: 'unread' } }))}
+            {renderOverviewCard(t('home.saved'), readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
           </View>
         </View>
 
         {/* Recent Articles */}
         {recentArticles.length > 0 && (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
-              Recent Articles
+            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+              {t('home.recentArticles')}
             </Text>
             <View style={styles.recentArticlesContainer}>
               {recentArticles.map(renderRecentArticle)}
@@ -215,16 +205,16 @@ export default function HomeScreen({ navigation }) {
               color={theme.colors.textSecondary} 
             />
             <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-              Get Started
+              {t('home.getStarted')}
             </Text>
             <Text style={[styles.emptyMessage, { color: theme.colors.textSecondary }]}>
-              Add your first RSS feed to start reading
+              {t('home.getStartedMessage')}
             </Text>
             <TouchableOpacity
               style={[styles.addFeedButton, { backgroundColor: theme.colors.primary }]}
               onPress={() => navigation.navigate('Feeds', { screen: 'AddFeed' })}
             >
-              <Text style={styles.addFeedButtonText}>Add Your First Feed</Text>
+              <Text style={styles.addFeedButtonText}>{t('home.addFirstFeed')}</Text>
             </TouchableOpacity>
           </View>
         )}

@@ -13,10 +13,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Slider from './VolumeSlider';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext';
 
 export default function MiniPlayer() {
   const { theme } = useTheme();
+  const { t, isRTL } = useTranslation();
   const insets = useSafeAreaInsets();
   const { currentSound, currentSoundId, isPlaying, isLoading, volume, togglePlayPause, stopSound, setVolume, selectSound, showPlaylist, setShowPlaylist } = useAmbientSound();
   const [expanded, setExpanded] = useState(false);
@@ -29,17 +31,17 @@ export default function MiniPlayer() {
     <>
     {showPlayerBar && (
     <View style={[styles.container, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}>
-      <View style={styles.mainRow}>
-        <TouchableOpacity style={styles.soundInfo} onPress={() => setExpanded(!expanded)}>
+      <View style={[styles.mainRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <TouchableOpacity style={[styles.soundInfo, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} onPress={() => setExpanded(!expanded)}>
           <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
             <Ionicons name={currentSound?.icon || 'musical-note'} size={18} color={theme.colors.primary} />
           </View>
           <View style={styles.textContainer}>
-            <Text style={[styles.soundName, { color: theme.colors.text }]} numberOfLines={1}>
-              {currentSound?.name || 'Loading...'}
+            <Text style={[styles.soundName, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
+              {currentSound?.name || t('common.loading')}
             </Text>
             {currentSound?.description && (
-              <Text style={[styles.soundDesc, { color: theme.colors.textTertiary }]} numberOfLines={1}>
+              <Text style={[styles.soundDesc, { color: theme.colors.textTertiary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
                 {currentSound.description}
               </Text>
             )}
@@ -52,7 +54,7 @@ export default function MiniPlayer() {
           />
         </TouchableOpacity>
 
-        <View style={styles.controls}>
+        <View style={[styles.controls, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <TouchableOpacity onPress={() => setShowPlaylist(true)} style={styles.controlButton}>
             <Ionicons name="list" size={20} color={theme.colors.textSecondary} />
           </TouchableOpacity>
@@ -74,7 +76,7 @@ export default function MiniPlayer() {
       </View>
 
       {expanded && (
-        <View style={[styles.volumeRow, { borderTopColor: theme.colors.border }]}>
+        <View style={[styles.volumeRow, { borderTopColor: theme.colors.border, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="volume-low" size={18} color={theme.colors.textSecondary} />
           <View style={styles.sliderContainer}>
             <Slider
@@ -100,8 +102,8 @@ export default function MiniPlayer() {
     >
       <View style={styles.playlistOverlay}>
         <View style={[styles.playlistContainer, { backgroundColor: theme.colors.surface, paddingBottom: Math.max(24, insets.bottom + 16) }]}>
-          <View style={[styles.playlistHeader, { borderBottomColor: theme.colors.border }]}>
-            <Text style={[styles.playlistTitle, { color: theme.colors.text }]}>Ambient Sounds</Text>
+          <View style={[styles.playlistHeader, { borderBottomColor: theme.colors.border, flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <Text style={[styles.playlistTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('miniPlayer.playlistTitle')}</Text>
             <TouchableOpacity onPress={() => setShowPlaylist(false)} style={styles.playlistClose}>
               <Ionicons name="close" size={24} color={theme.colors.text} />
             </TouchableOpacity>
@@ -113,15 +115,15 @@ export default function MiniPlayer() {
               return (
                 <TouchableOpacity
                   key={sound.id}
-                  style={[styles.playlistItem, { borderBottomColor: theme.colors.border }, isActive && { backgroundColor: theme.colors.primary + '10' }]}
+                  style={[styles.playlistItem, { borderBottomColor: theme.colors.border, flexDirection: isRTL ? 'row-reverse' : 'row' }, isActive && { backgroundColor: theme.colors.primary + '10' }]}
                   onPress={() => selectSound(sound.id)}
                 >
                   <View style={[styles.playlistItemIcon, { backgroundColor: (isActive ? theme.colors.primary : theme.colors.textTertiary) + '20' }]}>
                     <Ionicons name={sound.icon} size={20} color={isActive ? theme.colors.primary : theme.colors.textTertiary} />
                   </View>
-                  <View style={styles.playlistItemText}>
-                    <Text style={[styles.playlistItemName, { color: isActive ? theme.colors.primary : theme.colors.text }]}>{sound.name}</Text>
-                    <Text style={[styles.playlistItemDesc, { color: theme.colors.textTertiary }]}>{sound.description}</Text>
+                  <View style={[styles.playlistItemText, { marginLeft: isRTL ? 0 : 12, marginRight: isRTL ? 12 : 0 }]}>
+                    <Text style={[styles.playlistItemName, { color: isActive ? theme.colors.primary : theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{sound.name}</Text>
+                    <Text style={[styles.playlistItemDesc, { color: theme.colors.textTertiary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{sound.description}</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.playlistInfoButton}
@@ -157,9 +159,9 @@ export default function MiniPlayer() {
         <View style={[styles.infoContainer, { backgroundColor: theme.colors.surface }]}>
           {showSoundInfo && (
             <>
-              <View style={styles.infoHeader}>
+              <View style={[styles.infoHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Ionicons name={showSoundInfo.icon} size={28} color={theme.colors.primary} />
-                <Text style={[styles.infoTitle, { color: theme.colors.text }]}>{showSoundInfo.name}</Text>
+                <Text style={[styles.infoTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.name}</Text>
                 <TouchableOpacity
                   style={styles.infoCloseButton}
                   onPress={() => setShowSoundInfo(null)}
@@ -168,44 +170,44 @@ export default function MiniPlayer() {
                   <Ionicons name="close" size={22} color={theme.colors.textSecondary} />
                 </TouchableOpacity>
               </View>
-              <Text style={[styles.infoDescription, { color: theme.colors.textSecondary }]}>{showSoundInfo.description}</Text>
-              
+              <Text style={[styles.infoDescription, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.description}</Text>
+
               <View style={[styles.infoSection, { borderTopColor: theme.colors.border }]}>
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Ionicons name="bulb-outline" size={18} color={theme.colors.primary} />
                   <View style={styles.infoRowText}>
-                    <Text style={[styles.infoLabel, { color: theme.colors.text }]}>Brain Effect</Text>
-                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary }]}>{showSoundInfo.info.brain}</Text>
+                    <Text style={[styles.infoLabel, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('miniPlayer.brainEffect')}</Text>
+                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.info.brain}</Text>
                   </View>
                 </View>
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Ionicons name="book-outline" size={18} color={theme.colors.primary} />
                   <View style={styles.infoRowText}>
-                    <Text style={[styles.infoLabel, { color: theme.colors.text }]}>Study & Reading</Text>
-                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary }]}>{showSoundInfo.info.study}</Text>
+                    <Text style={[styles.infoLabel, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('miniPlayer.studyReading')}</Text>
+                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.info.study}</Text>
                   </View>
                 </View>
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Ionicons name="eye-outline" size={18} color={theme.colors.primary} />
                   <View style={styles.infoRowText}>
-                    <Text style={[styles.infoLabel, { color: theme.colors.text }]}>Focus Level</Text>
-                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary }]}>{showSoundInfo.info.focus}</Text>
+                    <Text style={[styles.infoLabel, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('miniPlayer.focusLevel')}</Text>
+                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.info.focus}</Text>
                   </View>
                 </View>
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   <Ionicons name="notifications-off-outline" size={18} color={theme.colors.primary} />
                   <View style={styles.infoRowText}>
-                    <Text style={[styles.infoLabel, { color: theme.colors.text }]}>Distraction</Text>
-                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary }]}>{showSoundInfo.info.distract}</Text>
+                    <Text style={[styles.infoLabel, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('miniPlayer.distraction')}</Text>
+                    <Text style={[styles.infoValue, { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{showSoundInfo.info.distract}</Text>
                   </View>
                 </View>
               </View>
               <TouchableOpacity
-                style={[styles.infoPlayButton, { backgroundColor: theme.colors.primary }]}
+                style={[styles.infoPlayButton, { backgroundColor: theme.colors.primary, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
                 onPress={() => { selectSound(showSoundInfo.id); setShowSoundInfo(null); }}
               >
                 <Ionicons name="play" size={18} color="#fff" />
-                <Text style={styles.infoPlayButtonText}>Play {showSoundInfo.name}</Text>
+                <Text style={styles.infoPlayButtonText}>{t('miniPlayer.playSound', { name: showSoundInfo.name })}</Text>
               </TouchableOpacity>
             </>
           )}

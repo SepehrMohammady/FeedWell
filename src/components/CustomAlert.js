@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 
 /**
  * CustomAlert - A themed alert dialog that replaces native Alert.alert
@@ -30,6 +31,7 @@ import { useTheme } from '../context/ThemeContext';
  */
 export default function CustomAlert({ visible, title, message, icon, buttons = [], onDismiss }) {
   const { theme } = useTheme();
+  const { isRTL } = useTranslation();
 
   const handleButtonPress = (button) => {
     button.onPress?.();
@@ -76,6 +78,7 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
       fontWeight: '700',
       color: theme.colors.text,
       textAlign: 'center',
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     messageContainer: {
       paddingHorizontal: 24,
@@ -87,6 +90,7 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
       color: theme.colors.textSecondary,
       textAlign: 'center',
       lineHeight: 20,
+      writingDirection: isRTL ? 'rtl' : 'ltr',
     },
     divider: {
       height: StyleSheet.hairlineWidth,

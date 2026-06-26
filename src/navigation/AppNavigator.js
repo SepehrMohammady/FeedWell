@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import MiniPlayer from '../components/MiniPlayer';
 
 import FeedListScreen from '../screens/FeedListScreen';
@@ -61,6 +62,7 @@ function FeedStack() {
 
 export default function AppNavigator() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const bottomPadding = Math.max(insets.bottom, 6);
   
@@ -103,14 +105,14 @@ export default function AppNavigator() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Feeds" component={FeedStack} />
-      <Tab.Screen 
-        name="ReadLater" 
-        component={ReadLaterStack} 
-        options={{ title: 'Saved' }}
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tab.home') }} />
+      <Tab.Screen name="Feeds" component={FeedStack} options={{ title: t('tab.feeds') }} />
+      <Tab.Screen
+        name="ReadLater"
+        component={ReadLaterStack}
+        options={{ title: t('tab.saved') }}
       />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('tab.settings') }} />
     </Tab.Navigator>
   );
 }

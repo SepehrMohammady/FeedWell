@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from '../context/LanguageContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
 import { useNotes } from '../context/NotesContext';
@@ -81,6 +82,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     currentSortOrder = 'newest' 
   } = route.params;
   const { theme } = useTheme();
+  const { t, isRTL: appRTL, formatNumber } = useTranslation();
   const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
@@ -94,7 +96,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         feedTitle: articleFeedName,
         links: [{ url: articleLink }], 
         content: '' 
-      } : { title: 'Article not found', link: '', links: [], content: '', feedTitle: '' });
+      } : { title: t('reader.articleNotFound'), link: '', links: [], content: '', feedTitle: '' });
   
   const { getNote, setNote, hasNote } = useNotes();
   const { addToReadLater, removeFromReadLater, updateReadLaterArticle, isInReadLater } = useReadLater();
@@ -444,13 +446,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
     if (hasBookmark) {
       setAlertConfig({
         visible: true,
-        title: 'Reading Bookmark',
-        message: 'What would you like to do?',
+        title: t('reader.bookmarkDialogTitle'),
+        message: t('reader.bookmarkDialogMessage'),
         icon: 'bookmark',
         buttons: [
-          { text: 'Update Position', onPress: saveBookmark },
-          { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
-          { text: 'Cancel', style: 'cancel' },
+          { text: t('reader.updatePosition'), onPress: saveBookmark },
+          { text: t('reader.removeBookmark'), onPress: removeBookmark, style: 'destructive' },
+          { text: t('common.cancel'), style: 'cancel' },
         ],
       });
     } else {
@@ -461,12 +463,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const handleIndicatorPress = useCallback(() => {
     setAlertConfig({
       visible: true,
-      title: 'Reading Bookmark',
-      message: 'Remove your saved reading position?',
+      title: t('reader.bookmarkDialogTitle'),
+      message: t('reader.removeBookmarkConfirm'),
       icon: 'bookmark',
       buttons: [
-        { text: 'Remove Bookmark', onPress: removeBookmark, style: 'destructive' },
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('reader.removeBookmark'), onPress: removeBookmark, style: 'destructive' },
+        { text: t('common.cancel'), style: 'cancel' },
       ],
     });
   }, [removeBookmark]);
@@ -670,7 +672,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       
       // If we still have very short content, show a message
       if (content.length < 50) {
-        content = content + '\n\n[Full article content may not be available in reader mode. Use the browser button (🌐) to view the complete article.]';
+        content = content + '\n\n' + t('reader.contentUnavailableInline');
       }
       
       setFullContent(content);
@@ -688,7 +690,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       }
     } catch (err) {
       console.error('Error loading article:', err);
-      setError('Unable to load article content. Please try using the browser button to view the full article.');
+      setError(t('reader.loadErrorMessage'));
       // Fallback to RSS content
       setFullContent(article.content || article.description || '');
     } finally {
@@ -713,7 +715,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     if (!contentToTranslate || contentToTranslate.length === 0) return;
 
     setTranslating(true);
-    setTranslationProgress('Detecting language...');
+    setTranslationProgress(t('reader.progressDetecting'));
 
     try {
       // Step 1: Detect source language (returns BCP-47 code)
@@ -734,12 +736,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
       if (sourceLangCode === targetLangCode) {
         setAlertConfig({
           visible: true,
-          title: 'Same Language',
-          message: `The article appears to be in ${getDisplayName(sourceLangCode)}. Please choose a different target language.`,
+          title: t('reader.sameLanguageTitle'),
+          message: t('reader.sameLanguageMessage', { language: getDisplayName(sourceLangCode) }),
           icon: 'language-outline',
           buttons: [
-            { text: 'Change Language', onPress: () => setShowLanguagePicker(true) },
-            { text: 'Cancel', style: 'cancel' },
+            { text: t('reader.changeLanguage'), onPress: () => setShowLanguagePicker(true) },
+            { text: t('common.cancel'), style: 'cancel' },
           ],
         });
         setTranslating(false);
@@ -748,7 +750,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       }
 
       // Step 2: Translate title
-      setTranslationProgress('Translating title...');
+      setTranslationProgress(t('reader.progressTranslatingTitle'));
       const titleResult = await translateText(
         article.title,
         sourceLangCode,
@@ -789,10 +791,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
       console.error('Translation error:', error);
       setAlertConfig({
         visible: true,
-        title: 'Translation Failed',
-        message: error.message || 'Unable to translate this article. Please check your connection for initial model download.',
+        title: t('reader.translationFailedTitle'),
+        message: error.message || t('reader.translationFailedMessage'),
         icon: 'alert-circle-outline',
-        buttons: [{ text: 'OK' }],
+        buttons: [{ text: t('common.ok') }],
       });
     } finally {
       setTranslating(false);
@@ -829,7 +831,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const handleShare = async () => {
     try {
       const shareOptions = {
-        message: Platform.OS === 'ios' ? `📰 Shared via FeedWell\n\n${article.title}` : `📰 Shared via FeedWell\n\n${article.title}\n\n${article.url}`,
+        message: Platform.OS === 'ios'
+          ? `📰 ${t('reader.sharedVia')}\n\n${article.title}`
+          : `📰 ${t('reader.sharedVia')}\n\n${article.title}\n\n${article.url}`,
         url: Platform.OS === 'ios' ? article.url : undefined,
         title: article.title,
       };
@@ -889,16 +893,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const allActions = useMemo(() => [
     {
       id: 'bookmark',
-      label: 'Bookmark',
-      shortLabel: 'Bookmark',
+      label: t('reader.actionBookmark'),
+      shortLabel: t('reader.actionBookmarkShort'),
       icon: hasBookmark ? 'bookmark' : 'bookmark-outline',
       color: hasBookmark ? theme.colors.primary : theme.colors.text,
       onPress: handleBookmarkPress,
     },
     {
       id: 'translate',
-      label: 'Translate',
-      shortLabel: 'Translate',
+      label: t('reader.actionTranslate'),
+      shortLabel: t('reader.actionTranslateShort'),
       icon: isTranslated ? 'swap-horizontal' : 'language-outline',
       color: isTranslated ? theme.colors.success : theme.colors.text,
       onPress: isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate,
@@ -908,24 +912,24 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     {
       id: 'readAloud',
-      label: 'Read Aloud',
-      shortLabel: 'Read',
+      label: t('reader.actionReadAloud'),
+      shortLabel: t('reader.actionReadAloudShort'),
       icon: isSpeaking ? 'volume-high' : 'volume-high-outline',
       color: isSpeaking ? theme.colors.primary : theme.colors.text,
       onPress: handleReadAloud,
     },
     {
       id: 'browser',
-      label: 'Open in Browser',
-      shortLabel: 'Browser',
+      label: t('reader.actionOpenInBrowser'),
+      shortLabel: t('reader.actionOpenInBrowserShort'),
       icon: 'globe-outline',
       color: theme.colors.text,
       onPress: handleOpenBrowser,
     },
     {
       id: 'save',
-      label: isSaved ? 'Unsave Article' : 'Save for Later',
-      shortLabel: isSaved ? 'Unsave' : 'Save',
+      label: isSaved ? t('reader.actionUnsave') : t('reader.actionSaveForLater'),
+      shortLabel: isSaved ? t('reader.actionUnsaveShort') : t('reader.actionSaveShort'),
       icon: isSaved ? 'save' : 'save-outline',
       color: isSaved ? theme.colors.primary : theme.colors.text,
       onPress: handleSaveArticle,
@@ -933,29 +937,29 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     {
       id: 'notes',
-      label: 'Notes',
-      shortLabel: 'Notes',
+      label: t('reader.actionNotes'),
+      shortLabel: t('reader.actionNotesShort'),
       icon: hasNote(article?.id) ? 'document-text' : 'document-text-outline',
       color: hasNote(article?.id) ? theme.colors.primary : theme.colors.text,
       onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
     },
     {
       id: 'share',
-      label: 'Share',
-      shortLabel: 'Share',
+      label: t('reader.actionShare'),
+      shortLabel: t('reader.actionShareShort'),
       icon: 'share-outline',
       color: theme.colors.text,
       onPress: handleShare,
     },
     {
       id: 'sounds',
-      label: 'Ambient Sounds',
-      shortLabel: 'Sounds',
+      label: t('reader.actionAmbientSounds'),
+      shortLabel: t('reader.actionAmbientSoundsShort'),
       icon: isSoundPlaying ? 'musical-notes' : 'musical-notes-outline',
       color: isSoundPlaying ? theme.colors.primary : theme.colors.text,
       onPress: () => openSoundPlaylist(true),
     },
-  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, article?.id, articleNote, theme.colors, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, openSoundPlaylist]);
+  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, article?.id, articleNote, theme.colors, t, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, openSoundPlaylist]);
 
   const pinnedActions = useMemo(() => {
     return readerHeaderActions
@@ -1002,13 +1006,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return formatNumber(date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    }));
   };
 
   const styles = StyleSheet.create({
@@ -1536,15 +1540,15 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
         <TouchableOpacity
           style={styles.headerButton}
           onPress={handleBackNavigation}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons name={appRTL ? 'arrow-forward' : 'arrow-back'} size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Reader</Text>
-        <View style={styles.headerActions}>
+        <Text style={styles.headerTitle}>{t('reader.headerTitle')}</Text>
+        <View style={[styles.headerActions, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
           {pinnedActions.map(action => (
             <TouchableOpacity
               key={action.id}
@@ -1566,7 +1570,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
             onPress={() => setShowOverflowMenu(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.text} />
-            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>More</Text>
+            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>{t('reader.more')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1608,7 +1612,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {article.authors && article.authors.length > 0 && (
           <Text selectable={true} style={styles.articleAuthor}>
-            By {article.authors.map(author => author.name).join(', ')}
+            {t('reader.byAuthor', { author: article.authors.map(author => author.name).join(', ') })}
           </Text>
         )}
 
@@ -1623,20 +1627,20 @@ function ArticleReaderScreenContent({ route, navigation }) {
         {loading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingText}>Loading article...</Text>
+            <Text style={styles.loadingText}>{t('reader.loadingArticle')}</Text>
           </View>
         )}
 
         {error && (
           <View style={styles.errorContainer}>
             <Ionicons name="alert-circle-outline" size={48} color={theme.colors.error} />
-            <Text style={styles.errorTitle}>Failed to load article</Text>
+            <Text style={styles.errorTitle}>{t('reader.loadErrorTitle')}</Text>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity
               style={styles.retryButton}
               onPress={fetchFullArticle}
             >
-              <Text style={styles.retryButtonText}>Try Again</Text>
+              <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -1654,12 +1658,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
             {/* Show translation banner when translated */}
             {isTranslated && (
-              <View style={styles.translatedBanner}>
+              <View style={[styles.translatedBanner, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
                 <Ionicons name="checkmark-circle" size={16} color={theme.colors.success} />
                 <Text style={styles.translatedBannerText}>
-                  Translated to {getDisplayName(targetLangCode)}
-                  {detectedSourceLang ? ` from ${getDisplayName(detectedSourceLang)}` : ''}
-                  {translationMethod === 'online' ? ' (Google Translate)' : translationMethod === 'offline' ? ' (Offline)' : ''}
+                  {(detectedSourceLang
+                    ? t('reader.translatedFromTo', { source: getDisplayName(detectedSourceLang), target: getDisplayName(targetLangCode) })
+                    : t('reader.translatedTo', { target: getDisplayName(targetLangCode) }))
+                    + (translationMethod === 'online'
+                        ? ' ' + t('reader.translationMethodOnline')
+                        : translationMethod === 'offline'
+                          ? ' ' + t('reader.translationMethodOffline')
+                          : '')}
                 </Text>
               </View>
             )}
@@ -1678,7 +1687,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                         source={{ uri: img.src }}
                         style={styles.inlineImage}
                         resizeMode="contain"
-                        accessibilityLabel={img.alt || 'Article image'}
+                        accessibilityLabel={img.alt || t('reader.articleImageAlt')}
                       />
                       {img.caption ? (
                         <Text style={[styles.imageCaption, { color: theme.colors.textSecondary }]}>{img.caption}</Text>
@@ -1709,9 +1718,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
         {!loading && !error && (!fullContent || fullContent.length === 0) && (
           <View style={styles.noContentContainer}>
             <Ionicons name="document-text-outline" size={48} color="#666" />
-            <Text style={styles.noContentTitle}>No content available</Text>
+            <Text style={styles.noContentTitle}>{t('reader.noContentTitle')}</Text>
             <Text style={styles.noContentText}>
-              This article may not have full content available for reader mode.
+              {t('reader.noContentMessage')}
             </Text>
           </View>
         )}
@@ -1758,9 +1767,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
       )}
 
       {isSpeaking && (
-        <View style={[styles.ttsFloatingBar, { backgroundColor: theme.colors.primary }]}>
+        <View style={[styles.ttsFloatingBar, { backgroundColor: theme.colors.primary, flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="volume-high" size={18} color="#fff" />
-          <Text style={styles.ttsFloatingBarText}>Reading aloud...</Text>
+          <Text style={styles.ttsFloatingBarText}>{t('reader.readingAloud')}</Text>
           <TouchableOpacity onPress={handleStopSpeech} style={styles.ttsStopButton}>
             <Ionicons name="stop-circle" size={28} color="#fff" />
           </TouchableOpacity>
@@ -1773,12 +1782,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
         pointerEvents="none"
         style={[
           styles.bookmarkToast,
-          { opacity: bookmarkFlashAnim },
+          { opacity: bookmarkFlashAnim, flexDirection: appRTL ? 'row-reverse' : 'row' },
         ]}
       >
         <Ionicons name="bookmark" size={16} color="#fff" />
         <Text style={styles.bookmarkToastText}>
-          {hasBookmark ? 'Bookmark saved' : 'Scrolled to bookmark'}
+          {hasBookmark ? t('reader.bookmarkSaved') : t('reader.scrolledToBookmark')}
         </Text>
       </Animated.View>
 
@@ -1794,8 +1803,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Translate To</Text>
+            <View style={[styles.modalHeader, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.modalTitle}>{t('reader.translateTo')}</Text>
               <TouchableOpacity
                 onPress={() => {
                   setShowLanguagePicker(false);
@@ -1807,11 +1816,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.modalSearchContainer}>
+            <View style={[styles.modalSearchContainer, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
               <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
               <TextInput
-                style={styles.modalSearchInput}
-                placeholder="Search languages..."
+                style={[styles.modalSearchInput, { textAlign: appRTL ? 'right' : 'left' }]}
+                placeholder={t('reader.searchLanguages')}
                 placeholderTextColor={theme.colors.textTertiary}
                 value={languageSearchQuery}
                 onChangeText={setLanguageSearchQuery}
@@ -1832,6 +1841,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                 <TouchableOpacity
                   style={[
                     styles.languageItem,
+                    { flexDirection: appRTL ? 'row-reverse' : 'row' },
                     item.code === targetLangCode && styles.languageItemSelected,
                   ]}
                   onPress={() => handleChangeTargetLanguage(item.code)}
@@ -1878,9 +1888,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <View style={[styles.notesModalContainer, { backgroundColor: theme.colors.surface }]}>
-            <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border }]}>
-              <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>Notes</Text>
-              <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border, flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>{t('reader.notesTitle')}</Text>
+              <View style={{ flexDirection: appRTL ? 'row-reverse' : 'row', gap: 8 }}>
                 {noteText.trim() !== '' && (
                   <TouchableOpacity
                     onPress={() => {
@@ -1902,9 +1912,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
               </View>
             </View>
             <TextInput
-              style={[styles.notesInput, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.background }]}
+              style={[styles.notesInput, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.background, textAlign: appRTL ? 'right' : 'left' }]}
               multiline
-              placeholder="Write your notes about this article..."
+              placeholder={t('reader.notesPlaceholder')}
               placeholderTextColor={theme.colors.textTertiary}
               value={noteText}
               onChangeText={setNoteText}
@@ -1918,7 +1928,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                 setShowNotesModal(false);
               }}
             >
-              <Text style={styles.notesSaveButtonText}>Save Note</Text>
+              <Text style={styles.notesSaveButtonText}>{t('reader.saveNote')}</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -1942,11 +1952,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
                 key={action.id}
                 style={[
                   styles.overflowItem,
+                  { flexDirection: appRTL ? 'row-reverse' : 'row' },
                   index === overflowActions.length - 1 && { borderBottomWidth: 0 },
                 ]}
               >
                 <TouchableOpacity
-                  style={styles.overflowItemContent}
+                  style={[styles.overflowItemContent, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}
                   onPress={() => { setShowOverflowMenu(false); action.onPress(); }}
                   disabled={action.disabled}
                 >
@@ -1973,16 +1984,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
             {pinnedActions.length > 0 && (
               <>
                 <View style={[styles.overflowDivider, { backgroundColor: theme.colors.border }]} />
-                <Text style={[styles.overflowSectionLabel, { color: theme.colors.textSecondary }]}>Pinned to header (tap to unpin)</Text>
+                <Text style={[styles.overflowSectionLabel, { color: theme.colors.textSecondary, textAlign: appRTL ? 'right' : 'left' }]}>{t('reader.pinnedToHeader')}</Text>
                 {pinnedActions.map((action, index) => (
                   <View
                     key={action.id}
                     style={[
                       styles.overflowItem,
+                      { flexDirection: appRTL ? 'row-reverse' : 'row' },
                       index === pinnedActions.length - 1 && { borderBottomWidth: 0 },
                     ]}
                   >
-                    <View style={styles.overflowItemContent}>
+                    <View style={[styles.overflowItemContent, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
                       <Ionicons name={action.icon} size={22} color={action.color} />
                       <Text numberOfLines={1} style={[styles.overflowItemText, { color: theme.colors.textSecondary }]}>{action.label}</Text>
                     </View>
