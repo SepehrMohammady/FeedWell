@@ -24,6 +24,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from '../context/LanguageContext';
+import { formatLocalizedDate } from '../utils/formatDate';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useFeed } from '../context/FeedContext';
 import { useNotes } from '../context/NotesContext';
@@ -82,7 +83,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     currentSortOrder = 'newest' 
   } = route.params;
   const { theme } = useTheme();
-  const { t, isRTL: appRTL, formatNumber } = useTranslation();
+  const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
   const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
@@ -1004,16 +1005,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return formatNumber(date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }));
-  };
+  const formatDate = (dateString) => formatLocalizedDate(dateString, language, formatNumber, {
+    withYear: true,
+    withTime: true,
+    localeOptions: { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' },
+  });
 
   const styles = StyleSheet.create({
     container: {
@@ -1241,7 +1237,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
       flex: 1,
       fontSize: 15,
       color: theme.colors.text,
-      marginLeft: 8,
+      marginLeft: appRTL ? 0 : 8,
+      marginRight: appRTL ? 8 : 0,
       paddingVertical: 4,
     },
     languageList: {
@@ -1475,7 +1472,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
       fontSize: 14,
       fontWeight: '600',
       flex: 1,
-      marginLeft: 10,
+      marginLeft: appRTL ? 0 : 10,
+      marginRight: appRTL ? 10 : 0,
     },
     ttsStopButton: {
       padding: 4,
@@ -1513,7 +1511,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     overflowItemText: {
       fontSize: 16,
-      marginLeft: 14,
+      marginLeft: appRTL ? 0 : 14,
+      marginRight: appRTL ? 14 : 0,
       fontWeight: '500',
       flex: 1,
     },
@@ -1524,7 +1523,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     },
     overflowPinButton: {
       padding: 8,
-      marginLeft: 8,
+      marginLeft: appRTL ? 0 : 8,
+      marginRight: appRTL ? 8 : 0,
     },
     overflowDivider: {
       height: StyleSheet.hairlineWidth,

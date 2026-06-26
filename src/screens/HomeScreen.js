@@ -21,7 +21,7 @@ import { formatRelativeDate } from '../utils/formatDate';
 
 export default function HomeScreen({ navigation }) {
   const { theme, isDarkMode } = useTheme();
-  const { t, isRTL, formatNumber } = useTranslation();
+  const { t, isRTL, formatNumber, language } = useTranslation();
   const { feeds, articles, getUnreadCount, addArticles, setLoading, setError } = useFeed();
   const { articles: readLaterArticles } = useReadLater();
   const { maxArticleAge } = useAppSettings();
@@ -136,7 +136,7 @@ export default function HomeScreen({ navigation }) {
   );
 
   const formatTimeAgo = (dateString) => {
-    return formatRelativeDate(dateString, t, formatNumber);
+    return formatRelativeDate(dateString, t, formatNumber, language);
   };
 
   return (
@@ -158,7 +158,7 @@ export default function HomeScreen({ navigation }) {
           <View style={[styles.headerContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
             <Image
               source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
-              style={styles.logoIcon}
+              style={[styles.logoIcon, { marginRight: isRTL ? 0 : 8, marginLeft: isRTL ? 8 : 0 }]}
               resizeMode="contain"
             />
             <View style={styles.headerText}>

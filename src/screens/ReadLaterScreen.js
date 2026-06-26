@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from '../context/LanguageContext';
+import { formatLocalizedDate } from '../utils/formatDate';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
@@ -20,7 +21,7 @@ import CustomAlert from '../components/CustomAlert';
 
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
-  const { t, isRTL, formatNumber } = useTranslation();
+  const { t, isRTL, formatNumber, language } = useTranslation();
   const { showImages } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
@@ -141,7 +142,7 @@ export default function ReadLaterScreen({ navigation }) {
       >
         <View style={styles.articleContent}>
           <View style={[styles.articleHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            <Text style={[styles.feedTitle, { color: theme.colors.primary, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
+            <Text style={[styles.feedTitle, { color: theme.colors.primary, marginRight: isRTL ? 0 : 8, marginLeft: isRTL ? 8 : 0, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
               {item.feedTitle}
             </Text>
             <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
@@ -163,7 +164,7 @@ export default function ReadLaterScreen({ navigation }) {
             {item.offlineCached && (
               <View style={[styles.offlineIndicator, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.success || '#28a745' }]}>
                 <Ionicons name="download" size={10} color="#fff" />
-                <Text style={styles.offlineText}>{t('readLater.offline')}</Text>
+                <Text style={[styles.offlineText, { marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }]}>{t('readLater.offline')}</Text>
               </View>
             )}
             <TouchableOpacity
@@ -179,11 +180,11 @@ export default function ReadLaterScreen({ navigation }) {
           item.imageUrl ? (
             <ArticleImage
               uri={item.imageUrl}
-              style={styles.image}
+              style={[styles.image, { marginLeft: isRTL ? 0 : 12, marginRight: isRTL ? 12 : 0 }]}
               resizeMode="cover"
             />
           ) : (
-            <View style={[styles.image, styles.placeholderImage, { backgroundColor: theme.colors.border }]}>
+            <View style={[styles.image, styles.placeholderImage, { marginLeft: isRTL ? 0 : 12, marginRight: isRTL ? 12 : 0, backgroundColor: theme.colors.border }]}>
               <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
             </View>
           )
@@ -192,20 +193,11 @@ export default function ReadLaterScreen({ navigation }) {
     </View>
   );
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return formatNumber(date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }));
-    } catch (error) {
-      return '';
-    }
-  };
+  const formatDate = (dateString) => formatLocalizedDate(dateString, language, formatNumber, {
+    withYear: false,
+    withTime: true,
+    localeOptions: { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' },
+  });
 
   const renderHeader = () => (
     <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface }]}>
@@ -254,7 +246,7 @@ export default function ReadLaterScreen({ navigation }) {
 
   const renderSearchBar = () => (
     <View style={[styles.searchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-      <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
+      <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={[styles.searchIcon, { marginRight: isRTL ? 0 : 8, marginLeft: isRTL ? 8 : 0 }]} />
       <TextInput
         style={[styles.searchInput, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}
         placeholder={t('readLater.searchPlaceholder')}
@@ -366,7 +358,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchIcon: {
-    marginRight: 8,
   },
   searchInput: {
     flex: 1,
@@ -428,7 +419,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     flex: 1,
-    marginRight: 8,
   },
   date: {
     fontSize: 12,
@@ -460,7 +450,6 @@ const styles = StyleSheet.create({
   offlineText: {
     fontSize: 10,
     color: '#fff',
-    marginLeft: 4,
     fontWeight: '600',
   },
   trashButton: {
@@ -474,7 +463,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 8,
-    marginLeft: 12,
   },
   placeholderImage: {
     justifyContent: 'center',

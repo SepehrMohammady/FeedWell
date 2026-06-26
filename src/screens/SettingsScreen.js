@@ -28,6 +28,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 import { APP_LANGUAGES, getAppLanguage } from '../i18n/appLanguages';
 import { tStatic } from '../i18n';
+import { formatLocalizedDate } from '../utils/formatDate';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import OnboardingTutorial from '../components/OnboardingTutorial';
@@ -487,7 +488,7 @@ export default function SettingsScreen({ navigation }) {
       // Confirm restore
       const confirmRestore = () => {
         const restoreDate = backupData.timestamp
-          ? new Date(backupData.timestamp).toLocaleDateString(language)
+          ? formatLocalizedDate(backupData.timestamp, language, formatNumber, { withTime: false, locale: language })
           : t('settings.restoreUnknownDate');
         const restoreMessage = t('settings.restoreConfirmMessage', {
           date: restoreDate,
@@ -1239,10 +1240,10 @@ export default function SettingsScreen({ navigation }) {
         </View>
 
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }]}>
             {t('settings.footerText')}
           </Text>
-          <Text style={[styles.copyrightText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          <Text style={[styles.copyrightText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }]}>
             {t('settings.copyright')}
           </Text>
         </View>
@@ -1281,7 +1282,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={[styles.modalSearchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
               <TextInput
-                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left', marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }]}
                 placeholder={t('settings.searchLanguagesPlaceholder')}
                 placeholderTextColor={theme.colors.textTertiary}
                 value={langSearchQuery}
@@ -1409,7 +1410,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={[styles.modalSearchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
               <TextInput
-                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left', marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }]}
                 placeholder={t('settings.searchLanguagesPlaceholder')}
                 placeholderTextColor={theme.colors.textTertiary}
                 value={modelSearchQuery}

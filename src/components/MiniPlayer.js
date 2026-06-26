@@ -36,7 +36,7 @@ export default function MiniPlayer() {
           <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
             <Ionicons name={currentSound?.icon || 'musical-note'} size={18} color={theme.colors.primary} />
           </View>
-          <View style={styles.textContainer}>
+          <View style={[styles.textContainer, { marginLeft: isRTL ? 0 : 10, marginRight: isRTL ? 10 : 0 }]}>
             <Text style={[styles.soundName, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>
               {currentSound ? t(currentSound.nameKey) : t('common.loading')}
             </Text>
@@ -49,8 +49,8 @@ export default function MiniPlayer() {
           <Ionicons 
             name={expanded ? 'chevron-down' : 'chevron-up'} 
             size={16} 
-            color={theme.colors.textTertiary} 
-            style={styles.expandIcon}
+            color={theme.colors.textTertiary}
+            style={[styles.expandIcon, { marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }]}
           />
         </TouchableOpacity>
 
@@ -137,7 +137,7 @@ export default function MiniPlayer() {
                       name={isCurrentlyPlaying ? 'pause-circle' : 'play-circle'}
                       size={28}
                       color={theme.colors.primary}
-                      style={{ marginLeft: 4 }}
+                      style={{ marginLeft: isRTL ? 0 : 4, marginRight: isRTL ? 4 : 0 }}
                     />
                   )}
                 </TouchableOpacity>
@@ -163,7 +163,7 @@ export default function MiniPlayer() {
                 <Ionicons name={showSoundInfo.icon} size={28} color={theme.colors.primary} />
                 <Text style={[styles.infoTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t(showSoundInfo.nameKey)}</Text>
                 <TouchableOpacity
-                  style={styles.infoCloseButton}
+                  style={[styles.infoCloseButton, { marginLeft: isRTL ? 0 : 'auto', marginRight: isRTL ? 'auto' : 0 }]}
                   onPress={() => setShowSoundInfo(null)}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
@@ -242,7 +242,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    marginLeft: 10,
   },
   soundName: {
     fontSize: 14,
@@ -253,7 +252,6 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   expandIcon: {
-    marginLeft: 4,
   },
   controls: {
     flexDirection: 'row',
@@ -323,7 +321,6 @@ const styles = StyleSheet.create({
   },
   playlistItemText: {
     flex: 1,
-    marginLeft: 12,
   },
   playlistItemName: {
     fontSize: 15,
@@ -362,7 +359,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoCloseButton: {
-    marginLeft: 'auto',
     padding: 4,
   },
   infoTitle: {

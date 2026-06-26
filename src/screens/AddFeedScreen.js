@@ -21,6 +21,7 @@ import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 import { FEED_REGIONS, getCuratedFeeds, CURATED_FEEDS } from '../data/curatedFeeds';
+import { formatLocalizedDate } from '../utils/formatDate';
 import CustomAlert from '../components/CustomAlert';
 
 export default function AddFeedScreen({ navigation }) {
@@ -331,14 +332,11 @@ export default function AddFeedScreen({ navigation }) {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    try {
-      return date.toLocaleDateString(language);
-    } catch (e) {
-      return date.toLocaleDateString();
-    }
-  };
+  const formatDate = (dateString) => formatLocalizedDate(dateString, language, formatNumber, {
+    withYear: true,
+    withTime: false,
+    locale: language,
+  });
 
   const SectionHeader = ({ title }) => (
     <Text style={styles.sectionHeader}>{title}</Text>
@@ -635,7 +633,7 @@ export default function AddFeedScreen({ navigation }) {
                   </View>
                   <TouchableOpacity
                     onPress={() => toggleFeedPriority(feed.id)}
-                    style={styles.priorityButton}
+                    style={[styles.priorityButton, isRTL && { marginLeft: 0, marginRight: 4 }]}
                   >
                     <Ionicons
                       name={feed.isPriority ? 'star' : 'star-outline'}
@@ -648,7 +646,7 @@ export default function AddFeedScreen({ navigation }) {
                       console.log('Trash icon pressed for feed:', feed);
                       handleRemoveFeed(feed);
                     }}
-                    style={styles.trashButton}
+                    style={[styles.trashButton, isRTL && { marginLeft: 0, marginRight: 8 }]}
                   >
                     <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
                   </TouchableOpacity>

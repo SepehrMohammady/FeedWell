@@ -16,6 +16,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTranslation } from '../context/LanguageContext';
+import { formatLocalizedDate } from '../utils/formatDate';
 import SaveButton from '../components/SaveButton';
 
 export default function ArticleActionsScreen({ route, navigation }) {
@@ -23,7 +24,7 @@ export default function ArticleActionsScreen({ route, navigation }) {
   const { theme } = useTheme();
   const { markArticleRead } = useFeed();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
-  const { t, isRTL, formatNumber } = useTranslation();
+  const { t, isRTL, formatNumber, language } = useTranslation();
 
   
   // Track if we've already marked this article as read to prevent infinite loops
@@ -73,16 +74,11 @@ export default function ArticleActionsScreen({ route, navigation }) {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return formatNumber(date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }));
-  };
+  const formatDate = (dateString) => formatLocalizedDate(dateString, language, formatNumber, {
+    withYear: true,
+    withTime: true,
+    localeOptions: { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' },
+  });
 
   const styles = StyleSheet.create({
     container: {

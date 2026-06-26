@@ -30,7 +30,7 @@ import { formatRelativeDate } from '../utils/formatDate';
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
-  const { t, isRTL, formatNumber } = useTranslation();
+  const { t, isRTL, formatNumber, language } = useTranslation();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds } = useAppSettings();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
@@ -194,7 +194,7 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const formatDate = (dateString) => {
-    return formatRelativeDate(dateString, t, formatNumber);
+    return formatRelativeDate(dateString, t, formatNumber, language);
   };
 
   const handleArticlePress = (article) => {
@@ -562,7 +562,8 @@ export default function FeedListScreen({ navigation, route }) {
       gap: 8,
     },
     filterPill: {
-      marginRight: 8,
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
     },
     headerButtons: {
       flexDirection: isRTL ? 'row-reverse' : 'row',
