@@ -1243,8 +1243,9 @@ export default function SettingsScreen({ navigation }) {
           <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }]}>
             {t('settings.footerText')}
           </Text>
-          <Text style={[styles.copyrightText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'center' }]}>
-            {t('settings.copyright')}
+          {/* Keep the copyright in English + LTR for RTL languages (it's brand + year). */}
+          <Text style={[styles.copyrightText, { writingDirection: 'ltr', textAlign: 'center' }]}>
+            {isRTL ? tStatic('settings.copyright', 'en') : t('settings.copyright')}
           </Text>
         </View>
       </ScrollView>
