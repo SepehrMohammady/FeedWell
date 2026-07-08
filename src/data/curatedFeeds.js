@@ -11,10 +11,12 @@ export const CATEGORY_ORDER = [
 // Global first, then alphabetical by English language name (standard ordering).
 export const FEED_REGIONS = [
   { code: 'global', labelKey: 'region.global' },
+  { code: 'zh', labelKey: 'region.zh' },
   { code: 'hi', labelKey: 'region.hi' },
   { code: 'it', labelKey: 'region.it' },
   { code: 'fa', labelKey: 'region.fa' },
   { code: 'pl', labelKey: 'region.pl' },
+  { code: 'es', labelKey: 'region.es' },
   { code: 'th', labelKey: 'region.th' },
   { code: 'tr', labelKey: 'region.tr' },
 ];
@@ -420,6 +422,120 @@ export const CURATED_FEEDS = {
       { name: 'Interia Kobieta', url: 'https://kobieta.interia.pl/feed' },
       { name: 'Gazeta.pl Kobieta', url: 'https://kobieta.gazeta.pl/pub/rss/kobieta.xml' },
       { name: 'Onet Podróże', url: 'https://podroze.onet.pl/.feed' },
+    ]},
+  ],
+
+  es: [
+    { categoryKey: 'technology', feeds: [
+      { name: 'Xataka', url: 'https://feeds.weblogssl.com/xataka2' },
+      { name: 'Genbeta', url: 'https://feeds.weblogssl.com/genbeta' },
+      { name: 'Hipertextual', url: 'https://hipertextual.com/feed' },
+      { name: 'Applesfera', url: 'https://feeds.weblogssl.com/applesfera' },
+      { name: 'Xataka Android', url: 'https://feeds.weblogssl.com/xatakandroid' },
+    ]},
+    { categoryKey: 'news', feeds: [
+      { name: 'El País', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada' },
+      { name: 'BBC Mundo', url: 'https://feeds.bbci.co.uk/mundo/rss.xml' },
+      { name: '20minutos', url: 'https://www.20minutos.es/rss/' },
+      { name: 'Infobae', url: 'https://www.infobae.com/arc/outboundfeeds/rss/' },
+      { name: 'El Mundo', url: 'https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml' },
+    ]},
+    { categoryKey: 'sports', feeds: [
+      { name: 'Marca', url: 'https://e00-marca.uecdn.es/rss/portada.xml' },
+      { name: 'AS', url: 'https://as.com/rss/tags/ultimas_noticias.xml' },
+      { name: 'Mundo Deportivo', url: 'https://www.mundodeportivo.com/rss/home.xml' },
+      { name: 'Sport', url: 'https://www.sport.es/es/rss/portada/rss.xml' },
+      { name: 'RTVE Deportes', url: 'https://api.rtve.es/rss/deportes.xml' },
+    ]},
+    { categoryKey: 'entertainment', feeds: [
+      { name: 'Fotogramas', url: 'https://www.fotogramas.es/rss/all.xml' },
+      { name: 'SensaCine', url: 'https://www.sensacine.com/rss/noticias.xml' },
+      { name: 'Espinof', url: 'https://feeds.weblogssl.com/espinof' },
+      { name: 'Vertele', url: 'https://www.vertele.com/rss' },
+      { name: 'Poprosa', url: 'https://feeds.weblogssl.com/poprosa' },
+    ]},
+    { categoryKey: 'gaming', feeds: [
+      { name: 'IGN España', url: 'https://es.ign.com/feed.xml' },
+      { name: 'HobbyConsolas', url: 'https://www.hobbyconsolas.com/rss' },
+      { name: 'VidaExtra', url: 'https://feeds.weblogssl.com/vidaextra' },
+      { name: 'Nintenderos', url: 'https://www.nintenderos.com/feed/' },
+      { name: 'Areajugones', url: 'https://areajugones.sport.es/feed/' },
+    ]},
+    { categoryKey: 'business', feeds: [
+      { name: 'Expansión', url: 'https://e00-expansion.uecdn.es/rss/portada.xml' },
+      { name: 'Cinco Días', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/cincodias.elpais.com/portada' },
+      { name: 'Forbes España', url: 'https://forbes.es/feed/' },
+      { name: 'Business Insider España', url: 'https://www.businessinsider.es/rss' },
+      { name: 'El País Economía', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/economia/portada' },
+    ]},
+    { categoryKey: 'science', feeds: [
+      { name: 'Muy Interesante', url: 'https://www.muyinteresante.es/rss' },
+      { name: 'El País Ciencia', url: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/ciencia/portada' },
+      { name: 'Wired en Español', url: 'https://es.wired.com/feed/rss' },
+      { name: 'ABC Ciencia', url: 'https://www.abc.es/rss/feeds/abc_Ciencia.xml' },
+      { name: 'El Mundo Ciencia', url: 'https://e00-elmundo.uecdn.es/elmundo/rss/ciencia.xml' },
+    ]},
+    { categoryKey: 'lifestyle', feeds: [
+      { name: 'Directo al Paladar', url: 'https://feeds.weblogssl.com/directoalpaladar' },
+      { name: 'Trendencias', url: 'https://feeds.weblogssl.com/trendencias' },
+      { name: 'Vitónica', url: 'https://feeds.weblogssl.com/vitonica' },
+      { name: 'Compradicción', url: 'https://feeds.weblogssl.com/compradiccion' },
+      { name: 'MujerHoy', url: 'https://www.mujerhoy.com/rss/2.0/portada' },
+    ]},
+  ],
+
+  // Chinese (Simplified). Native feeds are listed first; a few use public RSSHub
+  // mirrors (rsshub.rssforever.com / hub.slarker.me / rsshub.ktachibana.party)
+  // because the native sites expose no reachable RSS from outside China — those
+  // may be less reliable. Sports/science/lifestyle are short of 5 (mainland RSS
+  // is scarce internationally).
+  zh: [
+    { categoryKey: 'technology', feeds: [
+      { name: '少数派', url: 'https://sspai.com/feed' },
+      { name: '36氪', url: 'https://36kr.com/feed' },
+      { name: '爱范儿', url: 'https://www.ifanr.com/feed' },
+      { name: 'IT之家', url: 'https://www.ithome.com/rss/' },
+      { name: '雷峰网', url: 'https://www.leiphone.com/feed' },
+    ]},
+    { categoryKey: 'news', feeds: [
+      { name: 'BBC中文', url: 'https://feeds.bbci.co.uk/zhongwen/simp/rss.xml' },
+      { name: '德国之声', url: 'https://rss.dw.com/rdf/rss-chi-all' },
+      { name: 'RFI 法广', url: 'https://www.rfi.fr/cn/rss' },
+      { name: '界面新闻', url: 'https://a.jiemian.com/index.php?m=article&a=rss' },
+      { name: '澎湃新闻', url: 'https://rsshub.rssforever.com/thepaper/featured' },
+    ]},
+    { categoryKey: 'sports', feeds: [
+      { name: '虎扑', url: 'https://rsshub.rssforever.com/hupu/all' },
+    ]},
+    { categoryKey: 'entertainment', feeds: [
+      { name: '豆瓣影评', url: 'https://www.douban.com/feed/review/movie' },
+      { name: '豆瓣书评', url: 'https://www.douban.com/feed/review/book' },
+      { name: '豆瓣乐评', url: 'https://www.douban.com/feed/review/music' },
+      { name: '豆瓣·正在热映', url: 'https://rsshub.ktachibana.party/douban/movie/playing' },
+      { name: '游民星空·娱乐', url: 'https://hub.slarker.me/gamersky/ent' },
+    ]},
+    { categoryKey: 'gaming', feeds: [
+      { name: '机核 Gcores', url: 'https://www.gcores.com/rss' },
+      { name: '触乐', url: 'https://www.chuapp.com/feed' },
+      { name: '游民星空', url: 'https://hub.slarker.me/gamersky/news' },
+      { name: 'indienova', url: 'https://rsshub.ktachibana.party/indienova/news' },
+      { name: '3DMGame', url: 'https://rsshub.ktachibana.party/3dmgame/news' },
+    ]},
+    { categoryKey: 'business', feeds: [
+      { name: '雪球', url: 'https://xueqiu.com/hots/topic/rss' },
+      { name: '钛媒体', url: 'https://www.tmtpost.com/rss.xml' },
+      { name: '36氪·快讯', url: 'https://36kr.com/feed-newsflash' },
+      { name: 'FT中文网', url: 'https://www.ftchinese.com/rss/news' },
+      { name: '华尔街见闻', url: 'https://rsshub.rssforever.com/wallstreetcn/live/global' },
+    ]},
+    { categoryKey: 'science', feeds: [
+      { name: 'Solidot', url: 'https://www.solidot.org/index.rss' },
+      { name: '量子位', url: 'https://www.qbitai.com/feed' },
+      { name: '果壳·科学人', url: 'https://rsshub.rssforever.com/guokr/scientific' },
+    ]},
+    { categoryKey: 'lifestyle', feeds: [
+      { name: '少数派 Matrix', url: 'https://rsshub.rssforever.com/sspai/matrix' },
+      { name: '知乎日报', url: 'https://hub.slarker.me/zhihu/daily' },
     ]},
   ],
 };

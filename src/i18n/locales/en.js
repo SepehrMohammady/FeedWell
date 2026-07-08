@@ -45,6 +45,8 @@ export default {
   // --- Feed regions (Popular Categories source language) ---
   'region.label': 'Feed language',
   'region.global': 'Global / English',
+  'region.zh': 'Chinese',
+  'region.es': 'Spanish',
   'region.fa': 'Persian',
   'region.it': 'Italian',
   'region.hi': 'Hindi',
@@ -62,7 +64,7 @@ export default {
   'whatsNew.title': "What's New",
   'whatsNew.version': 'Version {version}',
   'whatsNew.languagesTitle': 'New app languages',
-  'whatsNew.languagesBody': 'FeedWell now speaks Farsi, Italian, Hindi, Turkish, Thai and Polish — in addition to English. The app picks your device language automatically.',
+  'whatsNew.languagesBody': 'FeedWell now speaks Chinese, Spanish, Farsi, Italian, Hindi, Turkish, Thai and Polish — in addition to English. The app picks your device language automatically.',
   'whatsNew.feedsTitle': 'Local feeds',
   'whatsNew.feedsBody': 'Popular Categories now offer curated local feeds for each language. Switch the feed language right from the Add Feed screen.',
   'whatsNew.changeHint': 'You can change the app language anytime in Settings.',
