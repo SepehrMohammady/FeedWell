@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.RemoteViews
 import org.json.JSONArray
@@ -138,8 +140,24 @@ class LatestArticlesWidget : AppWidgetProvider() {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val thisWidget = android.content.ComponentName(context, LatestArticlesWidget::class.java)
                 val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+                // Swap the refresh button for a spinner (partial update keeps the rest of the widget intact)
+                for (appWidgetId in appWidgetIds) {
+                    val progressViews = RemoteViews(context.packageName, R.layout.widget_latest_articles)
+                    progressViews.setViewVisibility(R.id.widget_refresh_button, View.GONE)
+                    progressViews.setViewVisibility(R.id.widget_refresh_progress, View.VISIBLE)
+                    appWidgetManager.partiallyUpdateAppWidget(appWidgetId, progressViews)
+                }
+
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_article_list)
-                refreshAllWidgets(context)
+
+                // Re-run the normal update (which restores the refresh button) after a short
+                // delay so the spinner is visible even when the refresh is instant
+                val pendingResult = goAsync()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    refreshAllWidgets(context)
+                    pendingResult.finish()
+                }, 800)
             }
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -265,6 +283,10 @@ class LatestArticlesWidget : AppWidgetProvider() {
         val refreshIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_REFRESH }
         val refreshPending = PendingIntent.getBroadcast(context, 4, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         views.setOnClickPendingIntent(R.id.widget_refresh_button, refreshPending)
+
+        // Always restore the refresh button so widgets never get stuck showing the spinner
+        views.setViewVisibility(R.id.widget_refresh_button, View.VISIBLE)
+        views.setViewVisibility(R.id.widget_refresh_progress, View.GONE)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }

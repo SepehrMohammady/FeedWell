@@ -339,38 +339,153 @@ async function fetchOgImage(articleUrl, timeoutMs = 8000) {
   }
 }
 
-// Fetch og:image for all articles that are missing images, in parallel
-// v1.1.8: Limit to first 5 articles to avoid slow feed loading
+// v1.8.1: og:image fetch budgeting + persistent per-URL attempt cache.
+// Previously only the FIRST 5 image-less articles (in feed order) were ever
+// fetched, and there was no memory of attempts — articles past the cap were
+// never retried on later refreshes (TechCrunch bug: feed carries zero image
+// markup, so every item depends on this fallback).
+const OG_FETCH_LIMIT_PER_PARSE = 10;          // max article-page fetches per feed parse
+const OG_FETCH_TIMEOUT_MS = 8000;             // bounded page-fetch timeout
+const OG_MAX_ATTEMPTS = 3;                    // give up on a URL after this many failed fetches
+const OG_RETRY_COOLDOWN_MS = 30 * 60 * 1000;  // don't re-try the same URL within 30 min
+const OG_CACHE_STORAGE_KEY = 'ogImageAttemptCache';
+const OG_CACHE_MAX_ENTRIES = 300;
+
+// Map: articleUrl -> { t: lastAttemptMs, n: failedAttempts, img: foundImageUrl|undefined }
+let ogAttemptCache = null;
+let ogCacheLoadPromise = null;
+
+function getAsyncStorageSafe() {
+  try {
+    const mod = require('@react-native-async-storage/async-storage');
+    return mod.default || mod;
+  } catch (e) {
+    return null; // cache degrades to in-memory only
+  }
+}
+
+async function loadOgAttemptCache() {
+  if (ogAttemptCache) return ogAttemptCache;
+  if (!ogCacheLoadPromise) {
+    ogCacheLoadPromise = (async () => {
+      const map = new Map();
+      try {
+        const AsyncStorage = getAsyncStorageSafe();
+        if (AsyncStorage) {
+          const raw = await AsyncStorage.getItem(OG_CACHE_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              Object.keys(parsed).forEach(url => {
+                const entry = parsed[url];
+                if (entry && typeof entry.t === 'number') map.set(url, entry);
+              });
+            }
+          }
+        }
+      } catch (e) {
+        // Cache is best-effort; start empty on any failure
+      }
+      ogAttemptCache = map;
+      return map;
+    })();
+  }
+  return ogCacheLoadPromise;
+}
+
+async function saveOgAttemptCache(cache) {
+  try {
+    const AsyncStorage = getAsyncStorageSafe();
+    if (!AsyncStorage) return;
+    let entries = Array.from(cache.entries());
+    // Prune to the most recently touched entries to bound storage size
+    if (entries.length > OG_CACHE_MAX_ENTRIES) {
+      entries.sort((a, b) => b[1].t - a[1].t);
+      entries = entries.slice(0, OG_CACHE_MAX_ENTRIES);
+      ogAttemptCache = new Map(entries);
+    }
+    const obj = {};
+    entries.forEach(([url, entry]) => { obj[url] = entry; });
+    await AsyncStorage.setItem(OG_CACHE_STORAGE_KEY, JSON.stringify(obj));
+  } catch (e) {
+    // Best-effort persistence; in-memory cache still works this session
+  }
+}
+
+// Fetch og:image for articles that are missing images, in parallel.
+// v1.8.1 strategy:
+//   - Cached successes are applied instantly with NO network call.
+//   - Up to OG_FETCH_LIMIT_PER_PARSE page fetches per parse, prioritizing
+//     never-attempted articles (newest published first), then previously
+//     failed ones oldest-attempt first — so articles beyond the cap get
+//     picked up on SUBSEQUENT refreshes instead of never.
+//   - Failed URLs respect a cooldown and a max-attempt limit.
 async function fetchMissingArticleImages(articles) {
   const articlesNeedingImages = articles
     .map((article, index) => ({ article, index }))
     .filter(({ article }) => !article.imageUrl && article.url);
-  
+
   if (articlesNeedingImages.length === 0) return articles;
-  
-  // Limit to first 5 to keep feed loading fast (was causing major slowdown)
-  const batch = articlesNeedingImages.slice(0, 5);
-  console.log(`[og:image] Fetching preview images for ${batch.length}/${articlesNeedingImages.length} articles without RSS images...`);
-  
-  const results = await Promise.allSettled(
-    batch.map(({ article }) => fetchOgImage(article.url, 5000))
-  );
-  
+
+  const cache = await loadOgAttemptCache();
+  const now = Date.now();
   const updatedArticles = [...articles];
+
+  // 1. Apply cached successes without any network access
+  let cachedHits = 0;
+  const candidates = [];
+  for (const { article, index } of articlesNeedingImages) {
+    const entry = cache.get(article.url);
+    if (entry && entry.img) {
+      updatedArticles[index] = { ...updatedArticles[index], imageUrl: entry.img };
+      cachedHits++;
+      continue;
+    }
+    if (entry && entry.n >= OG_MAX_ATTEMPTS) continue;            // repeatedly failed — give up
+    if (entry && now - entry.t < OG_RETRY_COOLDOWN_MS) continue;  // tried too recently
+    candidates.push({ article, index, entry });
+  }
+  if (cachedHits > 0) {
+    console.log(`[og:image] Applied ${cachedHits} cached preview images (no network)`);
+  }
+
+  // 2. Prioritize: never-attempted first (newest published first),
+  //    then previously attempted ordered by oldest attempt first
+  candidates.sort((a, b) => {
+    const aTried = a.entry ? 1 : 0;
+    const bTried = b.entry ? 1 : 0;
+    if (aTried !== bTried) return aTried - bTried;
+    if (!aTried) {
+      return new Date(b.article.publishedDate || 0) - new Date(a.article.publishedDate || 0);
+    }
+    return a.entry.t - b.entry.t;
+  });
+
+  const batch = candidates.slice(0, OG_FETCH_LIMIT_PER_PARSE);
+  if (batch.length === 0) return updatedArticles;
+
+  console.log(`[og:image] Fetching preview images for ${batch.length}/${articlesNeedingImages.length} articles without RSS images...`);
+
+  const results = await Promise.allSettled(
+    batch.map(({ article }) => fetchOgImage(article.url, OG_FETCH_TIMEOUT_MS))
+  );
+
   let foundCount = 0;
-  
   results.forEach((result, i) => {
+    const { article, index, entry } = batch[i];
+    const prevFailures = entry && typeof entry.n === 'number' ? entry.n : 0;
     if (result.status === 'fulfilled' && result.value) {
-      const articleIndex = batch[i].index;
-      updatedArticles[articleIndex] = {
-        ...updatedArticles[articleIndex],
-        imageUrl: result.value,
-      };
+      updatedArticles[index] = { ...updatedArticles[index], imageUrl: result.value };
+      cache.set(article.url, { t: now, n: prevFailures, img: result.value });
       foundCount++;
+    } else {
+      cache.set(article.url, { t: now, n: prevFailures + 1 });
     }
   });
-  
+
   console.log(`[og:image] Found ${foundCount}/${batch.length} preview images from article pages`);
+
+  await saveOgAttemptCache(cache);
   return updatedArticles;
 }
 

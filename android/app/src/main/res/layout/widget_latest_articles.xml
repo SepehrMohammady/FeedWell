@@ -57,6 +57,17 @@
             android:scaleType="centerInside"
             android:tint="@color/widget_icon"
             android:layout_marginStart="2dp" />
+
+        <ProgressBar
+            android:id="@+id/widget_refresh_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:padding="4dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/widget_icon"
+            android:visibility="gone"
+            android:layout_marginStart="2dp" />
     </LinearLayout>
 
     <!-- Single Article Content (compact mode) -->

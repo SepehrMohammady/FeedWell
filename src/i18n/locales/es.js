@@ -45,6 +45,8 @@ export default {
   "region.tr": "Turco",
   "region.th": "Tailandés",
   "region.pl": "Polaco",
+  "region.ar": "Árabe",
+  "region.pt": "Portugués",
 
   "date.justNow": "Ahora mismo",
   "date.minutesAgo": "hace {count} min",
@@ -54,7 +56,7 @@ export default {
   "whatsNew.title": "Novedades",
   "whatsNew.version": "Versión {version}",
   "whatsNew.languagesTitle": "Nuevos idiomas de la app",
-  "whatsNew.languagesBody": "FeedWell ahora habla chino, español, persa, italiano, hindi, turco, tailandés y polaco, además de inglés. La app elige el idioma de tu dispositivo automáticamente.",
+  "whatsNew.languagesBody": "FeedWell ahora habla árabe, chino, español, persa, hindi, italiano, polaco, portugués, tailandés y turco, además de inglés. La app elige el idioma de tu dispositivo automáticamente.",
   "whatsNew.feedsTitle": "Fuentes locales",
   "whatsNew.feedsBody": "Las Categorías populares ahora ofrecen fuentes locales seleccionadas para cada idioma. Cambia el idioma de la fuente directamente desde la pantalla Añadir fuente.",
   "whatsNew.changeHint": "Puedes cambiar el idioma de la app en cualquier momento en Ajustes.",

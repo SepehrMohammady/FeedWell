@@ -497,31 +497,61 @@ export function FeedProvider({ children }) {
     console.log('Before merge - existing unread:', existingArticles.filter(a => !a.isRead).length);
 
     // First, add all existing articles (preserving read status from storage)
+    // v1.8.1: Track indices so duplicate articles from a fresh parse can
+    // BACKFILL missing data (imageUrl found via og:image fallback) instead of
+    // being skipped entirely — previously an article stored without an image
+    // could never gain one on later refreshes.
+    const existingIndexById = new Map();
+    const existingIndexByUrl = new Map();
     existingArticles.forEach(article => {
       mergedArticles.push(article);
       existingIds.add(article.id);
+      existingIndexById.set(article.id, mergedArticles.length - 1);
       if (article.url) {
         existingUrls.set(article.url, article);
+        existingIndexByUrl.set(article.url, mergedArticles.length - 1);
       }
     });
+
+    // v1.8.1: Merge helper — keeps the EXISTING article (read status, readAt,
+    // existing imageUrl) and only fills in fields the stored copy is missing.
+    // An existing imageUrl is never overwritten by an empty one from a fresh parse.
+    let backfilledImageCount = 0;
+    const backfillExistingArticle = (newArticle, idx) => {
+      if (idx === undefined) return;
+      const existing = mergedArticles[idx];
+      const updates = {};
+      if (newArticle.imageUrl && !existing.imageUrl) {
+        updates.imageUrl = newArticle.imageUrl;
+        backfilledImageCount++;
+      }
+      if (newArticle.description && (!existing.description || existing.description.length < 10)) {
+        updates.description = newArticle.description;
+      }
+      if (Object.keys(updates).length > 0) {
+        mergedArticles[idx] = { ...existing, ...updates };
+      }
+    };
 
     // Then, add only new articles that don't exist yet
     // CRITICAL FIX v1.0.28: Check by BOTH id AND url for duplicates
     let actuallyNewCount = 0;
     let restoredReadCount = 0;
     newArticles.forEach(newArticle => {
-      // Skip if we already have this article by ID
+      // Already have this article by ID — backfill missing image/description
       if (existingIds.has(newArticle.id)) {
+        backfillExistingArticle(newArticle, existingIndexById.get(newArticle.id));
         return;
       }
-      
-      // CRITICAL FIX v1.0.28: Also check by URL - if an existing article has the 
+
+      // CRITICAL FIX v1.0.28: Also check by URL - if an existing article has the
       // same URL, this is the same article with a different ID (unstable GUID)
       if (newArticle.url && existingUrls.has(newArticle.url)) {
-        console.log('Duplicate detected by URL (different ID):', newArticle.url, 
-          'old ID:', existingUrls.get(newArticle.url).id, 
+        console.log('Duplicate detected by URL (different ID):', newArticle.url,
+          'old ID:', existingUrls.get(newArticle.url).id,
           'new ID:', newArticle.id);
-        return; // Skip - already have this article
+        backfillExistingArticle(newArticle, existingIndexByUrl.get(newArticle.url));
+        return; // Keep existing article (read status preserved), data backfilled
       }
       
       // This is a genuinely new article - check if its URL was previously read
@@ -541,6 +571,7 @@ export function FeedProvider({ children }) {
     });
 
     console.log('Actually new articles added:', actuallyNewCount);
+    console.log('Backfilled images on existing articles:', backfilledImageCount);
     console.log('Restored read status count:', restoredReadCount);
     console.log('Final merged articles count:', mergedArticles.length);
     console.log('Final read count:', mergedArticles.filter(a => a.isRead).length);

@@ -45,6 +45,8 @@ export default {
   "region.tr": "तुर्की",
   "region.th": "थाई",
   "region.pl": "पोलिश",
+  "region.ar": "अरबी",
+  "region.pt": "पुर्तगाली",
 
   "date.justNow": "अभी-अभी",
   "date.minutesAgo": "{count} मिनट पहले",
@@ -54,7 +56,7 @@ export default {
   "whatsNew.title": "नया क्या है",
   "whatsNew.version": "संस्करण {version}",
   "whatsNew.languagesTitle": "नई ऐप भाषाएँ",
-  "whatsNew.languagesBody": "FeedWell अब अंग्रेज़ी के अलावा चीनी, स्पेनिश, फ़ारसी, इतालवी, हिन्दी, तुर्की, थाई और पोलिश भी बोलता है। ऐप अपने आप आपकी डिवाइस की भाषा चुन लेता है।",
+  "whatsNew.languagesBody": "FeedWell अब अंग्रेज़ी के अलावा अरबी, चीनी, स्पेनिश, फ़ारसी, इतालवी, हिन्दी, तुर्की, थाई, पोलिश और पुर्तगाली भी बोलता है। ऐप अपने आप आपकी डिवाइस की भाषा चुन लेता है।",
   "whatsNew.feedsTitle": "स्थानीय फ़ीड्स",
   "whatsNew.feedsBody": "लोकप्रिय श्रेणियाँ अब हर भाषा के लिए चुनिंदा स्थानीय फ़ीड्स प्रदान करती हैं। फ़ीड जोड़ें स्क्रीन से ही फ़ीड भाषा बदलें।",
   "whatsNew.changeHint": "आप ऐप की भाषा किसी भी समय सेटिंग्स में बदल सकते हैं।",
