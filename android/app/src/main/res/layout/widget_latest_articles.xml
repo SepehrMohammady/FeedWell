@@ -46,6 +46,17 @@
             android:contentDescription="Next article"
             android:scaleType="centerInside"
             android:tint="@color/widget_icon" />
+
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="@null"
+            android:src="@drawable/ic_widget_refresh"
+            android:contentDescription="Refresh"
+            android:scaleType="centerInside"
+            android:tint="@color/widget_icon"
+            android:layout_marginStart="2dp" />
     </LinearLayout>
 
     <!-- Single Article Content (compact mode) -->

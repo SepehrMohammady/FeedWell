@@ -251,6 +251,10 @@ export default {
   "reader.actionShareShort": "साझा करें",
   "reader.actionAmbientSounds": "परिवेशी ध्वनियाँ",
   "reader.actionAmbientSoundsShort": "ध्वनियाँ",
+  "reader.actionHighlight": "हाइलाइट",
+  "reader.actionHighlightShort": "हाइलाइट",
+  "reader.highlightNeedsSaved": "हाइलाइट करने के लिए पहले लेख को सहेजें।",
+  "reader.highlightModeHint": "हाइलाइट मोड: किसी अनुच्छेद को हाइलाइट करने या हटाने के लिए उस पर टैप करें।",
 
   "settings.sectionPreferences": "प्राथमिकताएँ",
   "settings.sectionWidget": "होम स्क्रीन विजेट",

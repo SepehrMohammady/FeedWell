@@ -272,6 +272,10 @@ export default {
   'reader.actionShareShort': 'Share',
   'reader.actionAmbientSounds': 'Ambient Sounds',
   'reader.actionAmbientSoundsShort': 'Sounds',
+  'reader.actionHighlight': 'Highlight',
+  'reader.actionHighlightShort': 'Highlight',
+  'reader.highlightNeedsSaved': 'Save the article first to highlight it.',
+  'reader.highlightModeHint': 'Highlight mode: tap a paragraph to highlight or unhighlight it.',
 
   // --- Settings ---
   'settings.sectionPreferences': 'Preferences',

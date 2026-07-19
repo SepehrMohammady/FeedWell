@@ -1,72 +1,14 @@
 // Alternative RSS parser for web platforms with CORS issues
+// v1.8.1: image extraction is shared with rssParser.js so both parsers
+// resolve preview images identically (media:*, enclosure, itunes:image,
+// <img> in content/description with lazy-load/srcset/entity-decode support).
 import { parse } from 'react-native-rss-parser';
-import { decodeHtmlEntities } from './rssParser';
-
-// Extract image URL from item (same as in rssParser.js)
-function extractImageUrl(item) {
-  // Try different fields where images might be stored
-  if (item.imageUrl) return item.imageUrl;
-  if (item.image?.url) return item.image.url;
-  
-  // Check for media:content or media:thumbnail (common in RSS feeds)
-  if (item['media:content']?.[0]?.attributes?.url) {
-    const mediaContent = item['media:content'][0].attributes;
-    if (mediaContent.medium === 'image' || mediaContent.type?.startsWith('image/')) {
-      return mediaContent.url;
-    }
-  }
-  
-  if (item['media:thumbnail']?.[0]?.attributes?.url) {
-    return item['media:thumbnail'][0].attributes.url;
-  }
-  
-  // Check enclosures for images
-  if (item.enclosures?.[0]?.url && item.enclosures[0].type?.startsWith('image/')) {
-    return item.enclosures[0].url;
-  }
-  
-  // Extract from content/description - try multiple patterns
-  const content = item.content || item.description || '';
-  
-  // Look for img tags with various patterns
-  const imgPatterns = [
-    /<img[^>]+src=['"]([^'"]+)['"][^>]*>/i,
-    /<img[^>]+data-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
-    /<img[^>]+data-original=['"]([^'"]+)['"][^>]*>/i, // lazy loading
-  ];
-  
-  for (const pattern of imgPatterns) {
-    const match = content.match(pattern);
-    if (match && match[1]) {
-      // Filter out common non-article images
-      const url = match[1];
-      if (!isAdOrTrackingImage(url)) {
-        return url;
-      }
-    }
-  }
-  
-  return null;
-}
-
-// Check if an image URL is likely an ad or tracking pixel
-function isAdOrTrackingImage(url) {
-  const adPatterns = [
-    /\/ads?\//i,
-    /\/tracking\//i,
-    /\/analytics\//i,
-    /\/pixel\//i,
-    /1x1\./i,
-    /\.gif$/i, // Many tracking pixels are 1x1 GIFs
-    /doubleclick/i,
-    /googleads/i,
-    /adsystem/i,
-    /facebook\.com\/tr/i,
-    /twitter\.com\/i\/adsct/i,
-  ];
-  
-  return adPatterns.some(pattern => pattern.test(url));
-}
+import {
+  decodeHtmlEntities,
+  extractImageUrl,
+  extractMediaUrlsFromXml,
+  normalizeImageUrl,
+} from './rssParser';
 
 // Simple RSS parser that works with CORS proxies
 export async function parseRSSFeedWithProxy(url) {
@@ -112,24 +54,33 @@ export async function parseRSSFeedWithProxy(url) {
 
       // Parse the RSS
       const feed = await parse(responseText);
-      
+
+      // Extract media:* / enclosure / itunes / <img> URLs from the raw XML,
+      // since the parser drops media-namespace elements (same as rssParser.js)
+      const media = extractMediaUrlsFromXml(responseText);
+
       return {
         title: decodeHtmlEntities(feed.title || url),
         description: feed.description || '',
         url: url,
-        articles: feed.items?.map((item, index) => ({
-          id: item.id || `${url}_${index}_${Date.now()}`,
-          title: decodeHtmlEntities(item.title || 'No Title'),
-          description: item.description || '',
-          content: item.content || '',
-          url: item.links?.[0]?.url || item.url || '',
-          publishedDate: item.published || item.pubDate || new Date().toISOString(),
-          authors: item.authors || [],
-          categories: item.categories || [],
-          feedUrl: url,
-          feedTitle: decodeHtmlEntities(feed.title || url),
-          imageUrl: extractImageUrl(item),
-        })) || [],
+        articles: feed.items?.map((item, index) => {
+          const rawParsedImageUrl = extractImageUrl(item);
+          const parsedImageUrl = normalizeImageUrl(rawParsedImageUrl) || rawParsedImageUrl;
+          const articleUrl = item.links?.[0]?.url || item.url || '';
+          return {
+            id: item.id || `${url}_${index}_${Date.now()}`,
+            title: decodeHtmlEntities(item.title || 'No Title'),
+            description: item.description || '',
+            content: item.content || '',
+            url: articleUrl,
+            publishedDate: item.published || item.pubDate || new Date().toISOString(),
+            authors: item.authors || [],
+            categories: item.categories || [],
+            feedUrl: url,
+            feedTitle: decodeHtmlEntities(feed.title || url),
+            imageUrl: parsedImageUrl || media.byUrl[articleUrl] || media.byUrl[item.id] || media.byIndex[index] || null,
+          };
+        }) || [],
       };
     } catch (error) {
       console.error(`Proxy ${proxy} failed:`, error.message);

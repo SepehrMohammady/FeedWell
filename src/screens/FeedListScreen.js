@@ -39,6 +39,9 @@ export default function FeedListScreen({ navigation, route }) {
   const [selectedArticles, setSelectedArticles] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const flatListRef = useRef(null);
+  // Last measured average item length reported by the FlatList (via
+  // onScrollToIndexFailed). Used instead of a hardcoded height estimate.
+  const avgItemLengthRef = useRef(null);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', icon: null, buttons: [] });
 
   // Apply filter from navigation params (e.g., when clicking Unread from Home)
@@ -52,37 +55,90 @@ export default function FeedListScreen({ navigation, route }) {
   useFocusEffect(
     React.useCallback(() => {
       setForceRender(prev => prev + 1);
-      
+
+      const timeouts = [];
+
       // Auto-scroll to reading position when tab becomes active
       if (readingPosition && readingPosition.afterArticleId && flatListRef.current && filteredAndSortedArticles && filteredAndSortedArticles.length > 0) {
         // Find the index of the article after which the reading position is set
         const targetIndex = filteredAndSortedArticles.findIndex(article => article.id === readingPosition.afterArticleId);
         if (targetIndex !== -1) {
-          // Wait a bit for the FlatList to render
-          setTimeout(() => {
+          // Scroll to the article after the reading position (or the reading position line)
+          const scrollIndex = Math.min(targetIndex + 1, filteredAndSortedArticles.length - 1);
+
+          const tryScrollToIndex = () => {
+            if (!flatListRef.current) return false;
             try {
-              // Scroll to the article after the reading position (or the reading position line)
-              const scrollToIndex = Math.min(targetIndex + 1, filteredAndSortedArticles.length - 1);
               flatListRef.current.scrollToIndex({
-                index: scrollToIndex,
+                index: scrollIndex,
                 animated: true,
                 viewPosition: 0.3, // Show the target item at 30% from the top
               });
+              return true;
             } catch (error) {
-              console.log('Auto-scroll failed, using offset method:', error);
-              // Fallback to offset calculation
-              const itemHeight = 150;
-              const targetOffset = (targetIndex + 1) * itemHeight;
-              flatListRef.current.scrollToOffset({
-                offset: targetOffset,
-                animated: true,
-              });
+              console.log('Auto-scroll scrollToIndex failed:', error);
+              return false;
             }
-          }, 500);
+          };
+
+          // Wait a bit for the FlatList to render
+          timeouts.push(setTimeout(() => {
+            if (!tryScrollToIndex()) {
+              // Fallback: jump near the estimated position (unanimated) so the
+              // far-away items get rendered, then retry the precise scroll.
+              // Prefer the list's own measured average item length over a guess.
+              const estimatedItemHeight = avgItemLengthRef.current || 180;
+              if (flatListRef.current) {
+                flatListRef.current.scrollToOffset({
+                  offset: scrollIndex * estimatedItemHeight,
+                  animated: false,
+                });
+              }
+              timeouts.push(setTimeout(() => {
+                if (!tryScrollToIndex()) {
+                  // With many items one retry can still land short while items
+                  // render; try once more a bit later.
+                  timeouts.push(setTimeout(tryScrollToIndex, 600));
+                }
+              }, 400));
+            }
+          }, 500));
         }
       }
+
+      return () => {
+        timeouts.forEach(clearTimeout);
+      };
     }, [readingPosition, filteredAndSortedArticles])
   );
+
+  // Standard RN pattern for scrollToIndex on a not-yet-rendered index with
+  // variable item heights: jump near the target using the list's measured
+  // average item length, wait for the items to render, then retry precisely.
+  const handleScrollToIndexFailed = (info) => {
+    if (info.averageItemLength) {
+      avgItemLengthRef.current = info.averageItemLength;
+    }
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({
+        offset: info.averageItemLength * info.index,
+        animated: false,
+      });
+    }
+    setTimeout(() => {
+      if (flatListRef.current && info.index < filteredAndSortedArticles.length) {
+        try {
+          flatListRef.current.scrollToIndex({
+            index: info.index,
+            animated: true,
+            viewPosition: 0.3,
+          });
+        } catch (error) {
+          console.log('scrollToIndex retry failed:', error);
+        }
+      }
+    }, 400);
+  };
 
   const refreshFeeds = async () => {
     if (feeds.length === 0) return;
@@ -1000,6 +1056,7 @@ export default function FeedListScreen({ navigation, route }) {
         data={filteredAndSortedArticles}
         renderItem={renderArticle}
         keyExtractor={(item) => item.id}
+        onScrollToIndexFailed={handleScrollToIndexFailed}
         extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

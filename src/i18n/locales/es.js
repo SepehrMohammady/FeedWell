@@ -251,6 +251,10 @@ export default {
   "reader.actionShareShort": "Compartir",
   "reader.actionAmbientSounds": "Sonidos ambientales",
   "reader.actionAmbientSoundsShort": "Sonidos",
+  "reader.actionHighlight": "Resaltar",
+  "reader.actionHighlightShort": "Resaltar",
+  "reader.highlightNeedsSaved": "Guarda primero el artículo para poder resaltarlo.",
+  "reader.highlightModeHint": "Modo resaltado: toca un párrafo para resaltarlo o quitar el resaltado.",
 
   "settings.sectionPreferences": "Preferencias",
   "settings.sectionWidget": "Widget de pantalla de inicio",

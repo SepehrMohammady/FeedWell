@@ -163,6 +163,20 @@ async function detectLanguageOnline(text) {
 
 // --- ML Kit (Offline) ---
 
+// Translate one chunk, self-repairing if ML Kit reports missing model files
+// (can happen when the OS evicts models while they are still marked downloaded):
+// re-prepare with downloadIfNeeded:true and retry once.
+async function mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit) {
+  try {
+    await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: false });
+    return await FastTranslator.translate(text);
+  } catch (error) {
+    console.warn('Offline translate failed, re-downloading model and retrying:', error?.message);
+    await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: true });
+    return await FastTranslator.translate(text);
+  }
+}
+
 async function translateOffline(text, sourceLang, targetLang, onProgress) {
   if (!text || text.trim().length === 0) return text;
   const sourceMlKit = CODE_TO_MLKIT[sourceLang] || 'English';
@@ -173,7 +187,7 @@ async function translateOffline(text, sourceLang, targetLang, onProgress) {
   const MAX_CHUNK = 4000;
   if (text.length <= MAX_CHUNK) {
     if (onProgress) onProgress('Translating offline...');
-    return await FastTranslator.translate(text);
+    return await mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit);
   }
   const paragraphs = text.split(/\n\n+/);
   const translatedParagraphs = [];
@@ -187,19 +201,16 @@ async function translateOffline(text, sourceLang, targetLang, onProgress) {
       const results = [];
       for (const sentence of sentences) {
         if ((batch + ' ' + sentence).length > MAX_CHUNK && batch.length > 0) {
-          await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: false });
-          results.push(await FastTranslator.translate(batch));
+          results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit));
           batch = sentence;
         } else { batch += (batch ? ' ' : '') + sentence; }
       }
       if (batch.length > 0) {
-        await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: false });
-        results.push(await FastTranslator.translate(batch));
+        results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit));
       }
       translatedParagraphs.push(results.join(' '));
     } else {
-      await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: false });
-      translatedParagraphs.push(await FastTranslator.translate(paragraph));
+      translatedParagraphs.push(await mlKitTranslateWithRepair(paragraph, sourceMlKit, targetMlKit));
     }
   }
   return translatedParagraphs.join('\n\n');
@@ -237,7 +248,14 @@ export async function translateText(text, sourceLangCode, targetLangCode, onProg
     const result = await translateOffline(text, sourceLangCode, targetLangCode, onProgress);
     return { text: result, method: 'offline' };
   } catch (offlineError) {
-    throw new Error('Translation failed: ' + offlineError.message);
+    // Last resort: the online failure may have been a transient flake — try once more.
+    try {
+      if (onProgress) onProgress('Retrying online...');
+      const result = await translateOnline(text, sourceLangCode, targetLangCode, onProgress);
+      return { text: result, method: 'online' };
+    } catch (finalError) {
+      throw new Error('Translation failed: ' + offlineError.message);
+    }
   }
 }
 

@@ -39,11 +39,88 @@ const AD_PATTERNS = [
   /googleadservices/gi
 ];
 
+// v1.8.1: Normalize an extracted image URL.
+// - Decodes HTML entities (&amp; in query strings, etc.)
+// - Upgrades protocol-relative URLs (//host/x -> https://host/x)
+// - Returns null for anything that is not an absolute http(s) URL
+export function normalizeImageUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  let normalized = decodeHtmlEntities(url.trim());
+  if (normalized.startsWith('//')) {
+    normalized = 'https:' + normalized;
+  }
+  if (!/^https?:\/\//i.test(normalized)) return null;
+  return normalized;
+}
+
+// v1.8.1: Find the first usable <img> URL inside an HTML fragment.
+// Handles: entity-encoded markup (&lt;img ...&gt;), lazy-load attributes
+// (data-src, data-lazy-src, data-original), srcset, and skips tiny
+// tracking pixels (width/height <= 2 or 1x1/pixel/spacer filenames).
+// Pure string parsing — no network access.
+export function extractImageFromHtml(html) {
+  if (!html) return null;
+
+  let text = html;
+  // If there is no literal <img> but there IS an entity-encoded one, decode first
+  if (!/<img[\s/>]/i.test(text) && /&lt;\s*img/i.test(text)) {
+    text = decodeHtmlEntities(text);
+  }
+
+  const imgTagRegex = /<img\b[^>]*>/gi;
+  let tagMatch;
+  while ((tagMatch = imgTagRegex.exec(text)) !== null) {
+    const tag = tagMatch[0];
+
+    // Skip tiny tracking pixels when detectable from attributes
+    const widthMatch = tag.match(/\bwidth=['"]?(\d+)/i);
+    const heightMatch = tag.match(/\bheight=['"]?(\d+)/i);
+    if ((widthMatch && parseInt(widthMatch[1], 10) <= 2) ||
+        (heightMatch && parseInt(heightMatch[1], 10) <= 2)) {
+      continue;
+    }
+
+    // Try src first, then common lazy-loading attributes
+    const srcAttrPatterns = [
+      /\bsrc=['"]([^'"]+)['"]/i,
+      /\bdata-src=['"]([^'"]+)['"]/i,
+      /\bdata-lazy-src=['"]([^'"]+)['"]/i,
+      /\bdata-original=['"]([^'"]+)['"]/i,
+    ];
+    let candidate = null;
+    for (const pattern of srcAttrPatterns) {
+      const attrMatch = tag.match(pattern);
+      if (attrMatch && attrMatch[1]) {
+        const normalized = normalizeImageUrl(attrMatch[1]);
+        if (normalized) {
+          candidate = normalized;
+          break;
+        }
+      }
+    }
+
+    // Fall back to the first URL of srcset
+    if (!candidate) {
+      const srcsetMatch = tag.match(/\bsrcset=['"]([^'"]+)['"]/i);
+      if (srcsetMatch && srcsetMatch[1]) {
+        const firstEntry = srcsetMatch[1].split(',')[0].trim().split(/\s+/)[0];
+        candidate = normalizeImageUrl(firstEntry);
+      }
+    }
+
+    if (candidate && !/(^|\/)(1x1|pixel|spacer|blank|transparent)\.(gif|png|jpg|jpeg|webp)/i.test(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 // CRITICAL FIX v1.0.28 + v1.1.6: Extract media:content and media:thumbnail URLs from raw XML
 // The react-native-rss-parser library does not parse these media namespace elements,
 // so many feeds' article images are missed. This function extracts them directly.
 // Returns { byIndex: [...], byUrl: {url: imageUrl} } for robust matching.
-function extractMediaUrlsFromXml(rawXml) {
+export function extractMediaUrlsFromXml(rawXml) {
   const byIndex = [];
   const byUrl = {};
   
@@ -140,18 +217,43 @@ function extractMediaUrlsFromXml(rawXml) {
       }
     }
 
-    // 7. Try extracting <img> from description CDATA
+    // 7. Try enclosure without a type attribute but with an image file extension
     if (!imageUrl) {
-      const descMatch = itemXml.match(/<description[^>]*>\s*(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?\s*<\/description>/i);
-      if (descMatch) {
-        const descHtml = descMatch[1];
-        const imgMatch = descHtml.match(/<img[^>]+src=['"]([^'"]+)['"][^>]*>/i);
-        if (imgMatch && imgMatch[1] && imgMatch[1].startsWith('http')) {
-          imageUrl = imgMatch[1];
+      const enclosureExt = itemXml.match(/<enclosure[^>]+url=['"]([^'"]+\.(?:jpg|jpeg|png|gif|webp)(?:\?[^'"]*)?)['"][^>]*\/?>/i);
+      if (enclosureExt) {
+        imageUrl = enclosureExt[1];
+      }
+    }
+
+    // 8. Try itunes:image (podcast feeds)
+    if (!imageUrl) {
+      const itunesImage = itemXml.match(/<itunes:image[^>]+href=['"]([^'"]+)['"][^>]*\/?>/i);
+      if (itunesImage) {
+        imageUrl = itunesImage[1];
+      }
+    }
+
+    // 9. Try the first <img> in content:encoded / content / description / summary
+    // (handles CDATA, entity-encoded markup, lazy-load attrs, srcset)
+    if (!imageUrl) {
+      const htmlFieldNames = ['content:encoded', 'content', 'description', 'summary'];
+      for (const fieldName of htmlFieldNames) {
+        const fieldRegex = new RegExp(
+          '<' + fieldName + '(?=[\\s>])[^>]*>\\s*(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?\\s*</' + fieldName + '>',
+          'i'
+        );
+        const fieldMatch = itemXml.match(fieldRegex);
+        if (fieldMatch && fieldMatch[1]) {
+          imageUrl = extractImageFromHtml(fieldMatch[1]);
+          if (imageUrl) break;
         }
       }
     }
-    
+
+    // Normalize whatever we found (entity-decode, //host -> https://host,
+    // drop non-absolute URLs so later fallbacks can still run)
+    imageUrl = normalizeImageUrl(imageUrl);
+
     byIndex.push(imageUrl);
     
     // Store in URL map for robust matching
@@ -672,7 +774,8 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
             const cleanContent = cleanHtmlContent(item.content || '');
             
             // Try parser's extractImageUrl first, fall back to raw XML media URL
-            const parsedImageUrl = extractImageUrl(item);
+            const rawParsedImageUrl = extractImageUrl(item);
+            const parsedImageUrl = normalizeImageUrl(rawParsedImageUrl) || rawParsedImageUrl;
             const articleUrl = item.links?.[0]?.url || item.url || '';
             const mediaImageUrl = media.byUrl[articleUrl] || media.byUrl[item.id] || media.byIndex[index] || null;
             
@@ -761,7 +864,8 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
       const cleanContent = cleanHtmlContent(item.content || '');
       
       // Try parser's extractImageUrl first, fall back to raw XML media URL
-      const parsedImageUrl = extractImageUrl(item);
+      const rawParsedImageUrl = extractImageUrl(item);
+      const parsedImageUrl = normalizeImageUrl(rawParsedImageUrl) || rawParsedImageUrl;
       const articleUrl = item.links?.[0]?.url || item.url || '';
       const mediaImageUrl = media.byUrl[articleUrl] || media.byUrl[item.id] || media.byIndex[index] || null;
       
@@ -804,7 +908,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
 }
 
 // Extract image URL from item
-function extractImageUrl(item) {
+export function extractImageUrl(item) {
   console.log('Extracting image for article:', item.title);
   
   // Try different fields where images might be stored
@@ -852,25 +956,15 @@ function extractImageUrl(item) {
   const content = item.content || item.description || '';
   
   if (content) {
-    // Look for img tags with various patterns
-    const imgPatterns = [
-      /<img[^>]+src=['"]([^'"]+)['"][^>]*>/i,
-      /<img[^>]+data-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
-      /<img[^>]+data-original=['"]([^'"]+)['"][^>]*>/i, // lazy loading
-      /<img[^>]+data-lazy-src=['"]([^'"]+)['"][^>]*>/i, // lazy loading
-      /<figure[^>]*>.*?<img[^>]+src=['"]([^'"]+)['"][^>]*>.*?<\/figure>/is,
-    ];
-    
-    for (const pattern of imgPatterns) {
-      const match = content.match(pattern);
-      if (match && match[1]) {
-        const url = match[1];
-        console.log('Found img tag:', url);
-        if (!isAdOrTrackingImage(url)) {
-          return url;
-        } else {
-          console.log('Rejected ad/tracking image:', url);
-        }
+    // v1.8.1: shared <img> extraction — handles src, data-src, data-lazy-src,
+    // data-original, srcset, entity-encoded markup, and skips tracking pixels
+    const htmlImg = extractImageFromHtml(content);
+    if (htmlImg) {
+      if (!isAdOrTrackingImage(htmlImg)) {
+        console.log('Found img tag:', htmlImg);
+        return htmlImg;
+      } else {
+        console.log('Rejected ad/tracking image:', htmlImg);
       }
     }
     

@@ -17,6 +17,7 @@ class LatestArticlesWidget : AppWidgetProvider() {
         const val ACTION_NEXT = "com.feedwell.app.WIDGET_NEXT"
         const val ACTION_PREV = "com.feedwell.app.WIDGET_PREV"
         const val ACTION_OPEN = "com.feedwell.app.WIDGET_OPEN"
+        const val ACTION_REFRESH = "com.feedwell.app.WIDGET_REFRESH"
         const val PREFS_NAME = "FeedWellWidgetPrefs"
         const val KEY_ARTICLES = "widget_articles"
         const val KEY_CURRENT_INDEX = "widget_current_index"
@@ -131,6 +132,14 @@ class LatestArticlesWidget : AppWidgetProvider() {
                     }
                     if (launchIntent != null) context.startActivity(launchIntent)
                 }
+            }
+            ACTION_REFRESH -> {
+                // Reload the list data and re-run the normal update so the whole widget refreshes
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val thisWidget = android.content.ComponentName(context, LatestArticlesWidget::class.java)
+                val appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_article_list)
+                refreshAllWidgets(context)
             }
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -251,6 +260,11 @@ class LatestArticlesWidget : AppWidgetProvider() {
         val prevIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_PREV }
         val prevPending = PendingIntent.getBroadcast(context, 2, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         views.setOnClickPendingIntent(R.id.widget_prev_button, prevPending)
+
+        // Refresh button (always visible)
+        val refreshIntent = Intent(context, LatestArticlesWidget::class.java).apply { action = ACTION_REFRESH }
+        val refreshPending = PendingIntent.getBroadcast(context, 4, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        views.setOnClickPendingIntent(R.id.widget_refresh_button, refreshPending)
 
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }

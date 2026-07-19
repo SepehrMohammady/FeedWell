@@ -149,6 +149,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
   // Overflow menu state
   const [showOverflowMenu, setShowOverflowMenu] = useState(false);
 
+  // Highlighting state (saved articles only): persisted paragraph indices +
+  // whether highlight mode (tap-a-paragraph-to-toggle) is active.
+  const [highlights, setHighlights] = useState(article?.highlights || []);
+  const [highlightMode, setHighlightMode] = useState(false);
+
   // TTS state
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [ttsCurrentIndex, setTtsCurrentIndex] = useState(-1); // -1 = inactive, 0 = title, 1+ = body paragraph
@@ -296,15 +301,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
             }
           } catch (e) { /* use existing content */ }
         }
-        // Persist an already-loaded online translation so it survives offline.
-        if (translatedContent && translationMethod === 'online') {
+        // Persist an already-loaded translation so it survives offline.
+        if (translatedContent) {
           enhanced.cachedTranslation = {
             targetLangCode,
             translatedTitle: translatedTitle || null,
             translatedContent,
-            method: 'online',
+            method: translationMethod || 'online',
             sourceLangCode: detectedSourceLang || null,
             cachedAt: new Date().toISOString(),
+            showTranslated: isTranslated,
           };
         }
         addToReadLater(enhanced);
@@ -312,7 +318,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         setIsSaving(false);
       }
     }
-  }, [isSaved, article, addToReadLater, removeFromReadLater, translatedContent, translationMethod, translatedTitle, targetLangCode, detectedSourceLang]);
+  }, [isSaved, article, addToReadLater, removeFromReadLater, translatedContent, translationMethod, translatedTitle, targetLangCode, detectedSourceLang, isTranslated]);
 
   // Check if article language matches target translation language
   const isSameLanguage = useMemo(() => {
@@ -537,11 +543,12 @@ function ArticleReaderScreenContent({ route, navigation }) {
     loadTranslationMode().then(mode => setTranslationMode(mode));
   }, []);
 
-  // Restore a previously cached (online) translation for saved articles so it can
-  // be re-read without translating again. Only applies when the cached target
+  // Restore a previously cached translation for saved articles so it can be
+  // re-read without translating again. Only applies when the cached target
   // language matches the user's current target language. Gated on targetLangLoaded
   // so we never match against the initial 'en' placeholder before the real target
-  // language has been read from storage.
+  // language has been read from storage. If the user was viewing the article
+  // translated last time (showTranslated), reopen it translated.
   useEffect(() => {
     if (!targetLangLoaded) return;
     const cached = article?.cachedTranslation;
@@ -550,16 +557,58 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setTranslatedContent(cached.translatedContent);
       setTranslationMethod(cached.method || 'online');
       if (cached.sourceLangCode) setDetectedSourceLang(cached.sourceLangCode);
+      if (cached.showTranslated !== false) setIsTranslated(true);
     }
   }, [article?.id, targetLangCode, targetLangLoaded]);
+
+  // Quality upgrade: if a saved article's cached translation was made with the
+  // OFFLINE model, silently re-translate it ONLINE when internet is available and
+  // replace the cache (and the displayed text) with the higher-quality version.
+  const upgradeAttemptedRef = useRef(false);
+  useEffect(() => {
+    const cached = article?.cachedTranslation;
+    if (
+      !targetLangLoaded || loading || upgradeAttemptedRef.current ||
+      !cached || cached.method !== 'offline' ||
+      cached.targetLangCode !== targetLangCode ||
+      !fullContent || !article?.id || !isInReadLater(article.id)
+    ) return;
+    upgradeAttemptedRef.current = true;
+    (async () => {
+      try {
+        const src = cached.sourceLangCode || detectedSourceLang || languageInfo?.code || 'auto';
+        const titleResult = await translateText(article.title, src, targetLangCode, null, TRANSLATION_MODES.ONLINE);
+        const contentResult = await translateText(fullContent, src, targetLangCode, null, TRANSLATION_MODES.ONLINE);
+        if (contentResult.method !== 'online' || !contentResult.text) return;
+        setTranslatedTitle(titleResult.text || null);
+        setTranslatedContent(contentResult.text);
+        setTranslationMethod('online');
+        updateReadLaterArticle(article.id, {
+          cachedTranslation: {
+            ...cached,
+            translatedTitle: titleResult.text || null,
+            translatedContent: contentResult.text,
+            method: 'online',
+            cachedAt: new Date().toISOString(),
+          },
+        });
+      } catch (e) {
+        // No internet or online endpoint unavailable — keep the offline version.
+        console.log('Online upgrade of cached translation skipped:', e?.message);
+      }
+    })();
+  }, [article?.id, targetLangCode, targetLangLoaded, loading, fullContent]);
 
   // Track if we've already marked this article as read
   const hasMarkedReadRef = useRef(false);
 
   useEffect(() => {
-    // Reset bookmark-restore state for the newly opened article.
+    // Reset bookmark-restore + translation-upgrade + highlight state for the newly opened article.
     hasAutoScrolled.current = false;
     userInteractedRef.current = false;
+    upgradeAttemptedRef.current = false;
+    setHighlights(article?.highlights || []);
+    setHighlightMode(false);
     if (bookmarkSettleTimer.current) {
       clearTimeout(bookmarkSettleTimer.current);
       bookmarkSettleTimer.current = null;
@@ -699,16 +748,28 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
   };
 
+  // Persist whether the user wants this saved article shown translated, so the
+  // next visit reopens it the same way.
+  const persistShowTranslated = useCallback((show) => {
+    if (!article?.id || !isInReadLater(article.id)) return;
+    const cached = article?.cachedTranslation;
+    if (cached && cached.translatedContent) {
+      updateReadLaterArticle(article.id, { cachedTranslation: { ...cached, showTranslated: show } });
+    }
+  }, [article, isInReadLater, updateReadLaterArticle]);
+
   const handleTranslate = async () => {
     // If already translated, toggle back to original
     if (isTranslated) {
       setIsTranslated(false);
+      persistShowTranslated(false);
       return;
     }
 
     // If we already have a translation cached, show it
     if (translatedContent) {
       setIsTranslated(true);
+      persistShowTranslated(true);
       return;
     }
 
@@ -774,26 +835,29 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setTranslationMethod(contentResult.method);
       setIsTranslated(true);
 
-      // Cache the online translation onto the saved article so it can be read
-      // again (even offline) without re-translating.
-      if (contentResult.method === 'online' && isInReadLater(article.id)) {
+      // Cache the translation onto the saved article so it can be read again
+      // (even offline) without re-translating. Offline-made translations are
+      // cached too and get silently upgraded to online quality later.
+      if (isInReadLater(article.id)) {
         updateReadLaterArticle(article.id, {
           cachedTranslation: {
             targetLangCode,
             translatedTitle: titleResult.text || null,
             translatedContent: contentResult.text,
-            method: 'online',
+            method: contentResult.method,
             sourceLangCode: sourceLangCode || null,
             cachedAt: new Date().toISOString(),
+            showTranslated: true,
           },
         });
       }
     } catch (error) {
+      // Log the technical detail; show the user only the localized friendly message.
       console.error('Translation error:', error);
       setAlertConfig({
         visible: true,
         title: t('reader.translationFailedTitle'),
-        message: error.message || t('reader.translationFailedMessage'),
+        message: t('reader.translationFailedMessage'),
         icon: 'alert-circle-outline',
         buttons: [{ text: t('common.ok') }],
       });
@@ -888,6 +952,31 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }, [handleBackNavigation])
   );
 
+  // Toggle a paragraph highlight (persisted on the saved article).
+  const toggleHighlight = useCallback((index) => {
+    if (!article?.id || !isInReadLater(article.id)) return;
+    setHighlights((prev) => {
+      const next = prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index];
+      updateReadLaterArticle(article.id, { highlights: next });
+      return next;
+    });
+  }, [article?.id, isInReadLater, updateReadLaterArticle]);
+
+  const handleHighlightAction = useCallback(() => {
+    if (!isSaved) {
+      setAlertConfig({
+        visible: true,
+        title: t('reader.actionHighlight'),
+        message: t('reader.highlightNeedsSaved'),
+        icon: 'color-wand-outline',
+        buttons: [{ text: t('common.ok') }],
+      });
+      return;
+    }
+    setShowOverflowMenu(false);
+    setHighlightMode((m) => !m);
+  }, [isSaved, t]);
+
   // All reader actions definition (order defines overflow menu order)
   // MUST be placed after all handler definitions to avoid undefined references
   const MAX_PINNED = 4;
@@ -945,6 +1034,14 @@ function ArticleReaderScreenContent({ route, navigation }) {
       onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
     },
     {
+      id: 'highlight',
+      label: t('reader.actionHighlight'),
+      shortLabel: t('reader.actionHighlightShort'),
+      icon: highlightMode ? 'color-wand' : 'color-wand-outline',
+      color: highlightMode ? theme.colors.primary : theme.colors.text,
+      onPress: handleHighlightAction,
+    },
+    {
       id: 'share',
       label: t('reader.actionShare'),
       shortLabel: t('reader.actionShareShort'),
@@ -960,7 +1057,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       color: isSoundPlaying ? theme.colors.primary : theme.colors.text,
       onPress: () => openSoundPlaylist(true),
     },
-  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, article?.id, articleNote, theme.colors, t, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, openSoundPlaylist]);
+  ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, highlightMode, article?.id, articleNote, theme.colors, t, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, handleHighlightAction, openSoundPlaylist]);
 
   const pinnedActions = useMemo(() => {
     return readerHeaderActions
@@ -1673,6 +1770,32 @@ function ArticleReaderScreenContent({ route, navigation }) {
               </View>
             )}
 
+            {/* Highlight-mode hint */}
+            {highlightMode && (
+              <View style={{
+                flexDirection: appRTL ? 'row-reverse' : 'row',
+                alignItems: 'center',
+                backgroundColor: theme.colors.warning + '22',
+                borderRadius: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                marginBottom: 14,
+              }}>
+                <Ionicons name="color-wand" size={16} color={theme.colors.warning} />
+                <Text style={{
+                  color: theme.colors.text,
+                  fontSize: 13,
+                  flex: 1,
+                  marginLeft: appRTL ? 0 : 8,
+                  marginRight: appRTL ? 8 : 0,
+                  textAlign: appRTL ? 'right' : 'left',
+                  writingDirection: appRTL ? 'rtl' : 'ltr',
+                }}>
+                  {t('reader.highlightModeHint')}
+                </Text>
+              </View>
+            )}
+
             {/* Render content as individual paragraphs for TTS highlight tracking */}
             {(isTranslated && translatedParagraphs.length > 0 ? translatedParagraphs : paragraphs).map((para, index) => {
               const isRTL = isTranslated ? ['ar', 'fa', 'he', 'ur'].includes(targetLangCode) : languageInfo?.isRTL;
@@ -1696,10 +1819,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
                   ))}
                   <View
                     onLayout={(e) => { paragraphYRef.current[index] = e.nativeEvent.layout.y; }}
-                    style={isHighlighted ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
+                    style={
+                      isHighlighted
+                        ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }]
+                        : (highlights.includes(index)
+                          ? [styles.ttsHighlight, { backgroundColor: theme.colors.warning + '2E' }]
+                          : null)
+                    }
                   >
                     <Text
-                      selectable={true}
+                      selectable={!highlightMode}
+                      onPress={highlightMode && isSaved ? () => toggleHighlight(index) : undefined}
                       style={[
                         styles.articleText,
                         { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' },
