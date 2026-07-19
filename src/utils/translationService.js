@@ -139,9 +139,22 @@ async function translateOnline(text, sourceLang, targetLang, onProgress) {
   return translatedParagraphs.join('\n\n');
 }
 
+// Hard timeout for online requests so translation never stalls on a dead or
+// absent network (fetch without a timeout can hang for minutes on some devices).
+const ONLINE_TIMEOUT_MS = 12000;
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ONLINE_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function googleTranslateRequest(text, sourceLang, targetLang) {
   const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + sourceLang + '&tl=' + targetLang + '&dt=t&q=' + encodeURIComponent(text);
-  const response = await fetch(url, { method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0' } });
+  const response = await fetchWithTimeout(url, { method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0' } });
   if (!response.ok) throw new Error('Google Translate returned ' + response.status);
   const data = await response.json();
   if (!data || !data[0]) throw new Error('Unexpected response from Google Translate');
@@ -155,7 +168,7 @@ async function googleTranslateRequest(text, sourceLang, targetLang) {
 async function detectLanguageOnline(text) {
   const sample = text.substring(0, 300);
   const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=' + encodeURIComponent(sample);
-  const response = await fetch(url, { method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0' } });
+  const response = await fetchWithTimeout(url, { method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0' } });
   if (!response.ok) throw new Error('Language detection failed');
   const data = await response.json();
   return data[2] || 'en';
@@ -164,14 +177,20 @@ async function detectLanguageOnline(text) {
 // --- ML Kit (Offline) ---
 
 // Translate one chunk, self-repairing if ML Kit reports missing model files
-// (can happen when the OS evicts models while they are still marked downloaded):
-// re-prepare with downloadIfNeeded:true and retry once.
-async function mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit) {
+// (can happen when the OS evicts models while they are still marked downloaded).
+// The repair (re-download + retry) runs AT MOST ONCE per translation and only
+// for missing-model errors — otherwise, with no internet, every chunk would
+// block on a doomed download attempt and the translation would appear to hang.
+async function mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit, repairState) {
   try {
     await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: false });
     return await FastTranslator.translate(text);
   } catch (error) {
-    console.warn('Offline translate failed, re-downloading model and retrying:', error?.message);
+    const msg = String(error?.message || '');
+    const missingModel = /model/i.test(msg);
+    if (!repairState || repairState.attempted || !missingModel) throw error;
+    repairState.attempted = true;
+    console.warn('Offline translate failed, re-downloading model and retrying once:', msg);
     await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: true });
     return await FastTranslator.translate(text);
   }
@@ -184,10 +203,11 @@ async function translateOffline(text, sourceLang, targetLang, onProgress) {
   if (sourceMlKit === targetMlKit) return text;
   if (onProgress) onProgress('Preparing offline models...');
   await FastTranslator.prepare({ source: sourceMlKit, target: targetMlKit, downloadIfNeeded: true });
+  const repairState = { attempted: false };
   const MAX_CHUNK = 4000;
   if (text.length <= MAX_CHUNK) {
     if (onProgress) onProgress('Translating offline...');
-    return await mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit);
+    return await mlKitTranslateWithRepair(text, sourceMlKit, targetMlKit, repairState);
   }
   const paragraphs = text.split(/\n\n+/);
   const translatedParagraphs = [];
@@ -201,16 +221,16 @@ async function translateOffline(text, sourceLang, targetLang, onProgress) {
       const results = [];
       for (const sentence of sentences) {
         if ((batch + ' ' + sentence).length > MAX_CHUNK && batch.length > 0) {
-          results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit));
+          results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit, repairState));
           batch = sentence;
         } else { batch += (batch ? ' ' : '') + sentence; }
       }
       if (batch.length > 0) {
-        results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit));
+        results.push(await mlKitTranslateWithRepair(batch, sourceMlKit, targetMlKit, repairState));
       }
       translatedParagraphs.push(results.join(' '));
     } else {
-      translatedParagraphs.push(await mlKitTranslateWithRepair(paragraph, sourceMlKit, targetMlKit));
+      translatedParagraphs.push(await mlKitTranslateWithRepair(paragraph, sourceMlKit, targetMlKit, repairState));
     }
   }
   return translatedParagraphs.join('\n\n');
