@@ -39,7 +39,7 @@ export const AVAILABLE_LANGUAGES = [
   { code: 'eo', mlKitName: 'Esperanto', displayName: 'Esperanto' },
   { code: 'es', mlKitName: 'Spanish', displayName: 'Espa\u00F1ol (Spanish)' },
   { code: 'et', mlKitName: 'Estonian', displayName: 'Eesti (Estonian)' },
-  { code: 'fa', mlKitName: 'Persian', displayName: '\u0641\u0627\u0631\u0633\u06CC (Persian)' },
+  { code: 'fa', mlKitName: 'Persian', displayName: '\u0641\u0627\u0631\u0633\u06CC (Farsi)' },
   { code: 'fi', mlKitName: 'Finnish', displayName: 'Suomi (Finnish)' },
   { code: 'fr', mlKitName: 'French', displayName: 'Fran\u00E7ais (French)' },
   { code: 'ga', mlKitName: 'Irish', displayName: 'Gaeilge (Irish)' },
