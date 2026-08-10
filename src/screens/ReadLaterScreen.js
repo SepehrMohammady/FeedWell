@@ -22,11 +22,12 @@ import CustomAlert from '../components/CustomAlert';
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
   const { t, isRTL, formatNumber, language } = useTranslation();
-  const { showImages } = useAppSettings();
+  // Sort order is persisted app-wide (like the Feeds tab) so it survives
+  // navigating into an article and back.
+  const { showImages, readLaterSortOrder: sortOrder, updateReadLaterSortOrder } = useAppSettings();
   const { articles, loading, clearReadLater, removeFromReadLater } = useReadLater();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOrder, setSortOrder] = useState('newest'); // 'newest' or 'oldest'
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
   // Filter and sort articles
@@ -54,7 +55,7 @@ export default function ReadLaterScreen({ navigation }) {
   }, [articles, searchQuery, sortOrder]);
 
   const toggleSort = () => {
-    setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
+    updateReadLaterSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
   };
 
   const handleArticlePress = (article) => {

@@ -13,10 +13,12 @@ import es from './locales/es';
 import zh from './locales/zh';
 import ar from './locales/ar';
 import pt from './locales/pt';
+import id from './locales/id';
+import ru from './locales/ru';
 
 export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
 
-export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt };
+export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru };
 
 function interpolate(str, vars) {
   if (!vars || typeof str !== 'string') return str;

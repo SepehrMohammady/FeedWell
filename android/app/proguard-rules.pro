@@ -50,3 +50,12 @@
 -keepattributes Exceptions
 
 # Add any project specific keep options here:
+
+# FeedWell native code (widget provider/service/bridge) — keep intact under R8
+# optimization; the widget classes are referenced from the manifest and via
+# reflection-adjacent RemoteViews paths.
+-keep class com.feedwell.app.** { *; }
+
+# ML Kit translate (fast-mlkit-translate-text) — belt-and-braces on top of the
+# library's own consumer rules.
+-keep class com.google.mlkit.** { *; }

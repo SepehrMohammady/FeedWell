@@ -28,6 +28,13 @@ export function AppSettingsProvider({ children }) {
   const [translationTargetUserSet, setTranslationTargetUserSet] = useState(false);
   // Last app version for which the "What's New" popup was shown.
   const [lastSeenVersion, setLastSeenVersion] = useState(null);
+  // Saved (Read Later) list sort order — persisted so it survives navigation.
+  const [readLaterSortOrder, setReadLaterSortOrder] = useState('newest'); // 'newest' | 'oldest'
+  // Feed-list auto-scroll: off by default; starts after `delay` seconds of
+  // inactivity and scrolls at the chosen speed.
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
+  const [autoScrollDelay, setAutoScrollDelay] = useState(5); // seconds: 3|5|10|15
+  const [autoScrollSpeed, setAutoScrollSpeed] = useState('normal'); // 'slow'|'normal'|'fast'
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -54,6 +61,10 @@ export function AppSettingsProvider({ children }) {
       const savedFeedRegionUserSet = await AsyncStorage.getItem('feedRegionUserSet');
       const savedTranslationTargetUserSet = await AsyncStorage.getItem('translationTargetUserSet');
       const savedLastSeenVersion = await AsyncStorage.getItem('lastSeenVersion');
+      const savedReadLaterSortOrder = await AsyncStorage.getItem('readLaterSortOrder');
+      const savedAutoScrollEnabled = await AsyncStorage.getItem('autoScrollEnabled');
+      const savedAutoScrollDelay = await AsyncStorage.getItem('autoScrollDelay');
+      const savedAutoScrollSpeed = await AsyncStorage.getItem('autoScrollSpeed');
 
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -125,6 +136,22 @@ export function AppSettingsProvider({ children }) {
 
       if (savedLastSeenVersion !== null) {
         setLastSeenVersion(JSON.parse(savedLastSeenVersion));
+      }
+
+      if (savedReadLaterSortOrder !== null) {
+        setReadLaterSortOrder(JSON.parse(savedReadLaterSortOrder));
+      }
+
+      if (savedAutoScrollEnabled !== null) {
+        setAutoScrollEnabled(JSON.parse(savedAutoScrollEnabled));
+      }
+
+      if (savedAutoScrollDelay !== null) {
+        setAutoScrollDelay(JSON.parse(savedAutoScrollDelay));
+      }
+
+      if (savedAutoScrollSpeed !== null) {
+        setAutoScrollSpeed(JSON.parse(savedAutoScrollSpeed));
       }
     } catch (error) {
       console.error('Error loading app settings:', error);
@@ -256,6 +283,42 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateReadLaterSortOrder = async (value) => {
+    try {
+      setReadLaterSortOrder(value);
+      await AsyncStorage.setItem('readLaterSortOrder', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving readLaterSortOrder setting:', error);
+    }
+  };
+
+  const updateAutoScrollEnabled = async (value) => {
+    try {
+      setAutoScrollEnabled(value);
+      await AsyncStorage.setItem('autoScrollEnabled', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving autoScrollEnabled setting:', error);
+    }
+  };
+
+  const updateAutoScrollDelay = async (value) => {
+    try {
+      setAutoScrollDelay(value);
+      await AsyncStorage.setItem('autoScrollDelay', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving autoScrollDelay setting:', error);
+    }
+  };
+
+  const updateAutoScrollSpeed = async (value) => {
+    try {
+      setAutoScrollSpeed(value);
+      await AsyncStorage.setItem('autoScrollSpeed', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving autoScrollSpeed setting:', error);
+    }
+  };
+
   const updateLastSeenVersion = async (value) => {
     try {
       setLastSeenVersion(value);
@@ -323,10 +386,18 @@ export function AppSettingsProvider({ children }) {
     feedRegionUserSet,
     translationTargetUserSet,
     lastSeenVersion,
+    readLaterSortOrder,
+    autoScrollEnabled,
+    autoScrollDelay,
+    autoScrollSpeed,
     isLoading,
     updateFeedRegion,
     markTranslationTargetUserSet,
     updateLastSeenVersion,
+    updateReadLaterSortOrder,
+    updateAutoScrollEnabled,
+    updateAutoScrollDelay,
+    updateAutoScrollSpeed,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,

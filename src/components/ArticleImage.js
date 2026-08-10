@@ -33,6 +33,9 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
       source={{ uri: safeUri }}
       style={style}
       resizeMode={resizeMode}
+      // Downsample to view size on Android (Fresco) instead of decoding the
+      // full-resolution bitmap — reduces memory per Play Console guidance.
+      resizeMethod="resize"
       onError={() => {
         setLoadError(true);
         setLoading(false);

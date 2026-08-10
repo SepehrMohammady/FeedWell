@@ -1810,6 +1810,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                         source={{ uri: img.src }}
                         style={styles.inlineImage}
                         resizeMode="contain"
+                        resizeMethod="resize"
                         accessibilityLabel={img.alt || t('reader.articleImageAlt')}
                       />
                       {img.caption ? (

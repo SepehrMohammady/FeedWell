@@ -53,7 +53,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
@@ -1052,6 +1052,57 @@ export default function SettingsScreen({ navigation }) {
               />
             }
           />
+          <SettingItem
+            title={t('settings.autoScroll')}
+            description={t('settings.autoScrollDesc')}
+            rightElement={
+              <Switch
+                value={autoScrollEnabled}
+                onValueChange={updateAutoScrollEnabled}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={autoScrollEnabled ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          {autoScrollEnabled && (
+            <SettingItem
+              title={t('settings.autoScrollDelay')}
+              description={t('settings.autoScrollDelayValue', { count: formatNumber(autoScrollDelay) })}
+              onPress={() => setAlertConfig({
+                visible: true,
+                title: t('settings.autoScrollDelay'),
+                message: '',
+                icon: 'timer-outline',
+                buttons: [
+                  ...[3, 5, 10, 15].map((s) => ({
+                    text: t('settings.autoScrollDelayValue', { count: formatNumber(s) }) + (autoScrollDelay === s ? ' ✓' : ''),
+                    onPress: () => updateAutoScrollDelay(s),
+                  })),
+                  { text: t('common.cancel'), style: 'cancel' },
+                ],
+              })}
+              rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+            />
+          )}
+          {autoScrollEnabled && (
+            <SettingItem
+              title={t('settings.autoScrollSpeed')}
+              description={autoScrollSpeed === 'slow' ? t('settings.speedSlow') : autoScrollSpeed === 'fast' ? t('settings.speedFast') : t('settings.speedNormal')}
+              onPress={() => setAlertConfig({
+                visible: true,
+                title: t('settings.autoScrollSpeed'),
+                message: '',
+                icon: 'speedometer-outline',
+                buttons: [
+                  { text: t('settings.speedSlow') + (autoScrollSpeed === 'slow' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('slow') },
+                  { text: t('settings.speedNormal') + (autoScrollSpeed === 'normal' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('normal') },
+                  { text: t('settings.speedFast') + (autoScrollSpeed === 'fast' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('fast') },
+                  { text: t('common.cancel'), style: 'cancel' },
+                ],
+              })}
+              rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+            />
+          )}
           <SettingItem
             title={t('settings.articleAgeFilter')}
             description={maxArticleAge === 0 ? t('settings.articleAgeFilterNoLimitDesc') : t('settings.articleAgeFilterDesc', { period: getArticleAgeLabel(maxArticleAge) })}
