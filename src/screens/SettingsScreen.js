@@ -75,6 +75,8 @@ export default function SettingsScreen({ navigation }) {
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
+  const [showAutoScrollDelayPicker, setShowAutoScrollDelayPicker] = useState(false);
+  const [showAutoScrollSpeedPicker, setShowAutoScrollSpeedPicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
@@ -1068,19 +1070,7 @@ export default function SettingsScreen({ navigation }) {
             <SettingItem
               title={t('settings.autoScrollDelay')}
               description={t('settings.autoScrollDelayValue', { count: formatNumber(autoScrollDelay) })}
-              onPress={() => setAlertConfig({
-                visible: true,
-                title: t('settings.autoScrollDelay'),
-                message: '',
-                icon: 'timer-outline',
-                buttons: [
-                  ...[3, 5, 10, 15].map((s) => ({
-                    text: t('settings.autoScrollDelayValue', { count: formatNumber(s) }) + (autoScrollDelay === s ? ' ✓' : ''),
-                    onPress: () => updateAutoScrollDelay(s),
-                  })),
-                  { text: t('common.cancel'), style: 'cancel' },
-                ],
-              })}
+              onPress={() => setShowAutoScrollDelayPicker(true)}
               rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
             />
           )}
@@ -1088,18 +1078,7 @@ export default function SettingsScreen({ navigation }) {
             <SettingItem
               title={t('settings.autoScrollSpeed')}
               description={autoScrollSpeed === 'slow' ? t('settings.speedSlow') : autoScrollSpeed === 'fast' ? t('settings.speedFast') : t('settings.speedNormal')}
-              onPress={() => setAlertConfig({
-                visible: true,
-                title: t('settings.autoScrollSpeed'),
-                message: '',
-                icon: 'speedometer-outline',
-                buttons: [
-                  { text: t('settings.speedSlow') + (autoScrollSpeed === 'slow' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('slow') },
-                  { text: t('settings.speedNormal') + (autoScrollSpeed === 'normal' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('normal') },
-                  { text: t('settings.speedFast') + (autoScrollSpeed === 'fast' ? ' ✓' : ''), onPress: () => updateAutoScrollSpeed('fast') },
-                  { text: t('common.cancel'), style: 'cancel' },
-                ],
-              })}
+              onPress={() => setShowAutoScrollSpeedPicker(true)}
               rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
             />
           )}
@@ -1660,6 +1639,118 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                 </View>
                 {maxArticleAge === option.value && (
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Auto-Scroll Delay Picker Modal */}
+      <Modal
+        visible={showAutoScrollDelayPicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowAutoScrollDelayPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.modalTitle}>{t('settings.autoScrollDelay')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowAutoScrollDelayPicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {[3, 5, 10, 15].map((seconds, index, arr) => (
+              <TouchableOpacity
+                key={seconds}
+                style={[
+                  styles.modeItem,
+                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                  autoScrollDelay === seconds && styles.langItemSelected,
+                  index === arr.length - 1 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => {
+                  updateAutoScrollDelay(seconds);
+                  setShowAutoScrollDelayPicker(false);
+                }}
+              >
+                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Ionicons
+                    name="timer-outline"
+                    size={22}
+                    color={autoScrollDelay === seconds ? theme.colors.primary : theme.colors.text}
+                  />
+                  <View style={styles.modeItemText}>
+                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, autoScrollDelay === seconds && { color: theme.colors.primary }]}>
+                      {t('settings.autoScrollDelayValue', { count: formatNumber(seconds) })}
+                    </Text>
+                  </View>
+                </View>
+                {autoScrollDelay === seconds && (
+                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Auto-Scroll Speed Picker Modal */}
+      <Modal
+        visible={showAutoScrollSpeedPicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowAutoScrollSpeedPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
+            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.modalTitle}>{t('settings.autoScrollSpeed')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowAutoScrollSpeedPicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {[
+              { value: 'slow', label: t('settings.speedSlow'), icon: 'walk-outline' },
+              { value: 'normal', label: t('settings.speedNormal'), icon: 'speedometer-outline' },
+              { value: 'fast', label: t('settings.speedFast'), icon: 'rocket-outline' },
+            ].map((option, index, arr) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.modeItem,
+                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                  autoScrollSpeed === option.value && styles.langItemSelected,
+                  index === arr.length - 1 && { borderBottomWidth: 0 },
+                ]}
+                onPress={() => {
+                  updateAutoScrollSpeed(option.value);
+                  setShowAutoScrollSpeedPicker(false);
+                }}
+              >
+                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Ionicons
+                    name={option.icon}
+                    size={22}
+                    color={autoScrollSpeed === option.value ? theme.colors.primary : theme.colors.text}
+                  />
+                  <View style={styles.modeItemText}>
+                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, autoScrollSpeed === option.value && { color: theme.colors.primary }]}>
+                      {option.label}
+                    </Text>
+                  </View>
+                </View>
+                {autoScrollSpeed === option.value && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>
