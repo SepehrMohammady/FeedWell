@@ -76,7 +76,6 @@ export default function SettingsScreen({ navigation }) {
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
   const [showAutoScrollDelayPicker, setShowAutoScrollDelayPicker] = useState(false);
-  const [showAutoScrollSpeedPicker, setShowAutoScrollSpeedPicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
@@ -1075,12 +1074,26 @@ export default function SettingsScreen({ navigation }) {
             />
           )}
           {autoScrollEnabled && (
-            <SettingItem
-              title={t('settings.autoScrollSpeed')}
-              description={autoScrollSpeed === 'slow' ? t('settings.speedSlow') : autoScrollSpeed === 'fast' ? t('settings.speedFast') : t('settings.speedNormal')}
-              onPress={() => setShowAutoScrollSpeedPicker(true)}
-              rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
-            />
+            <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border }}>
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text style={{ fontSize: 15, color: theme.colors.text }}>{t('settings.autoScrollSpeed')}</Text>
+                <Text style={{ fontSize: 14, color: theme.colors.textSecondary }}>{t('settings.percent', { value: formatNumber(autoScrollSpeed) })}</Text>
+              </View>
+              <Slider
+                minimumValue={25}
+                maximumValue={250}
+                step={25}
+                value={autoScrollSpeed}
+                onSlidingComplete={(v) => updateAutoScrollSpeed(Math.round(v))}
+                minimumTrackTintColor={theme.colors.primary}
+                maximumTrackTintColor={theme.colors.border}
+                thumbTintColor={theme.colors.primary}
+              />
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
+                <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedSlow')}</Text>
+                <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedFast')}</Text>
+              </View>
+            </View>
           )}
           <SettingItem
             title={t('settings.articleAgeFilter')}
@@ -1693,64 +1706,6 @@ export default function SettingsScreen({ navigation }) {
                   </View>
                 </View>
                 {autoScrollDelay === seconds && (
-                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </Modal>
-
-      {/* Auto-Scroll Speed Picker Modal */}
-      <Modal
-        visible={showAutoScrollSpeedPicker}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setShowAutoScrollSpeedPicker(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.autoScrollSpeed')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowAutoScrollSpeedPicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            {[
-              { value: 'slow', label: t('settings.speedSlow'), icon: 'walk-outline' },
-              { value: 'normal', label: t('settings.speedNormal'), icon: 'speedometer-outline' },
-              { value: 'fast', label: t('settings.speedFast'), icon: 'rocket-outline' },
-            ].map((option, index, arr) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[
-                  styles.modeItem,
-                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                  autoScrollSpeed === option.value && styles.langItemSelected,
-                  index === arr.length - 1 && { borderBottomWidth: 0 },
-                ]}
-                onPress={() => {
-                  updateAutoScrollSpeed(option.value);
-                  setShowAutoScrollSpeedPicker(false);
-                }}
-              >
-                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Ionicons
-                    name={option.icon}
-                    size={22}
-                    color={autoScrollSpeed === option.value ? theme.colors.primary : theme.colors.text}
-                  />
-                  <View style={styles.modeItemText}>
-                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, autoScrollSpeed === option.value && { color: theme.colors.primary }]}>
-                      {option.label}
-                    </Text>
-                  </View>
-                </View>
-                {autoScrollSpeed === option.value && (
                   <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
                 )}
               </TouchableOpacity>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { APP_VERSION } from '../config/version';
+import { normalizeAutoScrollSpeed } from '../hooks/useAutoScroll';
 
 const AppSettingsContext = createContext();
 
@@ -34,7 +35,9 @@ export function AppSettingsProvider({ children }) {
   // inactivity and scrolls at the chosen speed.
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
   const [autoScrollDelay, setAutoScrollDelay] = useState(5); // seconds: 3|5|10|15
-  const [autoScrollSpeed, setAutoScrollSpeed] = useState('normal'); // 'slow'|'normal'|'fast'
+  // Percent of the base speed (25–250, step 25). Legacy 'slow'|'normal'|'fast'
+  // values from pre-1.12 installs are migrated on load.
+  const [autoScrollSpeed, setAutoScrollSpeed] = useState(100);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -151,7 +154,7 @@ export function AppSettingsProvider({ children }) {
       }
 
       if (savedAutoScrollSpeed !== null) {
-        setAutoScrollSpeed(JSON.parse(savedAutoScrollSpeed));
+        setAutoScrollSpeed(normalizeAutoScrollSpeed(JSON.parse(savedAutoScrollSpeed)));
       }
     } catch (error) {
       console.error('Error loading app settings:', error);

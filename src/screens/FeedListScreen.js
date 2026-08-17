@@ -26,6 +26,7 @@ import CustomAlert from '../components/CustomAlert';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTranslation } from '../context/LanguageContext';
 import { formatRelativeDate } from '../utils/formatDate';
+import { useAutoScroll } from '../hooks/useAutoScroll';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
@@ -45,73 +46,27 @@ export default function FeedListScreen({ navigation, route }) {
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', icon: null, buttons: [] });
 
   // --- Auto-scroll (Settings > Auto-Scroll, default off) ---
-  // After `autoScrollDelay` seconds without interaction the list scrolls down at
-  // the chosen speed. Any touch pauses it and any manual scroll stops it; both
-  // re-arm the idle timer so scrolling resumes after the delay. Stops at the end.
-  const AUTO_SCROLL_PX_PER_SEC = { slow: 20, normal: 45, fast: 90 };
-  const autoScrollIdleTimerRef = useRef(null);
-  const autoScrollTickRef = useRef(null);
   const listOffsetRef = useRef(0);
   const listContentHeightRef = useRef(0);
   const listViewportHeightRef = useRef(0);
-  const autoScrollSettingsRef = useRef({ enabled: false, delay: 5, speed: 'normal' });
-  autoScrollSettingsRef.current = { enabled: autoScrollEnabled, delay: autoScrollDelay, speed: autoScrollSpeed };
-
-  const stopAutoScrollTick = React.useCallback(() => {
-    if (autoScrollTickRef.current) {
-      clearInterval(autoScrollTickRef.current);
-      autoScrollTickRef.current = null;
-    }
-  }, []);
-
-  const startAutoScrollTick = React.useCallback(() => {
-    stopAutoScrollTick();
-    const pxPerSec = AUTO_SCROLL_PX_PER_SEC[autoScrollSettingsRef.current.speed] || AUTO_SCROLL_PX_PER_SEC.normal;
-    const TICK_MS = 50;
-    autoScrollTickRef.current = setInterval(() => {
-      const maxOffset = Math.max(0, listContentHeightRef.current - listViewportHeightRef.current);
-      const next = listOffsetRef.current + (pxPerSec * TICK_MS) / 1000;
-      if (maxOffset <= 0 || next >= maxOffset) {
-        // Reached the end — stop without re-arming (a later touch re-arms).
-        stopAutoScrollTick();
-        return;
-      }
-      listOffsetRef.current = next;
-      flatListRef.current?.scrollToOffset({ offset: next, animated: false });
-    }, TICK_MS);
-  }, [stopAutoScrollTick]);
-
-  // (Re)arm the idle timer; called on focus, on settings change, and after any
-  // user interaction (touch or manual scroll).
-  const armAutoScroll = React.useCallback(() => {
-    if (autoScrollIdleTimerRef.current) {
-      clearTimeout(autoScrollIdleTimerRef.current);
-      autoScrollIdleTimerRef.current = null;
-    }
-    if (!autoScrollSettingsRef.current.enabled) return;
-    autoScrollIdleTimerRef.current = setTimeout(
-      startAutoScrollTick,
-      (autoScrollSettingsRef.current.delay || 5) * 1000
-    );
-  }, [startAutoScrollTick]);
-
-  const stopAndRearmAutoScroll = React.useCallback(() => {
-    stopAutoScrollTick();
-    armAutoScroll();
-  }, [stopAutoScrollTick, armAutoScroll]);
+  const autoScroll = useAutoScroll({
+    enabled: autoScrollEnabled,
+    delaySeconds: autoScrollDelay,
+    speedPercent: autoScrollSpeed,
+    getOffset: () => listOffsetRef.current,
+    getMaxOffset: () => Math.max(0, listContentHeightRef.current - listViewportHeightRef.current),
+    scrollTo: (y) => flatListRef.current?.scrollToOffset({ offset: y, animated: false }),
+  });
 
   // Arm while the tab is focused; fully stop on blur/unmount.
   useFocusEffect(
-    React.useCallback(() => {
-      armAutoScroll();
-      return () => {
-        stopAutoScrollTick();
-        if (autoScrollIdleTimerRef.current) {
-          clearTimeout(autoScrollIdleTimerRef.current);
-          autoScrollIdleTimerRef.current = null;
-        }
-      };
-    }, [armAutoScroll, stopAutoScrollTick, autoScrollEnabled, autoScrollDelay, autoScrollSpeed])
+    React.useCallback(
+      () => {
+        autoScroll.arm();
+        return autoScroll.pause;
+      },
+      [autoScroll.arm, autoScroll.pause, autoScrollEnabled, autoScrollDelay, autoScrollSpeed]
+    )
   );
 
   // Apply filter from navigation params (e.g., when clicking Unread from Home)
@@ -1128,9 +1083,11 @@ export default function FeedListScreen({ navigation, route }) {
         keyExtractor={(item) => item.id}
         onScrollToIndexFailed={handleScrollToIndexFailed}
         onScroll={(e) => { listOffsetRef.current = e.nativeEvent.contentOffset.y; }}
-        scrollEventThrottle={50}
-        onScrollBeginDrag={stopAndRearmAutoScroll}
-        onTouchStart={stopAndRearmAutoScroll}
+        scrollEventThrottle={16}
+        onScrollBeginDrag={autoScroll.onScrollBeginDrag}
+        onTouchStart={autoScroll.onTouchStart}
+        onTouchEnd={autoScroll.onTouchEnd}
+        onTouchCancel={autoScroll.onTouchCancel}
         onContentSizeChange={(w, h) => { listContentHeightRef.current = h; }}
         onLayout={(e) => { listViewportHeightRef.current = e.nativeEvent.layout.height; }}
         extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}

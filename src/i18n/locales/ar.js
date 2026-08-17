@@ -56,6 +56,9 @@ export default {
   "region.pl": "البولندية",
   "region.id": "الإندونيسية",
   "region.ru": "الروسية",
+  "region.fr": "الفرنسية",
+  "region.de": "الألمانية",
+  "region.ja": "اليابانية",
 
   // --- Relative date / time ---
   "date.justNow": "الآن",
@@ -67,7 +70,7 @@ export default {
   "whatsNew.title": "ما الجديد",
   "whatsNew.version": "الإصدار {version}",
   "whatsNew.languagesTitle": "لغات جديدة للتطبيق",
-  "whatsNew.languagesBody": "أصبح FeedWell يتحدث الآن العربية والصينية والفارسية والهندية والإندونيسية والإيطالية والبولندية والبرتغالية والروسية والإسبانية والتايلاندية والتركية — بالإضافة إلى الإنجليزية. يختار التطبيق لغة جهازك تلقائيًا.",
+  "whatsNew.languagesBody": "أصبح FeedWell يتحدث الآن العربية والصينية والفارسية والفرنسية والألمانية والهندية والإندونيسية والإيطالية واليابانية والبولندية والبرتغالية والروسية والإسبانية والتايلاندية والتركية — بالإضافة إلى الإنجليزية. يختار التطبيق لغة جهازك تلقائيًا.",
   "whatsNew.feedsTitle": "خلاصات محلية",
   "whatsNew.feedsBody": "تقدم الفئات الشائعة الآن خلاصات محلية منتقاة لكل لغة. بدّل لغة الخلاصات مباشرة من شاشة إضافة خلاصة.",
   "whatsNew.changeHint": "يمكنك تغيير لغة التطبيق في أي وقت من الإعدادات.",
@@ -308,7 +311,7 @@ export default {
   "settings.reduceMotion": "تقليل الحركة (دوار الحركة)",
   "settings.reduceMotionDesc": "تقليل الرسوم المتحركة وعرض نقطة ثابتة للحد من دوار الحركة",
   "settings.autoScroll": "التمرير التلقائي",
-  "settings.autoScrollDesc": "تمرير قائمة الخلاصات تلقائيًا بعد فترة من عدم النشاط",
+  "settings.autoScrollDesc": "تمرير قائمة الخلاصات والقارئ تلقائيًا بعد فترة من عدم النشاط",
   "settings.autoScrollDelay": "مهلة التمرير التلقائي",
   "settings.autoScrollDelayValue": "{count} ثوانٍ",
   "settings.autoScrollSpeed": "سرعة التمرير التلقائي",

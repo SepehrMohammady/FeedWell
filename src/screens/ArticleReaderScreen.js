@@ -36,6 +36,7 @@ import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } f
 import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CustomAlert from '../components/CustomAlert';
+import { useAutoScroll } from '../hooks/useAutoScroll';
 import {
   translateText,
   identifyLanguage,
@@ -84,7 +85,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   } = route.params;
   const { theme } = useTheme();
   const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
-  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
   // Resolve article from deep link if needed
@@ -413,6 +414,36 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
     tryRestoreBookmark();
   }, [tryRestoreBookmark]);
+
+  // Auto-scroll (same Settings > Auto-Scroll option as the feed list): drifts
+  // the article down after the idle delay. Held back while content is still
+  // loading, while a bookmark restore is pending (it would fight the animated
+  // jump), and while TTS reads (TTS follows its highlighted paragraph itself).
+  const autoScroll = useAutoScroll({
+    enabled: autoScrollEnabled,
+    delaySeconds: autoScrollDelay,
+    speedPercent: autoScrollSpeed,
+    getOffset: () => currentScrollY.current,
+    getMaxOffset: () => Math.max(0, contentHeightRef.current - viewportHeightRef.current),
+    scrollTo: (y) => scrollViewRef.current?.scrollTo({ y, animated: false }),
+    isBlocked: () =>
+      loading || !contentReady || isSpeaking ||
+      (bookmarkScrollPercent != null && !hasAutoScrolled.current && !userInteractedRef.current),
+  });
+
+  useFocusEffect(
+    useCallback(
+      () => {
+        if (!loading && contentReady && !isSpeaking) {
+          autoScroll.arm();
+        } else {
+          autoScroll.pause();
+        }
+        return autoScroll.pause;
+      },
+      [loading, contentReady, isSpeaking, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, autoScroll.arm, autoScroll.pause]
+    )
+  );
 
   const saveBookmark = useCallback(async () => {
     const cH = contentHeightRef.current;
@@ -1678,10 +1709,13 @@ function ArticleReaderScreenContent({ route, navigation }) {
         style={styles.content} 
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
-        onScrollBeginDrag={handleScrollBeginDrag}
+        onScrollBeginDrag={(e) => { handleScrollBeginDrag(e); autoScroll.onScrollBeginDrag(); }}
         scrollEventThrottle={16}
         onContentSizeChange={handleContentSizeChange}
         onLayout={handleScrollViewLayout}
+        onTouchStart={autoScroll.onTouchStart}
+        onTouchEnd={autoScroll.onTouchEnd}
+        onTouchCancel={autoScroll.onTouchCancel}
       >
         <View style={styles.contentInner}>
         <View style={styles.articleHeader}>
