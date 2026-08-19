@@ -299,6 +299,8 @@ export default {
   "settings.showImagesDesc": "عرض الصور في المقالات وقائمة الخلاصات",
   "settings.darkMode": "الوضع الداكن",
   "settings.darkModeDesc": "التبديل بين السمتين الفاتحة والداكنة",
+  "settings.amoledBlack": "أسود AMOLED",
+  "settings.amoledBlackDesc": "استخدام الأسود النقي للبطاقات والقوائم — يوفّر البطارية على شاشات OLED",
   "settings.themeColor": "لون السمة",
   "settings.bookmarkIndicators": "مؤشرات الإشارة المرجعية",
   "settings.bookmarkIndicatorsDesc": "عرض علامات موضع القراءة في قارئ المقالات",
@@ -464,6 +466,7 @@ export default {
   "addFeed.helpFeedPaths": "توفر العديد من المواقع الإخبارية خلاصات على المسارات ‎/feed أو ‎/rss أو ‎/feed.xml",
   "addFeed.helpAdsRemoved": "تتم إزالة جميع الإعلانات والتتبع تلقائيًا",
   "addFeed.addingFeed": "جارٍ إضافة الخلاصة...",
+  "addFeed.lookingForFeed": "جارٍ البحث عن خلاصة…",
   "addFeed.fetchingArticles": "جارٍ جلب المقالات وتحليلها",
 
   // --- Ambient sound levels (shared) ---

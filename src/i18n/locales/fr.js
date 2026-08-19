@@ -298,6 +298,8 @@ export default {
   "settings.showImagesDesc": "Afficher les images dans les articles et la liste des flux",
   "settings.darkMode": "Mode sombre",
   "settings.darkModeDesc": "Basculer entre les thèmes clair et sombre",
+  "settings.amoledBlack": "Noir AMOLED",
+  "settings.amoledBlackDesc": "Utiliser du noir pur pour les cartes et les menus : économise la batterie sur les écrans OLED",
   "settings.themeColor": "Couleur du thème",
   "settings.bookmarkIndicators": "Indicateurs de marque-page",
   "settings.bookmarkIndicatorsDesc": "Afficher les repères de position de lecture dans le lecteur d'articles",
@@ -463,6 +465,7 @@ export default {
   "addFeed.helpFeedPaths": "De nombreux sites d'actualités proposent des flux à /feed, /rss ou /feed.xml",
   "addFeed.helpAdsRemoved": "Toutes les publicités et le suivi sont automatiquement supprimés",
   "addFeed.addingFeed": "Ajout du flux...",
+  "addFeed.lookingForFeed": "Recherche d’un flux…",
   "addFeed.fetchingArticles": "Récupération et analyse des articles",
 
   // --- Ambient sound levels (shared) ---

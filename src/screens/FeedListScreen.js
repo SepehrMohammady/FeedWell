@@ -134,7 +134,7 @@ export default function FeedListScreen({ navigation, route }) {
       return () => {
         timeouts.forEach(clearTimeout);
       };
-    }, [readingPosition, filteredAndSortedArticles])
+    }, [readingPosition, articles, articleFilter, sortOrder, searchQuery])
   );
 
   // Standard RN pattern for scrollToIndex on a not-yet-rendered index with
@@ -520,19 +520,23 @@ export default function FeedListScreen({ navigation, route }) {
       return [];
     }
     
-    // v1.1.5: Apply age filter to existing articles
-    let filtered = filterByAge(articles);
-    
+    // Age filter first; the read-status filter then narrows THAT list.
+    // (Before v1.13.0 every branch below overwrote the age-filtered list from
+    // `articles`, so the Article Age Filter never applied to the visible list.)
+    const ageFiltered = filterByAge(articles);
+
     // Apply read status filter
+    let filtered;
     switch (articleFilter) {
       case 'unread':
-        filtered = articles.filter(article => !article.isRead);
+        filtered = ageFiltered.filter(article => !article.isRead);
         break;
       case 'read':
-        filtered = articles.filter(article => article.isRead);
+        filtered = ageFiltered.filter(article => article.isRead);
         break;
       default:
-        filtered = articles;
+        // Copy: the sort below must never mutate the articles state array.
+        filtered = [...ageFiltered];
     }
 
     // Apply search filter
@@ -545,13 +549,19 @@ export default function FeedListScreen({ navigation, route }) {
       );
     }
 
-    // Sort articles
-    let sortedArticles;
-    if (sortOrder === 'newest') {
-      sortedArticles = filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
-    } else {
-      sortedArticles = filtered.sort((a, b) => new Date(a.publishedDate) - new Date(b.publishedDate));
-    }
+    // Sort articles. Unparseable dates fall back to 0 (as everywhere else in
+    // the app) and ties break on a stable key, so the order is deterministic
+    // and can't reshuffle when the list re-renders after reading an article.
+    const timeOf = (article) => {
+      const t = new Date(article.publishedDate || 0).getTime();
+      return Number.isNaN(t) ? 0 : t;
+    };
+    const direction = sortOrder === 'newest' ? -1 : 1;
+    const sortedArticles = filtered.sort((a, b) => {
+      const diff = timeOf(a) - timeOf(b);
+      if (diff !== 0) return direction * diff;
+      return String(a.id ?? '').localeCompare(String(b.id ?? ''));
+    });
 
     // Priority feeds: articles from pinned feeds appear at the top
     const priorityFeedUrls = new Set(feeds.filter(f => f.isPriority).map(f => f.url));
@@ -564,6 +574,11 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const filteredAndSortedArticles = getFilteredArticles();
+  // Stable identity so FlatList only re-renders cells when something real changes.
+  const listExtraData = React.useMemo(
+    () => [articles, articleFilter, sortOrder, readingPosition?.afterArticleId],
+    [articles, articleFilter, sortOrder, readingPosition?.afterArticleId]
+  );
 
   const openFilterMenu = () => {
     setAlertConfig({
@@ -1090,7 +1105,7 @@ export default function FeedListScreen({ navigation, route }) {
         onTouchCancel={autoScroll.onTouchCancel}
         onContentSizeChange={(w, h) => { listContentHeightRef.current = h; }}
         onLayout={(e) => { listViewportHeightRef.current = e.nativeEvent.layout.height; }}
-        extraData={[articles, articleFilter, sortOrder, readingPosition?.afterArticleId]}
+        extraData={listExtraData}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

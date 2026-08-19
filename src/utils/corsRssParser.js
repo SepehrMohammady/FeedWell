@@ -3,6 +3,7 @@
 // resolve preview images identically (media:*, enclosure, itunes:image,
 // <img> in content/description with lazy-load/srcset/entity-decode support).
 import { parse } from 'react-native-rss-parser';
+import { normalizePublishedDate } from './rssParser';
 import {
   decodeHtmlEntities,
   extractImageUrl,
@@ -73,7 +74,7 @@ export async function parseRSSFeedWithProxy(url) {
             description: item.description || '',
             content: item.content || '',
             url: articleUrl,
-            publishedDate: item.published || item.pubDate || new Date().toISOString(),
+            publishedDate: normalizePublishedDate(item.published || item.pubDate) || new Date().toISOString(),
             authors: item.authors || [],
             categories: item.categories || [],
             feedUrl: url,

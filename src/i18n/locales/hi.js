@@ -278,6 +278,8 @@ export default {
   "settings.showImagesDesc": "लेखों और फ़ीड सूची में छवियाँ प्रदर्शित करें",
   "settings.darkMode": "डार्क मोड",
   "settings.darkModeDesc": "हल्की और गहरी थीम के बीच स्विच करें",
+  "settings.amoledBlack": "AMOLED ब्लैक",
+  "settings.amoledBlackDesc": "कार्ड और मेन्यू के लिए शुद्ध काला रंग — OLED स्क्रीन पर बैटरी बचाता है",
   "settings.themeColor": "थीम रंग",
   "settings.bookmarkIndicators": "बुकमार्क संकेतक",
   "settings.bookmarkIndicatorsDesc": "लेख रीडर में पढ़ने की स्थिति के मार्कर दिखाएँ",
@@ -442,6 +444,7 @@ export default {
   "addFeed.helpFeedPaths": "कई समाचार साइटों पर /feed, /rss या /feed.xml पर फ़ीड होते हैं",
   "addFeed.helpAdsRemoved": "सभी विज्ञापन और ट्रैकिंग अपने आप हटा दिए जाते हैं",
   "addFeed.addingFeed": "फ़ीड जोड़ा जा रहा है...",
+  "addFeed.lookingForFeed": "फ़ीड खोजी जा रही है…",
   "addFeed.fetchingArticles": "लेख प्राप्त और विश्लेषित किए जा रहे हैं",
 
   "sound.level.veryLow": "बहुत कम",

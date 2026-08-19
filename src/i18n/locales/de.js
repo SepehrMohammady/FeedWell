@@ -298,6 +298,8 @@ export default {
   "settings.showImagesDesc": "Bilder in Artikeln und in der Feed-Liste anzeigen",
   "settings.darkMode": "Dunkelmodus",
   "settings.darkModeDesc": "Zwischen hellem und dunklem Design wechseln",
+  "settings.amoledBlack": "AMOLED-Schwarz",
+  "settings.amoledBlackDesc": "Reines Schwarz für Karten und Menüs – spart Akku auf OLED-Displays",
   "settings.themeColor": "Designfarbe",
   "settings.bookmarkIndicators": "Lesezeichen-Markierungen",
   "settings.bookmarkIndicatorsDesc": "Lesepositionsmarkierungen im Artikel-Reader anzeigen",
@@ -463,6 +465,7 @@ export default {
   "addFeed.helpFeedPaths": "Viele Nachrichtenseiten haben Feeds unter /feed, /rss oder /feed.xml",
   "addFeed.helpAdsRemoved": "Werbung und Tracking werden automatisch vollständig entfernt",
   "addFeed.addingFeed": "Feed wird hinzugefügt...",
+  "addFeed.lookingForFeed": "Feed wird gesucht …",
   "addFeed.fetchingArticles": "Artikel werden abgerufen und verarbeitet",
 
   // --- Ambient sound levels (shared) ---

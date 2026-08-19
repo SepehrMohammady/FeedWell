@@ -298,6 +298,8 @@ export default {
   "settings.showImagesDesc": "Tampilkan gambar di artikel dan daftar feed",
   "settings.darkMode": "Mode Gelap",
   "settings.darkModeDesc": "Beralih antara tema terang dan gelap",
+  "settings.amoledBlack": "Hitam AMOLED",
+  "settings.amoledBlackDesc": "Gunakan hitam pekat untuk kartu dan menu — menghemat baterai di layar OLED",
   "settings.themeColor": "Warna Tema",
   "settings.bookmarkIndicators": "Indikator Penanda",
   "settings.bookmarkIndicatorsDesc": "Tampilkan penanda posisi membaca di pembaca artikel",
@@ -463,6 +465,7 @@ export default {
   "addFeed.helpFeedPaths": "Banyak situs berita memiliki feed di /feed, /rss, atau /feed.xml",
   "addFeed.helpAdsRemoved": "Semua iklan dan pelacakan dihapus secara otomatis",
   "addFeed.addingFeed": "Menambahkan feed...",
+  "addFeed.lookingForFeed": "Mencari feed…",
   "addFeed.fetchingArticles": "Mengambil dan mengurai artikel",
 
   // --- Ambient sound levels (shared) ---

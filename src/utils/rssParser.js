@@ -1,5 +1,50 @@
 import { parse } from 'react-native-rss-parser';
 
+// Feed dates arrive as raw strings in many formats. Hermes' Date parser is far
+// stricter than V8's, so a string that parses fine in a debugger can become
+// Invalid Date on-device — which used to poison list sorting. Normalize to ISO
+// at parse time, falling back to a hand-rolled RFC-822 reader.
+const RSS_MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+
+export function normalizePublishedDate(raw) {
+  if (!raw) return null;
+  if (raw instanceof Date) return Number.isNaN(raw.getTime()) ? null : raw.toISOString();
+  const s = String(raw).trim();
+  if (!s) return null;
+
+  const direct = new Date(s);
+  if (!Number.isNaN(direct.getTime())) return direct.toISOString();
+
+  // RFC-822 / RFC-1123: "Sat, 16 Aug 2026 19:05:00 +0300" (weekday and zone optional)
+  const m = s.match(/(d{1,2})s+([A-Za-z]{3})[a-z]*.?s+(d{4})(?:s+(d{1,2}):(d{2})(?::(d{2}))?)?s*([+-]d{4})?/);
+  if (m) {
+    const month = RSS_MONTHS[m[2].toLowerCase()];
+    if (month != null) {
+      let ms = Date.UTC(
+        parseInt(m[3], 10), month, parseInt(m[1], 10),
+        m[4] ? parseInt(m[4], 10) : 0,
+        m[5] ? parseInt(m[5], 10) : 0,
+        m[6] ? parseInt(m[6], 10) : 0
+      );
+      const zone = m[7];
+      if (zone) {
+        const sign = zone[0] === '-' ? -1 : 1;
+        ms -= sign * (parseInt(zone.slice(1, 3), 10) * 60 + parseInt(zone.slice(3, 5), 10)) * 60000;
+      }
+      if (!Number.isNaN(ms)) return new Date(ms).toISOString();
+    }
+  }
+
+  // "YYYY-MM-DD HH:MM(:SS)" — a space where ISO wants a T
+  const iso = s.match(/^(d{4})-(d{2})-(d{2})[ T](d{2}):(d{2})(?::(d{2}))?/);
+  if (iso) {
+    const ms = Date.UTC(+iso[1], +iso[2] - 1, +iso[3], +iso[4], +iso[5], iso[6] ? +iso[6] : 0);
+    if (!Number.isNaN(ms)) return new Date(ms).toISOString();
+  }
+
+  return null;
+}
+
 // Ad domains and patterns to block
 const AD_DOMAINS = [
   'googleads.g.doubleclick.net',
@@ -901,7 +946,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
               content: extractCleanText(cleanContent),
               htmlContent: cleanDescription || cleanContent,
               url: item.links?.[0]?.url || item.url || '',
-              publishedDate: item.published || item.pubDate || new Date().toISOString(),
+              publishedDate: normalizePublishedDate(item.published || item.pubDate) || new Date().toISOString(),
               authors: item.authors || [],
               categories: item.categories || [],
               feedUrl: url,
@@ -943,7 +988,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
         const response = await fetch(fetchUrl, {
           headers: {
             'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-            'User-Agent': 'FeedWell/1.1.7 RSS Reader',
+            'User-Agent': FEED_USER_AGENT,
           },
         });
         
@@ -991,7 +1036,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
         content: extractCleanText(cleanContent),
         htmlContent: cleanDescription || cleanContent,
         url: item.links?.[0]?.url || item.url || '',
-        publishedDate: item.published || item.pubDate || new Date().toISOString(),
+        publishedDate: normalizePublishedDate(item.published || item.pubDate) || new Date().toISOString(),
         authors: item.authors || [],
         categories: item.categories || [],
         feedUrl: url,
@@ -1182,6 +1227,84 @@ function isAdOrTrackingImage(url) {
 }
 
 // Validate RSS URL
+// --- Feed auto-discovery -----------------------------------------------------
+// Given a website address (e.g. "https://www.bbc.com"), find its RSS/Atom feed
+// the way a browser does: read the page's <link rel="alternate"> tags, then fall
+// back to the conventional feed paths. Returns a feed URL, or null if none works.
+
+const FEED_USER_AGENT = 'FeedWell RSS Reader';
+const COMMON_FEED_PATHS = ['/feed', '/rss', '/rss.xml', '/feed.xml', '/atom.xml', '/index.xml'];
+const MAX_DISCOVERY_PROBES = 8;
+
+function looksLikeFeedText(text) {
+  if (!text) return false;
+  const head = text.slice(0, 2000).toLowerCase();
+  return head.includes('<rss') || head.includes('<feed') || head.includes('<rdf:rdf');
+}
+
+async function fetchTextWithTimeout(url, accept, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      headers: { 'Accept': accept, 'User-Agent': FEED_USER_AGENT },
+      signal: controller.signal,
+    });
+    if (!response.ok) return null;
+    return await response.text();
+  } catch (e) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export async function discoverFeedUrl(siteUrl) {
+  const base = String(siteUrl || '').trim();
+  if (!base) return null;
+
+  // 1. Fetch the page. If the URL already IS a feed, we're done.
+  const pageHtml = await fetchTextWithTimeout(
+    base,
+    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+  );
+  if (looksLikeFeedText(pageHtml)) return base;
+
+  const candidates = [];
+
+  // 2. <link rel="alternate" type="application/rss+xml" href="..."> in the HTML.
+  if (pageHtml) {
+    const linkTags = pageHtml.match(/<link[^>]*>/gi) || [];
+    for (const tag of linkTags) {
+      if (!/rels*=s*["']?[^"'>]*alternate/i.test(tag)) continue;
+      if (!/types*=s*["']?application/(rss|atom)+xml/i.test(tag)) continue;
+      const href = tag.match(/hrefs*=s*["']([^"']+)["']/i);
+      if (href && href[1]) candidates.push(href[1]);
+    }
+  }
+
+  // 3. Conventional paths as a fallback.
+  let origin = base;
+  try { origin = new URL(base).origin; } catch (e) { /* keep base */ }
+  for (const path of COMMON_FEED_PATHS) candidates.push(origin + path);
+
+  // 4. Probe candidates in order; first one that parses as a feed wins.
+  const seen = new Set();
+  let probes = 0;
+  for (const candidate of candidates) {
+    if (probes >= MAX_DISCOVERY_PROBES) break;
+    let absolute;
+    try { absolute = new URL(candidate, base).toString(); } catch (e) { continue; }
+    if (seen.has(absolute)) continue;
+    seen.add(absolute);
+    probes++;
+    const text = await fetchTextWithTimeout(absolute, 'application/rss+xml, application/xml, text/xml, */*');
+    if (looksLikeFeedText(text)) return absolute;
+  }
+
+  return null;
+}
+
 export function isValidRSSUrl(url) {
   try {
     const urlObj = new URL(url);

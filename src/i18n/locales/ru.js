@@ -298,6 +298,8 @@ export default {
   "settings.showImagesDesc": "Отображать изображения в статьях и в списке лент",
   "settings.darkMode": "Тёмная тема",
   "settings.darkModeDesc": "Переключение между светлой и тёмной темами",
+  "settings.amoledBlack": "Чёрный AMOLED",
+  "settings.amoledBlackDesc": "Чистый чёрный для карточек и меню — экономит заряд на экранах OLED",
   "settings.themeColor": "Цвет темы",
   "settings.bookmarkIndicators": "Индикаторы закладок",
   "settings.bookmarkIndicatorsDesc": "Показывать отметки позиции чтения в ридере",
@@ -463,6 +465,7 @@ export default {
   "addFeed.helpFeedPaths": "На многих новостных сайтах ленты доступны по адресам /feed, /rss или /feed.xml",
   "addFeed.helpAdsRemoved": "Вся реклама и трекеры удаляются автоматически",
   "addFeed.addingFeed": "Добавление ленты...",
+  "addFeed.lookingForFeed": "Поиск ленты…",
   "addFeed.fetchingArticles": "Загрузка и разбор статей",
 
   // --- Ambient sound levels (shared) ---

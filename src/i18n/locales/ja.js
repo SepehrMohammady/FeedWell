@@ -298,6 +298,8 @@ export default {
   "settings.showImagesDesc": "記事とフィード一覧に画像を表示します",
   "settings.darkMode": "ダークモード",
   "settings.darkModeDesc": "ライトテーマとダークテーマを切り替えます",
+  "settings.amoledBlack": "AMOLEDブラック",
+  "settings.amoledBlackDesc": "カードやメニューに純黒を使用します。有機ELディスプレイでは電池を節約できます",
   "settings.themeColor": "テーマカラー",
   "settings.bookmarkIndicators": "ブックマークマーカー",
   "settings.bookmarkIndicatorsDesc": "記事リーダーに読書位置のマーカーを表示します",
@@ -463,6 +465,7 @@ export default {
   "addFeed.helpFeedPaths": "多くのニュースサイトは /feed、/rss、/feed.xml にフィードがあります",
   "addFeed.helpAdsRemoved": "広告とトラッキングはすべて自動的に除去されます",
   "addFeed.addingFeed": "フィードを追加中...",
+  "addFeed.lookingForFeed": "フィードを探しています…",
   "addFeed.fetchingArticles": "記事を取得・解析しています",
 
   // --- Ambient sound levels (shared) ---

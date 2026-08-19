@@ -299,6 +299,8 @@ export default {
   "settings.showImagesDesc": "Exibir imagens nos artigos e na lista de feeds",
   "settings.darkMode": "Modo Escuro",
   "settings.darkModeDesc": "Alternar entre os temas claro e escuro",
+  "settings.amoledBlack": "Preto AMOLED",
+  "settings.amoledBlackDesc": "Usar preto puro nos cartões e menus — poupa bateria em ecrãs OLED",
   "settings.themeColor": "Cor do Tema",
   "settings.bookmarkIndicators": "Indicadores de Marcador",
   "settings.bookmarkIndicatorsDesc": "Mostrar marcadores de posição de leitura no leitor de artigos",
@@ -464,6 +466,7 @@ export default {
   "addFeed.helpFeedPaths": "Muitos sites de notícias têm feeds em /feed, /rss ou /feed.xml",
   "addFeed.helpAdsRemoved": "Todos os anúncios e rastreamentos são removidos automaticamente",
   "addFeed.addingFeed": "A adicionar o feed...",
+  "addFeed.lookingForFeed": "A procurar um feed…",
   "addFeed.fetchingArticles": "A obter e a analisar artigos",
 
   // --- Ambient sound levels (shared) ---

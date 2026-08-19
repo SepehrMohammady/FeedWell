@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
-import { parseRSSFeed, isValidRSSUrl } from '../utils/rssParser';
+import { parseRSSFeed, isValidRSSUrl, discoverFeedUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -27,6 +27,7 @@ import CustomAlert from '../components/CustomAlert';
 export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
   const { addFeed, addArticles, feeds, removeFeed, toggleFeedPriority } = useFeed();
   const { theme } = useTheme();
   const { maxArticleAge, feedRegion, feedRegionUserSet, updateFeedRegion } = useAppSettings();
@@ -75,18 +76,37 @@ export default function AddFeedScreen({ navigation }) {
     try {
       console.log('Attempting to parse feed:', url.trim());
       
+      let feedUrl = url.trim();
       let feedData;
-      
+
       // Try the regular parser first
       try {
-        feedData = await parseRSSFeed(url.trim(), maxArticleAge);
+        feedData = await parseRSSFeed(feedUrl, maxArticleAge);
       } catch (error) {
         console.log('Regular parser failed, trying CORS proxy:', error.message);
         try {
-          feedData = await parseRSSFeedWithProxy(url.trim());
+          feedData = await parseRSSFeedWithProxy(feedUrl);
         } catch (proxyError) {
-          console.log('CORS proxy also failed:', proxyError.message);
-          throw new Error('Unable to access this feed. Please check the URL or try a different feed.');
+          console.log('CORS proxy also failed, trying discovery:', proxyError.message);
+          // The user most likely pasted a website address rather than a feed
+          // address — look up the site's feed the way a browser would.
+          let discovered = null;
+          setDiscovering(true);
+          try {
+            discovered = await discoverFeedUrl(feedUrl);
+          } finally {
+            setDiscovering(false);
+          }
+          if (!discovered) {
+            throw new Error('Unable to access this feed. Please check the URL or try a different feed.');
+          }
+          if (feeds.some(feed => feed.url === discovered)) {
+            setAlertConfig({ visible: true, title: t('common.error'), message: t('addFeed.alreadyAdded'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
+            return;
+          }
+          console.log('Discovered feed for site:', feedUrl, '->', discovered);
+          feedUrl = discovered;
+          feedData = await parseRSSFeed(feedUrl, maxArticleAge);
         }
       }
       
@@ -99,7 +119,7 @@ export default function AddFeedScreen({ navigation }) {
         setAlertConfig({ visible: true, title: t('addFeed.warning'), message: t('addFeed.emptyFeedWarning'), icon: 'warning-outline', buttons: [{ text: t('common.ok') }] });
       }
 
-      await addFeed(url.trim(), feedData.title);
+      await addFeed(feedUrl, feedData.title);
       
       if (feedData.articles && feedData.articles.length > 0) {
         await addArticles(feedData.articles);
@@ -781,7 +801,7 @@ export default function AddFeedScreen({ navigation }) {
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingBox}>
             <ActivityIndicator color={theme.colors.primary} size="large" />
-            <Text style={styles.loadingText}>{t('addFeed.addingFeed')}</Text>
+            <Text style={styles.loadingText}>{discovering ? t('addFeed.lookingForFeed') : t('addFeed.addingFeed')}</Text>
             <Text style={styles.loadingSubtext}>{t('addFeed.fetchingArticles')}</Text>
           </View>
         </View>

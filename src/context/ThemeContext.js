@@ -59,6 +59,16 @@ const lightShadows = {
   cardWeb: { boxShadow: '0 2px 8px rgba(0,0,0,0.1)' },
 };
 
+// AMOLED variant of the dark palette: surfaces drop to true black so OLED
+// pixels switch off entirely. Since card and background become identical, the
+// border is lifted to stay visible — it is what separates cards now.
+const baseAmoledColors = {
+  ...baseDarkColors,
+  surface: '#000000',
+  card: '#000000',
+  border: '#2A2A2C',
+};
+
 const darkShadows = {
   card: {
     shadowColor: '#000',
@@ -78,6 +88,7 @@ const buildTheme = (baseColors, shadows, palette) => ({
 export function ThemeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [paletteIndex, setPaletteIndex] = useState(0);
+  const [amoledBlack, setAmoledBlack] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -92,10 +103,12 @@ export function ThemeProvider({ children }) {
 
   const loadThemePreference = async () => {
     try {
-      const [savedTheme, savedPalette] = await Promise.all([
+      const [savedTheme, savedPalette, savedAmoled] = await Promise.all([
         AsyncStorage.getItem('theme'),
         AsyncStorage.getItem('paletteIndex'),
+        AsyncStorage.getItem('amoledBlack'),
       ]);
+      if (savedAmoled !== null) setAmoledBlack(savedAmoled === 'true');
       if (savedTheme !== null) {
         setIsDarkMode(savedTheme === 'dark');
         syncWidgetTheme(savedTheme === 'dark');
@@ -123,6 +136,15 @@ export function ThemeProvider({ children }) {
     }
   };
 
+  const toggleAmoledBlack = async (value) => {
+    try {
+      setAmoledBlack(value);
+      await AsyncStorage.setItem('amoledBlack', value ? 'true' : 'false');
+    } catch (error) {
+      console.error('Error saving AMOLED preference:', error);
+    }
+  };
+
   const setPalette = async (index) => {
     try {
       setPaletteIndex(index);
@@ -133,13 +155,15 @@ export function ThemeProvider({ children }) {
   };
 
   const theme = isDarkMode
-    ? buildTheme(baseDarkColors,  darkShadows,  DARK_PALETTES[paletteIndex])
+    ? buildTheme(amoledBlack ? baseAmoledColors : baseDarkColors, darkShadows, DARK_PALETTES[paletteIndex])
     : buildTheme(baseLightColors, lightShadows, LIGHT_PALETTES[paletteIndex]);
 
   const value = {
     theme,
     isDarkMode,
     toggleTheme,
+    amoledBlack,
+    toggleAmoledBlack,
     isLoading,
     paletteIndex,
     setPalette,

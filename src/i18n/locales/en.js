@@ -300,6 +300,8 @@ export default {
   'settings.showImagesDesc': 'Display images in articles and feed list',
   'settings.darkMode': 'Dark Mode',
   'settings.darkModeDesc': 'Switch between light and dark themes',
+  'settings.amoledBlack': 'AMOLED Black',
+  'settings.amoledBlackDesc': 'Use pure black for cards and menus — saves battery on OLED screens',
   'settings.themeColor': 'Theme Color',
   'settings.bookmarkIndicators': 'Bookmark Indicators',
   'settings.bookmarkIndicatorsDesc': 'Show reading position markers in article reader',
@@ -465,6 +467,7 @@ export default {
   'addFeed.helpFeedPaths': 'Many news sites have feeds at /feed, /rss, or /feed.xml',
   'addFeed.helpAdsRemoved': 'All ads and tracking are automatically removed',
   'addFeed.addingFeed': 'Adding feed...',
+  'addFeed.lookingForFeed': 'Looking for a feed…',
   'addFeed.fetchingArticles': 'Fetching and parsing articles',
 
   // --- Ambient sound levels (shared) ---

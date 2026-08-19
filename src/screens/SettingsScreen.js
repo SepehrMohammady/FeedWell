@@ -52,7 +52,7 @@ import {
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
-  const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES } = useTheme();
+  const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
@@ -957,6 +957,20 @@ export default function SettingsScreen({ navigation }) {
               />
             }
           />
+          {isDarkMode && (
+            <SettingItem
+              title={t('settings.amoledBlack')}
+              description={t('settings.amoledBlackDesc')}
+              rightElement={
+                <Switch
+                  value={amoledBlack}
+                  onValueChange={toggleAmoledBlack}
+                  trackColor={{ false: '#767577', true: theme.colors.primary }}
+                  thumbColor={amoledBlack ? '#fff' : '#f4f3f4'}
+                />
+              }
+            />
+          )}
           <SettingItem
             title={t('language.appTitle')}
             description={getAppLanguage(language).nativeLabel}

@@ -278,6 +278,8 @@ export default {
   "settings.showImagesDesc": "Mostrar imágenes en los artículos y en la lista de fuentes",
   "settings.darkMode": "Modo oscuro",
   "settings.darkModeDesc": "Alternar entre los temas claro y oscuro",
+  "settings.amoledBlack": "Negro AMOLED",
+  "settings.amoledBlackDesc": "Usa negro puro en tarjetas y menús: ahorra batería en pantallas OLED",
   "settings.themeColor": "Color del tema",
   "settings.bookmarkIndicators": "Indicadores de marcador",
   "settings.bookmarkIndicatorsDesc": "Mostrar marcadores de posición de lectura en el lector de artículos",
@@ -442,6 +444,7 @@ export default {
   "addFeed.helpFeedPaths": "Muchos sitios de noticias tienen fuentes en /feed, /rss o /feed.xml",
   "addFeed.helpAdsRemoved": "Todos los anuncios y el seguimiento se eliminan automáticamente",
   "addFeed.addingFeed": "Añadiendo fuente...",
+  "addFeed.lookingForFeed": "Buscando un feed…",
   "addFeed.fetchingArticles": "Obteniendo y analizando artículos",
 
   "sound.level.veryLow": "Muy bajo",
