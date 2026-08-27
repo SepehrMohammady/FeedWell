@@ -42,6 +42,8 @@ export default {
   "region.tr": "土耳其语",
   "region.th": "泰语",
   "region.pl": "波兰语",
+  "region.vi": "越南语",
+  "region.ko": "韩语",
   "region.ar": "阿拉伯语",
   "region.pt": "葡萄牙语",
   "region.id": "印度尼西亚语",

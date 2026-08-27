@@ -11,6 +11,9 @@ export const AUTO_SCROLL_BASE_PX_PER_SEC = 45;
 // ~60 fps with a fractional-pixel accumulator so the drift reads as continuous
 // motion instead of visible 20 Hz steps.
 const TICK_MS = 16;
+// Grace period on top of the idle delay before a touch that never reported its
+// end is treated as lost. See touchPause().
+const LOST_TOUCH_GRACE_MS = 5000;
 
 // The stored speed was originally 'slow' | 'normal' | 'fast'; it is now a
 // percentage. Map legacy values and clamp out-of-range numbers.
@@ -26,6 +29,8 @@ export function normalizeAutoScrollSpeed(value) {
 export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, getMaxOffset, scrollTo, isBlocked }) {
   const idleTimerRef = useRef(null);
   const tickRef = useRef(null);
+  // Rescue timer for a touch whose end never arrived (see touchPause).
+  const watchdogRef = useRef(null);
   // Float accumulator: the tick advances this, not the (quantized) offsets
   // echoed back through onScroll, so sub-pixel steps aren't lost.
   const offsetFloatRef = useRef(0);
@@ -34,13 +39,20 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
   const stateRef = useRef({});
   stateRef.current = { enabled, delaySeconds, speedPercent, getOffset, getMaxOffset, scrollTo, isBlocked };
   // Forward reference to arm(), which is defined below — lets a blocked tick
-  // reschedule itself without a circular dependency.
+  // and the watchdog reschedule without a circular dependency.
   const armRef = useRef(null);
 
   const clearIdleTimer = useCallback(() => {
     if (idleTimerRef.current) {
       clearTimeout(idleTimerRef.current);
       idleTimerRef.current = null;
+    }
+  }, []);
+
+  const clearWatchdog = useCallback(() => {
+    if (watchdogRef.current) {
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
     }
   }, []);
 
@@ -58,9 +70,9 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
     if (s.isBlocked && s.isBlocked()) {
       // Blocked right now (article still loading, TTS speaking, a bookmark
       // restore pending...). Re-arm and check again after the delay instead of
-      // giving up: before this, a tick that fired while blocked killed
-      // auto-scroll until the next touch, and since every touch re-armed into
-      // the same blocked state it could never resume on its own.
+      // giving up: a tick that fired while blocked used to kill auto-scroll
+      // until the next touch, and since every touch re-armed into the same
+      // blocked state it could never resume on its own.
       if (armRef.current) armRef.current();
       return;
     }
@@ -87,18 +99,38 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
     }, TICK_MS);
   }, [stopTick]);
 
-  // Pause without re-arming: finger down, drag in progress, or screen blurred.
+  // Hard pause with no rescue: screen blurred, or the component unmounting.
   const pause = useCallback(() => {
     stopTick();
     clearIdleTimer();
-  }, [stopTick, clearIdleTimer]);
+    clearWatchdog();
+  }, [stopTick, clearIdleTimer, clearWatchdog]);
+
+  // Pause because a finger is down. Resuming normally happens on touch end —
+  // but that event is not guaranteed to arrive: if the view under the finger
+  // unmounts mid-gesture (translating an article swaps the whole body), the
+  // touch end is delivered to a view that no longer exists and the scrollable
+  // never hears about it. Without a rescue that left auto-scroll paused
+  // forever, until the screen was closed and reopened. The watchdog makes that
+  // impossible: if no touch end arrives in time, we re-arm anyway.
+  const touchPause = useCallback(() => {
+    stopTick();
+    clearIdleTimer();
+    clearWatchdog();
+    const delayMs = (stateRef.current.delaySeconds || 5) * 1000;
+    watchdogRef.current = setTimeout(() => {
+      watchdogRef.current = null;
+      if (armRef.current) armRef.current();
+    }, delayMs + LOST_TOUCH_GRACE_MS);
+  }, [stopTick, clearIdleTimer, clearWatchdog]);
 
   // (Re)arm the idle timer: on focus, on settings change, on finger release.
   const arm = useCallback(() => {
     clearIdleTimer();
+    clearWatchdog();
     if (!stateRef.current.enabled) return;
     idleTimerRef.current = setTimeout(startTick, (stateRef.current.delaySeconds || 5) * 1000);
-  }, [clearIdleTimer, startTick]);
+  }, [clearIdleTimer, clearWatchdog, startTick]);
   armRef.current = arm;
 
   // Clear all timers on unmount.
@@ -107,10 +139,17 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
   return {
     arm,
     pause,
-    // Stay paused while the finger is down; the delay starts on release.
-    onTouchStart: pause,
+    // Stay paused while the finger is down; the delay starts on release. Every
+    // event that can mark the end of an interaction re-arms, so a single missed
+    // one can no longer strand the engine.
+    onTouchStart: touchPause,
+    // Each move pushes the rescue timer back, so a finger that is genuinely
+    // held down and moving keeps the scroll paused as intended.
+    onTouchMove: touchPause,
     onTouchEnd: arm,
     onTouchCancel: arm,
-    onScrollBeginDrag: pause,
+    onScrollBeginDrag: touchPause,
+    onScrollEndDrag: arm,
+    onMomentumScrollEnd: arm,
   };
 }

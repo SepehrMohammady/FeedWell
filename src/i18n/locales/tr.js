@@ -44,6 +44,8 @@ export default {
   "region.tr": "Türkçe",
   "region.th": "Tayca",
   "region.pl": "Lehçe",
+  "region.vi": "Vietnamca",
+  "region.ko": "Korece",
   "region.ar": "Arapça",
   "region.pt": "Portekizce",
   "region.fr": "Fransızca",

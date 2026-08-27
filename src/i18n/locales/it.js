@@ -42,6 +42,8 @@ export default {
   "region.tr": "Turco",
   "region.th": "Tailandese",
   "region.pl": "Polacco",
+  "region.vi": "Vietnamita",
+  "region.ko": "Coreano",
   "region.ar": "Arabo",
   "region.pt": "Portoghese",
   "region.id": "Indonesiano",

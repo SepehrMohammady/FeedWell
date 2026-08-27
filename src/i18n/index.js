@@ -18,10 +18,12 @@ import ru from './locales/ru';
 import ja from './locales/ja';
 import fr from './locales/fr';
 import de from './locales/de';
+import vi from './locales/vi';
+import ko from './locales/ko';
 
 export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
 
-export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de };
+export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko };
 
 function interpolate(str, vars) {
   if (!vars || typeof str !== 'string') return str;

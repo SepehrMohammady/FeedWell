@@ -45,6 +45,8 @@ export default {
   "region.tr": "तुर्की",
   "region.th": "थाई",
   "region.pl": "पोलिश",
+  "region.vi": "वियतनामी",
+  "region.ko": "कोरियाई",
   "region.ar": "अरबी",
   "region.pt": "पुर्तगाली",
   "region.id": "इंडोनेशियाई",

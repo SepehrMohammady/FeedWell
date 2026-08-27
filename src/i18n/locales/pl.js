@@ -47,6 +47,8 @@ export default {
   "region.tr": "turecki",
   "region.th": "tajski",
   "region.pl": "polski",
+  "region.vi": "wietnamski",
+  "region.ko": "koreański",
   "region.pt": "portugalski",
   "region.ru": "rosyjski",
   "date.justNow": "Przed chwilą",

@@ -13,12 +13,14 @@ export const APP_LANGUAGES = [
   { code: 'id', nativeLabel: 'Bahasa Indonesia', englishLabel: 'Indonesian', isRTL: false },
   { code: 'it', nativeLabel: 'Italiano', englishLabel: 'Italian',    isRTL: false },
   { code: 'ja', nativeLabel: '日本語',   englishLabel: 'Japanese',   isRTL: false },
+  { code: 'ko', nativeLabel: '한국어',   englishLabel: 'Korean',     isRTL: false },
   { code: 'pl', nativeLabel: 'Polski',   englishLabel: 'Polish',     isRTL: false },
   { code: 'pt', nativeLabel: 'Português', englishLabel: 'Portuguese', isRTL: false },
   { code: 'ru', nativeLabel: 'Русский',  englishLabel: 'Russian',    isRTL: false },
   { code: 'es', nativeLabel: 'Español',  englishLabel: 'Spanish',    isRTL: false },
   { code: 'th', nativeLabel: 'ไทย',     englishLabel: 'Thai',       isRTL: false },
   { code: 'tr', nativeLabel: 'Türkçe',  englishLabel: 'Turkish',    isRTL: false },
+  { code: 'vi', nativeLabel: 'Tiếng Việt', englishLabel: 'Vietnamese', isRTL: false },
 ];
 
 export const SUPPORTED_LANGUAGES = APP_LANGUAGES.map((l) => l.code);

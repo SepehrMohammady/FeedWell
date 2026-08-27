@@ -54,6 +54,8 @@ export default {
   "region.tr": "التركية",
   "region.th": "التايلاندية",
   "region.pl": "البولندية",
+  "region.vi": "الفيتنامية",
+  "region.ko": "الكورية",
   "region.id": "الإندونيسية",
   "region.ru": "الروسية",
   "region.fr": "الفرنسية",

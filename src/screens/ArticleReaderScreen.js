@@ -445,7 +445,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         }
         return autoScroll.pause;
       },
-      [loading, contentReady, isSpeaking, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, autoScroll.arm, autoScroll.pause]
+      [loading, contentReady, isSpeaking, translating, isTranslated, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, autoScroll.arm, autoScroll.pause]
     )
   );
 
@@ -1720,7 +1720,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
         onContentSizeChange={handleContentSizeChange}
         onLayout={handleScrollViewLayout}
         onTouchStart={autoScroll.onTouchStart}
+        onTouchMove={autoScroll.onTouchMove}
         onTouchEnd={autoScroll.onTouchEnd}
+        onScrollEndDrag={autoScroll.onScrollEndDrag}
+        onMomentumScrollEnd={autoScroll.onMomentumScrollEnd}
         onTouchCancel={autoScroll.onTouchCancel}
       >
         <View style={styles.contentInner}>

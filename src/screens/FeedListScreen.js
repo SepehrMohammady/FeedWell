@@ -312,36 +312,14 @@ export default function FeedListScreen({ navigation, route }) {
       });
       return;
     }
-    const count = await markArticlesRead(ids);
-    setAlertConfig({
-      visible: true,
-      title: t('common.success'),
-      message: t('feedList.markedReadSuccess', { count: formatNumber(count) }),
-      icon: 'checkmark-circle-outline',
-      buttons: [{ text: t('common.ok') }],
-    });
+    await markArticlesRead(ids);
   };
 
-  // Tapping the line between two articles offers both boundary actions.
   const handleSetReadingPosition = (articleIndex) => {
     const article = filteredAndSortedArticles[articleIndex];
-    if (!article) return;
-    setAlertConfig({
-      visible: true,
-      title: t('feedList.readingPositionTitle'),
-      icon: 'bookmark-outline',
-      buttons: [
-        {
-          text: t('feedList.setPositionHere'),
-          onPress: () => setReadingPosition(`after_article_${article.id}`, article.id),
-        },
-        {
-          text: t('feedList.markAboveRead'),
-          onPress: () => handleMarkAboveRead(articleIndex),
-        },
-        { text: t('common.cancel'), style: 'cancel' },
-      ],
-    });
+    if (article) {
+      setReadingPosition(`after_article_${article.id}`, article.id);
+    }
   };
 
   const handleGoToReadingPosition = () => {
@@ -535,8 +513,11 @@ export default function FeedListScreen({ navigation, route }) {
         {showReadingPositionInFeeds && !showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
             onPress={() => handleSetReadingPosition(index)}
+            onMarkAbove={() => handleMarkAboveRead(index)}
             onClear={() => {}}
             isActive={false}
+            positionLabel={t('feedList.setPositionHere')}
+            markAboveLabel={t('feedList.markAboveRead')}
           />
         )}
       </View>
@@ -1149,7 +1130,10 @@ export default function FeedListScreen({ navigation, route }) {
         scrollEventThrottle={16}
         onScrollBeginDrag={autoScroll.onScrollBeginDrag}
         onTouchStart={autoScroll.onTouchStart}
+        onTouchMove={autoScroll.onTouchMove}
         onTouchEnd={autoScroll.onTouchEnd}
+        onScrollEndDrag={autoScroll.onScrollEndDrag}
+        onMomentumScrollEnd={autoScroll.onMomentumScrollEnd}
         onTouchCancel={autoScroll.onTouchCancel}
         onContentSizeChange={(w, h) => { listContentHeightRef.current = h; }}
         onLayout={(e) => { listViewportHeightRef.current = e.nativeEvent.layout.height; }}

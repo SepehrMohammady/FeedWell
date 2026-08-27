@@ -58,6 +58,8 @@ export default {
   "region.tr": "Turki",
   "region.th": "Thai",
   "region.pl": "Polandia",
+  "region.vi": "Vietnam",
+  "region.ko": "Korea",
 
   // --- Relative date / time ---
   "date.justNow": "Baru saja",

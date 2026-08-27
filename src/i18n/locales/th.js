@@ -45,6 +45,8 @@ export default {
   "region.tr": "ตุรกี",
   "region.th": "ไทย",
   "region.pl": "โปแลนด์",
+  "region.vi": "เวียดนาม",
+  "region.ko": "เกาหลี",
   "region.pt": "โปรตุเกส",
   "region.id": "อินโดนีเซีย",
   "region.ja": "ญี่ปุ่น",

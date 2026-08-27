@@ -58,6 +58,8 @@ export default {
   "region.tr": "Turc",
   "region.th": "Thaï",
   "region.pl": "Polonais",
+  "region.vi": "Vietnamien",
+  "region.ko": "Coréen",
 
   // --- Relative date / time ---
   "date.justNow": "À l'instant",
