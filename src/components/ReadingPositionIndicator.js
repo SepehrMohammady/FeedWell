@@ -34,9 +34,12 @@ export default function ReadingPositionIndicator({ onPress, onClear, onMarkAbove
       justifyContent: 'center',
       alignItems: 'center',
     },
-    // Slightly tighter gap so the pair reads as one control cluster.
+    // The two icons are separate actions, so they need real separation: at 6px
+    // apart their 8px hitSlop regions overlapped and a tap in between landed on
+    // whichever won the responder race. 10px each side leaves a 20px gap, so
+    // the touch targets stay clear of each other.
     bulletPaired: {
-      marginHorizontal: 3,
+      marginHorizontal: 10,
     },
   });
 
