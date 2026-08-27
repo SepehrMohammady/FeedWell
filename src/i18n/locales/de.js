@@ -69,9 +69,11 @@ export default {
   "whatsNew.title": "Neuigkeiten",
   "whatsNew.version": "Version {version}",
   "whatsNew.languagesTitle": "Neue App-Sprachen",
-  "whatsNew.languagesBody": "FeedWell spricht jetzt Arabisch, Chinesisch, Farsi, Französisch, Deutsch, Hindi, Indonesisch, Italienisch, Japanisch, Polnisch, Portugiesisch, Russisch, Spanisch, Thailändisch und Türkisch — zusätzlich zu Englisch. Die App wählt automatisch die Sprache Ihres Geräts.",
+  "whatsNew.languagesBody": "Es wurden neue App-Sprachen hinzugefügt, jeweils mit handverlesenen lokalen Feeds. FeedWell übernimmt automatisch Ihre Gerätesprache.",
   "whatsNew.feedsTitle": "Lokale Feeds",
   "whatsNew.feedsBody": "Die beliebten Kategorien bieten jetzt kuratierte lokale Feeds für jede Sprache. Wechseln Sie die Feed-Sprache direkt auf dem Bildschirm „Feed hinzufügen“.",
+  "whatsNew.otherTitle": "Mehr in diesem Update",
+  "whatsNew.otherBody": "• Feeds über das Augensymbol ausblenden, ohne sie zu entfernen\n• Alle Artikel oberhalb eines Artikels als gelesen markieren\n• Feed durch Einfügen einer Webadresse hinzufügen\n• AMOLED-Schwarz",
   "whatsNew.changeHint": "Sie können die App-Sprache jederzeit in den Einstellungen ändern.",
   "whatsNew.openLanguageSettings": "Spracheinstellungen öffnen",
 
@@ -116,6 +118,8 @@ export default {
   "feedList.markAllUnreadTitle": "Alle als ungelesen markieren",
   "feedList.markAllUnreadConfirm": "Alle {count} gelesenen Artikel als ungelesen markieren?",
   "feedList.readingPositionTitle": "Leseposition",
+  "feedList.setPositionHere": "Leseposition hier setzen",
+  "feedList.markAboveRead": "Alles darüber als gelesen markieren",
   "feedList.readingPositionMarkedBelow": "Ihre Leseposition ist in der Liste unten markiert.",
   "feedList.readingPositionNotVisible": "Der Artikel mit der Leseposition ist in der aktuellen Filter-/Sortieransicht nicht sichtbar.",
   "feedList.clearReadingPositionTitle": "Leseposition entfernen",
@@ -466,6 +470,8 @@ export default {
   "addFeed.helpAdsRemoved": "Werbung und Tracking werden automatisch vollständig entfernt",
   "addFeed.addingFeed": "Feed wird hinzugefügt...",
   "addFeed.lookingForFeed": "Feed wird gesucht …",
+  "addFeed.hideFeed": "Diesen Feed ausblenden",
+  "addFeed.showFeed": "Diesen Feed einblenden",
   "addFeed.fetchingArticles": "Artikel werden abgerufen und verarbeitet",
 
   // --- Ambient sound levels (shared) ---

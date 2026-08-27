@@ -70,9 +70,11 @@ export default {
   "whatsNew.title": "Novidades",
   "whatsNew.version": "Versão {version}",
   "whatsNew.languagesTitle": "Novos idiomas da aplicação",
-  "whatsNew.languagesBody": "O FeedWell agora fala árabe, chinês, persa, francês, alemão, hindi, indonésio, italiano, japonês, polaco, português, russo, espanhol, tailandês e turco — além do inglês. A aplicação escolhe automaticamente o idioma do seu dispositivo.",
+  "whatsNew.languagesBody": "Foram adicionados novos idiomas à aplicação, cada um com feeds locais escolhidos a dedo. O FeedWell escolhe automaticamente o idioma do seu dispositivo.",
   "whatsNew.feedsTitle": "Feeds locais",
   "whatsNew.feedsBody": "As Categorias Populares agora oferecem feeds locais selecionados para cada idioma. Mude o idioma dos feeds diretamente no ecrã Adicionar Feed.",
+  "whatsNew.otherTitle": "Mais nesta atualização",
+  "whatsNew.otherBody": "• Oculte um feed com o ícone de olho, sem cancelar a subscrição\n• Marque como lidos todos os artigos acima de um artigo\n• Adicione um feed colando o endereço de um site\n• Tema Preto AMOLED",
   "whatsNew.changeHint": "Pode alterar o idioma da aplicação a qualquer momento nas Definições.",
   "whatsNew.openLanguageSettings": "Abrir Definições de Idioma",
 
@@ -117,6 +119,8 @@ export default {
   "feedList.markAllUnreadTitle": "Marcar Tudo como Não Lido",
   "feedList.markAllUnreadConfirm": "Marcar todos os {count} artigos lidos como não lidos?",
   "feedList.readingPositionTitle": "Posição de Leitura",
+  "feedList.setPositionHere": "Definir aqui a posição de leitura",
+  "feedList.markAboveRead": "Marcar tudo acima como lido",
   "feedList.readingPositionMarkedBelow": "Pode ver a sua posição de leitura marcada na lista abaixo.",
   "feedList.readingPositionNotVisible": "O artigo da posição de leitura não está visível no filtro/ordenação atual.",
   "feedList.clearReadingPositionTitle": "Limpar Posição de Leitura",
@@ -467,6 +471,8 @@ export default {
   "addFeed.helpAdsRemoved": "Todos os anúncios e rastreamentos são removidos automaticamente",
   "addFeed.addingFeed": "A adicionar o feed...",
   "addFeed.lookingForFeed": "A procurar um feed…",
+  "addFeed.hideFeed": "Ocultar este feed",
+  "addFeed.showFeed": "Mostrar este feed",
   "addFeed.fetchingArticles": "A obter e a analisar artigos",
 
   // --- Ambient sound levels (shared) ---

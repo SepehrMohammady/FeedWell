@@ -332,8 +332,8 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const handleOpenWebsite = async () => {
-    const url = 'https://semo-lab.com/feedwell/';
+  const handleOpenWebsite = async (target) => {
+    const url = typeof target === 'string' ? target : 'https://semo-lab.com/feedwell/';
     try {
       if (Platform.OS === 'web') {
         window.open(url, '_blank');
@@ -1292,7 +1292,9 @@ export default function SettingsScreen({ navigation }) {
           <SettingItem
             title={t('settings.privacy')}
             description={t('settings.privacyDesc')}
+            onPress={() => handleOpenWebsite('https://semo-lab.com/feedwell/privacy-policy/')}
             isLast={true}
+            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
           />
         </View>
 

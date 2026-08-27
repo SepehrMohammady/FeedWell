@@ -29,7 +29,7 @@ import { formatRelativeDate } from '../utils/formatDate';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 
 export default function FeedListScreen({ navigation, route }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { t, isRTL, formatNumber, language } = useTranslation();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds, autoScrollEnabled, autoScrollDelay, autoScrollSpeed } = useAppSettings();
@@ -294,12 +294,54 @@ export default function FeedListScreen({ navigation, route }) {
     }
   };
 
+  // Mark every article from the top of the list down to this point as read
+  // (Feedly's "mark as read above"). Uses the list as currently displayed, so
+  // "above" always means what the user actually sees above the line.
+  const handleMarkAboveRead = async (articleIndex) => {
+    const ids = filteredAndSortedArticles
+      .slice(0, articleIndex + 1)
+      .filter(a => !a.isRead)
+      .map(a => a.id);
+    if (ids.length === 0) {
+      setAlertConfig({
+        visible: true,
+        title: t('feedList.infoTitle'),
+        message: t('feedList.noUnreadToMark'),
+        icon: 'information-circle-outline',
+        buttons: [{ text: t('common.ok') }],
+      });
+      return;
+    }
+    const count = await markArticlesRead(ids);
+    setAlertConfig({
+      visible: true,
+      title: t('common.success'),
+      message: t('feedList.markedReadSuccess', { count: formatNumber(count) }),
+      icon: 'checkmark-circle-outline',
+      buttons: [{ text: t('common.ok') }],
+    });
+  };
+
+  // Tapping the line between two articles offers both boundary actions.
   const handleSetReadingPosition = (articleIndex) => {
     const article = filteredAndSortedArticles[articleIndex];
-    if (article) {
-      setReadingPosition(`after_article_${article.id}`, article.id);
-      // No alert needed - the visual line indicator is sufficient
-    }
+    if (!article) return;
+    setAlertConfig({
+      visible: true,
+      title: t('feedList.readingPositionTitle'),
+      icon: 'bookmark-outline',
+      buttons: [
+        {
+          text: t('feedList.setPositionHere'),
+          onPress: () => setReadingPosition(`after_article_${article.id}`, article.id),
+        },
+        {
+          text: t('feedList.markAboveRead'),
+          onPress: () => handleMarkAboveRead(articleIndex),
+        },
+        { text: t('common.cancel'), style: 'cancel' },
+      ],
+    });
   };
 
   const handleGoToReadingPosition = () => {
@@ -523,7 +565,13 @@ export default function FeedListScreen({ navigation, route }) {
     // Age filter first; the read-status filter then narrows THAT list.
     // (Before v1.13.0 every branch below overwrote the age-filtered list from
     // `articles`, so the Article Age Filter never applied to the visible list.)
-    const ageFiltered = filterByAge(articles);
+    // Hidden feeds (eye toggle on the Add Feed screen) stay subscribed but
+    // their articles are kept out of this list.
+    const hiddenFeedUrls = new Set(feeds.filter(f => f.isHidden).map(f => f.url));
+    const visible = hiddenFeedUrls.size > 0
+      ? articles.filter(a => !hiddenFeedUrls.has(a.feedUrl))
+      : articles;
+    const ageFiltered = filterByAge(visible);
 
     // Apply read status filter
     let filtered;

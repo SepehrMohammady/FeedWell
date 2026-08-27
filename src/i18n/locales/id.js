@@ -69,9 +69,11 @@ export default {
   "whatsNew.title": "Apa yang Baru",
   "whatsNew.version": "Versi {version}",
   "whatsNew.languagesTitle": "Bahasa aplikasi baru",
-  "whatsNew.languagesBody": "FeedWell kini tersedia dalam bahasa Arab, Mandarin, Farsi, Prancis, Jerman, Hindi, Indonesia, Italia, Jepang, Polandia, Portugis, Rusia, Spanyol, Thai, dan Turki — selain bahasa Inggris. Aplikasi memilih bahasa perangkat Anda secara otomatis.",
+  "whatsNew.languagesBody": "Bahasa baru telah ditambahkan ke aplikasi, masing-masing dengan feed lokal pilihan. FeedWell memilih bahasa perangkat Anda secara otomatis.",
   "whatsNew.feedsTitle": "Feed lokal",
   "whatsNew.feedsBody": "Kategori Populer kini menawarkan feed lokal pilihan untuk setiap bahasa. Ganti bahasa feed langsung dari layar Tambah Feed.",
+  "whatsNew.otherTitle": "Lainnya di pembaruan ini",
+  "whatsNew.otherBody": "• Sembunyikan feed lewat ikon mata, tanpa berhenti berlangganan\n• Tandai semua artikel di atas sebuah artikel sebagai dibaca\n• Tambahkan feed dengan menempelkan alamat situs\n• Tema Hitam AMOLED",
   "whatsNew.changeHint": "Anda dapat mengubah bahasa aplikasi kapan saja di Pengaturan.",
   "whatsNew.openLanguageSettings": "Buka Pengaturan Bahasa",
 
@@ -116,6 +118,8 @@ export default {
   "feedList.markAllUnreadTitle": "Tandai Semua Belum Dibaca",
   "feedList.markAllUnreadConfirm": "Tandai semua {count} artikel yang sudah dibaca sebagai belum dibaca?",
   "feedList.readingPositionTitle": "Posisi Membaca",
+  "feedList.setPositionHere": "Tetapkan posisi baca di sini",
+  "feedList.markAboveRead": "Tandai semua di atas sebagai dibaca",
   "feedList.readingPositionMarkedBelow": "Anda dapat melihat posisi membaca Anda ditandai di daftar di bawah ini.",
   "feedList.readingPositionNotVisible": "Artikel posisi membaca tidak terlihat dalam tampilan filter/urutan saat ini.",
   "feedList.clearReadingPositionTitle": "Hapus Posisi Membaca",
@@ -466,6 +470,8 @@ export default {
   "addFeed.helpAdsRemoved": "Semua iklan dan pelacakan dihapus secara otomatis",
   "addFeed.addingFeed": "Menambahkan feed...",
   "addFeed.lookingForFeed": "Mencari feed…",
+  "addFeed.hideFeed": "Sembunyikan feed ini",
+  "addFeed.showFeed": "Tampilkan feed ini",
   "addFeed.fetchingArticles": "Mengambil dan mengurai artikel",
 
   // --- Ambient sound levels (shared) ---

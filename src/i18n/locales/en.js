@@ -71,9 +71,11 @@ export default {
   'whatsNew.title': "What's New",
   'whatsNew.version': 'Version {version}',
   'whatsNew.languagesTitle': 'New app languages',
-  'whatsNew.languagesBody': 'FeedWell now speaks Arabic, Chinese, Farsi, French, German, Hindi, Indonesian, Italian, Japanese, Polish, Portuguese, Russian, Spanish, Thai and Turkish — in addition to English. The app picks your device language automatically.',
+  'whatsNew.languagesBody': 'New app languages have been added, each with curated local feeds. FeedWell picks your device language automatically.',
   'whatsNew.feedsTitle': 'Local feeds',
   'whatsNew.feedsBody': 'Popular Categories now offer curated local feeds for each language. Switch the feed language right from the Add Feed screen.',
+  'whatsNew.otherTitle': 'More in this update',
+  'whatsNew.otherBody': '• Hide a feed with the eye icon, without unsubscribing\n• Mark everything above an article as read\n• Add a feed by pasting a website address\n• AMOLED black theme',
   'whatsNew.changeHint': 'You can change the app language anytime in Settings.',
   'whatsNew.openLanguageSettings': 'Open Language Settings',
 
@@ -118,6 +120,8 @@ export default {
   'feedList.markAllUnreadTitle': 'Mark All Unread',
   'feedList.markAllUnreadConfirm': 'Mark all {count} read articles as unread?',
   'feedList.readingPositionTitle': 'Reading Position',
+  'feedList.setPositionHere': 'Set reading position here',
+  'feedList.markAboveRead': 'Mark all above as read',
   'feedList.readingPositionMarkedBelow': 'You can see your reading position marked in the list below.',
   'feedList.readingPositionNotVisible': 'The reading position article is not visible in the current filter/sort view.',
   'feedList.clearReadingPositionTitle': 'Clear Reading Position',
@@ -468,6 +472,8 @@ export default {
   'addFeed.helpAdsRemoved': 'All ads and tracking are automatically removed',
   'addFeed.addingFeed': 'Adding feed...',
   'addFeed.lookingForFeed': 'Looking for a feed…',
+  'addFeed.hideFeed': 'Hide this feed',
+  'addFeed.showFeed': 'Show this feed',
   'addFeed.fetchingArticles': 'Fetching and parsing articles',
 
   // --- Ambient sound levels (shared) ---

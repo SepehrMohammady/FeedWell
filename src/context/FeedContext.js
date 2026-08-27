@@ -131,6 +131,18 @@ function feedReducer(state, action) {
           readAt: readTimestamp
         }))
       };
+    case 'MARK_ARTICLES_READ': {
+      const ids = new Set(action.payload);
+      const ts = new Date().toISOString();
+      return {
+        ...state,
+        articles: state.articles.map(article =>
+          ids.has(article.id) && !article.isRead
+            ? { ...article, isRead: true, readAt: ts }
+            : article
+        )
+      };
+    }
     case 'MARK_ALL_UNREAD':
       return {
         ...state,
@@ -151,6 +163,15 @@ function feedReducer(state, action) {
         feeds: state.feeds.map(feed =>
           feed.id === action.payload
             ? { ...feed, isPriority: !feed.isPriority }
+            : feed
+        )
+      };
+    case 'TOGGLE_FEED_HIDDEN':
+      return {
+        ...state,
+        feeds: state.feeds.map(feed =>
+          feed.id === action.payload
+            ? { ...feed, isHidden: !feed.isHidden }
             : feed
         )
       };
@@ -677,6 +698,16 @@ export function FeedProvider({ children }) {
     await saveFeeds(updatedFeeds);
   };
 
+  // Hidden feeds keep their subscription and cached articles but are filtered
+  // out of the Feeds list, so a source can be muted without unsubscribing.
+  const toggleFeedHidden = async (feedId) => {
+    dispatch({ type: 'TOGGLE_FEED_HIDDEN', payload: feedId });
+    const updatedFeeds = state.feeds.map(feed =>
+      feed.id === feedId ? { ...feed, isHidden: !feed.isHidden } : feed
+    );
+    await saveFeeds(updatedFeeds);
+  };
+
   const clearAllData = async () => {
     console.log('FeedContext: clearAllData called');
     console.log('Current state before clearing:', { feeds: state.feeds.length, articles: state.articles.length });
@@ -860,6 +891,29 @@ export function FeedProvider({ children }) {
       console.error('Error updating article unread status in storage:', error);
     }
   }, []); // Empty deps - uses stateRef.current for latest state
+
+  // Mark a specific set of articles as read in one pass — used by
+  // "mark everything above this point as read" in the feed list.
+  const markArticlesRead = useCallback(async (ids) => {
+    const idSet = new Set(ids || []);
+    if (idSet.size === 0) return 0;
+    const currentArticles = stateRef.current.articles;
+    const affected = currentArticles.filter(a => idSet.has(a.id) && !a.isRead).length;
+    if (affected === 0) return 0;
+    dispatch({ type: 'MARK_ARTICLES_READ', payload: Array.from(idSet) });
+    const ts = new Date().toISOString();
+    const updatedArticles = currentArticles.map(article =>
+      idSet.has(article.id) && !article.isRead
+        ? { ...article, isRead: true, readAt: ts }
+        : article
+    );
+    try {
+      await saveArticles(updatedArticles);
+    } catch (e) {
+      console.warn('Failed to persist bulk read state:', e);
+    }
+    return affected;
+  }, []);
 
   const markAllRead = useCallback(async () => {
     // Use stateRef to get the LATEST state (avoids stale closure)
@@ -1059,6 +1113,8 @@ export function FeedProvider({ children }) {
     getReadCount,
     autoRefreshFeeds,
     toggleFeedPriority,
+    toggleFeedHidden,
+    markArticlesRead,
     setReadingPosition,
     clearReadingPosition,
     loadReadingPosition,

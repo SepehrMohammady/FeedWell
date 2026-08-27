@@ -28,7 +28,7 @@ export default function AddFeedScreen({ navigation }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [discovering, setDiscovering] = useState(false);
-  const { addFeed, addArticles, feeds, removeFeed, toggleFeedPriority } = useFeed();
+  const { addFeed, addArticles, feeds, removeFeed, toggleFeedPriority, toggleFeedHidden } = useFeed();
   const { theme } = useTheme();
   const { maxArticleAge, feedRegion, feedRegionUserSet, updateFeedRegion } = useAppSettings();
   const { t, language, isRTL, formatNumber } = useTranslation();
@@ -641,7 +641,7 @@ export default function AddFeedScreen({ navigation }) {
                   style={[styles.feedItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
                 >
                   <View style={styles.feedContent}>
-                    <Text style={[styles.feedTitle, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                    <Text style={[styles.feedTitle, { textAlign: isRTL ? 'right' : 'left' }, feed.isHidden && { opacity: 0.5 }]} numberOfLines={1}>
                       {feed.title || feed.url || t('addFeed.unknownFeed')}
                     </Text>
                     <Text style={[styles.feedUrl, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
@@ -651,6 +651,17 @@ export default function AddFeedScreen({ navigation }) {
                       {t('addFeed.addedDate', { date: formatDate(feed.addedAt) })}
                     </Text>
                   </View>
+                  <TouchableOpacity
+                    onPress={() => toggleFeedHidden(feed.id)}
+                    style={[styles.priorityButton, isRTL && { marginLeft: 0, marginRight: 4 }]}
+                    accessibilityLabel={feed.isHidden ? t('addFeed.showFeed') : t('addFeed.hideFeed')}
+                  >
+                    <Ionicons
+                      name={feed.isHidden ? 'eye-off-outline' : 'eye-outline'}
+                      size={20}
+                      color={feed.isHidden ? theme.colors.textTertiary : theme.colors.textSecondary}
+                    />
+                  </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => toggleFeedPriority(feed.id)}
                     style={[styles.priorityButton, isRTL && { marginLeft: 0, marginRight: 4 }]}

@@ -69,9 +69,11 @@ export default {
   "whatsNew.title": "Nouveautés",
   "whatsNew.version": "Version {version}",
   "whatsNew.languagesTitle": "Nouvelles langues de l'application",
-  "whatsNew.languagesBody": "FeedWell parle désormais arabe, chinois, persan, français, allemand, hindi, indonésien, italien, japonais, polonais, portugais, russe, espagnol, thaï et turc — en plus de l'anglais. L'application choisit automatiquement la langue de votre appareil.",
+  "whatsNew.languagesBody": "De nouvelles langues ont été ajoutées, chacune avec des flux locaux sélectionnés. FeedWell choisit automatiquement la langue de votre appareil.",
   "whatsNew.feedsTitle": "Flux locaux",
   "whatsNew.feedsBody": "Les catégories populaires proposent désormais une sélection de flux locaux pour chaque langue. Changez la langue des flux directement depuis l'écran d'ajout de flux.",
+  "whatsNew.otherTitle": "Autres nouveautés",
+  "whatsNew.otherBody": "• Masquez un flux avec l’icône en forme d’œil, sans vous désabonner\n• Marquez comme lus tous les articles situés au-dessus\n• Ajoutez un flux en collant l’adresse d’un site\n• Thème Noir AMOLED",
   "whatsNew.changeHint": "Vous pouvez changer la langue de l'application à tout moment dans les réglages.",
   "whatsNew.openLanguageSettings": "Ouvrir les réglages de langue",
 
@@ -116,6 +118,8 @@ export default {
   "feedList.markAllUnreadTitle": "Tout marquer comme non lu",
   "feedList.markAllUnreadConfirm": "Marquer les {count} articles lus comme non lus ?",
   "feedList.readingPositionTitle": "Position de lecture",
+  "feedList.setPositionHere": "Définir la position de lecture ici",
+  "feedList.markAboveRead": "Marquer tout ce qui précède comme lu",
   "feedList.readingPositionMarkedBelow": "Votre position de lecture est indiquée dans la liste ci-dessous.",
   "feedList.readingPositionNotVisible": "L'article marquant la position de lecture n'est pas visible avec le filtre ou le tri actuel.",
   "feedList.clearReadingPositionTitle": "Effacer la position de lecture",
@@ -466,6 +470,8 @@ export default {
   "addFeed.helpAdsRemoved": "Toutes les publicités et le suivi sont automatiquement supprimés",
   "addFeed.addingFeed": "Ajout du flux...",
   "addFeed.lookingForFeed": "Recherche d’un flux…",
+  "addFeed.hideFeed": "Masquer ce flux",
+  "addFeed.showFeed": "Afficher ce flux",
   "addFeed.fetchingArticles": "Récupération et analyse des articles",
 
   // --- Ambient sound levels (shared) ---

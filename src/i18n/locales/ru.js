@@ -69,9 +69,11 @@ export default {
   "whatsNew.title": "Что нового",
   "whatsNew.version": "Версия {version}",
   "whatsNew.languagesTitle": "Новые языки приложения",
-  "whatsNew.languagesBody": "FeedWell теперь говорит на арабском, китайском, фарси, французском, немецком, хинди, индонезийском, итальянском, японском, польском, португальском, русском, испанском, тайском и турецком — в дополнение к английскому. Приложение автоматически выбирает язык вашего устройства.",
+  "whatsNew.languagesBody": "В приложение добавлены новые языки, к каждому — подборка местных лент. FeedWell автоматически выбирает язык вашего устройства.",
   "whatsNew.feedsTitle": "Локальные ленты",
   "whatsNew.feedsBody": "В «Популярных категориях» теперь есть подобранные локальные ленты для каждого языка. Переключайте язык лент прямо на экране добавления ленты.",
+  "whatsNew.otherTitle": "Что ещё нового",
+  "whatsNew.otherBody": "• Скрывайте ленту значком глаза, не отписываясь от неё\n• Отмечайте все статьи выше выбранной как прочитанные\n• Добавляйте ленту, вставив адрес сайта\n• Тема «Чёрный AMOLED»",
   "whatsNew.changeHint": "Вы можете изменить язык приложения в любой момент в настройках.",
   "whatsNew.openLanguageSettings": "Открыть настройки языка",
 
@@ -116,6 +118,8 @@ export default {
   "feedList.markAllUnreadTitle": "Отметить всё как непрочитанное",
   "feedList.markAllUnreadConfirm": "Отметить все прочитанные статьи ({count}) как непрочитанные?",
   "feedList.readingPositionTitle": "Позиция чтения",
+  "feedList.setPositionHere": "Отметить позицию чтения здесь",
+  "feedList.markAboveRead": "Отметить всё выше прочитанным",
   "feedList.readingPositionMarkedBelow": "Ваша позиция чтения отмечена в списке ниже.",
   "feedList.readingPositionNotVisible": "Статья с позицией чтения не видна при текущем фильтре или сортировке.",
   "feedList.clearReadingPositionTitle": "Сбросить позицию чтения",
@@ -466,6 +470,8 @@ export default {
   "addFeed.helpAdsRemoved": "Вся реклама и трекеры удаляются автоматически",
   "addFeed.addingFeed": "Добавление ленты...",
   "addFeed.lookingForFeed": "Поиск ленты…",
+  "addFeed.hideFeed": "Скрыть эту ленту",
+  "addFeed.showFeed": "Показать эту ленту",
   "addFeed.fetchingArticles": "Загрузка и разбор статей",
 
   // --- Ambient sound levels (shared) ---

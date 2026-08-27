@@ -69,9 +69,11 @@ export default {
   "whatsNew.title": "新機能",
   "whatsNew.version": "バージョン {version}",
   "whatsNew.languagesTitle": "新しいアプリ言語",
-  "whatsNew.languagesBody": "FeedWell は英語に加えて、アラビア語、中国語、ペルシア語、フランス語、ドイツ語、ヒンディー語、インドネシア語、イタリア語、日本語、ポーランド語、ポルトガル語、ロシア語、スペイン語、タイ語、トルコ語に対応しました。アプリは端末の言語を自動的に選択します。",
+  "whatsNew.languagesBody": "アプリに新しい言語が追加されました。それぞれに厳選した現地フィードが付いています。FeedWellは端末の言語を自動で選びます。",
   "whatsNew.feedsTitle": "ローカルフィード",
   "whatsNew.feedsBody": "「人気のカテゴリー」で各言語向けに厳選されたローカルフィードを提供するようになりました。フィード追加画面から直接フィードの言語を切り替えられます。",
+  "whatsNew.otherTitle": "このアップデートのその他の新機能",
+  "whatsNew.otherBody": "• 目のアイコンで、購読を解除せずにフィードを非表示にできます\n• ある記事より上の記事をまとめて既読にできます\n• ウェブサイトのアドレスを貼り付けてフィードを追加できます\n• AMOLEDブラックテーマ",
   "whatsNew.changeHint": "アプリの言語はいつでも設定から変更できます。",
   "whatsNew.openLanguageSettings": "言語設定を開く",
 
@@ -116,6 +118,8 @@ export default {
   "feedList.markAllUnreadTitle": "すべて未読にする",
   "feedList.markAllUnreadConfirm": "既読記事{count}件をすべて未読にしますか？",
   "feedList.readingPositionTitle": "読書位置",
+  "feedList.setPositionHere": "ここに読書位置を設定",
+  "feedList.markAboveRead": "これより上をすべて既読にする",
   "feedList.readingPositionMarkedBelow": "下のリストに読書位置が表示されています。",
   "feedList.readingPositionNotVisible": "読書位置の記事は、現在のフィルター/並び替え表示では表示されていません。",
   "feedList.clearReadingPositionTitle": "読書位置を消去",
@@ -466,6 +470,8 @@ export default {
   "addFeed.helpAdsRemoved": "広告とトラッキングはすべて自動的に除去されます",
   "addFeed.addingFeed": "フィードを追加中...",
   "addFeed.lookingForFeed": "フィードを探しています…",
+  "addFeed.hideFeed": "このフィードを非表示",
+  "addFeed.showFeed": "このフィードを表示",
   "addFeed.fetchingArticles": "記事を取得・解析しています",
 
   // --- Ambient sound levels (shared) ---

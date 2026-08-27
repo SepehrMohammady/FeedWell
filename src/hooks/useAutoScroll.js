@@ -33,6 +33,9 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
   // values from the latest render.
   const stateRef = useRef({});
   stateRef.current = { enabled, delaySeconds, speedPercent, getOffset, getMaxOffset, scrollTo, isBlocked };
+  // Forward reference to arm(), which is defined below — lets a blocked tick
+  // reschedule itself without a circular dependency.
+  const armRef = useRef(null);
 
   const clearIdleTimer = useCallback(() => {
     if (idleTimerRef.current) {
@@ -51,13 +54,25 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
   const startTick = useCallback(() => {
     stopTick();
     const s = stateRef.current;
-    if (s.isBlocked && s.isBlocked()) return;
+    if (!s.enabled) return;
+    if (s.isBlocked && s.isBlocked()) {
+      // Blocked right now (article still loading, TTS speaking, a bookmark
+      // restore pending...). Re-arm and check again after the delay instead of
+      // giving up: before this, a tick that fired while blocked killed
+      // auto-scroll until the next touch, and since every touch re-armed into
+      // the same blocked state it could never resume on its own.
+      if (armRef.current) armRef.current();
+      return;
+    }
     const pxPerSec = AUTO_SCROLL_BASE_PX_PER_SEC * (normalizeAutoScrollSpeed(s.speedPercent) / 100);
     offsetFloatRef.current = Math.max(0, s.getOffset ? s.getOffset() : 0);
     tickRef.current = setInterval(() => {
       const cur = stateRef.current;
       if (cur.isBlocked && cur.isBlocked()) {
+        // Became blocked mid-scroll (e.g. Read Aloud started) — stop, but
+        // re-arm so scrolling resumes once the blocker clears.
         stopTick();
+        if (armRef.current) armRef.current();
         return;
       }
       const maxOffset = cur.getMaxOffset ? cur.getMaxOffset() : 0;
@@ -84,6 +99,7 @@ export function useAutoScroll({ enabled, delaySeconds, speedPercent, getOffset, 
     if (!stateRef.current.enabled) return;
     idleTimerRef.current = setTimeout(startTick, (stateRef.current.delaySeconds || 5) * 1000);
   }, [clearIdleTimer, startTick]);
+  armRef.current = arm;
 
   // Clear all timers on unmount.
   useEffect(() => pause, [pause]);

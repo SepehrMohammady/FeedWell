@@ -70,9 +70,11 @@ export default {
   "whatsNew.title": "ما الجديد",
   "whatsNew.version": "الإصدار {version}",
   "whatsNew.languagesTitle": "لغات جديدة للتطبيق",
-  "whatsNew.languagesBody": "أصبح FeedWell يتحدث الآن العربية والصينية والفارسية والفرنسية والألمانية والهندية والإندونيسية والإيطالية واليابانية والبولندية والبرتغالية والروسية والإسبانية والتايلاندية والتركية — بالإضافة إلى الإنجليزية. يختار التطبيق لغة جهازك تلقائيًا.",
+  "whatsNew.languagesBody": "أُضيفت لغات جديدة للتطبيق، ولكل منها خلاصات محلية منتقاة. يختار FeedWell لغة جهازك تلقائيًا.",
   "whatsNew.feedsTitle": "خلاصات محلية",
   "whatsNew.feedsBody": "تقدم الفئات الشائعة الآن خلاصات محلية منتقاة لكل لغة. بدّل لغة الخلاصات مباشرة من شاشة إضافة خلاصة.",
+  "whatsNew.otherTitle": "المزيد في هذا التحديث",
+  "whatsNew.otherBody": "• إخفاء خلاصة بأيقونة العين دون إلغاء الاشتراك\n• تعليم كل المقالات فوق مقال ما كمقروءة\n• إضافة خلاصة بلصق عنوان الموقع\n• سمة أسود AMOLED",
   "whatsNew.changeHint": "يمكنك تغيير لغة التطبيق في أي وقت من الإعدادات.",
   "whatsNew.openLanguageSettings": "فتح إعدادات اللغة",
 
@@ -117,6 +119,8 @@ export default {
   "feedList.markAllUnreadTitle": "تعليم الكل كغير مقروء",
   "feedList.markAllUnreadConfirm": "هل تريد تعليم جميع المقالات المقروءة ({count}) كغير مقروءة؟",
   "feedList.readingPositionTitle": "موضع القراءة",
+  "feedList.setPositionHere": "تعيين موضع القراءة هنا",
+  "feedList.markAboveRead": "تعليم كل ما فوقه كمقروء",
   "feedList.readingPositionMarkedBelow": "يمكنك رؤية موضع قراءتك معلّمًا في القائمة أدناه.",
   "feedList.readingPositionNotVisible": "مقالة موضع القراءة غير ظاهرة في عرض التصفية/الترتيب الحالي.",
   "feedList.clearReadingPositionTitle": "مسح موضع القراءة",
@@ -467,6 +471,8 @@ export default {
   "addFeed.helpAdsRemoved": "تتم إزالة جميع الإعلانات والتتبع تلقائيًا",
   "addFeed.addingFeed": "جارٍ إضافة الخلاصة...",
   "addFeed.lookingForFeed": "جارٍ البحث عن خلاصة…",
+  "addFeed.hideFeed": "إخفاء هذه الخلاصة",
+  "addFeed.showFeed": "إظهار هذه الخلاصة",
   "addFeed.fetchingArticles": "جارٍ جلب المقالات وتحليلها",
 
   // --- Ambient sound levels (shared) ---

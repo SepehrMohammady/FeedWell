@@ -119,6 +119,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
   const contentHeightRef = useRef(0);
   const viewportHeightRef = useRef(0);
   const hasAutoScrolled = useRef(false);
+  // Auto-scroll defers to a pending reading-position restore, but only briefly:
+  // after this moment it stops waiting so auto-scroll can't be blocked forever.
+  const bookmarkBlockUntilRef = useRef(0);
   const userInteractedRef = useRef(false); // user grabbed the scroll — stop auto-restoring
   const bookmarkSettleTimer = useRef(null); // debounce until content height stops growing
   const bookmarkFlashAnim = useRef(new Animated.Value(0)).current;
@@ -428,7 +431,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     scrollTo: (y) => scrollViewRef.current?.scrollTo({ y, animated: false }),
     isBlocked: () =>
       loading || !contentReady || isSpeaking ||
-      (bookmarkScrollPercent != null && !hasAutoScrolled.current && !userInteractedRef.current),
+      (bookmarkScrollPercent != null && !hasAutoScrolled.current && !userInteractedRef.current
+        && Date.now() < bookmarkBlockUntilRef.current),
   });
 
   useFocusEffect(
@@ -638,6 +642,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
     hasAutoScrolled.current = false;
     userInteractedRef.current = false;
     upgradeAttemptedRef.current = false;
+    // Give the restore ~12s to happen; after that auto-scroll stops waiting.
+    bookmarkBlockUntilRef.current = Date.now() + 12000;
     setHighlights(article?.highlights || []);
     setHighlightMode(false);
     if (bookmarkSettleTimer.current) {

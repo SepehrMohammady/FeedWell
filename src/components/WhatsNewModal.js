@@ -48,6 +48,11 @@ export default function WhatsNewModal({ visible, onClose, onOpenLanguageSettings
               title={t('whatsNew.feedsTitle')}
               body={t('whatsNew.feedsBody')}
             />
+            <Feature
+              icon="sparkles"
+              title={t('whatsNew.otherTitle')}
+              body={t('whatsNew.otherBody')}
+            />
             <Text style={[styles.hint, { color: theme.colors.textSecondary, textAlign }]}>
               {t('whatsNew.changeHint')}
             </Text>
