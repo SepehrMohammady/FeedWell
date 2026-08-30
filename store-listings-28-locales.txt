@@ -1,0 +1,812 @@
+﻿===== en-US =====
+
+Name:
+FeedWell - A clean RSS Reader
+
+Short:
+A clean, private RSS reader. Block ads, read offline, and focus on content
+
+Full:
+A clean, private RSS reader that blocks ads, removes trackers, and lets you focus on what matters: the content. Read the web, minus the clutter.
+
+
+Key Features:
+
+Built-in Ad Blocker & Privacy First: Automatically strips ads, tracking scripts, and promotional content from feeds for clean articles. Zero data collection, no accounts, and no analytics; everything stays securely on your device.
+
+Smart Feed Reader: Subscribe to any RSS or Atom feed, or simply paste a website address and FeedWell finds the feed for you. Get one-tap access to popular feeds, automatic updates, and search across all your subscriptions. Hide a feed without unsubscribing, or mark everything above an article as read.
+
+Beautiful, Accessible Reader: Enjoy an in-app article reader with clean typography, reading position bookmarks to save your scroll position, and RTL language support. Pick from eight reading fonts, including high-legibility and dyslexia-friendly options. You can also translate articles or use the Read Aloud (TTS) feature with adjustable speed.
+
+Offline Reading & Save for Later: Bookmark articles to read later, and enjoy locally cached articles so you can read anytime, anywhere, even without an internet connection.
+
+Ambient Sounds: Enhance your reading experience with background audio, including white noise, lo-fi beats, and nature sounds, complete with per-sound volume control.
+
+Multi-Language & Local Feeds: FeedWell speaks multiple languages and follows your device language automatically, each one with hand-picked local feeds across eight categories.
+
+Personalized Experience: Choose between light, dark, and AMOLED black themes, customize your theme accent color, toggle article images, turn on hands-free auto-scrolling, and set up a home screen widget for quick access.
+
+
+===== ar =====
+
+Name:
+FeedWell - قارئ RSS نظيف
+
+Short:
+قارئ RSS نظيف وخاص. احجب الإعلانات، اقرأ دون إنترنت، وركّز على المحتوى
+
+Full:
+قارئ RSS نظيف يحترم خصوصيتك، يحجب الإعلانات ويزيل أدوات التتبّع ليتيح لك التركيز على ما يهم فعلاً: المحتوى. اقرأ الويب بلا فوضى.
+
+
+المزايا الرئيسية:
+
+حاجب إعلانات مدمج والخصوصية أولاً: يزيل تلقائياً الإعلانات وبرامج التتبّع والمحتوى الترويجي من الخلاصات لتحصل على مقالات نظيفة. لا جمع للبيانات، ولا حسابات، ولا تحليلات؛ يبقى كل شيء محفوظاً بأمان على جهازك.
+
+قارئ خلاصات ذكي: اشترك في أي خلاصة RSS أو Atom، أو الصق عنوان موقع ويب وسيعثر FeedWell على الخلاصة نيابةً عنك. أضف الخلاصات الشائعة بلمسة واحدة، مع تحديث تلقائي وبحث في كل اشتراكاتك. يمكنك إخفاء خلاصة دون إلغاء الاشتراك، أو تعليم كل ما فوق مقال ما كمقروء.
+
+قارئ جميل وسهل الوصول: استمتع بقارئ مقالات داخل التطبيق بخطوط أنيقة، وعلامات لحفظ موضع القراءة، ودعم اللغات التي تُكتب من اليمين إلى اليسار. اختر من بين ثمانية خطوط للقراءة، منها خطوط عالية الوضوح وأخرى مناسبة لعسر القراءة. كما يمكنك ترجمة المقالات أو الاستماع إليها عبر القراءة الصوتية (TTS) بسرعة قابلة للضبط.
+
+القراءة دون إنترنت والحفظ لاحقاً: احفظ المقالات لقراءتها لاحقاً، واستفد من تخزينها محلياً لتقرأ في أي وقت وأي مكان، حتى بدون اتصال بالإنترنت.
+
+أصوات محيطة: عزّز تجربة قراءتك بصوت خلفي يشمل الضجيج الأبيض وموسيقى lo-fi وأصوات الطبيعة، مع تحكّم بمستوى الصوت لكل صوت على حدة.
+
+لغات متعددة وخلاصات محلية: يتحدث FeedWell لغات متعددة ويتبع لغة جهازك تلقائياً، ولكل لغة خلاصات محلية منتقاة بعناية ضمن ثماني فئات.
+
+تجربة مخصّصة: اختر بين المظهر الفاتح والداكن وأسود AMOLED، وخصّص لون التمييز، وأظهر صور المقالات أو أخفها، وفعّل التمرير التلقائي بلا استخدام اليدين، وأضف أداة إلى الشاشة الرئيسية للوصول السريع.
+
+
+===== zh-CN =====
+
+Name:
+FeedWell - 简洁的 RSS 阅读器
+
+Short:
+简洁、注重隐私的 RSS 阅读器。屏蔽广告，离线阅读。
+
+Full:
+一款简洁、注重隐私的 RSS 阅读器，屏蔽广告、移除跟踪器，让你专注于真正重要的东西：内容本身。畅读网络，不受干扰。
+
+
+主要功能：
+
+内置广告拦截，隐私优先：自动从信息源中清除广告、跟踪脚本和推广内容，只留下干净的文章。不收集数据、无需账号、没有分析工具；所有内容都安全地保存在你的设备上。
+
+智能信息源阅读器：订阅任意 RSS 或 Atom 信息源，或者只需粘贴网站地址，FeedWell 就会自动找到对应的信息源。热门信息源一键添加，自动更新，并可在全部订阅中搜索文章。你可以隐藏某个信息源而不取消订阅，也可以将某篇文章上方的内容全部标为已读。
+
+美观易读的阅读界面：在应用内直接阅读文章，排版清爽，书签可记住你的阅读位置，并支持从右到左书写的语言。提供八种阅读字体，其中包括高可读性字体和对阅读障碍友好的字体。你还可以翻译文章，或使用可调节语速的朗读（TTS）功能收听。
+
+离线阅读与稍后阅读：把文章保存起来稍后再读；内容会存放在设备上，因此随时随地都能阅读，即使没有网络连接。
+
+环境音效：用背景音让阅读更舒适，包括白噪音、Lo-Fi 音乐和自然声音，每种声音都可单独调节音量。
+
+多语言与本地信息源：FeedWell 支持多种语言并会自动跟随设备语言，每种语言都配有覆盖八个分类的精选本地信息源。
+
+个性化体验：可在浅色、深色和 AMOLED 纯黑主题之间切换，自定义主题强调色，显示或隐藏文章配图，开启免手动的自动滚动，并将小组件添加到主屏幕以便快速访问。
+
+
+===== fr-CA =====
+
+Name:
+FeedWell - Lecteur RSS épuré
+
+Short:
+Un lecteur RSS épuré et privé. Bloquez les publicités, lisez hors ligne.
+
+Full:
+Un lecteur RSS épuré et respectueux de votre vie privée, qui bloque les publicités, supprime les traqueurs et vous laisse vous concentrer sur l'essentiel : le contenu. Lisez le Web, sans le superflu.
+
+
+Fonctionnalités principales :
+
+Bloqueur de publicités intégré et confidentialité avant tout : les publicités, les scripts de suivi et les contenus promotionnels sont automatiquement retirés de vos fils pour ne garder que des articles épurés. Aucune collecte de données, aucun compte, aucun outil d'analyse : tout demeure sur votre appareil.
+
+Lecteur de fils intelligent : abonnez-vous à n'importe quel fil RSS ou Atom, ou collez simplement l'adresse d'un site et FeedWell trouve le fil pour vous. Ajoutez les fils populaires d'une seule touche, profitez des mises à jour automatiques et cherchez dans tous vos abonnements. Masquez un fil sans vous désabonner, ou marquez comme lu tout ce qui précède un article.
+
+Un lecteur élégant et accessible : lisez vos articles directement dans l'application, avec une typographie soignée, des signets qui mémorisent votre position de lecture et la prise en charge des langues qui s'écrivent de droite à gauche. Choisissez parmi huit polices de lecture, dont des polices très lisibles et adaptées à la dyslexie. Vous pouvez aussi traduire les articles ou les écouter grâce à la lecture à voix haute (TTS), à vitesse réglable.
+
+Lecture hors ligne et articles enregistrés : mettez des articles de côté pour plus tard. Ils sont conservés sur votre appareil, ce qui vous permet de les lire en tout temps, où que vous soyez, même sans connexion Internet.
+
+Sons d'ambiance : accompagnez votre lecture d'un fond sonore — bruit blanc, musique lo-fi ou sons de la nature — avec un réglage de volume propre à chaque son.
+
+Multilingue et fils locaux : FeedWell parle plusieurs langues et suit automatiquement celle de votre appareil, chacune avec des fils locaux triés sur le volet dans huit catégories.
+
+Une expérience personnalisée : choisissez le thème clair, sombre ou noir AMOLED, modifiez la couleur d'accentuation, affichez ou masquez les images des articles, activez le défilement automatique mains libres et ajoutez un widget à votre écran d'accueil.
+
+
+===== fr-FR =====
+
+Name:
+FeedWell - Lecteur RSS épuré
+
+Short:
+Un lecteur RSS épuré et privé. Bloquez les pubs et lisez hors ligne.
+
+Full:
+Un lecteur RSS épuré et respectueux de votre vie privée, qui bloque les publicités, supprime les traqueurs et vous laisse vous concentrer sur l'essentiel : le contenu. Lisez le Web, sans le superflu.
+
+
+Fonctionnalités principales :
+
+Bloqueur de publicités intégré et confidentialité avant tout : les publicités, les scripts de suivi et les contenus promotionnels sont automatiquement retirés de vos flux pour ne garder que des articles épurés. Aucune collecte de données, aucun compte, aucun outil d'analyse : tout reste sur votre appareil.
+
+Lecteur de flux intelligent : abonnez-vous à n'importe quel flux RSS ou Atom, ou collez simplement l'adresse d'un site et FeedWell trouve le flux pour vous. Ajoutez les flux populaires d'un seul geste, profitez des mises à jour automatiques et cherchez dans tous vos abonnements. Masquez un flux sans vous désabonner, ou marquez comme lu tout ce qui précède un article.
+
+Un lecteur élégant et accessible : lisez vos articles directement dans l'application, avec une typographie soignée, des marque-pages qui mémorisent votre position de lecture et la prise en charge des langues qui s'écrivent de droite à gauche. Choisissez parmi huit polices de lecture, dont des polices très lisibles et adaptées à la dyslexie. Vous pouvez aussi traduire les articles ou les écouter grâce à la lecture à voix haute (TTS), à vitesse réglable.
+
+Lecture hors ligne et articles enregistrés : mettez des articles de côté pour plus tard. Ils sont conservés sur votre appareil, ce qui vous permet de les lire à tout moment, où que vous soyez, même sans connexion Internet.
+
+Sons d'ambiance : accompagnez votre lecture d'un fond sonore — bruit blanc, musique lo-fi ou sons de la nature — avec un réglage de volume propre à chaque son.
+
+Multilingue et flux locaux : FeedWell parle plusieurs langues et suit automatiquement celle de votre appareil, chacune avec des flux locaux sélectionnés à la main dans huit catégories.
+
+Une expérience personnalisée : choisissez le thème clair, sombre ou noir AMOLED, modifiez la couleur d'accentuation, affichez ou masquez les images des articles, activez le défilement automatique mains libres et ajoutez un widget à votre écran d'accueil.
+
+
+===== de-DE =====
+
+Name:
+FeedWell - Klarer RSS-Reader
+
+Short:
+Klarer, privater RSS-Reader. Werbung blockieren, offline lesen.
+
+Full:
+Ein klarer, privater RSS-Reader, der Werbung blockiert, Tracker entfernt und Sie sich auf das Wesentliche konzentrieren lässt: den Inhalt. Lesen Sie das Web, ganz ohne Ballast.
+
+
+Hauptfunktionen:
+
+Integrierter Werbeblocker und Privatsphäre zuerst: Entfernt Werbung, Tracking-Skripte und Werbeinhalte automatisch aus Ihren Feeds, sodass nur saubere Artikel übrig bleiben. Keine Datenerfassung, keine Konten, keine Analysetools – alles bleibt sicher auf Ihrem Gerät.
+
+Intelligenter Feed-Reader: Abonnieren Sie jeden RSS- oder Atom-Feed – oder fügen Sie einfach eine Webadresse ein, und FeedWell findet den passenden Feed für Sie. Beliebte Feeds mit einem Fingertipp, automatische Aktualisierung und Suche über alle Abonnements hinweg. Blenden Sie einen Feed aus, ohne ihn zu kündigen, oder markieren Sie alles oberhalb eines Artikels als gelesen.
+
+Schöner, zugänglicher Lesemodus: Lesen Sie Artikel direkt in der App – mit sauberer Typografie, Lesezeichen für Ihre Leseposition und Unterstützung für Sprachen, die von rechts nach links geschrieben werden. Wählen Sie aus acht Leseschriftarten, darunter besonders gut lesbare und Legasthenie-freundliche Varianten. Artikel lassen sich außerdem übersetzen oder mit einstellbarer Geschwindigkeit vorlesen (TTS).
+
+Offline lesen und für später speichern: Legen Sie Artikel für später beiseite. Sie werden lokal gespeichert, sodass Sie jederzeit und überall lesen können – auch ohne Internetverbindung.
+
+Hintergrundklänge: Begleiten Sie Ihre Lektüre mit Hintergrundaudio – weißes Rauschen, Lo-Fi-Beats und Naturgeräusche, jeweils mit eigener Lautstärkeregelung.
+
+Mehrsprachig mit lokalen Feeds: FeedWell spricht viele Sprachen und übernimmt automatisch Ihre Gerätesprache – jede mit handverlesenen lokalen Feeds in acht Kategorien.
+
+Personalisierte Nutzung: Wählen Sie zwischen hellem, dunklem und AMOLED-schwarzem Design, passen Sie die Akzentfarbe an, blenden Sie Artikelbilder ein oder aus, aktivieren Sie das freihändige Auto-Scrollen und fügen Sie ein Widget zum Startbildschirm hinzu.
+
+
+===== hi-IN =====
+
+Name:
+FeedWell - साफ़ RSS रीडर
+
+Short:
+साफ़ और निजी RSS रीडर। विज्ञापन रोकें, ऑफ़लाइन पढ़ें।
+
+Full:
+एक साफ़ और निजता का ध्यान रखने वाला RSS रीडर, जो विज्ञापन रोकता है, ट्रैकर हटाता है और आपको उसी पर ध्यान देने देता है जो असल में मायने रखता है: सामग्री। वेब पढ़िए, बिना किसी शोर के।
+
+
+मुख्य विशेषताएँ:
+
+बिल्ट-इन विज्ञापन ब्लॉकर और निजता सबसे पहले: फ़ीड से विज्ञापन, ट्रैकिंग स्क्रिप्ट और प्रचार सामग्री अपने आप हट जाती है, जिससे लेख साफ़ दिखते हैं। कोई डेटा संग्रह नहीं, कोई खाता नहीं और कोई एनालिटिक्स नहीं; सब कुछ सुरक्षित रूप से आपके डिवाइस पर रहता है।
+
+स्मार्ट फ़ीड रीडर: किसी भी RSS या Atom फ़ीड को सब्सक्राइब करें, या बस किसी वेबसाइट का पता चिपकाएँ और FeedWell आपके लिए फ़ीड ढूँढ़ लेगा। लोकप्रिय फ़ीड एक टैप में जोड़ें, अपने आप अपडेट पाएँ और अपनी सभी सदस्यताओं में खोजें। किसी फ़ीड को अनसब्सक्राइब किए बिना छिपाएँ, या किसी लेख के ऊपर के सभी लेख पढ़े हुए चिह्नित करें।
+
+सुंदर और सुलभ रीडर: ऐप के भीतर ही लेख पढ़ें — साफ़ टाइपोग्राफ़ी, पढ़ने की जगह सहेजने वाले बुकमार्क और दाएँ-से-बाएँ लिखी जाने वाली भाषाओं के समर्थन के साथ। आठ रीडिंग फ़ॉन्ट में से चुनें, जिनमें अधिक सुपाठ्य और डिस्लेक्सिया-अनुकूल विकल्प भी शामिल हैं। आप लेखों का अनुवाद कर सकते हैं या समायोज्य गति के साथ पढ़कर सुनाने (TTS) की सुविधा इस्तेमाल कर सकते हैं।
+
+ऑफ़लाइन पढ़ना और बाद के लिए सहेजना: लेखों को बाद में पढ़ने के लिए सहेजें; वे डिवाइस पर ही संग्रहित रहते हैं, ताकि आप कभी भी, कहीं भी — इंटरनेट के बिना भी — पढ़ सकें।
+
+परिवेशी ध्वनियाँ: पढ़ने के अनुभव को बेहतर बनाएँ — व्हाइट नॉइज़, लो-फ़ाई बीट्स और प्रकृति की आवाज़ों के साथ, और हर ध्वनि का अलग वॉल्यूम नियंत्रण।
+
+बहुभाषी और स्थानीय फ़ीड: FeedWell कई भाषाएँ बोलता है और अपने आप आपके डिवाइस की भाषा चुन लेता है, और हर भाषा के लिए आठ श्रेणियों में चुनिंदा स्थानीय फ़ीड मौजूद हैं।
+
+निजी पसंद के अनुसार अनुभव: लाइट, डार्क और AMOLED ब्लैक थीम में से चुनें, थीम का एक्सेंट रंग बदलें, लेखों की तस्वीरें दिखाएँ या छिपाएँ, हाथ लगाए बिना ऑटो-स्क्रॉल चालू करें और तेज़ पहुँच के लिए होम स्क्रीन विजेट जोड़ें।
+
+
+===== id =====
+
+Name:
+FeedWell - Pembaca RSS Bersih
+
+Short:
+Pembaca RSS yang bersih & privat. Blokir iklan, baca offline.
+
+Full:
+Pembaca RSS yang bersih dan privat, yang memblokir iklan, menghapus pelacak, dan membuat Anda fokus pada hal yang benar-benar penting: kontennya. Nikmati bacaan dari web, tanpa gangguan.
+
+
+Fitur Utama:
+
+Pemblokir Iklan Bawaan & Privasi Diutamakan: Iklan, skrip pelacak, dan konten promosi otomatis disingkirkan dari feed sehingga artikel tampil bersih. Tanpa pengumpulan data, tanpa akun, dan tanpa analitik; semuanya tersimpan dengan aman di perangkat Anda.
+
+Pembaca Feed yang Cerdas: Berlangganan feed RSS atau Atom apa pun, atau cukup tempelkan alamat situs dan FeedWell akan mencarikan feed-nya untuk Anda. Tambahkan feed populer dengan satu ketukan, dapatkan pembaruan otomatis, dan cari artikel di seluruh langganan. Sembunyikan feed tanpa berhenti berlangganan, atau tandai semua artikel di atas sebuah artikel sebagai dibaca.
+
+Tampilan Baca yang Indah dan Mudah Diakses: Nikmati pembaca artikel di dalam aplikasi dengan tipografi yang rapi, penanda posisi baca untuk menyimpan posisi gulir Anda, serta dukungan bahasa dengan penulisan kanan ke kiri. Pilih dari delapan font bacaan, termasuk font berketerbacaan tinggi dan ramah disleksia. Anda juga dapat menerjemahkan artikel atau memakai fitur Baca Nyaring (TTS) dengan kecepatan yang dapat diatur.
+
+Baca Offline & Simpan untuk Nanti: Simpan artikel untuk dibaca nanti; artikel tersimpan langsung di perangkat sehingga Anda bisa membaca kapan saja, di mana saja, bahkan tanpa koneksi internet.
+
+Suara Ambien: Tingkatkan pengalaman membaca Anda dengan audio latar, mulai dari white noise, musik lo-fi, hingga suara alam, lengkap dengan pengaturan volume untuk setiap suara.
+
+Multibahasa & Feed Lokal: FeedWell berbicara dalam banyak bahasa dan otomatis mengikuti bahasa perangkat Anda, masing-masing dengan feed lokal pilihan dalam delapan kategori.
+
+Pengalaman yang Dipersonalisasi: Pilih mode terang, gelap, atau hitam AMOLED, sesuaikan warna aksen tema, aktifkan atau nonaktifkan gambar artikel, hidupkan gulir otomatis tanpa sentuhan, dan pasang widget di layar beranda untuk akses cepat.
+
+
+===== it-IT =====
+
+Name:
+FeedWell - Lettore RSS pulito
+
+Short:
+Lettore RSS pulito e privato. Blocca le pubblicità, leggi offline.
+
+Full:
+Un lettore RSS pulito e rispettoso della privacy, che blocca le pubblicità, rimuove i tracker e ti permette di concentrarti su ciò che conta davvero: il contenuto. Leggi il Web, senza il superfluo.
+
+
+Funzioni principali:
+
+Blocco pubblicità integrato e privacy al primo posto: pubblicità, script di tracciamento e contenuti promozionali vengono rimossi automaticamente dai feed, lasciando solo articoli puliti. Nessuna raccolta di dati, nessun account e nessuno strumento di analisi: tutto resta al sicuro sul tuo dispositivo.
+
+Lettore di feed intelligente: iscriviti a qualsiasi feed RSS o Atom, oppure incolla semplicemente l'indirizzo di un sito e FeedWell troverà il feed per te. Aggiungi i feed più popolari con un tocco, ricevi aggiornamenti automatici e cerca tra tutte le tue iscrizioni. Nascondi un feed senza annullare l'iscrizione oppure segna come letti tutti gli articoli sopra a uno.
+
+Lettore bello e accessibile: leggi gli articoli direttamente nell'app, con una tipografia curata, segnalibri che memorizzano la posizione di lettura e supporto per le lingue che si scrivono da destra a sinistra. Scegli tra otto caratteri di lettura, comprese opzioni ad alta leggibilità e adatte alla dislessia. Puoi anche tradurre gli articoli o ascoltarli con la Lettura ad alta voce (TTS) a velocità regolabile.
+
+Lettura offline e salva per dopo: metti da parte gli articoli per leggerli più tardi; vengono conservati sul dispositivo, così puoi leggere in qualsiasi momento e ovunque, anche senza connessione a Internet.
+
+Suoni d'ambiente: arricchisci la lettura con un sottofondo audio — rumore bianco, musica lo-fi e suoni della natura — con regolazione del volume per ogni suono.
+
+Multilingua e feed locali: FeedWell parla molte lingue e segue automaticamente quella del tuo dispositivo, ognuna con feed locali selezionati a mano in otto categorie.
+
+Esperienza personalizzata: scegli tra tema chiaro, scuro e nero AMOLED, personalizza il colore d'accento, mostra o nascondi le immagini degli articoli, attiva lo scorrimento automatico a mani libere e aggiungi un widget alla schermata Home.
+
+
+===== ja-JP =====
+
+Name:
+FeedWell - シンプルなRSSリーダー
+
+Short:
+クリーンでプライベートなRSSリーダー。広告をブロックし、オフラインで読める。
+
+Full:
+広告をブロックし、トラッカーを除去して、本当に大切なもの、つまり記事の内容に集中できる、クリーンでプライベートなRSSリーダーです。ノイズのない快適なウェブ閲覧をお楽しみください。
+
+
+主な機能:
+
+広告ブロッカー内蔵・プライバシー第一: フィードから広告、トラッキングスクリプト、宣伝コンテンツを自動的に取り除き、記事をすっきりと表示します。データ収集も、アカウント登録も、解析ツールもありません。すべての情報はお使いの端末内に安全に保存されます。
+
+スマートなフィードリーダー: あらゆるRSSまたはAtomフィードを購読できるほか、ウェブサイトのアドレスを貼り付けるだけでFeedWellがフィードを見つけます。人気のフィードはワンタップで追加でき、自動更新に対応し、購読中のすべての記事をまとめて検索できます。購読を解除せずにフィードを非表示にしたり、ある記事より上をまとめて既読にしたりできます。
+
+美しく使いやすいリーダー: 読みやすいタイポグラフィ、スクロール位置を記憶する読書位置ブックマーク、右から左に記述する言語への対応を備えたアプリ内リーダーで記事を楽しめます。読書用フォントは8種類から選べ、視認性の高いフォントやディスレクシアに配慮したフォントも含まれます。記事の翻訳や、速度を調整できる読み上げ（TTS）機能もご利用いただけます。
+
+オフライン読書と「あとで読む」: 記事を「あとで読む」に保存すると端末内に保存されるため、インターネット接続がない場所でも、いつでもどこでも読むことができます。
+
+環境音: ホワイトノイズ、ローファイ音楽、自然の音などのバックグラウンド再生で、読書の時間をより心地よく。音ごとに音量を調整できます。
+
+多言語対応と現地フィード: FeedWellは多くの言語に対応し、端末の言語を自動で選びます。言語ごとに、8つのカテゴリーにわたる厳選された現地フィードをご用意しています。
+
+自分好みにカスタマイズ: ライト、ダーク、AMOLEDブラックの各テーマから選択でき、テーマのアクセントカラーの変更、記事画像の表示・非表示、手を使わない自動スクロールの有効化、ホーム画面ウィジェットの追加など、細かく設定できます。
+
+
+===== ko-KR =====
+
+Name:
+FeedWell - 깔끔한 RSS 리더
+
+Short:
+깔끔하고 개인정보를 지키는 RSS 리더. 광고 차단, 오프라인 읽기.
+
+Full:
+광고를 차단하고 트래커를 제거해 정말 중요한 것, 즉 콘텐츠에 집중할 수 있게 해 주는 깔끔하고 개인정보를 지키는 RSS 리더입니다. 소란스러움 없이 웹을 읽어 보세요.
+
+
+주요 기능:
+
+내장 광고 차단과 개인정보 우선: 피드에서 광고, 추적 스크립트, 홍보성 콘텐츠를 자동으로 걷어내 깔끔한 기사만 남깁니다. 데이터 수집도, 계정도, 분석 도구도 없으며 모든 정보는 기기 안에만 안전하게 저장됩니다.
+
+똑똑한 피드 리더: 어떤 RSS나 Atom 피드든 구독할 수 있고, 웹사이트 주소만 붙여 넣으면 FeedWell이 알아서 피드를 찾아 줍니다. 인기 피드는 한 번의 탭으로 추가되고, 자동으로 업데이트되며, 구독한 모든 피드에서 기사를 한 번에 검색할 수 있습니다. 구독을 유지한 채 피드를 숨기거나, 특정 기사 위의 기사를 모두 읽음으로 표시할 수도 있습니다.
+
+아름답고 편안한 리더: 깔끔한 서체, 읽던 위치를 기억하는 책갈피, 오른쪽에서 왼쪽으로 쓰는 언어 지원까지 갖춘 앱 내 리더로 기사를 읽어 보세요. 읽기 글꼴은 여덟 가지 중에서 고를 수 있으며, 가독성이 높은 글꼴과 난독증 친화적인 글꼴도 포함되어 있습니다. 기사를 번역하거나, 속도를 조절할 수 있는 읽어주기(TTS) 기능으로 들을 수도 있습니다.
+
+오프라인 읽기와 나중에 저장: 기사를 저장해 두면 기기에 함께 보관되므로 인터넷 연결이 없어도 언제 어디서나 읽을 수 있습니다.
+
+배경 사운드: 백색 소음부터 로파이 음악, 자연의 소리까지 배경 오디오로 읽는 시간을 더 편안하게 만들어 보세요. 소리마다 음량을 따로 조절할 수 있습니다.
+
+다국어 지원과 현지 피드: FeedWell은 여러 언어를 지원하며 기기 언어를 자동으로 따릅니다. 언어마다 여덟 개 카테고리에 걸쳐 엄선한 현지 피드를 제공합니다.
+
+나에게 맞춘 경험: 밝은 테마, 어두운 테마, AMOLED 블랙 테마 중에서 고르고, 테마 강조 색을 바꾸고, 기사 이미지를 켜거나 끄고, 손을 대지 않는 자동 스크롤을 켜고, 홈 화면에 위젯을 추가해 빠르게 접근하세요.
+
+
+===== fa =====
+
+Name:
+FeedWell - خوراک‌خوان تمیز
+
+Short:
+خوراک‌خوان RSS تمیز و خصوصی. مسدودسازی تبلیغات و خواندن آفلاین.
+
+Full:
+یک خوراک‌خوان RSS تمیز و حریم‌خصوصی‌محور که تبلیغات را مسدود می‌کند، ردیاب‌ها را حذف می‌کند و می‌گذارد روی چیزی تمرکز کنید که واقعاً مهم است: خودِ محتوا. وب را بدون شلوغی بخوانید.
+
+
+ویژگی‌های کلیدی:
+
+مسدودکنندهٔ تبلیغات داخلی و اولویت با حریم خصوصی: تبلیغات، اسکریپت‌های ردیابی و محتوای تبلیغاتی به‌طور خودکار از خوراک‌ها حذف می‌شوند تا مقاله‌ها تمیز بمانند. بدون جمع‌آوری داده، بدون حساب کاربری و بدون ابزار تحلیلی؛ همه‌چیز امن روی دستگاه خودتان می‌ماند.
+
+خوراک‌خوان هوشمند: در هر خوراک RSS یا Atom مشترک شوید، یا کافی است نشانی یک وب‌سایت را بچسبانید تا FeedWell خودش خوراک آن را پیدا کند. خوراک‌های محبوب را با یک ضربه اضافه کنید، به‌روزرسانی خودکار داشته باشید و در همهٔ اشتراک‌هایتان جست‌وجو کنید. می‌توانید یک خوراک را بدون لغو اشتراک پنهان کنید، یا همهٔ مقاله‌های بالای یک مقاله را خوانده‌شده علامت بزنید.
+
+خوانشگر زیبا و در دسترس: از خوانشگر درون‌برنامه با تایپوگرافی تمیز، نشانک‌هایی برای ذخیرهٔ موقعیت مطالعه و پشتیبانی از زبان‌های راست‌به‌چپ لذت ببرید. از میان هشت قلم مطالعه انتخاب کنید، از جمله قلم‌های با خوانایی بالا و مناسب نارساخوانی. همچنین می‌توانید مقاله‌ها را ترجمه کنید یا با خواندن صوتی (TTS) و سرعت قابل تنظیم بشنوید.
+
+مطالعهٔ آفلاین و ذخیره برای بعد: مقاله‌ها را برای بعد ذخیره کنید؛ روی دستگاه نگهداری می‌شوند تا هر زمان و هر جا، حتی بدون اینترنت، بتوانید بخوانید.
+
+صداهای محیطی: تجربهٔ مطالعه‌تان را با صدای پس‌زمینه کامل کنید؛ از نویز سفید و موسیقی lo-fi تا صداهای طبیعت، با تنظیم جداگانهٔ بلندی هر صدا.
+
+چندزبانه با خوراک‌های محلی: FeedWell به چند زبان صحبت می‌کند و به‌طور خودکار زبان دستگاه شما را دنبال می‌کند؛ برای هر زبان خوراک‌های محلی منتخب در هشت دسته آماده است.
+
+تجربهٔ شخصی‌سازی‌شده: میان پوستهٔ روشن، تیره و سیاه AMOLED یکی را انتخاب کنید، رنگ تأکید را تغییر دهید، تصویر مقاله‌ها را روشن یا خاموش کنید، پیمایش خودکار بدون دست را فعال کنید و ابزارک را به صفحهٔ اصلی اضافه کنید.
+
+
+===== fa-IR =====
+
+Name:
+FeedWell - خوراک‌خوان تمیز
+
+Short:
+خوراک‌خوان RSS تمیز و خصوصی. مسدودسازی تبلیغات و خواندن آفلاین.
+
+Full:
+یک خوراک‌خوان RSS تمیز و حریم‌خصوصی‌محور که تبلیغات را مسدود می‌کند، ردیاب‌ها را حذف می‌کند و می‌گذارد روی چیزی تمرکز کنید که واقعاً مهم است: خودِ محتوا. وب را بدون شلوغی بخوانید.
+
+
+ویژگی‌های کلیدی:
+
+مسدودکنندهٔ تبلیغات داخلی و اولویت با حریم خصوصی: تبلیغات، اسکریپت‌های ردیابی و محتوای تبلیغاتی به‌طور خودکار از خوراک‌ها حذف می‌شوند تا مقاله‌ها تمیز بمانند. بدون جمع‌آوری داده، بدون حساب کاربری و بدون ابزار تحلیلی؛ همه‌چیز امن روی دستگاه خودتان می‌ماند.
+
+خوراک‌خوان هوشمند: در هر خوراک RSS یا Atom مشترک شوید، یا کافی است نشانی یک وب‌سایت را بچسبانید تا FeedWell خودش خوراک آن را پیدا کند. خوراک‌های محبوب را با یک ضربه اضافه کنید، به‌روزرسانی خودکار داشته باشید و در همهٔ اشتراک‌هایتان جست‌وجو کنید. می‌توانید یک خوراک را بدون لغو اشتراک پنهان کنید، یا همهٔ مقاله‌های بالای یک مقاله را خوانده‌شده علامت بزنید.
+
+خوانشگر زیبا و در دسترس: از خوانشگر درون‌برنامه با تایپوگرافی تمیز، نشانک‌هایی برای ذخیرهٔ موقعیت مطالعه و پشتیبانی از زبان‌های راست‌به‌چپ لذت ببرید. از میان هشت قلم مطالعه انتخاب کنید، از جمله قلم‌های با خوانایی بالا و مناسب نارساخوانی. همچنین می‌توانید مقاله‌ها را ترجمه کنید یا با خواندن صوتی (TTS) و سرعت قابل تنظیم بشنوید.
+
+مطالعهٔ آفلاین و ذخیره برای بعد: مقاله‌ها را برای بعد ذخیره کنید؛ روی دستگاه نگهداری می‌شوند تا هر زمان و هر جا، حتی بدون اینترنت، بتوانید بخوانید.
+
+صداهای محیطی: تجربهٔ مطالعه‌تان را با صدای پس‌زمینه کامل کنید؛ از نویز سفید و موسیقی lo-fi تا صداهای طبیعت، با تنظیم جداگانهٔ بلندی هر صدا.
+
+چندزبانه با خوراک‌های محلی: FeedWell به چند زبان صحبت می‌کند و به‌طور خودکار زبان دستگاه شما را دنبال می‌کند؛ برای هر زبان خوراک‌های محلی منتخب در هشت دسته آماده است.
+
+تجربهٔ شخصی‌سازی‌شده: میان پوستهٔ روشن، تیره و سیاه AMOLED یکی را انتخاب کنید، رنگ تأکید را تغییر دهید، تصویر مقاله‌ها را روشن یا خاموش کنید، پیمایش خودکار بدون دست را فعال کنید و ابزارک را به صفحهٔ اصلی اضافه کنید.
+
+
+===== pl-PL =====
+
+Name:
+FeedWell - Czysty czytnik RSS
+
+Short:
+Czysty i prywatny czytnik RSS. Blokuj reklamy, czytaj offline.
+
+Full:
+Czysty czytnik RSS dbający o prywatność: blokuje reklamy, usuwa skrypty śledzące i pozwala skupić się na tym, co naprawdę ważne — na treści. Czytaj sieć bez zbędnego szumu.
+
+
+Najważniejsze funkcje:
+
+Wbudowana blokada reklam i prywatność przede wszystkim: reklamy, skrypty śledzące i treści promocyjne są automatycznie usuwane z kanałów, więc zostają same czyste artykuły. Zero zbierania danych, brak kont i brak analityki; wszystko pozostaje bezpiecznie na Twoim urządzeniu.
+
+Inteligentny czytnik kanałów: subskrybuj dowolny kanał RSS lub Atom albo po prostu wklej adres strony, a FeedWell sam znajdzie kanał. Dodawaj popularne kanały jednym dotknięciem, korzystaj z automatycznych aktualizacji i przeszukuj wszystkie subskrypcje. Ukryj kanał bez rezygnacji z subskrypcji lub oznacz jako przeczytane wszystko powyżej wybranego artykułu.
+
+Piękny i dostępny czytnik: czytaj artykuły bezpośrednio w aplikacji — z zadbaną typografią, zakładkami zapamiętującymi miejsce czytania i obsługą języków pisanych od prawej do lewej. Wybieraj spośród ośmiu czcionek do czytania, w tym opcji o wysokiej czytelności i przyjaznych osobom z dysleksją. Artykuły możesz też tłumaczyć lub odsłuchiwać dzięki czytaniu na głos (TTS) z regulowaną prędkością.
+
+Czytanie offline i zapisywanie na później: zapisuj artykuły na później; są przechowywane na urządzeniu, więc przeczytasz je zawsze i wszędzie, nawet bez połączenia z internetem.
+
+Dźwięki otoczenia: wzbogać czytanie o tło dźwiękowe — biały szum, bity lo-fi i odgłosy natury — z osobną regulacją głośności dla każdego dźwięku.
+
+Wiele języków i lokalne kanały: FeedWell mówi w wielu językach i automatycznie podąża za językiem Twojego urządzenia, a każdy z nich ma starannie dobrane lokalne kanały w ośmiu kategoriach.
+
+Spersonalizowane działanie: wybierz motyw jasny, ciemny lub czarny AMOLED, zmień kolor akcentu, włącz lub wyłącz obrazy w artykułach, uruchom automatyczne przewijanie bez użycia rąk i dodaj widżet do ekranu głównego.
+
+
+===== pt-BR =====
+
+Name:
+FeedWell - Leitor RSS limpo
+
+Short:
+Leitor de RSS limpo e privado. Bloqueie anúncios, leia offline.
+
+Full:
+Um leitor de RSS limpo e privado que bloqueia anúncios, remove rastreadores e deixa você focar no que realmente importa: o conteúdo. Leia a web, sem a bagunça.
+
+
+Principais recursos:
+
+Bloqueador de anúncios integrado e privacidade em primeiro lugar: anúncios, scripts de rastreamento e conteúdo promocional são removidos automaticamente dos feeds, deixando só os artigos limpos. Zero coleta de dados, sem contas e sem análises; tudo fica guardado com segurança no seu aparelho.
+
+Leitor de feeds inteligente: assine qualquer feed RSS ou Atom, ou simplesmente cole o endereço de um site e o FeedWell encontra o feed para você. Adicione feeds populares com um toque, receba atualizações automáticas e pesquise em todas as suas assinaturas. Oculte um feed sem cancelar a assinatura ou marque como lido tudo o que está acima de um artigo.
+
+Leitor bonito e acessível: leia os artigos dentro do próprio app, com tipografia caprichada, marcadores que guardam sua posição de leitura e suporte a idiomas escritos da direita para a esquerda. Escolha entre oito fontes de leitura, incluindo opções de alta legibilidade e amigáveis para dislexia. Você também pode traduzir artigos ou ouvi-los com a Leitura em Voz Alta (TTS), com velocidade ajustável.
+
+Leitura offline e salvar para depois: guarde artigos para ler mais tarde; eles ficam salvos no aparelho, então você pode ler a qualquer hora e em qualquer lugar, mesmo sem conexão com a internet.
+
+Sons ambientes: deixe a leitura mais agradável com áudio de fundo — ruído branco, batidas lo-fi e sons da natureza — com controle de volume para cada som.
+
+Vários idiomas e feeds locais: o FeedWell fala vários idiomas e segue automaticamente o idioma do seu aparelho, cada um com feeds locais escolhidos a dedo em oito categorias.
+
+Experiência personalizada: escolha entre os temas claro, escuro e preto AMOLED, personalize a cor de destaque, mostre ou oculte as imagens dos artigos, ative a rolagem automática sem as mãos e adicione um widget à tela inicial.
+
+
+===== pt-PT =====
+
+Name:
+FeedWell - Leitor RSS limpo
+
+Short:
+Leitor de RSS limpo e privado. Bloqueie anúncios, leia offline.
+
+Full:
+Um leitor de RSS limpo e privado que bloqueia anúncios, remove rastreadores e permite que se concentre no que realmente importa: o conteúdo. Leia a web, sem a confusão.
+
+
+Principais funcionalidades:
+
+Bloqueador de anúncios integrado e privacidade em primeiro lugar: os anúncios, os scripts de seguimento e os conteúdos promocionais são removidos automaticamente dos feeds, deixando apenas artigos limpos. Zero recolha de dados, sem contas e sem análises; tudo fica guardado em segurança no seu dispositivo.
+
+Leitor de feeds inteligente: subscreva qualquer feed RSS ou Atom, ou basta colar o endereço de um site e o FeedWell encontra o feed por si. Adicione feeds populares com um toque, receba atualizações automáticas e pesquise em todas as suas subscrições. Oculte um feed sem cancelar a subscrição ou marque como lido tudo o que está acima de um artigo.
+
+Leitor bonito e acessível: leia os artigos na própria aplicação, com tipografia cuidada, marcadores que guardam a sua posição de leitura e suporte para idiomas escritos da direita para a esquerda. Escolha entre oito tipos de letra de leitura, incluindo opções de elevada legibilidade e adequadas à dislexia. Pode ainda traduzir artigos ou ouvi-los com a Leitura em Voz Alta (TTS), com velocidade ajustável.
+
+Leitura offline e guardar para depois: guarde artigos para ler mais tarde; ficam armazenados no dispositivo, para que possa ler a qualquer hora e em qualquer lugar, mesmo sem ligação à Internet.
+
+Sons ambiente: torne a leitura mais agradável com áudio de fundo — ruído branco, batidas lo-fi e sons da natureza — com controlo de volume para cada som.
+
+Vários idiomas e feeds locais: o FeedWell fala vários idiomas e segue automaticamente o idioma do seu dispositivo, cada um com feeds locais escolhidos a dedo em oito categorias.
+
+Experiência personalizada: escolha entre os temas claro, escuro e preto AMOLED, personalize a cor de destaque, mostre ou oculte as imagens dos artigos, ative o deslocamento automático sem mãos e adicione um widget ao ecrã principal.
+
+
+===== ru-RU =====
+
+Name:
+FeedWell - чистый RSS-ридер
+
+Short:
+Чистый и приватный RSS-ридер: блокируйте рекламу и читайте офлайн
+
+Full:
+Чистый и приватный RSS-ридер, который блокирует рекламу, удаляет трекеры и позволяет сосредоточиться на главном — на самом контенте. Читайте интернет без лишнего шума.
+
+
+Основные возможности:
+
+Встроенный блокировщик рекламы и приватность прежде всего: реклама, отслеживающие скрипты и промо-блоки автоматически убираются из лент, оставляя только чистый текст статьи. Никакого сбора данных, никаких аккаунтов и аналитики — всё надёжно хранится только на вашем устройстве.
+
+Умная работа с лентами: подпишитесь на любую ленту RSS или Atom или просто вставьте адрес сайта — FeedWell сам найдёт ленту. Популярные источники добавляются в одно касание, ленты обновляются автоматически, а поиск работает сразу по всем подпискам. Ленту можно скрыть, не отписываясь, или отметить прочитанными все статьи выше выбранной.
+
+Красивый и удобный ридер: читайте статьи прямо в приложении — с аккуратной типографикой, закладками позиции чтения и поддержкой языков с письмом справа налево. Выбирайте из восьми шрифтов для чтения, включая варианты с повышенной разборчивостью и удобные при дислексии. Статьи можно переводить или слушать благодаря озвучиванию текста (TTS) с настраиваемой скоростью.
+
+Офлайн-чтение и «Сохранённые»: добавляйте статьи в «Сохранённые», чтобы вернуться к ним позже. Материалы хранятся прямо на устройстве, поэтому читать можно когда угодно и где угодно — даже без интернета.
+
+Фоновые звуки: дополните чтение атмосферным аудио — белый шум, lo-fi-биты и звуки природы, с отдельной регулировкой громкости для каждого звука.
+
+Много языков и местные ленты: FeedWell говорит на многих языках и автоматически следует языку вашего устройства, а для каждого подобраны местные ленты в восьми категориях.
+
+Персонализация: выбирайте светлую, тёмную или чёрную AMOLED-тему, меняйте акцентный цвет, включайте или отключайте изображения в статьях, запускайте автопрокрутку без рук и добавляйте виджет на главный экран.
+
+
+===== es-419 =====
+
+Name:
+FeedWell - Lector RSS limpio
+
+Short:
+Lector RSS limpio y privado. Bloquea anuncios y lee sin conexión.
+
+Full:
+Un lector RSS limpio y privado que bloquea anuncios, elimina rastreadores y te deja concentrarte en lo que importa: el contenido. Lee la web, sin el ruido.
+
+
+Funciones principales:
+
+Bloqueador de anuncios integrado y privacidad ante todo: quita automáticamente los anuncios, los scripts de rastreo y el contenido promocional de tus fuentes para dejar solo artículos limpios. Cero recopilación de datos, sin cuentas y sin analíticas; todo permanece seguro en tu dispositivo.
+
+Lector de fuentes inteligente: suscríbete a cualquier fuente RSS o Atom, o simplemente pega la dirección de un sitio web y FeedWell encuentra la fuente por ti. Agrega fuentes populares con un toque, recibe actualizaciones automáticas y busca en todas tus suscripciones. Oculta una fuente sin darte de baja o marca como leído todo lo que está encima de un artículo.
+
+Lector hermoso y accesible: disfruta de un lector de artículos dentro de la app, con tipografía cuidada, marcadores que guardan tu posición de lectura y compatibilidad con idiomas de derecha a izquierda. Elige entre ocho fuentes de lectura, incluidas opciones de alta legibilidad y aptas para dislexia. También puedes traducir artículos o escucharlos con Leer en voz alta (TTS) a la velocidad que prefieras.
+
+Lectura sin conexión y guardar para después: guarda artículos para leerlos más tarde; se almacenan en el dispositivo para que puedas leer en cualquier momento y lugar, incluso sin conexión a internet.
+
+Sonidos ambientales: mejora tu lectura con audio de fondo, como ruido blanco, música lo-fi y sonidos de la naturaleza, con control de volumen para cada sonido.
+
+Multilenguaje y fuentes locales: FeedWell habla varios idiomas y sigue automáticamente el idioma de tu dispositivo, cada uno con fuentes locales seleccionadas a mano en ocho categorías.
+
+Experiencia personalizada: elige entre los temas claro, oscuro y negro AMOLED, personaliza el color de acento, muestra u oculta las imágenes de los artículos, activa el desplazamiento automático manos libres y agrega un widget a la pantalla de inicio.
+
+
+===== es-ES =====
+
+Name:
+FeedWell - Lector RSS limpio
+
+Short:
+Lector RSS limpio y privado. Bloquea anuncios y lee sin conexión.
+
+Full:
+Un lector RSS limpio y privado que bloquea anuncios, elimina rastreadores y te permite centrarte en lo que importa: el contenido. Lee la web, sin el ruido.
+
+
+Funciones principales:
+
+Bloqueador de anuncios integrado y privacidad ante todo: elimina automáticamente los anuncios, los scripts de seguimiento y el contenido promocional de tus fuentes para dejar solo artículos limpios. Cero recopilación de datos, sin cuentas y sin analíticas; todo permanece seguro en tu dispositivo.
+
+Lector de fuentes inteligente: suscríbete a cualquier fuente RSS o Atom, o simplemente pega la dirección de un sitio web y FeedWell encontrará la fuente por ti. Añade fuentes populares con un toque, recibe actualizaciones automáticas y busca en todas tus suscripciones. Oculta una fuente sin darte de baja o marca como leído todo lo que hay encima de un artículo.
+
+Lector bonito y accesible: disfruta de un lector de artículos dentro de la app, con una tipografía cuidada, marcadores que guardan tu posición de lectura y compatibilidad con idiomas de derecha a izquierda. Elige entre ocho fuentes de lectura, incluidas opciones de alta legibilidad y aptas para la dislexia. También puedes traducir artículos o escucharlos con Leer en voz alta (TTS) a la velocidad que prefieras.
+
+Lectura sin conexión y guardar para después: guarda artículos para leerlos más tarde; se almacenan en el dispositivo para que puedas leer en cualquier momento y lugar, incluso sin conexión a internet.
+
+Sonidos ambientales: mejora tu lectura con audio de fondo, como ruido blanco, música lo-fi y sonidos de la naturaleza, con control de volumen para cada sonido.
+
+Multiidioma y fuentes locales: FeedWell habla varios idiomas y sigue automáticamente el idioma de tu dispositivo, cada uno con fuentes locales seleccionadas a mano en ocho categorías.
+
+Experiencia personalizada: elige entre los temas claro, oscuro y negro AMOLED, personaliza el color de acento, muestra u oculta las imágenes de los artículos, activa el desplazamiento automático con manos libres y añade un widget a la pantalla de inicio.
+
+
+===== es-US =====
+
+Name:
+FeedWell - Lector RSS limpio
+
+Short:
+Lector RSS limpio y privado. Bloquea anuncios y lee sin conexión.
+
+Full:
+Un lector RSS limpio y privado que bloquea anuncios, elimina rastreadores y te deja concentrarte en lo que importa: el contenido. Lee la web, sin el ruido.
+
+
+Funciones principales:
+
+Bloqueador de anuncios integrado y privacidad ante todo: quita automáticamente los anuncios, los scripts de rastreo y el contenido promocional de tus fuentes para dejar solo artículos limpios. Cero recopilación de datos, sin cuentas y sin analíticas; todo permanece seguro en tu dispositivo.
+
+Lector de fuentes inteligente: suscríbete a cualquier fuente RSS o Atom, o simplemente pega la dirección de un sitio web y FeedWell encuentra la fuente por ti. Agrega fuentes populares con un toque, recibe actualizaciones automáticas y busca en todas tus suscripciones. Oculta una fuente sin darte de baja o marca como leído todo lo que está encima de un artículo.
+
+Lector hermoso y accesible: disfruta de un lector de artículos dentro de la app, con tipografía cuidada, marcadores que guardan tu posición de lectura y compatibilidad con idiomas de derecha a izquierda. Elige entre ocho fuentes de lectura, incluidas opciones de alta legibilidad y aptas para dislexia. También puedes traducir artículos o escucharlos con Leer en voz alta (TTS) a la velocidad que prefieras.
+
+Lectura sin conexión y guardar para después: guarda artículos para leerlos más tarde; se almacenan en el dispositivo para que puedas leer en cualquier momento y lugar, incluso sin conexión a internet.
+
+Sonidos ambientales: mejora tu lectura con audio de fondo, como ruido blanco, música lo-fi y sonidos de la naturaleza, con control de volumen para cada sonido.
+
+Multilenguaje y fuentes locales: FeedWell habla varios idiomas y sigue automáticamente el idioma de tu dispositivo, cada uno con fuentes locales seleccionadas a mano en ocho categorías.
+
+Experiencia personalizada: elige entre los temas claro, oscuro y negro AMOLED, personaliza el color de acento, muestra u oculta las imágenes de los artículos, activa el desplazamiento automático manos libres y agrega un widget a la pantalla de inicio.
+
+
+===== th =====
+
+Name:
+FeedWell - โปรแกรมอ่าน RSS
+
+Short:
+โปรแกรมอ่าน RSS ที่สะอาดและเป็นส่วนตัว บล็อกโฆษณา อ่านออฟไลน์ได้
+
+Full:
+โปรแกรมอ่าน RSS ที่สะอาดและเคารพความเป็นส่วนตัว บล็อกโฆษณา กำจัดตัวติดตาม และให้คุณจดจ่อกับสิ่งที่สำคัญจริง ๆ นั่นคือเนื้อหา อ่านเว็บโดยไม่มีสิ่งรบกวน
+
+
+ฟีเจอร์เด่น:
+
+ตัวบล็อกโฆษณาในตัวและความเป็นส่วนตัวมาก่อน: ระบบจะลบโฆษณา สคริปต์ติดตาม และเนื้อหาโปรโมตออกจากฟีดโดยอัตโนมัติ เหลือไว้เพียงบทความที่สะอาดตา ไม่มีการเก็บข้อมูล ไม่ต้องมีบัญชี และไม่มีเครื่องมือวิเคราะห์ ทุกอย่างถูกเก็บไว้อย่างปลอดภัยบนเครื่องของคุณ
+
+ตัวอ่านฟีดอัจฉริยะ: ติดตามฟีด RSS หรือ Atom ใดก็ได้ หรือเพียงวางที่อยู่เว็บไซต์ แล้ว FeedWell จะค้นหาฟีดให้คุณเอง เพิ่มฟีดยอดนิยมได้ในแตะเดียว อัปเดตอัตโนมัติ และค้นหาบทความจากทุกรายการที่ติดตาม คุณสามารถซ่อนฟีดโดยไม่ต้องเลิกติดตาม หรือทำเครื่องหมายว่าอ่านแล้วสำหรับทุกบทความที่อยู่เหนือบทความหนึ่ง
+
+หน้าอ่านที่สวยงามและเข้าถึงง่าย: อ่านบทความได้ในแอปโดยตรง ด้วยการจัดวางตัวอักษรที่เรียบร้อย บุ๊กมาร์กที่จำตำแหน่งการอ่าน และรองรับภาษาที่เขียนจากขวาไปซ้าย เลือกแบบอักษรสำหรับอ่านได้ถึงแปดแบบ รวมถึงแบบที่อ่านง่ายเป็นพิเศษและแบบที่เป็นมิตรกับผู้มีภาวะดิสเล็กเซีย นอกจากนี้ยังแปลบทความ หรือฟังด้วยฟังก์ชันอ่านออกเสียง (TTS) ที่ปรับความเร็วได้
+
+อ่านออฟไลน์และบันทึกไว้อ่านทีหลัง: บันทึกบทความไว้อ่านภายหลัง โดยจัดเก็บไว้ในเครื่อง จึงอ่านได้ทุกที่ทุกเวลา แม้ไม่มีอินเทอร์เน็ต
+
+เสียงบรรยากาศ: เพิ่มอรรถรสในการอ่านด้วยเสียงพื้นหลัง ทั้งไวต์นอยส์ ดนตรีโลไฟ และเสียงธรรมชาติ พร้อมปรับระดับเสียงแยกของแต่ละเสียงได้
+
+หลายภาษาและฟีดท้องถิ่น: FeedWell รองรับหลายภาษาและเลือกภาษาของอุปกรณ์ให้โดยอัตโนมัติ พร้อมฟีดท้องถิ่นที่คัดสรรมาแล้วในแปดหมวดหมู่สำหรับแต่ละภาษา
+
+ประสบการณ์ที่ปรับแต่งได้: เลือกได้ระหว่างธีมสว่าง ธีมมืด และธีมดำ AMOLED ปรับสีเน้นของธีม เปิดหรือปิดรูปภาพในบทความ เปิดใช้การเลื่อนอัตโนมัติแบบไม่ต้องใช้มือ และเพิ่มวิดเจ็ตบนหน้าจอหลักเพื่อเข้าถึงได้อย่างรวดเร็ว
+
+
+===== tr-TR =====
+
+Name:
+FeedWell - Sade RSS Okuyucu
+
+Short:
+Sade ve gizliliğe saygılı RSS okuyucu. Reklamları engelle, çevrimdışı oku.
+
+Full:
+Reklamları engelleyen, izleyicileri kaldıran ve gerçekten önemli olana, yani içeriğe odaklanmanızı sağlayan sade ve gizliliğe saygılı bir RSS okuyucu. Web'i gereksiz kalabalık olmadan okuyun.
+
+
+Öne Çıkan Özellikler:
+
+Yerleşik Reklam Engelleyici ve Önce Gizlilik: Reklamlar, izleme betikleri ve tanıtım içerikleri akışlardan otomatik olarak temizlenir, geriye yalnızca sade makaleler kalır. Veri toplama yok, hesap yok, analiz aracı yok; her şey güvenle cihazınızda kalır.
+
+Akıllı Akış Okuyucu: Herhangi bir RSS veya Atom akışına abone olun ya da yalnızca bir site adresini yapıştırın; FeedWell akışı sizin için bulsun. Popüler akışları tek dokunuşla ekleyin, otomatik güncellemelerden yararlanın ve tüm aboneliklerinizde arama yapın. Abonelikten çıkmadan bir akışı gizleyin veya bir makalenin üstündeki her şeyi okundu olarak işaretleyin.
+
+Güzel ve Erişilebilir Okuyucu: Makaleleri doğrudan uygulama içinde okuyun; özenli tipografi, okuma konumunuzu saklayan yer imleri ve sağdan sola yazılan diller için destek sunar. Sekiz okuma yazı tipi arasından seçim yapın; bunlara yüksek okunabilirlikli ve disleksi dostu seçenekler de dâhildir. Ayrıca makaleleri çevirebilir veya hızını ayarlayabileceğiniz Sesli Okuma (TTS) özelliğiyle dinleyebilirsiniz.
+
+Çevrimdışı Okuma ve Sonrası İçin Kaydetme: Makaleleri sonra okumak üzere kaydedin; cihazınızda saklandıkları için internet bağlantınız olmasa bile istediğiniz zaman, istediğiniz yerde okuyabilirsiniz.
+
+Ortam Sesleri: Okuma deneyiminizi arka plan sesleriyle zenginleştirin: beyaz gürültü, lo-fi ritimler ve doğa sesleri; her ses için ayrı ses düzeyi denetimiyle birlikte.
+
+Çok Dilli ve Yerel Akışlar: FeedWell birçok dili konuşur ve cihazınızın dilini otomatik olarak izler; her dil için sekiz kategoride özenle seçilmiş yerel akışlar sunar.
+
+Kişiselleştirilmiş Deneyim: Açık, koyu ve AMOLED siyah temalar arasından seçim yapın, tema vurgu rengini değiştirin, makale görsellerini açıp kapatın, eller serbest otomatik kaydırmayı etkinleştirin ve hızlı erişim için ana ekrana bir widget ekleyin.
+
+
+===== vi =====
+
+Name:
+FeedWell - Đọc RSS gọn nhẹ
+
+Short:
+Trình đọc RSS gọn nhẹ và riêng tư. Chặn quảng cáo, đọc ngoại tuyến.
+
+Full:
+Trình đọc RSS gọn nhẹ và tôn trọng quyền riêng tư, giúp chặn quảng cáo, loại bỏ trình theo dõi và để bạn tập trung vào điều thực sự quan trọng: nội dung. Hãy đọc web mà không bị làm phiền.
+
+
+Tính năng chính:
+
+Chặn quảng cáo tích hợp và ưu tiên quyền riêng tư: Quảng cáo, tập lệnh theo dõi và nội dung quảng bá được tự động loại bỏ khỏi nguồn cấp, chỉ giữ lại bài viết sạch sẽ. Không thu thập dữ liệu, không cần tài khoản, không có công cụ phân tích; mọi thứ được lưu an toàn ngay trên thiết bị của bạn.
+
+Trình đọc nguồn cấp thông minh: Đăng ký bất kỳ nguồn cấp RSS hoặc Atom nào, hoặc chỉ cần dán địa chỉ một trang web và FeedWell sẽ tìm nguồn cấp giúp bạn. Thêm các nguồn phổ biến chỉ với một lần chạm, tự động cập nhật và tìm kiếm trên toàn bộ nguồn đã đăng ký. Bạn có thể ẩn một nguồn cấp mà không cần hủy đăng ký, hoặc đánh dấu tất cả bài viết phía trên một bài là đã đọc.
+
+Trình đọc đẹp mắt và dễ tiếp cận: Đọc bài viết ngay trong ứng dụng với kiểu chữ rõ ràng, dấu trang ghi nhớ vị trí đọc và hỗ trợ các ngôn ngữ viết từ phải sang trái. Chọn trong tám phông chữ đọc, bao gồm cả các phông dễ đọc và thân thiện với chứng khó đọc. Bạn cũng có thể dịch bài viết hoặc nghe bằng tính năng Đọc to (TTS) với tốc độ tùy chỉnh.
+
+Đọc ngoại tuyến và lưu để đọc sau: Lưu bài viết để đọc sau; nội dung được lưu ngay trên thiết bị nên bạn có thể đọc mọi lúc, mọi nơi, ngay cả khi không có kết nối Internet.
+
+Âm thanh nền: Làm cho việc đọc dễ chịu hơn với âm thanh nền, từ tiếng ồn trắng và nhạc lo-fi đến âm thanh thiên nhiên, kèm tùy chỉnh âm lượng riêng cho từng âm thanh.
+
+Đa ngôn ngữ và nguồn cấp địa phương: FeedWell hỗ trợ nhiều ngôn ngữ và tự động theo ngôn ngữ thiết bị của bạn, mỗi ngôn ngữ đều có nguồn cấp địa phương được tuyển chọn trong tám danh mục.
+
+Trải nghiệm cá nhân hóa: Chọn giao diện sáng, tối hoặc đen AMOLED, đổi màu nhấn của chủ đề, bật hoặc tắt hình ảnh trong bài viết, bật cuộn tự động rảnh tay và thêm tiện ích vào màn hình chính để truy cập nhanh.
+
+
+===== uk =====
+
+Name:
+FeedWell - чистий RSS-читач
+
+Short:
+Чистий і приватний RSS-читач. Блокуйте рекламу, читайте офлайн.
+
+Full:
+Чистий RSS-читач, який поважає вашу приватність: блокує рекламу, прибирає трекери й дає змогу зосередитися на головному — на самому змісті. Читайте вебсторінки без зайвого шуму.
+
+
+Основні можливості:
+
+Вбудований блокувальник реклами й приватність понад усе: реклама, скрипти стеження та промоматеріали автоматично прибираються зі стрічок, залишаючи тільки чисті статті. Жодного збору даних, жодних облікових записів і жодної аналітики — усе надійно зберігається на вашому пристрої.
+
+Розумний читач стрічок: підпишіться на будь-яку стрічку RSS або Atom чи просто вставте адресу сайту — FeedWell сам знайде стрічку. Додавайте популярні джерела одним дотиком, отримуйте автоматичні оновлення та шукайте по всіх підписках. Стрічку можна приховати, не скасовуючи підписку, або позначити прочитаними всі статті вище вибраної.
+
+Гарний і доступний режим читання: читайте статті прямо в застосунку — з охайною типографікою, закладками, що зберігають позицію читання, і підтримкою мов із письмом справа наліво. Обирайте з восьми шрифтів для читання, зокрема з підвищеною розбірливістю та зручних для людей із дислексією. Статті також можна перекладати або слухати завдяки озвученню тексту (TTS) з регульованою швидкістю.
+
+Читання офлайн і збереження на потім: зберігайте статті, щоб повернутися до них пізніше; вони лишаються на пристрої, тож читати можна будь-коли й будь-де, навіть без інтернету.
+
+Фонові звуки: доповніть читання фоновим аудіо — білий шум, lo-fi-біти та звуки природи — з окремим регулюванням гучності для кожного звуку.
+
+Багатомовність і місцеві стрічки: FeedWell розмовляє багатьма мовами й автоматично враховує мову вашого пристрою, а для кожної мови дібрано місцеві стрічки у восьми категоріях.
+
+Персоналізація: обирайте світлу, темну або чорну AMOLED-тему, змінюйте акцентний колір, вмикайте чи вимикайте зображення в статтях, запускайте автопрокручування без рук і додавайте віджет на головний екран.
+
+
+===== nl-NL =====
+
+Name:
+FeedWell - Strakke RSS-reader
+
+Short:
+Een strakke, privé RSS-reader. Blokkeer advertenties, lees offline.
+
+Full:
+Een strakke RSS-reader die je privacy respecteert: advertenties worden geblokkeerd, trackers verwijderd en je kunt je richten op wat er echt toe doet — de inhoud. Lees het web, zonder de ruis.
+
+
+Belangrijkste functies:
+
+Ingebouwde advertentieblokker en privacy voorop: advertenties, trackingscripts en promotionele content worden automatisch uit je feeds verwijderd, zodat alleen schone artikelen overblijven. Geen gegevensverzameling, geen accounts en geen analytics; alles blijft veilig op je apparaat.
+
+Slimme feedreader: abonneer je op elke RSS- of Atom-feed, of plak gewoon een website-adres en FeedWell vindt de feed voor je. Voeg populaire feeds toe met één tik, ontvang automatische updates en zoek door al je abonnementen. Verberg een feed zonder je af te melden, of markeer alles boven een artikel als gelezen.
+
+Mooie, toegankelijke leesweergave: lees artikelen direct in de app, met verzorgde typografie, bladwijzers die je leespositie onthouden en ondersteuning voor talen die van rechts naar links worden geschreven. Kies uit acht leeslettertypen, waaronder extra goed leesbare en dyslexievriendelijke opties. Je kunt artikelen ook vertalen of laten voorlezen (TTS) met instelbare snelheid.
+
+Offline lezen en bewaren voor later: bewaar artikelen om later te lezen; ze worden op je apparaat opgeslagen, zodat je altijd en overal kunt lezen, ook zonder internetverbinding.
+
+Omgevingsgeluiden: maak het lezen aangenamer met achtergrondgeluid — witte ruis, lo-fi beats en natuurgeluiden — met een eigen volumeregeling per geluid.
+
+Meertalig met lokale feeds: FeedWell spreekt meerdere talen en volgt automatisch de taal van je apparaat, elk met met zorg gekozen lokale feeds in acht categorieën.
+
+Gepersonaliseerde ervaring: kies tussen een licht, donker of AMOLED-zwart thema, pas de accentkleur aan, toon of verberg artikelafbeeldingen, zet handsfree automatisch scrollen aan en voeg een widget toe aan je startscherm.
+
+
+===== fil =====
+
+Name:
+FeedWell - Malinis na RSS
+
+Short:
+Malinis at pribadong RSS reader. I-block ang ads, magbasa offline.
+
+Full:
+Isang malinis at pribadong RSS reader na humaharang sa mga ad, nag-aalis ng mga tracker, at nagbibigay-daan sa iyong tumuon sa talagang mahalaga: ang nilalaman. Basahin ang web, nang walang kalat.
+
+
+Mga Pangunahing Feature:
+
+Built-in na Ad Blocker at Privacy Muna: Awtomatikong inaalis ang mga ad, tracking script, at promotional na nilalaman mula sa iyong mga feed para malinis ang mga artikulo. Walang kinokolektang data, walang account, at walang analytics; ligtas na nananatili ang lahat sa iyong device.
+
+Matalinong Feed Reader: Mag-subscribe sa kahit anong RSS o Atom feed, o i-paste lang ang address ng isang website at hahanapin ng FeedWell ang feed para sa iyo. Magdagdag ng mga sikat na feed sa isang tap, makakuha ng awtomatikong update, at maghanap sa lahat ng iyong subscription. Itago ang isang feed nang hindi nag-a-unsubscribe, o markahang nabasa na ang lahat ng nasa itaas ng isang artikulo.
+
+Magandang at Naa-access na Reader: Basahin ang mga artikulo mismo sa app, na may malinis na typography, mga bookmark na nag-aalala sa iyong posisyon sa pagbabasa, at suporta sa mga wikang isinusulat mula kanan pakaliwa. Pumili mula sa walong reading font, kabilang ang mga opsyong lubos na nababasa at angkop sa may dyslexia. Puwede mo ring isalin ang mga artikulo o pakinggan ang mga ito gamit ang Read Aloud (TTS) na may adjustable na bilis.
+
+Offline na Pagbabasa at I-save para Mamaya: I-save ang mga artikulo para basahin mamaya; nakaimbak ang mga ito sa device, kaya makakabasa ka kahit kailan at saan man, kahit walang koneksyon sa internet.
+
+Ambient na Tunog: Gawing mas kaaya-aya ang pagbabasa gamit ang background audio — white noise, lo-fi beats, at mga tunog ng kalikasan — na may hiwalay na kontrol sa volume para sa bawat tunog.
+
+Maraming Wika at Lokal na Feed: Maraming wikang sinasalita ang FeedWell at awtomatiko nitong sinusunod ang wika ng iyong device, at bawat isa ay may piling lokal na feed sa walong kategorya.
+
+Personalisadong Karanasan: Pumili sa pagitan ng light, dark, at AMOLED black na tema, i-customize ang accent color, ipakita o itago ang mga larawan ng artikulo, i-on ang hands-free na auto-scroll, at maglagay ng widget sa home screen para sa mabilis na access.
+
+
+===== sw =====
+
+Name:
+FeedWell - Kisomaji RSS safi
+
+Short:
+Kisomaji cha RSS safi na cha faragha. Zuia matangazo, soma nje ya mtandao.
+
+Full:
+Kisomaji cha RSS ambacho ni safi na kinachoheshimu faragha yako: kinazuia matangazo, kinaondoa vifuatiliaji na kinakuwezesha kuzingatia kile kinachohesabika kweli — maudhui yenyewe. Soma wavuti bila kelele.
+
+
+Vipengele Muhimu:
+
+Kizuia Matangazo Kilichojengwa Ndani na Faragha Kwanza: Matangazo, hati za ufuatiliaji na maudhui ya matangazo huondolewa kiotomatiki kwenye mipasho, na kubaki makala safi pekee. Hakuna ukusanyaji wa data, hakuna akaunti, wala uchanganuzi; kila kitu hubaki salama kwenye kifaa chako.
+
+Kisomaji Mipasho Chenye Akili: Jiandikishe kwenye mpasho wowote wa RSS au Atom, au bandika tu anwani ya tovuti na FeedWell atatafuta mpasho kwa niaba yako. Ongeza mipasho maarufu kwa mguso mmoja, pata masasisho ya kiotomatiki na tafuta katika michango yako yote. Ficha mpasho bila kujiondoa, au weka alama kuwa umesoma makala zote zilizo juu ya makala fulani.
+
+Kisomaji Kizuri na Kinachofikika: Soma makala ndani ya programu yenyewe, ikiwa na maandishi nadhifu, alamisho zinazokumbuka mahali ulipoishia, na msaada wa lugha zinazoandikwa kutoka kulia kwenda kushoto. Chagua kati ya fonti nane za kusoma, ikiwemo chaguo zenye usomekaji wa hali ya juu na rafiki kwa watu wenye dyslexia. Pia unaweza kutafsiri makala au kuzisikiliza kwa kipengele cha Kusoma kwa Sauti (TTS) chenye kasi inayoweza kubadilishwa.
+
+Kusoma Nje ya Mtandao na Kuhifadhi kwa Baadaye: Hifadhi makala ili uzisome baadaye; huhifadhiwa kwenye kifaa chako, hivyo unaweza kusoma wakati wowote na mahali popote, hata bila muunganisho wa intaneti.
+
+Sauti za Mazingira: Boresha usomaji wako kwa sauti ya mandharinyuma — kelele nyeupe, muziki wa lo-fi na sauti za asili — ikiwa na udhibiti wa sauti kwa kila mojawapo.
+
+Lugha Nyingi na Mipasho ya Kienyeji: FeedWell huzungumza lugha nyingi na hufuata lugha ya kifaa chako kiotomatiki, kila moja ikiwa na mipasho ya kienyeji iliyoteuliwa kwa uangalifu katika kategoria nane.
+
+Matumizi Yaliyobinafsishwa: Chagua kati ya mandhari nyepesi, nyeusi, na nyeusi ya AMOLED, badilisha rangi ya lafudhi, onyesha au ficha picha za makala, washa usogezaji wa kiotomatiki bila mikono, na ongeza wijeti kwenye skrini ya kwanza.
+
+
+===== ro =====
+
+Name:
+FeedWell - Cititor RSS curat
+
+Short:
+Cititor RSS curat și privat. Blochează reclamele, citește offline.
+
+Full:
+Un cititor RSS curat și care îți respectă confidențialitatea: blochează reclamele, elimină urmăritoarele și te lasă să te concentrezi pe ceea ce contează cu adevărat — conținutul. Citește internetul, fără dezordine.
+
+
+Funcții principale:
+
+Blocare de reclame integrată și confidențialitate în primul rând: reclamele, scripturile de urmărire și conținutul promoțional sunt eliminate automat din fluxuri, rămânând doar articole curate. Zero colectare de date, fără conturi și fără analize; totul rămâne în siguranță pe dispozitivul tău.
+
+Cititor de fluxuri inteligent: abonează-te la orice flux RSS sau Atom ori lipește pur și simplu adresa unui site, iar FeedWell găsește fluxul pentru tine. Adaugă fluxuri populare dintr-o singură atingere, primești actualizări automate și cauți în toate abonamentele tale. Ascunde un flux fără să te dezabonezi sau marchează drept citite toate articolele de deasupra unuia.
+
+Cititor frumos și accesibil: citește articolele direct în aplicație, cu tipografie îngrijită, semne de carte care rețin poziția de citire și suport pentru limbile scrise de la dreapta la stânga. Alege dintre opt fonturi de citire, inclusiv variante cu lizibilitate ridicată și prietenoase cu dislexia. Poți, de asemenea, să traduci articolele sau să le asculți cu funcția de citire cu voce tare (TTS), cu viteză reglabilă.
+
+Citire offline și salvare pentru mai târziu: salvează articole pentru mai târziu; sunt păstrate pe dispozitiv, așa că poți citi oricând și oriunde, chiar și fără conexiune la internet.
+
+Sunete de fundal: fă lectura mai plăcută cu sunet ambiental — zgomot alb, ritmuri lo-fi și sunete din natură — cu reglaj de volum separat pentru fiecare sunet.
+
+Multilingv și fluxuri locale: FeedWell vorbește mai multe limbi și urmează automat limba dispozitivului tău, fiecare cu fluxuri locale alese cu grijă în opt categorii.
+
+Experiență personalizată: alege între temele deschisă, întunecată și negru AMOLED, personalizează culoarea de accent, afișează sau ascunde imaginile articolelor, activează derularea automată fără mâini și adaugă un widget pe ecranul principal.
+
+
