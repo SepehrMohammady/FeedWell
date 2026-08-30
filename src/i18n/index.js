@@ -20,10 +20,15 @@ import fr from './locales/fr';
 import de from './locales/de';
 import vi from './locales/vi';
 import ko from './locales/ko';
+import uk from './locales/uk';
+import nl from './locales/nl';
+import tl from './locales/tl';
+import sw from './locales/sw';
+import ro from './locales/ro';
 
 export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
 
-export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko };
+export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro };
 
 function interpolate(str, vars) {
   if (!vars || typeof str !== 'string') return str;

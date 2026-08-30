@@ -18,6 +18,8 @@ import AppNavigator from './src/navigation/AppNavigator';
 import OnboardingTutorial from './src/components/OnboardingTutorial';
 import WhatsNewModal from './src/components/WhatsNewModal';
 import KinetosisOverlay from './src/components/KinetosisOverlay';
+import * as Font from 'expo-font';
+import { BUNDLED_FONT_ASSETS } from './src/config/readingFonts';
 import { APP_VERSION } from './src/config/version';
 import { setupNotificationChannel, scheduleReminderNotification, cancelReminderNotification } from './src/utils/notificationService';
 
@@ -165,6 +167,15 @@ function AppContent() {
 
     return () => subscription.remove();
   }, [readingReminder, language]);
+
+  // Load the bundled reading fonts. Deliberately not gated behind a splash
+  // screen: a failure here must never block the app, it just means the reader
+  // falls back to the system font.
+  useEffect(() => {
+    Font.loadAsync(BUNDLED_FONT_ASSETS).catch((e) => {
+      console.warn('Reading fonts failed to load:', e?.message);
+    });
+  }, []);
 
   // Handle deep links from widget
   useEffect(() => {

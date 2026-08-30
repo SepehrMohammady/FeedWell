@@ -37,6 +37,7 @@ import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CustomAlert from '../components/CustomAlert';
 import { useAutoScroll } from '../hooks/useAutoScroll';
+import { readingFontStyle } from '../config/readingFonts';
 import {
   translateText,
   identifyLanguage,
@@ -85,7 +86,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   } = route.params;
   const { theme } = useTheme();
   const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
-  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, readingFont } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
   // Resolve article from deep link if needed
@@ -1232,7 +1233,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
       fontSize: 18,
       color: theme.colors.text,
       lineHeight: 28,
-      fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+      // Settings > Reading Font. 'system' contributes no fontFamily, so the
+      // long-standing default (Georgia on iOS, serif on Android) still applies.
+      ...(readingFont === 'system'
+        ? { fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' }
+        : readingFontStyle(readingFont)),
     },
     inlineImageContainer: {
       marginVertical: 12,

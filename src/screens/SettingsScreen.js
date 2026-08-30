@@ -15,6 +15,7 @@ import {
   NativeModules,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { READING_FONTS, getReadingFont, readingFontStyle } from '../config/readingFonts';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,7 +55,7 @@ export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed } = useAppSettings();
-  const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet } = useAppSettings();
+  const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
@@ -76,6 +77,7 @@ export default function SettingsScreen({ navigation }) {
   const [downloadingModel, setDownloadingModel] = useState(null); // code of model being downloaded
   const [showArticleAgePicker, setShowArticleAgePicker] = useState(false);
   const [showAutoScrollDelayPicker, setShowAutoScrollDelayPicker] = useState(false);
+  const [showFontPicker, setShowFontPicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
   const restoreResolveRef = useRef(null);
 
@@ -972,6 +974,12 @@ export default function SettingsScreen({ navigation }) {
             />
           )}
           <SettingItem
+            title={t('settings.readingFont')}
+            description={getReadingFont(readingFont).label || t(getReadingFont(readingFont).labelKey)}
+            onPress={() => setShowFontPicker(true)}
+            rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+          />
+          <SettingItem
             title={t('language.appTitle')}
             description={getAppLanguage(language).nativeLabel}
             onPress={() => setShowAppLangPicker(true)}
@@ -1726,6 +1734,75 @@ export default function SettingsScreen({ navigation }) {
                 )}
               </TouchableOpacity>
             ))}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Reading Font Picker Modal */}
+      <Modal
+        visible={showFontPicker}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowFontPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '70%' }]}>
+            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.modalTitle}>{t('settings.readingFont')}</Text>
+              <TouchableOpacity onPress={() => setShowFontPicker(false)} style={styles.modalCloseButton}>
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {READING_FONTS.map((font, index, arr) => (
+                <TouchableOpacity
+                  key={font.key}
+                  style={[
+                    styles.modeItem,
+                    { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                    readingFont === font.key && styles.langItemSelected,
+                    index === arr.length - 1 && { borderBottomWidth: 0 },
+                  ]}
+                  onPress={() => {
+                    updateReadingFont(font.key);
+                    setShowFontPicker(false);
+                  }}
+                >
+                  <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Ionicons
+                      name="text-outline"
+                      size={22}
+                      color={readingFont === font.key ? theme.colors.primary : theme.colors.text}
+                    />
+                    <View style={styles.modeItemText}>
+                      <Text
+                        style={[
+                          styles.modeItemTitle,
+                          { textAlign: isRTL ? 'right' : 'left' },
+                          readingFontStyle(font.key),
+                          readingFont === font.key && { color: theme.colors.primary },
+                        ]}
+                      >
+                        {font.label || t(font.labelKey)}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.settingDescription,
+                          { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left' },
+                          readingFontStyle(font.key),
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {t('settings.fontPreview')}
+                      </Text>
+                    </View>
+                  </View>
+                  {readingFont === font.key && (
+                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </View>
       </Modal>

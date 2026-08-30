@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { APP_VERSION } from '../config/version';
 import { normalizeAutoScrollSpeed } from '../hooks/useAutoScroll';
+import { DEFAULT_READING_FONT, getReadingFont } from '../config/readingFonts';
 
 const AppSettingsContext = createContext();
 
@@ -31,6 +32,8 @@ export function AppSettingsProvider({ children }) {
   const [lastSeenVersion, setLastSeenVersion] = useState(null);
   // Saved (Read Later) list sort order — persisted so it survives navigation.
   const [readLaterSortOrder, setReadLaterSortOrder] = useState('newest'); // 'newest' | 'oldest'
+  // Font used for article body text in the reader (Settings > Reading Font).
+  const [readingFont, setReadingFont] = useState(DEFAULT_READING_FONT);
   // Feed-list auto-scroll: off by default; starts after `delay` seconds of
   // inactivity and scrolls at the chosen speed.
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
@@ -65,6 +68,7 @@ export function AppSettingsProvider({ children }) {
       const savedTranslationTargetUserSet = await AsyncStorage.getItem('translationTargetUserSet');
       const savedLastSeenVersion = await AsyncStorage.getItem('lastSeenVersion');
       const savedReadLaterSortOrder = await AsyncStorage.getItem('readLaterSortOrder');
+      const savedReadingFont = await AsyncStorage.getItem('readingFont');
       const savedAutoScrollEnabled = await AsyncStorage.getItem('autoScrollEnabled');
       const savedAutoScrollDelay = await AsyncStorage.getItem('autoScrollDelay');
       const savedAutoScrollSpeed = await AsyncStorage.getItem('autoScrollSpeed');
@@ -143,6 +147,11 @@ export function AppSettingsProvider({ children }) {
 
       if (savedReadLaterSortOrder !== null) {
         setReadLaterSortOrder(JSON.parse(savedReadLaterSortOrder));
+      }
+
+      if (savedReadingFont !== null) {
+        // getReadingFont falls back to the default for an unknown key.
+        setReadingFont(getReadingFont(JSON.parse(savedReadingFont)).key);
       }
 
       if (savedAutoScrollEnabled !== null) {
@@ -295,6 +304,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateReadingFont = async (value) => {
+    try {
+      setReadingFont(value);
+      await AsyncStorage.setItem('readingFont', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving readingFont setting:', error);
+    }
+  };
+
   const updateAutoScrollEnabled = async (value) => {
     try {
       setAutoScrollEnabled(value);
@@ -390,6 +408,7 @@ export function AppSettingsProvider({ children }) {
     translationTargetUserSet,
     lastSeenVersion,
     readLaterSortOrder,
+    readingFont,
     autoScrollEnabled,
     autoScrollDelay,
     autoScrollSpeed,
@@ -398,6 +417,7 @@ export function AppSettingsProvider({ children }) {
     markTranslationTargetUserSet,
     updateLastSeenVersion,
     updateReadLaterSortOrder,
+    updateReadingFont,
     updateAutoScrollEnabled,
     updateAutoScrollDelay,
     updateAutoScrollSpeed,
