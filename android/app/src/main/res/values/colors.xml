@@ -1,7 +1,9 @@
 <resources>
   <color name="splashscreen_background">#ffffff</color>
   <color name="iconBackground">#ffffff</color>
-  <color name="notification_accent">#A17F66</color>
+  <!-- Fills the circle behind the notification icon. White to match the
+       FeedWell logo's own white background. -->
+  <color name="notification_accent">#FFFFFFFF</color>
   <color name="colorPrimary">#023c69</color>
   <color name="colorPrimaryDark">#ffffff</color>
   <!-- Widget colors (light mode) -->

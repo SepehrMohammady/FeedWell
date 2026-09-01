@@ -312,7 +312,39 @@ export default function FeedListScreen({ navigation, route }) {
       });
       return;
     }
+    // Where the first still-unread article sits AFTER the mark, computed from
+    // the list as it looks right now:
+    //  - "unread" filter: everything just marked disappears, so what followed
+    //    the line collapses to the top of the list.
+    //  - any other filter: the list keeps its shape, so that article stays at
+    //    its own index.
+    // Without this the viewport stayed at its old offset and the user had to
+    // scroll back to find where they had got to.
+    const nextUnreadIndex = filteredAndSortedArticles.findIndex(
+      (a, i) => i > articleIndex && !a.isRead
+    );
+
     await markArticlesRead(ids);
+
+    if (nextUnreadIndex === -1) return; // nothing unread below — leave the view alone
+    // Let the list re-render with the new read state before moving the viewport.
+    requestAnimationFrame(() => {
+      if (!flatListRef.current) return;
+      if (articleFilter === 'unread') {
+        flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+        return;
+      }
+      try {
+        flatListRef.current.scrollToIndex({
+          index: nextUnreadIndex,
+          animated: true,
+          viewPosition: 0,
+        });
+      } catch (e) {
+        // scrollToIndex can throw for a not-yet-measured row; onScrollToIndexFailed
+        // handles the retry, so a failure here is not worth surfacing.
+      }
+    });
   };
 
   const handleSetReadingPosition = (articleIndex) => {
