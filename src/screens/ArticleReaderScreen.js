@@ -37,6 +37,7 @@ import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CustomAlert from '../components/CustomAlert';
 import { useAutoScroll } from '../hooks/useAutoScroll';
+import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
 import { readingFontStyle } from '../config/readingFonts';
 import {
   translateText,
@@ -86,7 +87,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   } = route.params;
   const { theme } = useTheme();
   const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
-  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, readingFont } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled, readingFont } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
   // Resolve article from deep link if needed
@@ -435,6 +436,9 @@ function ArticleReaderScreenContent({ route, navigation }) {
       (bookmarkScrollPercent != null && !hasAutoScrolled.current && !userInteractedRef.current
         && Date.now() < bookmarkBlockUntilRef.current),
   });
+
+  // Keep the screen on while auto-scrolling an article.
+  useKeepScreenAwake(autoScrollEnabled && keepAwakeEnabled, 'feedwell-reader');
 
   useFocusEffect(
     useCallback(

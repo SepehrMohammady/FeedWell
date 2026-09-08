@@ -59,6 +59,9 @@ export default {
   "region.fr": "फ़्रेंच",
   "region.de": "जर्मन",
   "region.ja": "जापानी",
+  "region.cs": "चेक",
+  "region.el": "यूनानी",
+  "region.hu": "हंगेरियाई",
 
   "date.justNow": "अभी-अभी",
   "date.minutesAgo": "{count} मिनट पहले",
@@ -314,6 +317,8 @@ export default {
   "settings.readingReminderOffDesc": "कोई पढ़ने का अनुस्मारक नहीं",
   "settings.autoScroll": "स्वतः स्क्रॉल",
   "settings.autoScrollDesc": "कुछ समय तक निष्क्रिय रहने पर फ़ीड सूची और रीडर अपने आप स्क्रॉल करें",
+  "settings.keepAwake": "स्क्रीन चालू रखें",
+  "settings.keepAwakeDesc": "सूची या लेख पढ़ते समय स्क्रीन को बंद होने से रोकें",
   "settings.autoScrollDelay": "स्वतः स्क्रॉल विलंब",
   "settings.autoScrollDelayValue": "{count} सेकंड",
   "settings.autoScrollSpeed": "स्वतः स्क्रॉल गति",

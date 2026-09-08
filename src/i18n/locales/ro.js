@@ -65,6 +65,9 @@ export default {
   "region.pl": "Poloneză",
   "region.vi": "Vietnameză",
   "region.ko": "Coreeană",
+  "region.cs": "Cehă",
+  "region.el": "Greacă",
+  "region.hu": "Maghiară",
 
   // --- Relative date / time ---
   "date.justNow": "Chiar acum",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Reduce animațiile la minimum și afișează un punct fix pentru a diminua răul de mișcare",
   "settings.autoScroll": "Derulare automată",
   "settings.autoScrollDesc": "Derulează automat lista de fluxuri și modul lectură după o perioadă de inactivitate",
+  "settings.keepAwake": "Menține ecranul aprins",
+  "settings.keepAwakeDesc": "Împiedică stingerea ecranului cât timp citești lista sau un articol",
   "settings.autoScrollDelay": "Întârzierea derulării automate",
   "settings.autoScrollDelayValue": "{count} secunde",
   "settings.autoScrollSpeed": "Viteza derulării automate",

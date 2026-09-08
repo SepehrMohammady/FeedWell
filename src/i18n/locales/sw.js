@@ -65,6 +65,9 @@ export default {
   "region.pl": "Kipolandi",
   "region.vi": "Kivietinamu",
   "region.ko": "Kikorea",
+  "region.cs": "Kicheki",
+  "region.el": "Kigiriki",
+  "region.hu": "Kihungari",
 
   // --- Relative date / time ---
   "date.justNow": "Sasa hivi",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Punguza uhuishaji na uonyeshe nukta isiyosogea ili kupunguza kizunguzungu",
   "settings.autoScroll": "Kusogeza Kiotomatiki",
   "settings.autoScrollDesc": "Sogeza orodha ya mipasho na kisomaji kiotomatiki baada ya kipindi cha kutotumika",
+  "settings.keepAwake": "Weka Skrini Iwake",
+  "settings.keepAwakeDesc": "Zuia skrini isizime unaposoma orodha ya makala au makala",
   "settings.autoScrollDelay": "Ucheleweshaji wa Kusogeza",
   "settings.autoScrollDelayValue": "Sekunde {count}",
   "settings.autoScrollSpeed": "Kasi ya Kusogeza",

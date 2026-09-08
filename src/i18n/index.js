@@ -25,10 +25,13 @@ import nl from './locales/nl';
 import tl from './locales/tl';
 import sw from './locales/sw';
 import ro from './locales/ro';
+import cs from './locales/cs';
+import el from './locales/el';
+import hu from './locales/hu';
 
 export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
 
-export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro };
+export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro, cs, el, hu };
 
 function interpolate(str, vars) {
   if (!vars || typeof str !== 'string') return str;

@@ -65,6 +65,9 @@ export default {
   "region.pl": "Polnisch",
   "region.vi": "Vietnamesisch",
   "region.ko": "Koreanisch",
+  "region.cs": "Tschechisch",
+  "region.el": "Griechisch",
+  "region.hu": "Ungarisch",
 
   // --- Relative date / time ---
   "date.justNow": "Gerade eben",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Animationen minimieren und einen festen Punkt anzeigen, um Bewegungsübelkeit zu verringern",
   "settings.autoScroll": "Auto-Scroll",
   "settings.autoScrollDesc": "Feed-Liste und Reader nach einer Zeit der Inaktivität automatisch scrollen",
+  "settings.keepAwake": "Bildschirm anlassen",
+  "settings.keepAwakeDesc": "Verhindert, dass sich der Bildschirm beim Lesen der Liste oder eines Artikels ausschaltet",
   "settings.autoScrollDelay": "Auto-Scroll-Verzögerung",
   "settings.autoScrollDelayValue": "{count} Sekunden",
   "settings.autoScrollSpeed": "Auto-Scroll-Geschwindigkeit",

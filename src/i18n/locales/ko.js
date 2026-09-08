@@ -65,6 +65,9 @@ export default {
   "region.pl": "폴란드어",
   "region.vi": "베트남어",
   "region.ko": "한국어",
+  "region.cs": "체코어",
+  "region.el": "그리스어",
+  "region.hu": "헝가리어",
 
   // --- Relative date / time ---
   "date.justNow": "방금 전",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "애니메이션을 최소화하고 고정된 점을 표시해 멀미를 줄입니다",
   "settings.autoScroll": "자동 스크롤",
   "settings.autoScrollDesc": "일정 시간 조작이 없으면 피드 목록과 리더를 자동으로 스크롤합니다",
+  "settings.keepAwake": "화면 켜 두기",
+  "settings.keepAwakeDesc": "목록이나 기사를 읽는 동안 화면이 꺼지지 않도록 합니다",
   "settings.autoScrollDelay": "자동 스크롤 대기 시간",
   "settings.autoScrollDelayValue": "{count}초",
   "settings.autoScrollSpeed": "자동 스크롤 속도",

@@ -66,6 +66,9 @@ export default {
   "region.fr": "الفرنسية",
   "region.de": "الألمانية",
   "region.ja": "اليابانية",
+  "region.cs": "التشيكية",
+  "region.el": "اليونانية",
+  "region.hu": "المجرية",
 
   // --- Relative date / time ---
   "date.justNow": "الآن",
@@ -332,6 +335,8 @@ export default {
   "settings.reduceMotionDesc": "تقليل الرسوم المتحركة وعرض نقطة ثابتة للحد من دوار الحركة",
   "settings.autoScroll": "التمرير التلقائي",
   "settings.autoScrollDesc": "تمرير قائمة الخلاصات والقارئ تلقائيًا بعد فترة من عدم النشاط",
+  "settings.keepAwake": "إبقاء الشاشة مضاءة",
+  "settings.keepAwakeDesc": "منع انطفاء الشاشة أثناء قراءة قائمة المقالات أو مقال",
   "settings.autoScrollDelay": "مهلة التمرير التلقائي",
   "settings.autoScrollDelayValue": "{count} ثوانٍ",
   "settings.autoScrollSpeed": "سرعة التمرير التلقائي",

@@ -65,6 +65,9 @@ export default {
   "region.pl": "Pools",
   "region.vi": "Vietnamees",
   "region.ko": "Koreaans",
+  "region.cs": "Tsjechisch",
+  "region.el": "Grieks",
+  "region.hu": "Hongaars",
 
   // --- Relative date / time ---
   "date.justNow": "Zojuist",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Beperk animaties en toon een vast punt om bewegingsmisselijkheid te verminderen",
   "settings.autoScroll": "Automatisch scrollen",
   "settings.autoScrollDesc": "Scrol de feedlijst en de lezer automatisch na een periode zonder activiteit",
+  "settings.keepAwake": "Scherm aan houden",
+  "settings.keepAwakeDesc": "Voorkomt dat het scherm uitgaat terwijl je de lijst of een artikel leest",
   "settings.autoScrollDelay": "Vertraging automatisch scrollen",
   "settings.autoScrollDelayValue": "{count} seconden",
   "settings.autoScrollSpeed": "Snelheid automatisch scrollen",

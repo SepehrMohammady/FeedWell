@@ -65,6 +65,9 @@ export default {
   "region.pl": "ポーランド語",
   "region.vi": "ベトナム語",
   "region.ko": "韓国語",
+  "region.cs": "チェコ語",
+  "region.el": "ギリシャ語",
+  "region.hu": "ハンガリー語",
 
   // --- Relative date / time ---
   "date.justNow": "たった今",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "アニメーションを最小限にし、固定ドットを表示して映像酔いを軽減します",
   "settings.autoScroll": "自動スクロール",
   "settings.autoScrollDesc": "一定時間操作がないとき、フィード一覧とリーダーを自動的にスクロールします",
+  "settings.keepAwake": "画面をオンのままにする",
+  "settings.keepAwakeDesc": "記事一覧や記事を読んでいる間、画面が消灯しないようにします",
   "settings.autoScrollDelay": "自動スクロールの待ち時間",
   "settings.autoScrollDelayValue": "{count}秒",
   "settings.autoScrollSpeed": "自動スクロールの速度",

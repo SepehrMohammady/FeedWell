@@ -59,6 +59,9 @@ export default {
   "region.fr": "Francés",
   "region.de": "Alemán",
   "region.ja": "Japonés",
+  "region.cs": "Checo",
+  "region.el": "Griego",
+  "region.hu": "Húngaro",
 
   "date.justNow": "Ahora mismo",
   "date.minutesAgo": "hace {count} min",
@@ -314,6 +317,8 @@ export default {
   "settings.readingReminderOffDesc": "Sin recordatorios de lectura",
   "settings.autoScroll": "Desplazamiento automático",
   "settings.autoScrollDesc": "Desplaza automáticamente la lista de artículos y el lector tras un periodo de inactividad",
+  "settings.keepAwake": "Mantener pantalla encendida",
+  "settings.keepAwakeDesc": "Evita que la pantalla se apague mientras lees la lista o un artículo",
   "settings.autoScrollDelay": "Retardo del desplazamiento automático",
   "settings.autoScrollDelayValue": "{count} segundos",
   "settings.autoScrollSpeed": "Velocidad del desplazamiento automático",

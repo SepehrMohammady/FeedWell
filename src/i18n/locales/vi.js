@@ -65,6 +65,9 @@ export default {
   "region.pl": "Tiếng Ba Lan",
   "region.vi": "Tiếng Việt",
   "region.ko": "Tiếng Hàn",
+  "region.cs": "Tiếng Séc",
+  "region.el": "Tiếng Hy Lạp",
+  "region.hu": "Tiếng Hungary",
 
   // --- Relative date / time ---
   "date.justNow": "Vừa xong",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Giảm tối đa hiệu ứng động và hiển thị một chấm cố định để đỡ say khi nhìn màn hình",
   "settings.autoScroll": "Tự động cuộn",
   "settings.autoScrollDesc": "Tự động cuộn danh sách nguồn cấp và trình đọc sau một khoảng thời gian không thao tác",
+  "settings.keepAwake": "Giữ màn hình luôn sáng",
+  "settings.keepAwakeDesc": "Ngăn màn hình tắt khi bạn đọc danh sách bài viết hoặc một bài viết",
   "settings.autoScrollDelay": "Độ trễ tự động cuộn",
   "settings.autoScrollDelayValue": "{count} giây",
   "settings.autoScrollSpeed": "Tốc độ tự động cuộn",

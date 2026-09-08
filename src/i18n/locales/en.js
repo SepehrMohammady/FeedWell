@@ -67,6 +67,9 @@ export default {
   'region.pl': 'Polish',
   'region.vi': 'Vietnamese',
   'region.ko': 'Korean',
+  'region.cs': 'Czech',
+  'region.el': 'Greek',
+  'region.hu': 'Hungarian',
 
   // --- Relative date / time ---
   'date.justNow': 'Just now',
@@ -333,6 +336,8 @@ export default {
   'settings.reduceMotionDesc': 'Minimize animations and show a fixed dot to reduce motion sickness',
   'settings.autoScroll': 'Auto-Scroll',
   'settings.autoScrollDesc': 'Automatically scroll the feed list and reader after a period of inactivity',
+  'settings.keepAwake': 'Keep Screen On',
+  'settings.keepAwakeDesc': 'Stop the display from turning off while you read the feed list or an article',
   'settings.autoScrollDelay': 'Auto-Scroll Delay',
   'settings.autoScrollDelayValue': '{count} seconds',
   'settings.autoScrollSpeed': 'Auto-Scroll Speed',

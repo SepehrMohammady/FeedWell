@@ -65,6 +65,9 @@ export default {
   "region.pl": "Polonais",
   "region.vi": "Vietnamien",
   "region.ko": "Coréen",
+  "region.cs": "Tchèque",
+  "region.el": "Grec",
+  "region.hu": "Hongrois",
 
   // --- Relative date / time ---
   "date.justNow": "À l'instant",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Réduire les animations et afficher un point fixe pour limiter le mal des transports",
   "settings.autoScroll": "Défilement automatique",
   "settings.autoScrollDesc": "Faire défiler automatiquement la liste des flux et le lecteur après une période d'inactivité",
+  "settings.keepAwake": "Garder l'écran allumé",
+  "settings.keepAwakeDesc": "Empêche l'écran de s'éteindre pendant que vous lisez la liste ou un article",
   "settings.autoScrollDelay": "Délai du défilement automatique",
   "settings.autoScrollDelayValue": "{count} secondes",
   "settings.autoScrollSpeed": "Vitesse du défilement automatique",

@@ -65,6 +65,9 @@ export default {
   "region.pl": "Polako",
   "region.vi": "Biyetnames",
   "region.ko": "Koreano",
+  "region.cs": "Czech",
+  "region.el": "Griyego",
+  "region.hu": "Hungarian",
 
   // --- Relative date / time ---
   "date.justNow": "Ngayon lang",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Bawasan ang mga animation at magpakita ng nakapirming tuldok para mabawasan ang pagkahilo",
   "settings.autoScroll": "Auto-Scroll",
   "settings.autoScrollDesc": "Awtomatikong i-scroll ang listahan ng feed at ang reader pagkatapos ng ilang sandaling walang ginagawa",
+  "settings.keepAwake": "Panatilihing Bukas ang Screen",
+  "settings.keepAwakeDesc": "Pigilan ang screen na mag-off habang binabasa mo ang listahan o isang artikulo",
   "settings.autoScrollDelay": "Delay ng Auto-Scroll",
   "settings.autoScrollDelayValue": "{count} segundo",
   "settings.autoScrollSpeed": "Bilis ng Auto-Scroll",

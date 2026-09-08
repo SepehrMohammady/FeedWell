@@ -41,6 +41,9 @@ export function AppSettingsProvider({ children }) {
   // Percent of the base speed (25–250, step 25). Legacy 'slow'|'normal'|'fast'
   // values from pre-1.12 installs are migrated on load.
   const [autoScrollSpeed, setAutoScrollSpeed] = useState(100);
+  // Sub-option of auto-scroll: hold the screen on while reading the feed list
+  // or an article, so it never dims mid-scroll.
+  const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -72,6 +75,7 @@ export function AppSettingsProvider({ children }) {
       const savedAutoScrollEnabled = await AsyncStorage.getItem('autoScrollEnabled');
       const savedAutoScrollDelay = await AsyncStorage.getItem('autoScrollDelay');
       const savedAutoScrollSpeed = await AsyncStorage.getItem('autoScrollSpeed');
+      const savedKeepAwakeEnabled = await AsyncStorage.getItem('keepAwakeEnabled');
 
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -160,6 +164,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedAutoScrollDelay !== null) {
         setAutoScrollDelay(JSON.parse(savedAutoScrollDelay));
+      }
+
+      if (savedKeepAwakeEnabled !== null) {
+        setKeepAwakeEnabled(JSON.parse(savedKeepAwakeEnabled));
       }
 
       if (savedAutoScrollSpeed !== null) {
@@ -340,6 +348,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateKeepAwakeEnabled = async (value) => {
+    try {
+      setKeepAwakeEnabled(value);
+      await AsyncStorage.setItem('keepAwakeEnabled', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving keepAwakeEnabled setting:', error);
+    }
+  };
+
   const updateLastSeenVersion = async (value) => {
     try {
       setLastSeenVersion(value);
@@ -412,6 +429,7 @@ export function AppSettingsProvider({ children }) {
     autoScrollEnabled,
     autoScrollDelay,
     autoScrollSpeed,
+    keepAwakeEnabled,
     isLoading,
     updateFeedRegion,
     markTranslationTargetUserSet,
@@ -421,6 +439,7 @@ export function AppSettingsProvider({ children }) {
     updateAutoScrollEnabled,
     updateAutoScrollDelay,
     updateAutoScrollSpeed,
+    updateKeepAwakeEnabled,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,

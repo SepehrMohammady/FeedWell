@@ -65,6 +65,9 @@ export default {
   "region.pl": "Polandia",
   "region.vi": "Vietnam",
   "region.ko": "Korea",
+  "region.cs": "Ceko",
+  "region.el": "Yunani",
+  "region.hu": "Hongaria",
 
   // --- Relative date / time ---
   "date.justNow": "Baru saja",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Minimalkan animasi dan tampilkan titik tetap untuk mengurangi mabuk gerak",
   "settings.autoScroll": "Gulir Otomatis",
   "settings.autoScrollDesc": "Gulir daftar feed dan pembaca secara otomatis setelah beberapa saat tanpa aktivitas",
+  "settings.keepAwake": "Biarkan Layar Menyala",
+  "settings.keepAwakeDesc": "Cegah layar mati saat Anda membaca daftar artikel atau sebuah artikel",
   "settings.autoScrollDelay": "Jeda Gulir Otomatis",
   "settings.autoScrollDelayValue": "{count} detik",
   "settings.autoScrollSpeed": "Kecepatan Gulir Otomatis",

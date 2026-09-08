@@ -27,12 +27,13 @@ import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTranslation } from '../context/LanguageContext';
 import { formatRelativeDate } from '../utils/formatDate';
 import { useAutoScroll } from '../hooks/useAutoScroll';
+import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { t, isRTL, formatNumber, language } = useTranslation();
-  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds, autoScrollEnabled, autoScrollDelay, autoScrollSpeed } = useAppSettings();
+  const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled } = useAppSettings();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
@@ -57,6 +58,9 @@ export default function FeedListScreen({ navigation, route }) {
     getMaxOffset: () => Math.max(0, listContentHeightRef.current - listViewportHeightRef.current),
     scrollTo: (y) => flatListRef.current?.scrollToOffset({ offset: y, animated: false }),
   });
+
+  // Keep the screen on while auto-scrolling the list, so it never dims mid-scroll.
+  useKeepScreenAwake(autoScrollEnabled && keepAwakeEnabled, 'feedwell-feed-list');
 
   // Arm while the tab is focused; fully stop on blur/unmount.
   useFocusEffect(

@@ -65,6 +65,9 @@ export default {
   "region.pl": "Польська",
   "region.vi": "В'єтнамська",
   "region.ko": "Корейська",
+  "region.cs": "Чеська",
+  "region.el": "Грецька",
+  "region.hu": "Угорська",
 
   // --- Relative date / time ---
   "date.justNow": "Щойно",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Зменшує анімації та показує нерухому крапку, щоб послабити відчуття закачування",
   "settings.autoScroll": "Автопрокручування",
   "settings.autoScrollDesc": "Автоматично прокручувати список стрічки та читач після періоду бездіяльності",
+  "settings.keepAwake": "Не вимикати екран",
+  "settings.keepAwakeDesc": "Екран не гасне, доки ви читаєте список статей або статтю",
   "settings.autoScrollDelay": "Затримка автопрокручування",
   "settings.autoScrollDelayValue": "{count} секунд",
   "settings.autoScrollSpeed": "Швидкість автопрокручування",

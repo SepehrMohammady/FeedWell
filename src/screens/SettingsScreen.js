@@ -54,7 +54,7 @@ import {
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES, amoledBlack, toggleAmoledBlack } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
@@ -1116,6 +1116,20 @@ export default function SettingsScreen({ navigation }) {
                 <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedFast')}</Text>
               </View>
             </View>
+          )}
+          {autoScrollEnabled && (
+            <SettingItem
+              title={t('settings.keepAwake')}
+              description={t('settings.keepAwakeDesc')}
+              rightElement={
+                <Switch
+                  value={keepAwakeEnabled}
+                  onValueChange={updateKeepAwakeEnabled}
+                  trackColor={{ false: '#767577', true: theme.colors.primary }}
+                  thumbColor={keepAwakeEnabled ? '#fff' : '#f4f3f4'}
+                />
+              }
+            />
           )}
           <SettingItem
             title={t('settings.articleAgeFilter')}

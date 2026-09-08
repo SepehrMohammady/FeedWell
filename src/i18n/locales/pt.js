@@ -66,6 +66,9 @@ export default {
   "region.pl": "Polaco",
   "region.vi": "Vietnamita",
   "region.ko": "Coreano",
+  "region.cs": "Checo",
+  "region.el": "Grego",
+  "region.hu": "Húngaro",
 
   // --- Relative date / time ---
   "date.justNow": "Agora mesmo",
@@ -335,6 +338,8 @@ export default {
   "settings.readingReminderOffDesc": "Sem lembretes de leitura",
   "settings.autoScroll": "Deslocamento Automático",
   "settings.autoScrollDesc": "Deslocar automaticamente a lista de feeds e o leitor após um período de inatividade",
+  "settings.keepAwake": "Manter ecrã ligado",
+  "settings.keepAwakeDesc": "Impede que o ecrã se desligue enquanto lê a lista ou um artigo",
   "settings.autoScrollDelay": "Atraso do Deslocamento Automático",
   "settings.autoScrollDelayValue": "{count} segundos",
   "settings.autoScrollSpeed": "Velocidade do Deslocamento Automático",

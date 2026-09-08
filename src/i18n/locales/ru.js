@@ -65,6 +65,9 @@ export default {
   "region.pl": "Польский",
   "region.vi": "Вьетнамский",
   "region.ko": "Корейский",
+  "region.cs": "Чешский",
+  "region.el": "Греческий",
+  "region.hu": "Венгерский",
 
   // --- Relative date / time ---
   "date.justNow": "Только что",
@@ -331,6 +334,8 @@ export default {
   "settings.reduceMotionDesc": "Свести анимации к минимуму и показывать неподвижную точку, чтобы уменьшить укачивание",
   "settings.autoScroll": "Автопрокрутка",
   "settings.autoScrollDesc": "Автоматически прокручивать список лент и ридер после периода бездействия",
+  "settings.keepAwake": "Не выключать экран",
+  "settings.keepAwakeDesc": "Экран не гаснет, пока вы читаете список статей или статью",
   "settings.autoScrollDelay": "Задержка автопрокрутки",
   "settings.autoScrollDelayValue": "{count} сек",
   "settings.autoScrollSpeed": "Скорость автопрокрутки",
