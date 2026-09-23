@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,7 +8,8 @@
     android:background="@drawable/widget_background"
     android:padding="12dp">
 
-    <!-- Header -->
+    <!-- Header. In the one-row "strip" size the app name gives way to the
+         article title, so the row carries the article plus its controls. -->
     <LinearLayout
         android:id="@+id/widget_header"
         android:layout_width="match_parent"
@@ -24,7 +26,21 @@
             android:text="FeedWell"
             android:textColor="@color/widget_header"
             android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/widget_strip_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="@color/widget_title"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:visibility="gone" />
 
         <ImageButton
             android:id="@+id/widget_prev_button"
@@ -35,6 +51,7 @@
             android:contentDescription="Previous article"
             android:scaleType="centerInside"
             android:tint="@color/widget_icon"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="2dp" />
 
         <ImageButton
@@ -70,7 +87,8 @@
             android:layout_marginStart="2dp" />
     </LinearLayout>
 
-    <!-- Single Article Content (compact mode) -->
+    <!-- Single article. A tall widget puts the preview image on top and lets it
+         take the spare height; a short, wide one shows it beside the text. -->
     <LinearLayout
         android:id="@+id/widget_article_container"
         android:layout_width="match_parent"
@@ -79,49 +97,89 @@
         android:orientation="vertical"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/widget_article_title"
+        <ImageView
+            android:id="@+id/widget_image_top"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No articles yet"
-            android:textColor="@color/widget_title"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:maxLines="3"
-            android:ellipsize="end" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/widget_image_background"
+            android:clipToOutline="true"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            tools:targetApi="31" />
 
-        <TextView
-            android:id="@+id/widget_article_description"
+        <LinearLayout
+            android:id="@+id/widget_article_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textColor="@color/widget_feed"
-            android:textSize="12sp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:visibility="gone" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/widget_article_feed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text=""
-            android:textColor="@color/widget_feed"
-            android:textSize="11sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            <ImageView
+                android:id="@+id/widget_image_side"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="10dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/widget_image_background"
+                android:clipToOutline="true"
+                android:importantForAccessibility="no"
+                android:visibility="gone"
+                tools:targetApi="31" />
 
-        <TextView
-            android:id="@+id/widget_article_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text=""
-            android:textColor="@color/widget_date"
-            android:textSize="10sp"
-            android:maxLines="1" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/widget_article_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No articles yet"
+                    android:textColor="@color/widget_title"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="3"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/widget_article_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:textColor="@color/widget_feed"
+                    android:textSize="12sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/widget_article_feed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:textColor="@color/widget_feed"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/widget_article_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text=""
+                    android:textColor="@color/widget_date"
+                    android:textSize="10sp"
+                    android:maxLines="1" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Scrollable Article List (tall mode) -->
@@ -134,7 +192,7 @@
         android:dividerHeight="0.5dp"
         android:visibility="gone" />
 
-    <!-- Page indicator (compact mode only) -->
+    <!-- Page indicator (single-article modes) -->
     <TextView
         android:id="@+id/widget_page_indicator"
         android:layout_width="match_parent"

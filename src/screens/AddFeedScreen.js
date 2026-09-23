@@ -23,8 +23,11 @@ import { useTranslation } from '../context/LanguageContext';
 import { FEED_REGIONS, getCuratedFeeds, CURATED_FEEDS } from '../data/curatedFeeds';
 import { formatLocalizedDate } from '../utils/formatDate';
 import CustomAlert from '../components/CustomAlert';
+import { useTourTarget } from '../context/TourContext';
 
 export default function AddFeedScreen({ navigation }) {
+  const tourUrlRef = useTourTarget('addFeed.url');
+  const tourRegionRef = useTourTarget('addFeed.popular');
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [discovering, setDiscovering] = useState(false);
@@ -692,7 +695,7 @@ export default function AddFeedScreen({ navigation }) {
               {t('addFeed.rssFeedUrlDescription')}
             </Text>
             
-            <View style={styles.inputContainer}>
+            <View ref={tourUrlRef} collapsable={false} style={styles.inputContainer}>
               <TextInput
                 style={styles.textInput}
                 value={url}
@@ -739,6 +742,7 @@ export default function AddFeedScreen({ navigation }) {
               {t('region.label')}
             </Text>
             <TouchableOpacity
+              ref={tourRegionRef}
               onPress={() => setShowRegionPicker(true)}
               style={{
                 flexDirection: isRTL ? 'row-reverse' : 'row',

@@ -44,6 +44,9 @@ export function AppSettingsProvider({ children }) {
   // Sub-option of auto-scroll: hold the screen on while reading the feed list
   // or an article, so it never dims mid-scroll.
   const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(false);
+  // Translate articles into the default translation language as they open.
+  // Off by default: in online mode it sends each opened article to Google.
+  const [autoTranslate, setAutoTranslate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -76,6 +79,7 @@ export function AppSettingsProvider({ children }) {
       const savedAutoScrollDelay = await AsyncStorage.getItem('autoScrollDelay');
       const savedAutoScrollSpeed = await AsyncStorage.getItem('autoScrollSpeed');
       const savedKeepAwakeEnabled = await AsyncStorage.getItem('keepAwakeEnabled');
+      const savedAutoTranslate = await AsyncStorage.getItem('autoTranslate');
 
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -168,6 +172,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedKeepAwakeEnabled !== null) {
         setKeepAwakeEnabled(JSON.parse(savedKeepAwakeEnabled));
+      }
+
+      if (savedAutoTranslate !== null) {
+        setAutoTranslate(JSON.parse(savedAutoTranslate));
       }
 
       if (savedAutoScrollSpeed !== null) {
@@ -357,6 +365,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateAutoTranslate = async (value) => {
+    try {
+      setAutoTranslate(value);
+      await AsyncStorage.setItem('autoTranslate', JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving autoTranslate setting:', error);
+    }
+  };
+
   const updateLastSeenVersion = async (value) => {
     try {
       setLastSeenVersion(value);
@@ -430,6 +447,7 @@ export function AppSettingsProvider({ children }) {
     autoScrollDelay,
     autoScrollSpeed,
     keepAwakeEnabled,
+    autoTranslate,
     isLoading,
     updateFeedRegion,
     markTranslationTargetUserSet,
@@ -440,6 +458,7 @@ export function AppSettingsProvider({ children }) {
     updateAutoScrollDelay,
     updateAutoScrollSpeed,
     updateKeepAwakeEnabled,
+    updateAutoTranslate,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rounded placeholder behind widget preview images; on Android 12+ the image
+     is clipped to this outline (clipToOutline), older versions show it square. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#1F8B7355" />
+    <corners android:radius="10dp" />
+</shape>

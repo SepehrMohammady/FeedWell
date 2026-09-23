@@ -32,7 +32,7 @@ import { tStatic } from '../i18n';
 import { formatLocalizedDate } from '../utils/formatDate';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
-import OnboardingTutorial from '../components/OnboardingTutorial';
+import { useTour, useTourTarget } from '../context/TourContext';
 import CustomAlert from '../components/CustomAlert';
 import { SafeStorage } from '../utils/SafeStorage';
 import {
@@ -51,16 +51,26 @@ import {
   deleteModel,
 } from '../utils/translationService';
 
+// "More from SeMo Lab" — the other apps, alphabetical. Names are brands and stay
+// untranslated; descriptions are localized.
+const SEMO_LAB_DEVELOPER_ID = '6449174405168948991';
+const SEMO_LAB_APPS = [
+  { name: 'LedgerWell', packageName: 'com.ledgerwell.app', descKey: 'settings.appLedgerWellDesc' },
+  { name: 'ThinkWell', packageName: 'com.thinkwell.app', descKey: 'settings.appThinkWellDesc' },
+  { name: 'WeatherWell', packageName: 'com.weatherwell.app', descKey: 'settings.appWeatherWellDesc' },
+];
+
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
   const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES, amoledBlack, toggleAmoledBlack } = useTheme();
-  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled } = useAppSettings();
+  const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled, autoTranslate, updateAutoTranslate } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
   const insets = useSafeAreaInsets();
-  const [showTutorial, setShowTutorial] = useState(false);
+  const tour = useTour();
+  const tourHeaderRef = useTourTarget('settings.header');
   const [showAppLangPicker, setShowAppLangPicker] = useState(false);
 
   // Translation settings state
@@ -85,6 +95,7 @@ export default function SettingsScreen({ navigation }) {
   const [widgetTheme, setWidgetTheme] = useState('app'); // 'app', 'light', 'dark'
   const [showWidgetThemePicker, setShowWidgetThemePicker] = useState(false);
   const [widgetOpacity, setWidgetOpacity] = useState(100); // 0-100%
+  const [widgetShowImages, setWidgetShowImages] = useState(true);
 
   // Load target language and translation mode on mount
   useEffect(() => {
@@ -93,6 +104,7 @@ export default function SettingsScreen({ navigation }) {
     // Load widget preferences
     AsyncStorage.getItem('widget_theme').then(v => { if (v) setWidgetTheme(v); });
     AsyncStorage.getItem('widget_opacity').then(v => { if (v) setWidgetOpacity(parseInt(v, 10)); });
+    AsyncStorage.getItem('widget_show_images').then(v => { if (v !== null) setWidgetShowImages(v === 'true'); });
   }, []);
 
   const handleChangeDefaultLang = async (langCode) => {
@@ -199,6 +211,14 @@ export default function SettingsScreen({ navigation }) {
     await AsyncStorage.setItem('widget_opacity', String(rounded));
     if (Platform.OS === 'android' && WidgetBridge) {
       try { WidgetBridge.setWidgetOpacity(Math.round(rounded * 2.55)); } catch (e) {}
+    }
+  };
+
+  const handleWidgetShowImagesChange = async (value) => {
+    setWidgetShowImages(value);
+    await AsyncStorage.setItem('widget_show_images', String(value));
+    if (Platform.OS === 'android' && WidgetBridge?.setWidgetShowImages) {
+      try { WidgetBridge.setWidgetShowImages(value); } catch (e) {}
     }
   };
 
@@ -350,6 +370,24 @@ export default function SettingsScreen({ navigation }) {
     } catch (error) {
       console.error('Error opening website:', error);
       setAlertConfig({ visible: true, title: t('common.error'), message: t('settings.openWebsiteError'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
+    }
+  };
+
+  // More from SeMo Lab: open the Play Store app directly, falling back to the
+  // web listing where there is no store app (or on web).
+  const openPlayListing = async (packageName) => {
+    try {
+      await Linking.openURL(`market://details?id=${packageName}`);
+    } catch (e) {
+      handleOpenWebsite(`https://play.google.com/store/apps/details?id=${packageName}`);
+    }
+  };
+
+  const openDeveloperPage = async () => {
+    try {
+      await Linking.openURL(`market://dev?id=${SEMO_LAB_DEVELOPER_ID}`);
+    } catch (e) {
+      handleOpenWebsite(`https://play.google.com/store/apps/dev?id=${SEMO_LAB_DEVELOPER_ID}`);
     }
   };
 
@@ -914,7 +952,7 @@ export default function SettingsScreen({ navigation }) {
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
-      <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+      <View ref={tourHeaderRef} collapsable={false} style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <Text style={styles.headerTitle}>{t('tab.settings')}</Text>
       </View>
 
@@ -1156,6 +1194,18 @@ export default function SettingsScreen({ navigation }) {
                 onPress={() => setShowWidgetThemePicker(true)}
                 rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
               />
+              <SettingItem
+                title={t('settings.widgetImages')}
+                description={t('settings.widgetImagesDesc')}
+                rightElement={
+                  <Switch
+                    value={widgetShowImages}
+                    onValueChange={handleWidgetShowImagesChange}
+                    trackColor={{ false: '#767577', true: theme.colors.primary }}
+                    thumbColor={widgetShowImages ? '#fff' : '#f4f3f4'}
+                  />
+                }
+              />
               <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
                 <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                   <Text style={{ fontSize: 15, color: theme.colors.text }}>{t('settings.widgetOpacity')}</Text>
@@ -1239,6 +1289,18 @@ export default function SettingsScreen({ navigation }) {
             rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
           />
           <SettingItem
+            title={t('settings.autoTranslate')}
+            description={t('settings.autoTranslateDesc', { language: getDisplayName(targetLangCode) })}
+            rightElement={
+              <Switch
+                value={autoTranslate}
+                onValueChange={updateAutoTranslate}
+                trackColor={{ false: '#767577', true: theme.colors.primary }}
+                thumbColor={autoTranslate ? '#fff' : '#f4f3f4'}
+              />
+            }
+          />
+          <SettingItem
             title={t('settings.downloadedModels')}
             description={t('settings.downloadedModelsDesc')}
             onPress={handleOpenModelManager}
@@ -1250,9 +1312,9 @@ export default function SettingsScreen({ navigation }) {
         <SectionHeader title={t('settings.sectionHelp')} />
         <View style={styles.section}>
           <SettingItem
-            title={t('settings.appTutorial')}
-            description={t('settings.appTutorialDesc')}
-            onPress={() => setShowTutorial(true)}
+            title={t('settings.appTour')}
+            description={t('settings.appTourDesc')}
+            onPress={() => tour?.startTour()}
             isLast={true}
             rightElement={<Ionicons name="help-circle-outline" size={20} color={theme.colors.primary} />}
           />
@@ -1286,6 +1348,7 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem isNote={true}>{t('settings.testersThankYou')}</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
+          <TesterItem>Basel Badich</TesterItem>
           <TesterItem>Chris (few-thoughts)</TesterItem>
           <TesterItem>Danoush Faryar</TesterItem>
           <TesterItem>Houriyeh Emadoleslami</TesterItem>
@@ -1320,6 +1383,26 @@ export default function SettingsScreen({ navigation }) {
           />
         </View>
 
+        <SectionHeader title={t('settings.sectionMoreApps')} />
+        <View style={styles.section}>
+          {SEMO_LAB_APPS.map((app) => (
+            <SettingItem
+              key={app.packageName}
+              title={app.name}
+              description={t(app.descKey)}
+              onPress={() => openPlayListing(app.packageName)}
+              rightElement={<Ionicons name="logo-google-playstore" size={20} color={theme.colors.primary} />}
+            />
+          ))}
+          <SettingItem
+            title={t('settings.allApps')}
+            description={t('settings.allAppsDesc')}
+            onPress={openDeveloperPage}
+            isLast={true}
+            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
+          />
+        </View>
+
         <View style={styles.footer}>
           {/* Centered like every language; explicit writingDirection keeps the bidi
               base stable so the line doesn't flip when it starts with a Latin word. */}
@@ -1333,10 +1416,6 @@ export default function SettingsScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      <OnboardingTutorial 
-        visible={showTutorial} 
-        onComplete={() => setShowTutorial(false)}
-      />
 
       {/* Default Language Picker Modal */}
       <Modal

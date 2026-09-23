@@ -28,6 +28,7 @@ export function updateWidget(articles, feeds) {
       pubDate: article.pubDate || article.publishedDate || '',
       link: article.link || article.url || '',
       description: article.description || '',
+      imageUrl: article.imageUrl || '',
     }));
 
     WidgetBridge.updateArticles(JSON.stringify(widgetArticles));

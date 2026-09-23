@@ -95,6 +95,23 @@ AVAILABLE_LANGUAGES.forEach(lang => {
   MLKIT_TO_CODE[lang.mlKitName.toLowerCase()] = lang.code;
 });
 
+// Google's detector and Android's locale both still use a few pre-ISO-639
+// codes ('iw' for Hebrew, 'in' for Indonesian), and Google also returns
+// region-tagged codes like 'zh-CN'. Map them onto the codes this table uses,
+// or the same-language check compares 'iw' with 'he' and never matches.
+const LEGACY_LANGUAGE_CODES = { iw: 'he', in: 'id', ji: 'yi', jw: 'jv' };
+
+export function normalizeLanguageCode(code) {
+  if (!code) return code;
+  const raw = String(code).trim();
+  if (CODE_TO_MLKIT[raw]) return raw;
+  const [base, ...region] = raw.split(/[-_]/);
+  const lang = LEGACY_LANGUAGE_CODES[base.toLowerCase()] || base.toLowerCase();
+  const withRegion = region.length ? lang + '-' + region.join('-') : lang;
+  if (CODE_TO_MLKIT[withRegion]) return withRegion;
+  return lang;
+}
+
 export function getMLKitName(langCode) {
   return CODE_TO_MLKIT[langCode] || 'English';
 }
@@ -284,7 +301,7 @@ export async function translateText(text, sourceLangCode, targetLangCode, onProg
 export async function identifyLanguage(text) {
   if (!text || text.length < 20) return null;
   try {
-    const langCode = await detectLanguageOnline(text);
+    const langCode = normalizeLanguageCode(await detectLanguageOnline(text));
     console.log('Online language detection:', langCode);
     return langCode;
   } catch (error) {
@@ -361,7 +378,7 @@ export async function loadTargetLanguage() {
       const locale = Platform.OS === 'ios'
         ? (NativeModules.SettingsManager?.settings?.AppleLocale || NativeModules.SettingsManager?.settings?.AppleLanguages?.[0] || 'en')
         : NativeModules.I18nManager?.localeIdentifier || 'en';
-      deviceLang = locale.split(/[-_]/)[0].toLowerCase();
+      deviceLang = normalizeLanguageCode(locale.split(/[-_]/)[0].toLowerCase());
     } catch (e) { /* ignore */ }
     // Only use if it's a supported language
     return CODE_TO_MLKIT[deviceLang] ? deviceLang : 'en';

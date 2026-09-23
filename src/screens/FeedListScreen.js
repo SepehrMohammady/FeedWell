@@ -28,6 +28,7 @@ import { useTranslation } from '../context/LanguageContext';
 import { formatRelativeDate } from '../utils/formatDate';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
+import { useTour, useTourTarget } from '../context/TourContext';
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
@@ -50,6 +51,18 @@ export default function FeedListScreen({ navigation, route }) {
   const listOffsetRef = useRef(0);
   const listContentHeightRef = useRef(0);
   const listViewportHeightRef = useRef(0);
+  // App tour: the controls it points at, and a pause for auto-scroll while it runs.
+  const tour = useTour();
+  const tourActiveRef = useRef(false);
+  tourActiveRef.current = !!tour?.active;
+  const tourAddRef = useTourTarget('feeds.add');
+  const tourFilterRef = useTourTarget('feeds.filter');
+  const tourSoundsRef = useTourTarget('feeds.sounds');
+  const tourSortRef = useTourTarget('feeds.sort');
+  const tourReadAllRef = useTourTarget('feeds.readAll');
+  const tourSearchRef = useTourTarget('feeds.search');
+  const tourReadingPositionRef = useTourTarget('feeds.readingPosition');
+
   const autoScroll = useAutoScroll({
     enabled: autoScrollEnabled,
     delaySeconds: autoScrollDelay,
@@ -57,7 +70,13 @@ export default function FeedListScreen({ navigation, route }) {
     getOffset: () => listOffsetRef.current,
     getMaxOffset: () => Math.max(0, listContentHeightRef.current - listViewportHeightRef.current),
     scrollTo: (y) => flatListRef.current?.scrollToOffset({ offset: y, animated: false }),
+    isBlocked: () => tourActiveRef.current,
   });
+
+  // The tour points at the first reading-position row, so start it at the top.
+  useEffect(() => {
+    if (tour?.active) flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [tour?.active]);
 
   // Keep the screen on while auto-scrolling the list, so it never dims mid-scroll.
   useKeepScreenAwake(autoScrollEnabled && keepAwakeEnabled, 'feedwell-feed-list');
@@ -536,6 +555,7 @@ export default function FeedListScreen({ navigation, route }) {
           )}
         </TouchableOpacity>
 
+        <View ref={index === 0 ? tourReadingPositionRef : undefined} collapsable={index !== 0}>
         {/* Show reading position line after this article if it matches */}
         {showReadingPositionInFeeds && showReadingPositionAfter && !selectionMode && (
           <ReadingPositionIndicator
@@ -556,6 +576,7 @@ export default function FeedListScreen({ navigation, route }) {
             markAboveLabel={t('feedList.markAboveRead')}
           />
         )}
+        </View>
       </View>
     );
   };
@@ -969,6 +990,7 @@ export default function FeedListScreen({ navigation, route }) {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>FeedWell</Text>
           <TouchableOpacity
+            ref={tourAddRef}
             style={styles.addButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
@@ -1079,6 +1101,7 @@ export default function FeedListScreen({ navigation, route }) {
         ) : (
           <View style={styles.headerRightGroup}>
             <TouchableOpacity
+              ref={tourFilterRef}
               style={[styles.filterPill, styles.filterButton]}
               onPress={openFilterMenu}
             >
@@ -1087,6 +1110,7 @@ export default function FeedListScreen({ navigation, route }) {
             </TouchableOpacity>
             <View style={styles.headerButtons}>
               <TouchableOpacity
+                ref={tourSoundsRef}
                 style={styles.headerButton}
                 onPress={() => openSoundPlaylist(true)}
               >
@@ -1094,6 +1118,7 @@ export default function FeedListScreen({ navigation, route }) {
                 <Text style={styles.headerButtonLabel}>{t('feedList.soundsLabel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                ref={tourSortRef}
                 style={styles.headerButton}
                 onPress={toggleSort}
               >
@@ -1102,6 +1127,7 @@ export default function FeedListScreen({ navigation, route }) {
               </TouchableOpacity>
               {articleFilter !== 'read' && (
                 <TouchableOpacity
+                  ref={tourReadAllRef}
                   style={styles.headerButton}
                   onPress={handleMarkAllRead}
                 >
@@ -1119,6 +1145,7 @@ export default function FeedListScreen({ navigation, route }) {
                 </TouchableOpacity>
               )}
               <TouchableOpacity
+                ref={tourAddRef}
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddFeed')}
               >
@@ -1131,7 +1158,7 @@ export default function FeedListScreen({ navigation, route }) {
       </View>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      <View ref={tourSearchRef} collapsable={false} style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}

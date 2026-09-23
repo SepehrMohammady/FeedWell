@@ -28,10 +28,14 @@ import ro from './locales/ro';
 import cs from './locales/cs';
 import el from './locales/el';
 import hu from './locales/hu';
+import he from './locales/he';
+import sv from './locales/sv';
+import da from './locales/da';
+import fi from './locales/fi';
 
 export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
 
-export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro, cs, el, hu };
+export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro, cs, el, hu, he, sv, da, fi };
 
 function interpolate(str, vars) {
   if (!vars || typeof str !== 'string') return str;

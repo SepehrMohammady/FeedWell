@@ -87,7 +87,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
   } = route.params;
   const { theme } = useTheme();
   const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
-  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled, readingFont } = useAppSettings();
+  const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled, readingFont, autoTranslate } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
   // Resolve article from deep link if needed
@@ -800,9 +800,14 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
   }, [article, isInReadLater, updateReadLaterArticle]);
 
-  const handleTranslate = async () => {
+  // options.auto: started by the Auto-Translate setting rather than a tap. Auto
+  // runs never toggle a translation off and never raise alerts. (A tap passes the
+  // press event here, which has no auto field.)
+  const handleTranslate = async (options) => {
+    const auto = options?.auto === true;
     // If already translated, toggle back to original
     if (isTranslated) {
+      if (auto) return;
       setIsTranslated(false);
       persistShowTranslated(false);
       return;
@@ -838,6 +843,11 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
       // Check if source and target are the same
       if (sourceLangCode === targetLangCode) {
+        if (auto) {
+          setTranslating(false);
+          setTranslationProgress('');
+          return;
+        }
         setAlertConfig({
           visible: true,
           title: t('reader.sameLanguageTitle'),
@@ -896,6 +906,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     } catch (error) {
       // Log the technical detail; show the user only the localized friendly message.
       console.error('Translation error:', error);
+      if (auto) return; // the finally block still clears the progress state
       setAlertConfig({
         visible: true,
         title: t('reader.translationFailedTitle'),
@@ -908,6 +919,22 @@ function ArticleReaderScreenContent({ route, navigation }) {
       setTranslationProgress('');
     }
   };
+
+  // Auto-Translate: once the article has loaded, translate it into the default
+  // language without a tap. One attempt per article. A saved translation for this
+  // language is left to the restore effect above, so an article the reader
+  // switched back to the original stays in the original.
+  const autoTranslateTriedRef = useRef(false);
+  useEffect(() => { autoTranslateTriedRef.current = false; }, [article?.id]);
+  useEffect(() => {
+    if (!autoTranslate || autoTranslateTriedRef.current) return;
+    if (!targetLangLoaded || loading || !contentReady || !fullContent) return;
+    if (isTranslated || translatedContent || translating || isSameLanguage) return;
+    if (article?.cachedTranslation?.targetLangCode === targetLangCode) return;
+    autoTranslateTriedRef.current = true;
+    handleTranslate({ auto: true });
+  }, [autoTranslate, targetLangLoaded, loading, contentReady, fullContent, isTranslated,
+      translatedContent, translating, isSameLanguage, targetLangCode, article?.cachedTranslation]);
 
   const handleChangeTargetLanguage = async (langCode) => {
     setTargetLangCode(langCode);

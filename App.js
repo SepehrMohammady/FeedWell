@@ -15,7 +15,8 @@ import { NotesProvider } from './src/context/NotesContext';
 import { AmbientSoundProvider } from './src/context/AmbientSoundContext';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import AppNavigator from './src/navigation/AppNavigator';
-import OnboardingTutorial from './src/components/OnboardingTutorial';
+import AppTour from './src/components/AppTour';
+import { TourProvider, useTour } from './src/context/TourContext';
 import WhatsNewModal from './src/components/WhatsNewModal';
 import KinetosisOverlay from './src/components/KinetosisOverlay';
 import * as Font from 'expo-font';
@@ -113,7 +114,7 @@ function AppContent() {
   const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation, readingReminder, lastSeenVersion, updateLastSeenVersion } = useAppSettings();
   const { theme, isDarkMode } = useTheme();
   const { langLoading, language } = useTranslation();
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const tour = useTour();
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [navStateReady, setNavStateReady] = useState(false);
   const [initialNavState, setInitialNavState] = useState(undefined);
@@ -186,11 +187,13 @@ function AppContent() {
     return () => linkSub.remove();
   }, []);
 
+  // First launch: walk the new user through the app. Finishing or skipping the
+  // tour marks onboarding done (and stamps the version, so no What's New popup).
   useEffect(() => {
-    if (!isLoading && !hasSeenOnboarding) {
-      setShowOnboarding(true);
+    if (!isLoading && !hasSeenOnboarding && tour && !tour.active) {
+      tour.startTour(completeOnboarding);
     }
-  }, [isLoading, hasSeenOnboarding]);
+  }, [isLoading, hasSeenOnboarding]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Show the "What's New" popup once after updating to a new version. Never on a
   // fresh install (those see onboarding, which stamps lastSeenVersion on finish).
@@ -199,11 +202,6 @@ function AppContent() {
       setShowWhatsNew(true);
     }
   }, [isLoading, hasSeenOnboarding, lastSeenVersion]);
-
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-    completeOnboarding();
-  };
 
   const handleWhatsNewClose = () => {
     setShowWhatsNew(false);
@@ -241,12 +239,9 @@ function AppContent() {
         <KinetosisOverlay />
         <StatusBar style={isDarkMode ? "light" : "dark"} />
       </NavigationContainer>
-      <OnboardingTutorial
-        visible={showOnboarding}
-        onComplete={handleOnboardingComplete}
-      />
+      <AppTour navigationRef={navigationRef} />
       <WhatsNewModal
-        visible={showWhatsNew && !showOnboarding}
+        visible={showWhatsNew && !tour?.active}
         onClose={handleWhatsNewClose}
         onOpenLanguageSettings={handleOpenLanguageSettings}
       />
@@ -265,7 +260,9 @@ export default function App() {
                 <NotesProvider>
                   <AmbientSoundProvider>
                     <FeedProvider>
-                      <AppContent />
+                      <TourProvider>
+                        <AppContent />
+                      </TourProvider>
                     </FeedProvider>
                   </AmbientSoundProvider>
                 </NotesProvider>

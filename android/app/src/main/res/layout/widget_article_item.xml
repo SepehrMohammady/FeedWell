@@ -1,44 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-    <TextView
-        android:id="@+id/widget_item_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/widget_title"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:maxLines="2"
-        android:ellipsize="end" />
-
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="2dp">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/widget_item_feed"
-            android:layout_width="0dp"
+            android:id="@+id/widget_item_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/widget_feed"
-            android:textSize="10sp"
-            android:maxLines="1"
+            android:textColor="@color/widget_title"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:maxLines="2"
             android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/widget_item_date"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/widget_date"
-            android:textSize="10sp"
-            android:layout_marginStart="8dp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="2dp">
+
+            <TextView
+                android:id="@+id/widget_item_feed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/widget_feed"
+                android:textSize="10sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/widget_item_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/widget_date"
+                android:textSize="10sp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/widget_item_image"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="10dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/widget_image_background"
+        android:clipToOutline="true"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        tools:targetApi="31" />
 </LinearLayout>

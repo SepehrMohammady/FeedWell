@@ -2,6 +2,7 @@ package com.feedwell.app
 
 import android.content.Context
 import android.content.Intent
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import org.json.JSONArray
@@ -57,6 +58,19 @@ class WidgetArticleListFactory(private val context: Context) : RemoteViewsServic
                 putExtra("article_date", pubDate)
             }
             views.setOnClickFillInIntent(R.id.widget_list_item, fillIntent)
+
+            // getViewAt runs on a binder thread, so a missing thumbnail can be
+            // downloaded right here without blocking the launcher's UI.
+            val imageUrl = article.optString("imageUrl", "")
+            val thumbnail = if (LatestArticlesWidget.showImages(context)) {
+                WidgetImageLoader.getBlocking(context, imageUrl, 160, LatestArticlesWidget.widgetBackground(context))
+            } else null
+            if (thumbnail != null) {
+                views.setImageViewBitmap(R.id.widget_item_image, thumbnail)
+                views.setViewVisibility(R.id.widget_item_image, View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.widget_item_image, View.GONE)
+            }
         }
 
         return views

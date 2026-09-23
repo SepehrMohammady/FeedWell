@@ -7,6 +7,10 @@ import { toPersianDigits } from '../utils/persianDigits';
 
 export const APP_LANGUAGE_KEY = 'appLanguage';
 
+// Android still reports some languages with their pre-ISO-639 Java codes, so a
+// Hebrew device says 'iw' and an Indonesian one says 'in'.
+const LEGACY_LANGUAGE_CODES = { iw: 'he', in: 'id', ji: 'yi', jw: 'jv' };
+
 // Best-effort device language detection without adding a native dependency
 // (mirrors the approach already used in translationService.loadTargetLanguage).
 export function detectDeviceLanguage() {
@@ -16,7 +20,8 @@ export function detectDeviceLanguage() {
         || NativeModules.SettingsManager?.settings?.AppleLanguages?.[0]
         || 'en')
       : (NativeModules.I18nManager?.localeIdentifier || 'en');
-    const code = String(locale).split(/[-_]/)[0].toLowerCase();
+    const raw = String(locale).split(/[-_]/)[0].toLowerCase();
+    const code = LEGACY_LANGUAGE_CODES[raw] || raw;
     return SUPPORTED_LANGUAGES.includes(code) ? code : 'en';
   } catch (e) {
     return 'en';

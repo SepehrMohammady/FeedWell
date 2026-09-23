@@ -18,9 +18,11 @@ import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import ArticleImage from '../components/ArticleImage';
 import CustomAlert from '../components/CustomAlert';
+import { useTourTarget } from '../context/TourContext';
 
 export default function ReadLaterScreen({ navigation }) {
   const { theme } = useTheme();
+  const tourHeaderRef = useTourTarget('saved.header');
   const { t, isRTL, formatNumber, language } = useTranslation();
   // Sort order is persisted app-wide (like the Feeds tab) so it survives
   // navigating into an article and back.
@@ -202,7 +204,7 @@ export default function ReadLaterScreen({ navigation }) {
 
   const renderHeader = () => (
     <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row', backgroundColor: theme.colors.surface }]}>
-      <View style={styles.headerContent}>
+      <View ref={tourHeaderRef} collapsable={false} style={styles.headerContent}>
         <Text style={[styles.headerTitle, { color: theme.colors.text, textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
           {t('readLater.title')}
         </Text>
