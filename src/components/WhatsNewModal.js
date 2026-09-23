@@ -3,10 +3,11 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from '../context/LanguageContext';
-import { APP_VERSION } from '../config/version';
+import { WHATS_NEW_RELEASES } from '../config/whatsNew';
 
 // One-time "What's New" popup shown after the app is updated to a new version.
-export default function WhatsNewModal({ visible, onClose, onOpenLanguageSettings }) {
+// It lists the last two releases (see config/whatsNew.js).
+export default function WhatsNewModal({ visible, onClose, onTakeTour }) {
   const { theme } = useTheme();
   const { t, isRTL } = useTranslation();
 
@@ -32,38 +33,27 @@ export default function WhatsNewModal({ visible, onClose, onOpenLanguageSettings
           <View style={[styles.header, { backgroundColor: theme.colors.primary + '14' }]}>
             <Ionicons name="sparkles" size={28} color={theme.colors.primary} />
             <Text style={[styles.title, { color: theme.colors.text }]}>{t('whatsNew.title')}</Text>
-            <Text style={[styles.version, { color: theme.colors.textSecondary }]}>
-              {t('whatsNew.version', { version: APP_VERSION.version })}
-            </Text>
           </View>
 
           <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-            <Feature
-              icon="language"
-              title={t('whatsNew.languagesTitle')}
-              body={t('whatsNew.languagesBody')}
-            />
-            <Feature
-              icon="newspaper"
-              title={t('whatsNew.feedsTitle')}
-              body={t('whatsNew.feedsBody')}
-            />
-            <Feature
-              icon="sparkles"
-              title={t('whatsNew.otherTitle')}
-              body={t('whatsNew.otherBody')}
-            />
-            <Text style={[styles.hint, { color: theme.colors.textSecondary, textAlign }]}>
-              {t('whatsNew.changeHint')}
-            </Text>
+            {WHATS_NEW_RELEASES.map((release, i) => (
+              <View key={release.version} style={i > 0 && [styles.release, { borderTopColor: theme.colors.border }]}>
+                <Text style={[styles.releaseVersion, { color: theme.colors.primary, textAlign }]}>
+                  {t('whatsNew.version', { version: release.version })}
+                </Text>
+                {release.items.map((item) => (
+                  <Feature key={item.body} icon={item.icon} title={t(item.title)} body={t(item.body)} />
+                ))}
+              </View>
+            ))}
           </ScrollView>
 
           <View style={styles.actions}>
             <TouchableOpacity
               style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
-              onPress={onOpenLanguageSettings}
+              onPress={onTakeTour}
             >
-              <Text style={styles.primaryBtnText}>{t('whatsNew.openLanguageSettings')}</Text>
+              <Text style={styles.primaryBtnText}>{t('whatsNew.takeTour')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryBtn} onPress={onClose}>
               <Text style={[styles.secondaryBtnText, { color: theme.colors.textSecondary }]}>
@@ -102,15 +92,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 8,
   },
-  version: {
-    fontSize: 13,
-    marginTop: 2,
-  },
   body: {
     paddingHorizontal: 20,
   },
   bodyContent: {
     paddingVertical: 16,
+  },
+  release: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 16,
+  },
+  releaseVersion: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 14,
   },
   feature: {
     alignItems: 'flex-start',
@@ -135,11 +130,6 @@ const styles = StyleSheet.create({
   featureBody: {
     fontSize: 14,
     lineHeight: 20,
-  },
-  hint: {
-    fontSize: 13,
-    fontStyle: 'italic',
-    marginTop: 4,
   },
   actions: {
     padding: 16,

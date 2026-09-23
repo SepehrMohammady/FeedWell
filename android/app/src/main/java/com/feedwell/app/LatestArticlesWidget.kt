@@ -242,6 +242,21 @@ class LatestArticlesWidget : AppWidgetProvider() {
 
         val articles = getArticles(context)
 
+        // The launcher keeps the widget's views and replays each update on top of
+        // them, so whatever an earlier update switched on stays on unless this one
+        // switches it off. Start every update from the layout's defaults; without
+        // this a resized widget showed the old top image next to the new side one,
+        // and paging could leave the previous article's image or snippet behind.
+        views.setViewVisibility(R.id.widget_image_top, View.GONE)
+        views.setViewVisibility(R.id.widget_image_side, View.GONE)
+        views.setViewVisibility(R.id.widget_article_description, View.GONE)
+        views.setViewVisibility(R.id.widget_app_name, View.VISIBLE)
+        views.setViewVisibility(R.id.widget_strip_title, View.GONE)
+        views.setViewVisibility(R.id.widget_next_button, View.VISIBLE)
+        views.setViewPadding(R.id.widget_container, px(12), px(12), px(12), px(12))
+        views.setViewPadding(R.id.widget_header, 0, 0, 0, px(6))
+        views.setInt(R.id.widget_container, "setGravity", Gravity.TOP or Gravity.START)
+
         // ── Apply theme colors programmatically ──
         val dark = isWidgetDark(context)
         val titleColor = if (dark) 0xFFF0E6DE.toInt() else 0xFF3C2A1E.toInt()

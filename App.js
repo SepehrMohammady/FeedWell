@@ -208,11 +208,9 @@ function AppContent() {
     updateLastSeenVersion(APP_VERSION.version);
   };
 
-  const handleOpenLanguageSettings = () => {
+  const handleWhatsNewTour = () => {
     handleWhatsNewClose();
-    if (navigationRef.isReady()) {
-      navigationRef.navigate('Settings');
-    }
+    tour?.startTour();
   };
 
   if (isLoading || langLoading || !navStateReady) {
@@ -243,7 +241,7 @@ function AppContent() {
       <WhatsNewModal
         visible={showWhatsNew && !tour?.active}
         onClose={handleWhatsNewClose}
-        onOpenLanguageSettings={handleOpenLanguageSettings}
+        onTakeTour={handleWhatsNewTour}
       />
     </>
   );
