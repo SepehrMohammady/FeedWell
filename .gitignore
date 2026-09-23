@@ -56,3 +56,6 @@ yarn-error.*
 
 # GitHub Copilot instructions (local development only)
 .github/copilot-instructions.md
+
+# Play Console files (store listing CSV, release notes), kept locally only
+store/
