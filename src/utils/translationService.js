@@ -298,14 +298,18 @@ export async function translateText(text, sourceLangCode, targetLangCode, onProg
 
 // --- Language Detection ---
 
-export async function identifyLanguage(text) {
+// In Offline mode detection stays on the device (ML Kit); otherwise Google's
+// detector is tried first because it is more accurate on short samples.
+export async function identifyLanguage(text, mode = TRANSLATION_MODES.AUTO) {
   if (!text || text.length < 20) return null;
-  try {
-    const langCode = normalizeLanguageCode(await detectLanguageOnline(text));
-    console.log('Online language detection:', langCode);
-    return langCode;
-  } catch (error) {
-    console.log('Online language detection failed:', error.message);
+  if (mode !== TRANSLATION_MODES.OFFLINE) {
+    try {
+      const langCode = normalizeLanguageCode(await detectLanguageOnline(text));
+      console.log('Online language detection:', langCode);
+      return langCode;
+    } catch (error) {
+      console.log('Online language detection failed:', error.message);
+    }
   }
   try {
     const sample = text.substring(0, 500);

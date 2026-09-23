@@ -579,8 +579,14 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
   // Load saved target language and translation mode on mount
   useEffect(() => {
-    loadTargetLanguage().then(code => { setTargetLangCode(code); setTargetLangLoaded(true); });
-    loadTranslationMode().then(mode => setTranslationMode(mode));
+    // Both at once: targetLangLoaded gates every automatic translation, and it
+    // must not open before the saved mode is known (it defaults to Auto, which
+    // would go online for someone who chose Offline only).
+    Promise.all([loadTargetLanguage(), loadTranslationMode()]).then(([code, mode]) => {
+      setTranslationMode(mode);
+      setTargetLangCode(code);
+      setTargetLangLoaded(true);
+    });
   }, []);
 
   // Restore a previously cached translation for saved articles so it can be
@@ -609,6 +615,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
     const cached = article?.cachedTranslation;
     if (
       !targetLangLoaded || loading || upgradeAttemptedRef.current ||
+      translationMode === TRANSLATION_MODES.OFFLINE ||
       !cached || cached.method !== 'offline' ||
       cached.targetLangCode !== targetLangCode ||
       !fullContent || !article?.id || !isInReadLater(article.id)
@@ -637,7 +644,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
         console.log('Online upgrade of cached translation skipped:', e?.message);
       }
     })();
-  }, [article?.id, targetLangCode, targetLangLoaded, loading, fullContent]);
+  }, [article?.id, targetLangCode, targetLangLoaded, loading, fullContent, translationMode]);
 
   // Track if we've already marked this article as read
   const hasMarkedReadRef = useRef(false);
@@ -830,7 +837,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       // Step 1: Detect source language (returns BCP-47 code)
       let sourceLangCode = detectedSourceLang;
       if (!sourceLangCode) {
-        const identified = await identifyLanguage(contentToTranslate);
+        const identified = await identifyLanguage(contentToTranslate, translationMode);
         if (identified) {
           sourceLangCode = identified;
           setDetectedSourceLang(identified);

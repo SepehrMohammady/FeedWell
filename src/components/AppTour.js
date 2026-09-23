@@ -20,6 +20,7 @@ const HOLE_PADDING = 6;
 const NAV_SETTLE_MS = 420;      // let a screen transition finish before measuring
 const MEASURE_RETRY_MS = 120;
 const MEASURE_ATTEMPTS = 12;    // ~1.5 s, then fall back to a centred card
+const REVEAL_SETTLE_MS = 350;   // after a target scrolls itself into view
 const DIM = 'rgba(0, 0, 0, 0.72)';
 
 function targetRouteName(nav) {
@@ -46,6 +47,7 @@ export default function AppTour({ navigationRef }) {
   const [ready, setReady] = useState(false);
   const fade = useRef(new Animated.Value(0)).current;
   const startTabRef = useRef(null);
+  const overlayRef = useRef(null);
   const visitedAddFeedRef = useRef(false);
 
   const active = !!tour?.active;
@@ -74,6 +76,7 @@ export default function AppTour({ navigationRef }) {
     let timer = null;
     let attempts = 0;
     let previous = null;
+    let revealed = false;
 
     setReady(false);
     setRect(null);
@@ -116,13 +119,34 @@ export default function AppTour({ navigationRef }) {
 
     function measure() {
       if (cancelled) return;
-      const node = tour.getTarget(step.target);
+      const entry = tour.getTarget(step.target);
+      const node = entry?.node;
       if (!node || typeof node.measureInWindow !== 'function') {
         retryOrGiveUp(false);
         return;
       }
-      node.measureInWindow((x, y, w, h) => {
+      // Let the target bring itself on screen (e.g. scroll its list) first.
+      if (!revealed && entry.reveal) {
+        revealed = true;
+        try { entry.reveal(); } catch (e) { /* measure wherever it is */ }
+        timer = setTimeout(measure, REVEAL_SETTLE_MS);
+        return;
+      }
+      // measureInWindow on Android is relative to the area below the status bar,
+      // while the overlay is drawn from the top of the screen (edge-to-edge).
+      // Measuring both the same way and subtracting cancels that out.
+      const overlay = overlayRef.current;
+      const withOverlayOrigin = (cb) => {
+        if (overlay && typeof overlay.measureInWindow === 'function') {
+          overlay.measureInWindow((ox, oy) => cb(ox || 0, oy || 0));
+        } else {
+          cb(0, 0);
+        }
+      };
+      withOverlayOrigin((ox, oy) => node.measureInWindow((mx, my, w, h) => {
         if (cancelled) return;
+        const x = mx - ox;
+        const y = my - oy;
         const onScreen = w > 0 && h > 0 && y >= 0 && y + h <= H && x > -2 && x + w <= W + 2;
         if (!onScreen) {
           previous = null;
@@ -137,7 +161,7 @@ export default function AppTour({ navigationRef }) {
           previous = { x, y, w, h };
           timer = setTimeout(measure, MEASURE_RETRY_MS);
         }
-      });
+      }));
     }
 
     if (step.target) {
@@ -270,6 +294,8 @@ export default function AppTour({ navigationRef }) {
 
   return (
     <View
+      ref={overlayRef}
+      collapsable={false}
       style={StyleSheet.absoluteFill}
       onLayout={(e) => setOverlayH(e.nativeEvent.layout.height)}
     >

@@ -8,21 +8,21 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 const TourContext = createContext(null);
 
 export function TourProvider({ children }) {
-  const targetsRef = useRef(new Map());
+  const targetsRef = useRef(new Map()); // id -> { node, reveal }
   const onEndRef = useRef(null);
   const [active, setActive] = useState(false);
   // Changes on every start, so the overlay restarts from step one even if a tour
   // is started again straight after the previous one ended.
   const [runId, setRunId] = useState(0);
 
-  const registerTarget = useCallback((id, node) => {
-    targetsRef.current.set(id, node);
+  const registerTarget = useCallback((id, node, reveal) => {
+    targetsRef.current.set(id, { node, reveal });
   }, []);
 
   // Only forget the node this caller registered, so an unmounting screen can't
   // remove a newer screen's target that reused the same id.
   const unregisterTarget = useCallback((id, node) => {
-    if (targetsRef.current.get(id) === node) targetsRef.current.delete(id);
+    if (targetsRef.current.get(id)?.node === node) targetsRef.current.delete(id);
   }, []);
 
   const getTarget = useCallback((id) => targetsRef.current.get(id) || null, []);
@@ -54,17 +54,20 @@ export function useTour() {
 
 // Returns a ref callback: <TouchableOpacity ref={useTourTarget('feeds.sort')} ...>
 // Plain Views need collapsable={false}, or Android may flatten them away and
-// leave nothing to measure.
-export function useTourTarget(id) {
+// leave nothing to measure. `reveal` (optional) brings the control on screen,
+// e.g. by scrolling its ScrollView, before the tour measures it.
+export function useTourTarget(id, reveal) {
   const ctx = useContext(TourContext);
   const register = ctx?.registerTarget;
   const unregister = ctx?.unregisterTarget;
   const nodeRef = useRef(null);
+  const revealRef = useRef(reveal);
+  revealRef.current = reveal;
   return useCallback((node) => {
     if (!register) return;
     if (node) {
       nodeRef.current = node;
-      register(id, node);
+      register(id, node, () => revealRef.current && revealRef.current());
     } else if (nodeRef.current) {
       unregister(id, nodeRef.current);
       nodeRef.current = null;

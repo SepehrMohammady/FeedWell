@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -26,8 +26,16 @@ import CustomAlert from '../components/CustomAlert';
 import { useTourTarget } from '../context/TourContext';
 
 export default function AddFeedScreen({ navigation }) {
-  const tourUrlRef = useTourTarget('addFeed.url');
-  const tourRegionRef = useTourTarget('addFeed.popular');
+  // The tour scrolls each target into view before spotlighting it.
+  const scrollRef = useRef(null);
+  const inputYRef = useRef(0);
+  const categoriesYRef = useRef(0);
+  // The URL box sits below the user's feed list, so with many feeds it starts
+  // off screen: scroll it into view before the tour spotlights it.
+  const tourUrlRef = useTourTarget('addFeed.url', () =>
+    scrollRef.current?.scrollTo({ y: Math.max(0, inputYRef.current - 12), animated: false }));
+  const tourRegionRef = useTourTarget('addFeed.popular', () =>
+    scrollRef.current?.scrollTo({ y: Math.max(0, categoriesYRef.current - 12), animated: false }));
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [discovering, setDiscovering] = useState(false);
@@ -628,7 +636,7 @@ export default function AddFeedScreen({ navigation }) {
           <View style={styles.headerButton} />
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView ref={scrollRef} style={styles.content} showsVerticalScrollIndicator={false}>
           <SectionHeader title={t('addFeed.yourFeeds', { count: formatNumber(feeds.length) })} />
           {feeds.length === 0 ? (
             <View style={styles.emptyState}>
@@ -689,7 +697,7 @@ export default function AddFeedScreen({ navigation }) {
             </View>
           )}
 
-          <View style={styles.inputSection}>
+          <View style={styles.inputSection} onLayout={(e) => { inputYRef.current = e.nativeEvent.layout.y; }}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t('addFeed.rssFeedUrl')}</Text>
             <Text style={[styles.sectionDescription, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('addFeed.rssFeedUrlDescription')}
@@ -732,7 +740,7 @@ export default function AddFeedScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.categoriesSection}>
+          <View style={styles.categoriesSection} onLayout={(e) => { categoriesYRef.current = e.nativeEvent.layout.y; }}>
             <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t('addFeed.popularCategories')}</Text>
             <Text style={[styles.sectionDescription, { textAlign: isRTL ? 'right' : 'left' }]}>
               {t('addFeed.popularDescription')}
