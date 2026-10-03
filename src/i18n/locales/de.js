@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Neuigkeiten",
   "whatsNew.version": "Version {version}",
+  "whatsNew.backFixTitle": "Zurück-Taste repariert",
+  "whatsNew.backFixBody": "Zurück aus einem Artikel führt jetzt direkt zur Liste, und Zurück in der Liste öffnet keine bereits gelesenen Artikel mehr.",
   "whatsNew.takeTour": "Rundgang starten",
   "whatsNew.tourBody": "Ein geführter Rundgang zeigt Ihnen FeedWell Funktion für Funktion. Sie können ihn jederzeit in den Einstellungen wiederholen.",
   "whatsNew.autoTranslateBody": "Einmal in den Einstellungen eingeschaltet, werden Artikel beim Öffnen direkt in Ihre Sprache übersetzt.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Die Größe des Startbildschirm-Widgets lässt sich von einer schmalen einzeiligen Leiste bis zur vollen Liste ändern. Ist genug Platz, zeigt es Vorschaubilder der Artikel.",
   "whatsNew.languages118Title": "Vier neue Sprachen",
   "whatsNew.languages118Body": "Hebräisch, Schwedisch, Dänisch und Finnisch, jeweils mit handverlesenen lokalen Feeds.",
-  "whatsNew.keepAwakeBody": "Auto-Scroll kann den Bildschirm beim Lesen anlassen, damit er nie mitten im Artikel dunkel wird.",
-  "whatsNew.languages117Title": "Drei neue Sprachen",
-  "whatsNew.languages117Body": "Tschechisch, Griechisch und Ungarisch, jeweils mit handverlesenen lokalen Feeds.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "Feed hinzufügen",

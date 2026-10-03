@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Что нового",
   "whatsNew.version": "Версия {version}",
+  "whatsNew.backFixTitle": "Исправлена кнопка Назад",
+  "whatsNew.backFixBody": "Назад из статьи теперь сразу ведёт к списку, а Назад в списке больше не открывает снова уже прочитанные статьи.",
   "whatsNew.takeTour": "Пройти обзор",
   "whatsNew.tourBody": "Обзор покажет FeedWell функцию за функцией. Его можно пройти снова в любой момент в Настройках.",
   "whatsNew.autoTranslateBody": "Включите его в Настройках, и статьи будут переводиться на ваш язык сразу при открытии.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Меняйте размер виджета от узкой полоски в одну строку до полного списка. Если места хватает, он показывает превью-изображения статей.",
   "whatsNew.languages118Title": "Четыре новых языка",
   "whatsNew.languages118Body": "Иврит, шведский, датский и финский, для каждого подобраны местные ленты.",
-  "whatsNew.keepAwakeBody": "Автопрокрутка может не давать экрану гаснуть, пока вы читаете, чтобы он не потемнел посреди статьи.",
-  "whatsNew.languages117Title": "Три новых языка",
-  "whatsNew.languages117Body": "Чешский, греческий и венгерский, для каждого подобраны местные ленты.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "Добавить ленту",

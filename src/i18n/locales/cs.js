@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Novinky",
   "whatsNew.version": "Verze {version}",
+  "whatsNew.backFixTitle": "Oprava tlačítka Zpět",
+  "whatsNew.backFixBody": "Zpět z článku vás teď vrátí rovnou do seznamu a Zpět v seznamu už neotevírá články, které jste už přečetli.",
   "whatsNew.takeTour": "Projít prohlídku",
   "whatsNew.tourBody": "Prohlídka vám FeedWell ukáže funkci po funkci. Kdykoli si ji můžete znovu spustit v Nastavení.",
   "whatsNew.autoTranslateBody": "Zapněte ho v Nastavení a články se přeloží do vašeho jazyka hned, jak je otevřete.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Velikost widgetu na ploše můžete měnit od úzkého jednořádkového pruhu až po celý seznam. Když je místo, zobrazuje náhledové obrázky článků.",
   "whatsNew.languages118Title": "Čtyři nové jazyky",
   "whatsNew.languages118Body": "Hebrejština, švédština, dánština a finština, každá s ručně vybranými místními kanály.",
-  "whatsNew.keepAwakeBody": "Automatické posouvání může při čtení nechat obrazovku zapnutou, takže nikdy neztmavne uprostřed článku.",
-  "whatsNew.languages117Title": "Tři nové jazyky",
-  "whatsNew.languages117Body": "Čeština, řečtina a maďarština, každá s ručně vybranými místními kanály.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Přidat kanál",

@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "新機能",
   "whatsNew.version": "バージョン {version}",
+  "whatsNew.backFixTitle": "戻るボタンの修正",
+  "whatsNew.backFixBody": "記事から戻ると一覧に直接戻るようになり、一覧で戻っても既読の記事が再び開くことはなくなりました。",
   "whatsNew.takeTour": "ツアーを見る",
   "whatsNew.tourBody": "ガイド付きツアーで、FeedWellの機能を一つずつ紹介します。ツアーは設定からいつでも見直せます。",
   "whatsNew.autoTranslateBody": "設定でオンにすると、記事を開いた時点であなたの言語に翻訳されます。",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "ホーム画面ウィジェットのサイズを、1行の細い帯から一覧全体まで変えられます。スペースがあれば、記事のプレビュー画像も表示します。",
   "whatsNew.languages118Title": "4つの新しい言語",
   "whatsNew.languages118Body": "ヘブライ語、スウェーデン語、デンマーク語、フィンランド語。それぞれに厳選したローカルフィードがあります。",
-  "whatsNew.keepAwakeBody": "自動スクロール中は画面をオンのままにできるので、記事の途中で画面が暗くなりません。",
-  "whatsNew.languages117Title": "3つの新しい言語",
-  "whatsNew.languages117Body": "チェコ語、ギリシャ語、ハンガリー語。それぞれに厳選したローカルフィードがあります。",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "フィードを追加",

@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Noutăți",
   "whatsNew.version": "Versiunea {version}",
+  "whatsNew.backFixTitle": "Butonul Înapoi reparat",
+  "whatsNew.backFixBody": "Înapoi dintr-un articol te duce acum direct la listă, iar Înapoi în listă nu mai redeschide articolele pe care le-ai citit deja.",
   "whatsNew.takeTour": "Începe turul",
   "whatsNew.tourBody": "Un tur ghidat îți arată FeedWell funcție cu funcție. Îl poți relua oricând din Setări.",
   "whatsNew.autoTranslateBody": "Activeaz-o în Setări și articolele sunt traduse în limba ta imediat ce le deschizi.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Redimensionează widgetul de pe ecranul principal de la o bandă subțire de un rând până la o listă completă. Când are loc, afișează imagini de previzualizare ale articolelor.",
   "whatsNew.languages118Title": "Patru limbi noi",
   "whatsNew.languages118Body": "Ebraică, suedeză, daneză și finlandeză, fiecare cu fluxuri locale alese cu grijă.",
-  "whatsNew.keepAwakeBody": "Derularea automată poate ține ecranul aprins cât timp citești, ca să nu se stingă niciodată la jumătatea unui articol.",
-  "whatsNew.languages117Title": "Trei limbi noi",
-  "whatsNew.languages117Body": "Cehă, greacă și maghiară, fiecare cu fluxuri locale alese cu grijă.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Adaugă flux",

@@ -3,8 +3,11 @@
 // A step with no target — or whose target isn't on screen (e.g. no feeds yet) —
 // is shown as a centred card, so every function is still explained.
 
-const FEED_LIST = ['Feeds', { screen: 'FeedList' }];
-const ADD_FEED = ['Feeds', { screen: 'AddFeed' }];
+// pop: true returns to the screen if the tab already has it. Without it, React
+// Navigation 7 stacks a new copy on top, and the tour left the Feeds tab as
+// List > Add Feed > List, so Back on the list opened Add Feed.
+const FEED_LIST = ['Feeds', { screen: 'FeedList', pop: true }];
+const ADD_FEED = ['Feeds', { screen: 'AddFeed', pop: true }];
 
 export const TOUR_STEPS = [
   { key: 'welcome', icon: 'sparkles-outline', titleKey: 'tour.welcomeTitle', bodyKey: 'tour.welcomeBody' },
@@ -18,7 +21,7 @@ export const TOUR_STEPS = [
   { key: 'readingPosition', nav: FEED_LIST, target: 'feeds.readingPosition', icon: 'bookmark-outline', titleKey: 'tour.readingPositionTitle', bodyKey: 'tour.readingPositionBody' },
   { key: 'sounds', nav: FEED_LIST, target: 'feeds.sounds', icon: 'musical-notes-outline', titleKey: 'tour.soundsTitle', bodyKey: 'tour.soundsBody' },
   { key: 'reader', icon: 'reader-outline', titleKey: 'tour.readerTitle', bodyKey: 'tour.readerBody' },
-  { key: 'saved', nav: ['ReadLater', { screen: 'ReadLaterList' }], target: 'saved.header', icon: 'save-outline', titleKey: 'tour.savedTitle', bodyKey: 'tour.savedBody' },
+  { key: 'saved', nav: ['ReadLater', { screen: 'ReadLaterList', pop: true }], target: 'saved.header', icon: 'save-outline', titleKey: 'tour.savedTitle', bodyKey: 'tour.savedBody' },
   { key: 'settings', nav: ['Settings'], target: 'settings.header', icon: 'settings-outline', titleKey: 'tour.settingsTitle', bodyKey: 'tour.settingsBody' },
   { key: 'done', icon: 'checkmark-circle-outline', titleKey: 'tour.doneTitle', bodyKey: 'tour.doneBody' },
 ];

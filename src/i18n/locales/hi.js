@@ -74,6 +74,8 @@ export default {
 
   "whatsNew.title": "नया क्या है",
   "whatsNew.version": "संस्करण {version}",
+  "whatsNew.backFixTitle": "बैक बटन ठीक किया गया",
+  "whatsNew.backFixBody": "लेख से बैक दबाने पर अब आप सीधे सूची पर पहुँचते हैं, और सूची पर बैक दबाने से पहले पढ़े गए लेख दोबारा नहीं खुलते।",
   "whatsNew.takeTour": "टूर शुरू करें",
   "whatsNew.tourBody": "एक गाइडेड टूर आपको FeedWell की हर सुविधा एक-एक करके दिखाता है। इसे आप कभी भी सेटिंग्स से दोबारा देख सकते हैं।",
   "whatsNew.autoTranslateBody": "इसे सेटिंग्स में चालू करें, और लेख खोलते ही आपकी भाषा में अनुवादित हो जाएँगे।",
@@ -81,9 +83,6 @@ export default {
   "whatsNew.widgetBody": "होम स्क्रीन विजेट का आकार एक पतली एक-पंक्ति वाली पट्टी से लेकर पूरी सूची तक बदलें। जगह होने पर यह लेखों की पूर्वावलोकन छवियाँ दिखाता है।",
   "whatsNew.languages118Title": "चार नई भाषाएँ",
   "whatsNew.languages118Body": "हिब्रू, स्वीडिश, डेनिश और फ़िनिश, हर एक के साथ चुनिंदा स्थानीय फ़ीड।",
-  "whatsNew.keepAwakeBody": "स्वतः स्क्रॉल पढ़ते समय स्क्रीन को चालू रख सकता है, ताकि लेख के बीच में वह बंद न हो।",
-  "whatsNew.languages117Title": "तीन नई भाषाएँ",
-  "whatsNew.languages117Body": "चेक, यूनानी और हंगेरियाई, हर एक के साथ चुनिंदा स्थानीय फ़ीड।",
 
   "addFeed.addButton": "फ़ीड जोड़ें",
   "addFeed.popularCategories": "लोकप्रिय श्रेणियाँ",

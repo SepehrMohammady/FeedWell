@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Anong Bago",
   "whatsNew.version": "Bersyon {version}",
+  "whatsNew.backFixTitle": "Naayos ang Back button",
+  "whatsNew.backFixBody": "Dinadala ka na ngayon ng Back mula sa artikulo diretso sa listahan, at hindi na muling binubuksan ng Back sa listahan ang mga artikulong nabasa mo na.",
   "whatsNew.takeTour": "Simulan ang tour",
   "whatsNew.tourBody": "Ipinapakita ng guided tour ang FeedWell nang isa-isang feature. Puwede mo itong ulitin kahit kailan mula sa Mga Setting.",
   "whatsNew.autoTranslateBody": "I-on ito sa Mga Setting at isasalin ang mga artikulo sa wika mo sa sandaling buksan mo ang mga ito.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Baguhin ang laki ng widget mula sa manipis na strip na isang linya hanggang sa buong listahan. Kapag may espasyo, nagpapakita ito ng mga preview na larawan ng artikulo.",
   "whatsNew.languages118Title": "Apat na bagong wika",
   "whatsNew.languages118Body": "Hebreo, Suweko, Danes at Finlandes, bawat isa ay may piling lokal na feed.",
-  "whatsNew.keepAwakeBody": "Kayang panatilihing bukas ng Auto-Scroll ang screen habang nagbabasa ka, kaya hindi ito dumidilim sa gitna ng artikulo.",
-  "whatsNew.languages117Title": "Tatlong bagong wika",
-  "whatsNew.languages117Body": "Czech, Griyego at Hungarian, bawat isa ay may piling lokal na feed.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Magdagdag ng Feed",

@@ -193,7 +193,7 @@ export default function AppTour({ navigationRef }) {
     try {
       // Don't leave the Add Feed screen the tour opened sitting in the Feeds tab.
       if (leftAddFeedOpen && navigationRef.getCurrentRoute()?.name === 'AddFeed') {
-        navigationRef.navigate('Feeds', { screen: 'FeedList' });
+        navigationRef.navigate('Feeds', { screen: 'FeedList', pop: true });
       }
       if (startTab) navigationRef.navigate(startTab);
     } catch (e) { /* ignore */ }

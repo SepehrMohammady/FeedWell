@@ -83,6 +83,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "ما الجديد",
   "whatsNew.version": "الإصدار {version}",
+  "whatsNew.backFixTitle": "إصلاح زر الرجوع",
+  "whatsNew.backFixBody": "يعيدك الرجوع من المقال الآن إلى القائمة مباشرة، ولم يعد الرجوع من القائمة يفتح مقالات قرأتها من قبل.",
   "whatsNew.takeTour": "ابدأ الجولة",
   "whatsNew.tourBody": "جولة إرشادية تعرّفك على FeedWell ميزةً تلو الأخرى. يمكنك إعادتها في أي وقت من الإعدادات.",
   "whatsNew.autoTranslateBody": "فعّلها من الإعدادات، وستُترجم المقالات إلى لغتك فور فتحها.",
@@ -90,9 +92,6 @@ export default {
   "whatsNew.widgetBody": "غيّر حجم أداة الشاشة الرئيسية من شريط رفيع بسطر واحد إلى قائمة كاملة. وحين تتسع المساحة، تعرض صور معاينة للمقالات.",
   "whatsNew.languages118Title": "أربع لغات جديدة",
   "whatsNew.languages118Body": "العبرية والسويدية والدنماركية والفنلندية، ولكل منها خلاصات محلية مختارة بعناية.",
-  "whatsNew.keepAwakeBody": "يمكن للتمرير التلقائي إبقاء الشاشة مضاءة أثناء القراءة، فلا تخفت في منتصف المقال.",
-  "whatsNew.languages117Title": "ثلاث لغات جديدة",
-  "whatsNew.languages117Body": "التشيكية واليونانية والمجرية، ولكل منها خلاصات محلية مختارة بعناية.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "إضافة خلاصة",

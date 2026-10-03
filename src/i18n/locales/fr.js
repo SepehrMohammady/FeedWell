@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Nouveautés",
   "whatsNew.version": "Version {version}",
+  "whatsNew.backFixTitle": "Bouton Retour corrigé",
+  "whatsNew.backFixBody": "Retour depuis un article vous ramène désormais directement à la liste, et Retour dans la liste ne rouvre plus les articles déjà lus.",
   "whatsNew.takeTour": "Faire la visite",
   "whatsNew.tourBody": "Une visite guidée vous présente FeedWell, une fonction à la fois. Vous pouvez la relancer à tout moment depuis les Réglages.",
   "whatsNew.autoTranslateBody": "Activez-la dans les Réglages et les articles sont traduits dans votre langue dès que vous les ouvrez.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Redimensionnez le widget de l'écran d'accueil, d'une fine bande d'une ligne jusqu'à une liste complète. S'il y a de la place, il affiche des images d'aperçu des articles.",
   "whatsNew.languages118Title": "Quatre nouvelles langues",
   "whatsNew.languages118Body": "Hébreu, suédois, danois et finnois, chacune avec des flux locaux choisis à la main.",
-  "whatsNew.keepAwakeBody": "Le défilement automatique peut garder l'écran allumé pendant la lecture, pour qu'il ne s'éteigne jamais au milieu d'un article.",
-  "whatsNew.languages117Title": "Trois nouvelles langues",
-  "whatsNew.languages117Body": "Tchèque, grec et hongrois, chacune avec des flux locaux choisis à la main.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "Ajouter un flux",

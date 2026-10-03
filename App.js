@@ -33,6 +33,31 @@ const NAV_STATE_KEY = 'feedwell_nav_state';
 const navigationRef = createNavigationContainerRef();
 let pendingDeepLinkUrl = null;
 
+// Cleans the saved navigation state before restoring it. Up to 1.18.1, Back
+// from an article stacked a second list on top of it (List > Article > List),
+// and this saved state carried that across restarts, so Back on the list kept
+// reopening an old article. Only the open tab keeps its stack, trimmed to start
+// at its last list screen; the other tabs start fresh at their list. Their
+// leftover nested-navigation params are dropped too, or the first visit to the
+// tab would replay them and reopen the article they pointed at.
+const TAB_LIST_SCREENS = { Feeds: 'FeedList', ReadLater: 'ReadLaterList' };
+function cleanRestoredNavState(state) {
+  if (!Array.isArray(state?.routes)) return state;
+  const focusedTab = state.routes[state.index ?? 0]?.name;
+  return {
+    ...state,
+    routes: state.routes.map((tab) => {
+      const listScreen = TAB_LIST_SCREENS[tab.name];
+      if (!listScreen) return tab;
+      const { params: _staleParams, state: stack, ...rest } = tab;
+      if (tab.name !== focusedTab || !Array.isArray(stack?.routes)) return rest;
+      const lastList = stack.routes.map((route) => route.name).lastIndexOf(listScreen);
+      const routes = lastList > 0 ? stack.routes.slice(lastList) : stack.routes;
+      return { ...rest, state: { ...stack, routes, index: routes.length - 1 } };
+    }),
+  };
+}
+
 function handleDeepLink(url) {
   if (!url) return;
   if (!navigationRef.isReady()) {
@@ -125,7 +150,7 @@ function AppContent() {
       try {
         const saved = await AsyncStorage.getItem(NAV_STATE_KEY);
         if (saved) {
-          setInitialNavState(JSON.parse(saved));
+          setInitialNavState(cleanRestoredNavState(JSON.parse(saved)));
         }
       } catch (e) {
         // Ignore restore errors

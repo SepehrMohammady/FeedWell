@@ -998,16 +998,23 @@ function ArticleReaderScreenContent({ route, navigation }) {
     }
   };
 
+  // Back from an article always lands on the list it was opened from, skipping
+  // the preview screen. It must pop, never navigate(): since React Navigation 7,
+  // navigate('FeedList') pushes a second list on top of the article instead of
+  // returning to the first one, so Back on that list reopened the article and
+  // the stack grew with every article read.
   const handleBackNavigation = useCallback(() => {
     const stackState = navigation.getState?.();
+    const listName = ['FeedList', 'ReadLaterList'].find((name) => stackState?.routeNames?.includes(name));
 
-    if (stackState?.routeNames?.includes('FeedList')) {
-      navigation.navigate('FeedList');
-      return true;
-    }
-
-    if (stackState?.routeNames?.includes('ReadLaterList')) {
-      navigation.navigate('ReadLaterList');
+    if (listName) {
+      // popToTop also clears anything a corrupted stack left below this article.
+      if (stackState.routes?.[0]?.name === listName) {
+        navigation.popToTop();
+      } else {
+        // Opened from Home, so the stack holds no list yet: swap the reader for it.
+        navigation.popTo(listName);
+      }
       return true;
     }
 
@@ -1016,7 +1023,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       return true;
     }
 
-    navigation.navigate('Feeds', { screen: 'FeedList' });
+    navigation.navigate('Feeds', { screen: 'FeedList', pop: true });
     return true;
   }, [navigation]);
 

@@ -83,6 +83,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "מה חדש",
   "whatsNew.version": "גרסה {version}",
+  "whatsNew.backFixTitle": "תיקון כפתור החזרה",
+  "whatsNew.backFixBody": "חזרה מכתבה מובילה עכשיו ישר לרשימה, וחזרה ברשימה כבר לא פותחת שוב כתבות שכבר קראתם.",
   "whatsNew.takeTour": "התחלת הסיור",
   "whatsNew.tourBody": "סיור מודרך מציג את FeedWell פונקציה אחר פונקציה. אפשר לחזור עליו בכל רגע מההגדרות.",
   "whatsNew.autoTranslateBody": "מפעילים את זה בהגדרות, והכתבות מתורגמות לשפה שלכם ברגע שפותחים אותן.",
@@ -90,9 +92,6 @@ export default {
   "whatsNew.widgetBody": "אפשר לשנות את גודל הווידג׳ט מפס דק של שורה אחת ועד רשימה מלאה. כשיש מקום, הוא מציג תמונות תצוגה מקדימה של הכתבות.",
   "whatsNew.languages118Title": "ארבע שפות חדשות",
   "whatsNew.languages118Body": "עברית, שוודית, דנית ופינית, כל אחת עם פידים מקומיים שנבחרו בקפידה.",
-  "whatsNew.keepAwakeBody": "הגלילה האוטומטית יכולה להשאיר את המסך דולק בזמן הקריאה, כך שהוא לא נכבה באמצע כתבה.",
-  "whatsNew.languages117Title": "שלוש שפות חדשות",
-  "whatsNew.languages117Body": "צ׳כית, יוונית והונגרית, כל אחת עם פידים מקומיים שנבחרו בקפידה.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "הוספת פיד",

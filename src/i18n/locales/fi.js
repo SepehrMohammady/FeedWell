@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Uutta",
   "whatsNew.version": "Versio {version}",
+  "whatsNew.backFixTitle": "Takaisin-painike korjattu",
+  "whatsNew.backFixBody": "Takaisin artikkelista vie nyt suoraan listaan, eikä Takaisin listassa enää avaa jo lukemiasi artikkeleita.",
   "whatsNew.takeTour": "Aloita esittely",
   "whatsNew.tourBody": "Opastettu esittely näyttää FeedWellin ominaisuus kerrallaan. Voit katsoa sen uudelleen milloin tahansa Asetuksista.",
   "whatsNew.autoTranslateBody": "Ota se käyttöön Asetuksissa, niin artikkelit käännetään kielellesi heti, kun avaat ne.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Muuta aloitusnäytön widgetin kokoa kapeasta yhden rivin nauhasta aina täyteen listaan. Kun tilaa on, se näyttää artikkelien esikatselukuvat.",
   "whatsNew.languages118Title": "Neljä uutta kieltä",
   "whatsNew.languages118Body": "Heprea, ruotsi, tanska ja suomi, kullekin käsin valitut paikalliset syötteet.",
-  "whatsNew.keepAwakeBody": "Automaattinen vieritys voi pitää näytön päällä lukemisen ajan, joten se ei pimene kesken artikkelin.",
-  "whatsNew.languages117Title": "Kolme uutta kieltä",
-  "whatsNew.languages117Body": "Tšekki, kreikka ja unkari, kullekin käsin valitut paikalliset syötteet.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Lisää syöte",

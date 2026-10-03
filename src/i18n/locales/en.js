@@ -84,6 +84,8 @@ export default {
   // --- What's New popup ---
   'whatsNew.title': "What's New",
   'whatsNew.version': 'Version {version}',
+  'whatsNew.backFixTitle': 'Back button fix',
+  'whatsNew.backFixBody': 'Back from an article now takes you straight to the list, and Back on the list no longer reopens articles you already read.',
   'whatsNew.takeTour': 'Take the tour',
   'whatsNew.tourBody': 'A guided tour shows FeedWell one feature at a time. You can replay it anytime from Settings.',
   'whatsNew.autoTranslateBody': 'Turn it on in Settings and articles are translated into your language as soon as you open them.',
@@ -91,9 +93,6 @@ export default {
   'whatsNew.widgetBody': 'Resize the home screen widget from a one-line strip up to a full list. It shows article preview images when there is room.',
   'whatsNew.languages118Title': 'Four new languages',
   'whatsNew.languages118Body': 'Hebrew, Swedish, Danish and Finnish, each with hand-picked local feeds.',
-  'whatsNew.keepAwakeBody': 'Auto-scroll can keep the screen on while you read, so it never dims halfway through an article.',
-  'whatsNew.languages117Title': 'Three new languages',
-  'whatsNew.languages117Body': 'Czech, Greek and Hungarian, each with hand-picked local feeds.',
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   'addFeed.addButton': 'Add Feed',

@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Nyheder",
   "whatsNew.version": "Version {version}",
+  "whatsNew.backFixTitle": "Rettelse af Tilbage-knappen",
+  "whatsNew.backFixBody": "Tilbage fra en artikel fører dig nu direkte til listen, og Tilbage på listen åbner ikke længere artikler, du allerede har læst.",
   "whatsNew.takeTour": "Tag rundvisningen",
   "whatsNew.tourBody": "En guidet rundvisning viser dig FeedWell én funktion ad gangen. Du kan altid se den igen under Indstillinger.",
   "whatsNew.autoTranslateBody": "Slå det til under Indstillinger, så bliver artikler oversat til dit sprog, så snart du åbner dem.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Skift størrelse på widgetten fra en smal stribe på én linje op til en hel liste. Når der er plads, viser den eksempelbilleder fra artiklerne.",
   "whatsNew.languages118Title": "Fire nye sprog",
   "whatsNew.languages118Body": "Hebraisk, svensk, dansk og finsk, hver med håndplukkede lokale feeds.",
-  "whatsNew.keepAwakeBody": "Automatisk rulning kan holde skærmen tændt, mens du læser, så den aldrig slukker midt i en artikel.",
-  "whatsNew.languages117Title": "Tre nye sprog",
-  "whatsNew.languages117Body": "Tjekkisk, græsk og ungarsk, hver med håndplukkede lokale feeds.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Tilføj feed",

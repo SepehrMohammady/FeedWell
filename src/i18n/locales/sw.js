@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Yaliyo Mapya",
   "whatsNew.version": "Toleo {version}",
+  "whatsNew.backFixTitle": "Kitufe cha Nyuma kimerekebishwa",
+  "whatsNew.backFixBody": "Nyuma kutoka kwenye makala sasa kinakupeleka moja kwa moja kwenye orodha, na Nyuma kwenye orodha hakifungui tena makala ulizokwisha kusoma.",
   "whatsNew.takeTour": "Anza ziara",
   "whatsNew.tourBody": "Ziara ya kuongozwa inakuonyesha FeedWell kipengele kimoja baada ya kingine. Unaweza kuirudia wakati wowote kutoka Mipangilio.",
   "whatsNew.autoTranslateBody": "Iwashe kwenye Mipangilio na makala yatatafsiriwa kwa lugha yako mara tu unapoyafungua.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Badilisha ukubwa wa wijeti kutoka ukanda mwembamba wa mstari mmoja hadi orodha kamili. Kukiwa na nafasi, huonyesha picha za kuchungulia makala.",
   "whatsNew.languages118Title": "Lugha nne mpya",
   "whatsNew.languages118Body": "Kiebrania, Kiswidi, Kideni na Kifini, kila moja ikiwa na mipasho ya ndani iliyochaguliwa kwa mkono.",
-  "whatsNew.keepAwakeBody": "Kusogeza Kiotomatiki kunaweza kuweka skrini iwake unaposoma, ili isizime katikati ya makala.",
-  "whatsNew.languages117Title": "Lugha tatu mpya",
-  "whatsNew.languages117Body": "Kicheki, Kigiriki na Kihungari, kila moja ikiwa na mipasho ya ndani iliyochaguliwa kwa mkono.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Ongeza Mpasho",

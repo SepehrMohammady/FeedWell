@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "새로운 기능",
   "whatsNew.version": "버전 {version}",
+  "whatsNew.backFixTitle": "뒤로 버튼 수정",
+  "whatsNew.backFixBody": "기사에서 뒤로 가면 이제 바로 목록으로 돌아가며, 목록에서 뒤로 가도 이미 읽은 기사가 다시 열리지 않습니다.",
   "whatsNew.takeTour": "둘러보기 시작",
   "whatsNew.tourBody": "가이드 둘러보기가 FeedWell의 기능을 하나씩 보여 줍니다. 설정에서 언제든 다시 볼 수 있습니다.",
   "whatsNew.autoTranslateBody": "설정에서 켜 두면 기사를 여는 즉시 사용자의 언어로 번역됩니다.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "홈 화면 위젯 크기를 한 줄짜리 얇은 띠부터 전체 목록까지 조절할 수 있습니다. 공간이 넉넉하면 기사 미리보기 이미지도 보여 줍니다.",
   "whatsNew.languages118Title": "새로운 언어 4개",
   "whatsNew.languages118Body": "히브리어, 스웨덴어, 덴마크어, 핀란드어. 언어마다 엄선한 현지 피드가 준비되어 있습니다.",
-  "whatsNew.keepAwakeBody": "자동 스크롤을 사용하는 동안 화면을 켜 둘 수 있어, 글을 읽다가 화면이 어두워지지 않습니다.",
-  "whatsNew.languages117Title": "새로운 언어 3개",
-  "whatsNew.languages117Body": "체코어, 그리스어, 헝가리어. 언어마다 엄선한 현지 피드가 준비되어 있습니다.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "피드 추가",

@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Wat is er nieuw",
   "whatsNew.version": "Versie {version}",
+  "whatsNew.backFixTitle": "Terugknop hersteld",
+  "whatsNew.backFixBody": "Terug vanuit een artikel brengt je nu meteen naar de lijst, en Terug in de lijst opent geen artikelen meer die je al hebt gelezen.",
   "whatsNew.takeTour": "Start de rondleiding",
   "whatsNew.tourBody": "Een rondleiding laat je FeedWell functie voor functie zien. Je kunt hem altijd opnieuw bekijken via Instellingen.",
   "whatsNew.autoTranslateBody": "Zet het aan in Instellingen en artikelen worden in jouw taal vertaald zodra je ze opent.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Maak de widget op het startscherm zo klein als een smalle strook van één regel of zo groot als een volledige lijst. Is er ruimte, dan toont hij voorbeeldafbeeldingen van artikelen.",
   "whatsNew.languages118Title": "Vier nieuwe talen",
   "whatsNew.languages118Body": "Hebreeuws, Zweeds, Deens en Fins, elk met zorgvuldig gekozen lokale feeds.",
-  "whatsNew.keepAwakeBody": "Automatisch scrollen kan het scherm aan houden terwijl je leest, zodat het nooit halverwege een artikel dimt.",
-  "whatsNew.languages117Title": "Drie nieuwe talen",
-  "whatsNew.languages117Body": "Tsjechisch, Grieks en Hongaars, elk met zorgvuldig gekozen lokale feeds.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Feed toevoegen",

@@ -28,6 +28,19 @@ export default function HomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
+  // Opens a screen in the Feeds tab with only the feed list beneath it. A plain
+  // navigate() would stack it on top of whatever that tab last showed, often an
+  // article, and Back would then return to that old article. Reusing the tab's
+  // existing list route keeps the list mounted, scroll position and all.
+  const openInFeeds = (screen, params) => {
+    const feedsStack = navigation.getState()?.routes?.find((route) => route.name === 'Feeds')?.state;
+    const list = feedsStack?.routes?.find((route) => route.name === 'FeedList') || { name: 'FeedList' };
+    const routes = screen === 'FeedList'
+      ? [{ ...list, params: { ...list.params, ...params } }]
+      : [list, { name: screen, params }];
+    navigation.navigate('Feeds', { state: { index: routes.length - 1, routes } });
+  };
+
   // v1.1.5: Helper to filter articles by age
   const filterByAge = (articleList) => {
     if (!maxArticleAge || maxArticleAge <= 0) return articleList;
@@ -110,10 +123,7 @@ export default function HomeScreen({ navigation }) {
     <TouchableOpacity
       key={article.id}
       style={[styles.recentArticle, { backgroundColor: theme.colors.surface, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
-      onPress={() => navigation.navigate('Feeds', {
-        screen: 'ArticleReader',
-        params: { article }
-      })}
+      onPress={() => openInFeeds('ArticleReader', { article })}
       activeOpacity={0.7}
     >
       <View style={styles.recentArticleContent}>
@@ -178,8 +188,8 @@ export default function HomeScreen({ navigation }) {
             {t('home.overview')}
           </Text>
           <View style={[styles.overviewGrid, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-            {renderOverviewCard(t('home.feeds'), totalFeeds, 'newspaper', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'AddFeed' }))}
-            {renderOverviewCard(t('home.unread'), unreadCount, 'mail-unread', theme.colors.primary, () => navigation.navigate('Feeds', { screen: 'FeedList', params: { filter: 'unread' } }))}
+            {renderOverviewCard(t('home.feeds'), totalFeeds, 'newspaper', theme.colors.primary, () => openInFeeds('AddFeed'))}
+            {renderOverviewCard(t('home.unread'), unreadCount, 'mail-unread', theme.colors.primary, () => openInFeeds('FeedList', { filter: 'unread' }))}
             {renderOverviewCard(t('home.saved'), readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
           </View>
         </View>
@@ -212,7 +222,7 @@ export default function HomeScreen({ navigation }) {
             </Text>
             <TouchableOpacity
               style={[styles.addFeedButton, { backgroundColor: theme.colors.primary }]}
-              onPress={() => navigation.navigate('Feeds', { screen: 'AddFeed' })}
+              onPress={() => openInFeeds('AddFeed')}
             >
               <Text style={styles.addFeedButtonText}>{t('home.addFirstFeed')}</Text>
             </TouchableOpacity>

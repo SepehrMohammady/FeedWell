@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Újdonságok",
   "whatsNew.version": "{version} verzió",
+  "whatsNew.backFixTitle": "Vissza gomb javítva",
+  "whatsNew.backFixBody": "A cikkből a Vissza most egyenesen a listára visz, és a listán a Vissza már nem nyitja meg újra a korábban olvasott cikkeket.",
   "whatsNew.takeTour": "Bemutató indítása",
   "whatsNew.tourBody": "Egy vezetett bemutató funkcióról funkcióra végigvezet a FeedWellen. Bármikor újra megnézheted a Beállításokban.",
   "whatsNew.autoTranslateBody": "Kapcsold be a Beállításokban, és a cikkek már megnyitáskor lefordulnak a nyelvedre.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Méretezd át a kezdőképernyő-modult egy vékony, egysoros csíktól egészen a teljes listáig. Ha van hely, a cikkek előnézeti képeit is megmutatja.",
   "whatsNew.languages118Title": "Négy új nyelv",
   "whatsNew.languages118Body": "Héber, svéd, dán és finn, mindegyik kézzel válogatott helyi forrásokkal.",
-  "whatsNew.keepAwakeBody": "Az automatikus görgetés olvasás közben bekapcsolva tarthatja a képernyőt, így az sosem sötétedik el egy cikk közepén.",
-  "whatsNew.languages117Title": "Három új nyelv",
-  "whatsNew.languages117Body": "Cseh, görög és magyar, mindegyik kézzel válogatott helyi forrásokkal.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Forrás hozzáadása",

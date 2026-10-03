@@ -74,6 +74,8 @@ export default {
 
   "whatsNew.title": "Novedades",
   "whatsNew.version": "Versión {version}",
+  "whatsNew.backFixTitle": "Botón Atrás corregido",
+  "whatsNew.backFixBody": "Atrás desde un artículo ahora te lleva directamente a la lista, y Atrás en la lista ya no vuelve a abrir artículos que ya leíste.",
   "whatsNew.takeTour": "Hacer el recorrido",
   "whatsNew.tourBody": "Un recorrido guiado te enseña FeedWell función a función. Puedes repetirlo cuando quieras desde Ajustes.",
   "whatsNew.autoTranslateBody": "Actívala en Ajustes y los artículos se traducirán a tu idioma en cuanto los abras.",
@@ -81,9 +83,6 @@ export default {
   "whatsNew.widgetBody": "Cambia el tamaño del widget desde una franja fina de una línea hasta una lista completa. Cuando hay espacio, muestra imágenes de vista previa de los artículos.",
   "whatsNew.languages118Title": "Cuatro idiomas nuevos",
   "whatsNew.languages118Body": "Hebreo, sueco, danés y finés, cada uno con fuentes locales elegidas a mano.",
-  "whatsNew.keepAwakeBody": "El desplazamiento automático puede mantener la pantalla encendida mientras lees, para que no se apague a mitad de un artículo.",
-  "whatsNew.languages117Title": "Tres idiomas nuevos",
-  "whatsNew.languages117Body": "Checo, griego y húngaro, cada uno con fuentes locales elegidas a mano.",
 
   "addFeed.addButton": "Añadir fuente",
   "addFeed.popularCategories": "Categorías populares",

@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Có gì mới",
   "whatsNew.version": "Phiên bản {version}",
+  "whatsNew.backFixTitle": "Sửa nút Quay lại",
+  "whatsNew.backFixBody": "Quay lại từ một bài viết giờ đưa bạn thẳng về danh sách, và Quay lại trong danh sách không còn mở lại bài viết bạn đã đọc.",
   "whatsNew.takeTour": "Xem hướng dẫn",
   "whatsNew.tourBody": "Phần hướng dẫn sẽ giới thiệu FeedWell lần lượt từng tính năng. Bạn có thể xem lại bất cứ lúc nào trong Cài đặt.",
   "whatsNew.autoTranslateBody": "Bật tính năng này trong Cài đặt, bài viết sẽ được dịch sang ngôn ngữ của bạn ngay khi bạn mở.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Đổi kích thước tiện ích màn hình chính từ một dải mỏng một dòng đến cả danh sách đầy đủ. Khi đủ chỗ, tiện ích sẽ hiển thị ảnh xem trước của bài viết.",
   "whatsNew.languages118Title": "Bốn ngôn ngữ mới",
   "whatsNew.languages118Body": "Tiếng Do Thái, tiếng Thụy Điển, tiếng Đan Mạch và tiếng Phần Lan, mỗi ngôn ngữ đều có các nguồn cấp địa phương được chọn lọc.",
-  "whatsNew.keepAwakeBody": "Tự động cuộn có thể giữ màn hình luôn sáng khi bạn đọc, để màn hình không tối đi giữa chừng bài viết.",
-  "whatsNew.languages117Title": "Ba ngôn ngữ mới",
-  "whatsNew.languages117Body": "Tiếng Séc, tiếng Hy Lạp và tiếng Hungary, mỗi ngôn ngữ đều có các nguồn cấp địa phương được chọn lọc.",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
   "addFeed.addButton": "Thêm nguồn cấp",

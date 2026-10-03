@@ -82,6 +82,8 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Apa yang Baru",
   "whatsNew.version": "Versi {version}",
+  "whatsNew.backFixTitle": "Tombol Kembali diperbaiki",
+  "whatsNew.backFixBody": "Kembali dari artikel kini langsung membawa Anda ke daftar, dan Kembali di daftar tidak lagi membuka artikel yang sudah Anda baca.",
   "whatsNew.takeTour": "Mulai tur",
   "whatsNew.tourBody": "Tur terpandu menunjukkan FeedWell satu fitur demi satu fitur. Anda bisa mengulangnya kapan saja dari Pengaturan.",
   "whatsNew.autoTranslateBody": "Aktifkan di Pengaturan, dan artikel langsung diterjemahkan ke bahasa Anda begitu dibuka.",
@@ -89,9 +91,6 @@ export default {
   "whatsNew.widgetBody": "Ubah ukuran widget layar utama dari strip tipis satu baris hingga daftar lengkap. Jika ada ruang, widget menampilkan gambar pratinjau artikel.",
   "whatsNew.languages118Title": "Empat bahasa baru",
   "whatsNew.languages118Body": "Ibrani, Swedia, Denmark, dan Finlandia, masing-masing dengan feed lokal pilihan.",
-  "whatsNew.keepAwakeBody": "Gulir Otomatis bisa membuat layar tetap menyala selama Anda membaca, jadi layar tidak meredup di tengah artikel.",
-  "whatsNew.languages117Title": "Tiga bahasa baru",
-  "whatsNew.languages117Body": "Ceko, Yunani, dan Hongaria, masing-masing dengan feed lokal pilihan.",
 
   // --- Add Feed (partial — region selector + headers) ---
   "addFeed.addButton": "Tambah Feed",
