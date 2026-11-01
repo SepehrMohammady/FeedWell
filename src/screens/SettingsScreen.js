@@ -23,7 +23,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { APP_VERSION } from '../config/version';
-import { useFeed } from '../context/FeedContext';
+import { useFeed, REMOVED_ARTICLES_KEY } from '../context/FeedContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -393,6 +393,13 @@ export default function SettingsScreen({ navigation }) {
 
   const handleBackupData = async () => {
     try {
+      // Articles the reader removed, so a restore keeps them out of the list
+      let removedArticles = [];
+      try {
+        const storedRemoved = await SafeStorage.getItem(REMOVED_ARTICLES_KEY);
+        removedArticles = storedRemoved ? JSON.parse(storedRemoved) : [];
+      } catch (e) { /* none removed yet */ }
+
       // Gather all data
       const backupData = {
         version: APP_VERSION.version,
@@ -400,6 +407,7 @@ export default function SettingsScreen({ navigation }) {
         feeds: feeds,
         articles: articles,
         readLater: readLaterArticles,
+        removedArticles,
         settings: {
           showImages,
           autoRefresh,
@@ -568,6 +576,11 @@ export default function SettingsScreen({ navigation }) {
       // Restore read later
       if (backupData.readLater) {
         await SafeStorage.setItem('feedwell_read_later_articles', JSON.stringify(backupData.readLater));
+      }
+
+      // Restore the removed articles (backups from 1.19.0 on carry them)
+      if (Array.isArray(backupData.removedArticles)) {
+        await SafeStorage.setItem(REMOVED_ARTICLES_KEY, JSON.stringify(backupData.removedArticles));
       }
 
       // Restore settings
@@ -1355,7 +1368,8 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem>Mohammad Torabi</TesterItem>
           <TesterItem>Mojtaba Alehosseini</TesterItem>
           <TesterItem>Sadeq Hayati</TesterItem>
-          <TesterItem isLast={true}>Saeed Abdollahi Taromsari</TesterItem>
+          <TesterItem>Saeed Abdollahi Taromsari</TesterItem>
+          <TesterItem isLast={true}>Ulas Altun</TesterItem>
         </View>
 
         <SectionHeader title={t('settings.sectionAbout')} />

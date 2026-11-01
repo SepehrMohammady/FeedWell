@@ -31,7 +31,7 @@ import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
 import { useTour, useTourTarget } from '../context/TourContext';
 
 export default function FeedListScreen({ navigation, route }) {
-  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticleRead, markArticleUnread, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
+  const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticlesUnread, markArticleRead, markArticleUnread, removeArticles, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { t, isRTL, formatNumber, language } = useTranslation();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled } = useAppSettings();
@@ -41,7 +41,10 @@ export default function FeedListScreen({ navigation, route }) {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedArticles, setSelectedArticles] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
+  // One source only, picked in Your Feeds on Home; null shows every feed.
+  const [sourceFeedUrl, setSourceFeedUrl] = useState(null);
   const flatListRef = useRef(null);
+  const searchInputRef = useRef(null);
   // Last measured average item length reported by the FlatList (via
   // onScrollToIndexFailed). Used instead of a hardcoded height estimate.
   const avgItemLengthRef = useRef(null);
@@ -98,6 +101,21 @@ export default function FeedListScreen({ navigation, route }) {
       updateArticleFilter(route.params.filter);
     }
   }, [route?.params?.filter]);
+
+  // Home's Search action opens the list with the search field focused.
+  useEffect(() => {
+    if (!route?.params?.focusSearchAt) return;
+    const timer = setTimeout(() => searchInputRef.current?.focus(), 350);
+    return () => clearTimeout(timer);
+  }, [route?.params?.focusSearchAt]);
+
+  // Home sets the source (or clears it, with null). sourceAt changes on every
+  // tap, so picking the same feed again after closing its chip still applies.
+  useEffect(() => {
+    if (route?.params?.sourceAt) {
+      setSourceFeedUrl(route.params.sourceFeedUrl || null);
+    }
+  }, [route?.params?.sourceAt]);
 
   // Force re-render when screen comes into focus to update read status
   useFocusEffect(
@@ -234,14 +252,16 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const handleMarkAllRead = async () => {
-    const unreadCount = getUnreadCount();
+    // With one source picked, only its articles; otherwise all of them.
+    const unreadIds = sourceFeedUrl ? scopedArticles.filter(a => !a.isRead).map(a => a.id) : null;
+    const unreadCount = unreadIds ? unreadIds.length : getUnreadCount();
     if (unreadCount === 0) {
       setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noUnreadToMark'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     const confirmAction = () => {
-      markAllRead();
+      if (unreadIds) markArticlesRead(unreadIds); else markAllRead();
       setAlertConfig({ visible: true, title: t('common.success'), message: t('feedList.markedReadSuccess', { count: formatNumber(unreadCount) }), icon: 'checkmark-circle', buttons: [{ text: t('common.ok') }] });
     };
 
@@ -258,14 +278,15 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const handleMarkAllUnread = async () => {
-    const readCount = getReadCount();
+    const readIds = sourceFeedUrl ? scopedArticles.filter(a => a.isRead).map(a => a.id) : null;
+    const readCount = readIds ? readIds.length : getReadCount();
     if (readCount === 0) {
       setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noReadToMark'), icon: 'information-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     const confirmAction = () => {
-      markAllUnread();
+      if (readIds) markArticlesUnread(readIds); else markAllUnread();
       setAlertConfig({ visible: true, title: t('common.success'), message: t('feedList.markedUnreadSuccess', { count: formatNumber(readCount) }), icon: 'checkmark-circle', buttons: [{ text: t('common.ok') }] });
     };
 
@@ -452,6 +473,41 @@ export default function FeedListScreen({ navigation, route }) {
     setForceRender(prev => prev + 1);
   };
 
+  // Removes the selected articles from the list for good (a refresh won't bring
+  // them back). If the reading position line sat under one of them, it moves up
+  // to the nearest article that stays, or goes away when none is left above it.
+  const removeSelectedArticles = async () => {
+    const ids = new Set(selectedArticles);
+    if (ids.size === 0) return;
+    if (readingPosition?.afterArticleId && ids.has(readingPosition.afterArticleId)) {
+      const anchorIndex = filteredAndSortedArticles.findIndex(a => a.id === readingPosition.afterArticleId);
+      const above = filteredAndSortedArticles.slice(0, Math.max(anchorIndex, 0)).reverse().find(a => !ids.has(a.id));
+      if (above) {
+        await setReadingPosition(readingPosition.positionId, above.id);
+      } else {
+        await clearReadingPosition();
+      }
+    }
+    await removeArticles(Array.from(ids));
+    setSelectedArticles(new Set());
+    setSelectionMode(false);
+    setForceRender(prev => prev + 1);
+  };
+
+  const confirmRemoveSelected = () => {
+    if (selectedArticles.size === 0) return;
+    setAlertConfig({
+      visible: true,
+      title: t('feedList.removeConfirmTitle'),
+      message: t('feedList.removeConfirmMessage', { count: formatNumber(selectedArticles.size) }),
+      icon: 'trash-outline',
+      buttons: [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.remove'), style: 'destructive', onPress: removeSelectedArticles },
+      ],
+    });
+  };
+
   const renderArticle = ({ item, index }) => {
     // Check if this article is before the reading position
     const isBeforeReadingPosition = readingPosition && 
@@ -595,6 +651,11 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   // Filter articles based on read status and search query
+  // The articles the counts and the mark-all actions work on: one source when
+  // one is picked, otherwise all of them.
+  const scopedArticles = sourceFeedUrl ? articles.filter(a => a.feedUrl === sourceFeedUrl) : articles;
+  const sourceFeed = sourceFeedUrl ? (feeds.find(f => f.url === sourceFeedUrl) || { url: sourceFeedUrl }) : null;
+
   const getFilteredArticles = () => {
     if (!articles || !Array.isArray(articles)) {
       return [];
@@ -609,7 +670,8 @@ export default function FeedListScreen({ navigation, route }) {
     const visible = hiddenFeedUrls.size > 0
       ? articles.filter(a => !hiddenFeedUrls.has(a.feedUrl))
       : articles;
-    const ageFiltered = filterByAge(visible);
+    // A source picked on Home shows only its articles, even a hidden feed's.
+    const ageFiltered = filterByAge(sourceFeedUrl ? scopedArticles : visible);
 
     // Apply read status filter
     let filtered;
@@ -687,10 +749,10 @@ export default function FeedListScreen({ navigation, route }) {
 
   // v1.1.5: Age-aware counts for the header button
   const getAgeFilteredUnreadCount = () => {
-    return filterByAge(articles).filter(a => !a.isRead).length;
+    return filterByAge(scopedArticles).filter(a => !a.isRead).length;
   };
   const getAgeFilteredReadCount = () => {
-    return filterByAge(articles).filter(a => a.isRead).length;
+    return filterByAge(scopedArticles).filter(a => a.isRead).length;
   };
 
   const getFilterButtonText = () => {
@@ -700,7 +762,7 @@ export default function FeedListScreen({ navigation, route }) {
       case 'read':
         return t('feedList.filterRead', { count: formatNumber(getAgeFilteredReadCount()) });
       default:
-        return t('feedList.filterAllCount', { count: formatNumber(filterByAge(articles).length) });
+        return t('feedList.filterAllCount', { count: formatNumber(filterByAge(scopedArticles).length) });
     }
   };
 
@@ -792,6 +854,24 @@ export default function FeedListScreen({ navigation, route }) {
       borderRadius: 12,
       borderWidth: 1,
       borderColor: theme.colors.border,
+    },
+    sourceBar: {
+      flexDirection: isRTL ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 12,
+      backgroundColor: theme.colors.primary + '1A',
+    },
+    sourceBarText: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '600',
+      color: theme.colors.text,
+      textAlign: isRTL ? 'right' : 'left',
     },
     searchIcon: {
       marginRight: isRTL ? 0 : 8,
@@ -1092,6 +1172,14 @@ export default function FeedListScreen({ navigation, route }) {
             })()}
             <TouchableOpacity
               style={styles.headerButton}
+              onPress={confirmRemoveSelected}
+              disabled={selectedArticles.size === 0}
+            >
+              <Ionicons name="trash-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.error} />
+              <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('common.remove')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.headerButton}
               onPress={toggleSelectionMode}
             >
               <Ionicons name="close" size={20} color={theme.colors.text} />
@@ -1161,6 +1249,7 @@ export default function FeedListScreen({ navigation, route }) {
       <View ref={tourSearchRef} collapsable={false} style={styles.searchContainer}>
         <Ionicons name="search" size={20} color={theme.colors.textSecondary} style={styles.searchIcon} />
         <TextInput
+          ref={searchInputRef}
           style={styles.searchInput}
           placeholder={t('feedList.searchPlaceholder')}
           placeholderTextColor={theme.colors.textSecondary}
@@ -1175,6 +1264,21 @@ export default function FeedListScreen({ navigation, route }) {
           </TouchableOpacity>
         )}
       </View>
+
+      {/* One source only, picked in Your Feeds on Home. Closing the chip shows every feed again. */}
+      {sourceFeed && (
+        <View style={styles.sourceBar}>
+          <Ionicons name="newspaper-outline" size={16} color={theme.colors.primary} />
+          <Text style={styles.sourceBarText} numberOfLines={1}>{sourceFeed.title || sourceFeed.url}</Text>
+          <TouchableOpacity
+            onPress={() => setSourceFeedUrl(null)}
+            accessibilityLabel={t('feedList.showAllFeeds')}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {loading && !refreshing && (
         <View style={styles.loadingContainer}>

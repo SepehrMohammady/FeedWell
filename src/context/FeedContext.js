@@ -5,6 +5,12 @@ import { updateWidget } from '../utils/widgetService';
 
 const FeedContext = createContext();
 
+// Articles the reader removed from the list. Their links are remembered so the
+// next refresh doesn't bring them back (an article without a link is kept by id).
+export const REMOVED_ARTICLES_KEY = 'removedArticleUrls';
+const REMOVED_ARTICLES_LIMIT = 2000;
+const removedKeyOf = (article) => article.url || `id:${article.id}`;
+
 const initialState = {
   feeds: [],
   articles: [],
@@ -139,6 +145,17 @@ function feedReducer(state, action) {
         articles: state.articles.map(article =>
           ids.has(article.id) && !article.isRead
             ? { ...article, isRead: true, readAt: ts }
+            : article
+        )
+      };
+    }
+    case 'MARK_ARTICLES_UNREAD': {
+      const ids = new Set(action.payload);
+      return {
+        ...state,
+        articles: state.articles.map(article =>
+          ids.has(article.id) && article.isRead
+            ? { ...article, isRead: false, readAt: null }
             : article
         )
       };
@@ -424,6 +441,43 @@ export function FeedProvider({ children }) {
     }
   };
 
+  const loadRemovedArticleKeys = async () => {
+    try {
+      const stored = await SafeStorage.getItem(REMOVED_ARTICLES_KEY);
+      const parsed = stored ? JSON.parse(stored) : [];
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch (error) {
+      console.error('Error reading removed articles:', error);
+      return new Set();
+    }
+  };
+
+  // Removes articles from the list for good. They leave the stored list, and
+  // their links are remembered (newest last, capped) so a refresh skips them.
+  const removeArticles = useCallback(async (articleIds) => {
+    const ids = new Set(articleIds);
+    if (ids.size === 0) return;
+    const current = stateRef.current.articles;
+    const remaining = current.filter((article) => !ids.has(article.id));
+    dispatch({ type: 'SET_ARTICLES', payload: remaining });
+    await saveArticles(remaining);
+    const removedKeys = await loadRemovedArticleKeys();
+    current.forEach((article) => {
+      if (ids.has(article.id)) {
+        removedKeys.delete(removedKeyOf(article));
+        removedKeys.add(removedKeyOf(article));
+      }
+    });
+    try {
+      await SafeStorage.setItem(
+        REMOVED_ARTICLES_KEY,
+        JSON.stringify(Array.from(removedKeys).slice(-REMOVED_ARTICLES_LIMIT))
+      );
+    } catch (error) {
+      console.error('Error saving removed articles:', error);
+    }
+  }, []);
+
   const addFeed = async (feedUrl, title) => {
     const newFeed = {
       url: feedUrl,
@@ -509,6 +563,7 @@ export function FeedProvider({ children }) {
     });
     
     const newArticles = articles;
+    const removedKeys = await loadRemovedArticleKeys();
     const mergedArticles = [];
     const existingIds = new Set();
     const existingUrls = new Map(); // url -> existing article (for URL-based duplicate detection)
@@ -559,6 +614,9 @@ export function FeedProvider({ children }) {
     let actuallyNewCount = 0;
     let restoredReadCount = 0;
     newArticles.forEach(newArticle => {
+      // The reader removed this article: keep it out of the list.
+      if (removedKeys.has(removedKeyOf(newArticle))) return;
+
       // Already have this article by ID — backfill missing image/description
       if (existingIds.has(newArticle.id)) {
         backfillExistingArticle(newArticle, existingIndexById.get(newArticle.id));
@@ -715,9 +773,10 @@ export function FeedProvider({ children }) {
     dispatch({ type: 'CLEAR_ALL_DATA' });
     await saveFeeds([]);
     await saveArticles([]);
-    // Also clear read article URLs tracker
+    // Also clear read article URLs tracker, and the list of removed articles
     try {
       await SafeStorage.setItem('readArticleUrls', JSON.stringify([]));
+      await SafeStorage.setItem(REMOVED_ARTICLES_KEY, JSON.stringify([]));
     } catch (e) { /* ignore */ }
     
     console.log('FeedContext: clearAllData completed');
@@ -911,6 +970,27 @@ export function FeedProvider({ children }) {
       await saveArticles(updatedArticles);
     } catch (e) {
       console.warn('Failed to persist bulk read state:', e);
+    }
+    return affected;
+  }, []);
+
+  // The bulk counterpart of markArticleUnread, for one source's "mark all unread".
+  const markArticlesUnread = useCallback(async (ids) => {
+    const idSet = new Set(ids || []);
+    if (idSet.size === 0) return 0;
+    const currentArticles = stateRef.current.articles;
+    const affected = currentArticles.filter(a => idSet.has(a.id) && a.isRead).length;
+    if (affected === 0) return 0;
+    dispatch({ type: 'MARK_ARTICLES_UNREAD', payload: Array.from(idSet) });
+    const updatedArticles = currentArticles.map(article =>
+      idSet.has(article.id) && article.isRead
+        ? { ...article, isRead: false, readAt: null }
+        : article
+    );
+    try {
+      await saveArticles(updatedArticles);
+    } catch (e) {
+      console.warn('Failed to persist bulk unread state:', e);
     }
     return affected;
   }, []);
@@ -1115,6 +1195,8 @@ export function FeedProvider({ children }) {
     toggleFeedPriority,
     toggleFeedHidden,
     markArticlesRead,
+    markArticlesUnread,
+    removeArticles,
     setReadingPosition,
     clearReadingPosition,
     loadReadingPosition,

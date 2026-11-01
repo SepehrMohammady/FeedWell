@@ -11,6 +11,7 @@ const ADD_FEED = ['Feeds', { screen: 'AddFeed', pop: true }];
 
 export const TOUR_STEPS = [
   { key: 'welcome', icon: 'sparkles-outline', titleKey: 'tour.welcomeTitle', bodyKey: 'tour.welcomeBody' },
+  { key: 'customizeHome', nav: ['Home'], target: 'home.customize', icon: 'grid-outline', titleKey: 'home.customize', bodyKey: 'tour.customizeHomeBody' },
   { key: 'add', nav: FEED_LIST, target: 'feeds.add', icon: 'add-circle-outline', titleKey: 'tour.addTitle', bodyKey: 'tour.addBody' },
   { key: 'addUrl', nav: ADD_FEED, target: 'addFeed.url', icon: 'link-outline', titleKey: 'tour.addUrlTitle', bodyKey: 'tour.addUrlBody' },
   { key: 'popular', nav: ADD_FEED, target: 'addFeed.popular', icon: 'grid-outline', titleKey: 'tour.popularTitle', bodyKey: 'tour.popularBody' },

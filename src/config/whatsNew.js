@@ -4,18 +4,17 @@
 // locale (titles may reuse existing keys, such as the Settings row names).
 export const WHATS_NEW_RELEASES = [
   {
-    version: '1.18.2',
+    version: '1.19.0',
     items: [
-      { icon: 'arrow-undo', title: 'whatsNew.backFixTitle', body: 'whatsNew.backFixBody' },
+      { icon: 'grid', title: 'home.customize', body: 'whatsNew.customizeHomeBody' },
+      { icon: 'trash', title: 'whatsNew.removeArticlesTitle', body: 'whatsNew.removeArticlesBody' },
+      { icon: 'newspaper', title: 'whatsNew.oneSourceTitle', body: 'whatsNew.oneSourceBody' },
     ],
   },
   {
-    version: '1.18.1',
+    version: '1.18.2',
     items: [
-      { icon: 'compass', title: 'settings.appTour', body: 'whatsNew.tourBody' },
-      { icon: 'language', title: 'settings.autoTranslate', body: 'whatsNew.autoTranslateBody' },
-      { icon: 'grid', title: 'whatsNew.widgetTitle', body: 'whatsNew.widgetBody' },
-      { icon: 'globe', title: 'whatsNew.languages118Title', body: 'whatsNew.languages118Body' },
+      { icon: 'arrow-undo', title: 'whatsNew.backFixTitle', body: 'whatsNew.backFixBody' },
     ],
   },
 ];

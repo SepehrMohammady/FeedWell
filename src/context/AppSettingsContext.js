@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DEFAULT_HOME_SECTIONS, normalizeHomeSections } from '../config/homeSections';
 import { APP_VERSION } from '../config/version';
 import { normalizeAutoScrollSpeed } from '../hooks/useAutoScroll';
 import { DEFAULT_READING_FONT, getReadingFont } from '../config/readingFonts';
@@ -47,6 +48,8 @@ export function AppSettingsProvider({ children }) {
   // Translate articles into the default translation language as they open.
   // Off by default: in online mode it sends each opened article to Google.
   const [autoTranslate, setAutoTranslate] = useState(false);
+  // Which Home sections show, and in what order (Customize Home).
+  const [homeSections, setHomeSections] = useState(DEFAULT_HOME_SECTIONS);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -80,6 +83,7 @@ export function AppSettingsProvider({ children }) {
       const savedAutoScrollSpeed = await AsyncStorage.getItem('autoScrollSpeed');
       const savedKeepAwakeEnabled = await AsyncStorage.getItem('keepAwakeEnabled');
       const savedAutoTranslate = await AsyncStorage.getItem('autoTranslate');
+      const savedHomeSections = await AsyncStorage.getItem('homeSections');
 
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -176,6 +180,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedAutoTranslate !== null) {
         setAutoTranslate(JSON.parse(savedAutoTranslate));
+      }
+
+      if (savedHomeSections !== null) {
+        setHomeSections(normalizeHomeSections(JSON.parse(savedHomeSections)));
       }
 
       if (savedAutoScrollSpeed !== null) {
@@ -374,6 +382,26 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateHomeSections = async (sections) => {
+    try {
+      setHomeSections(sections);
+      await AsyncStorage.setItem('homeSections', JSON.stringify(sections));
+    } catch (error) {
+      console.error('Error saving homeSections setting:', error);
+    }
+  };
+
+  // Back to the default layout. The key is removed rather than saved, so a
+  // later version's new defaults still reach people who never customized.
+  const resetHomeSections = async () => {
+    try {
+      setHomeSections(DEFAULT_HOME_SECTIONS);
+      await AsyncStorage.removeItem('homeSections');
+    } catch (error) {
+      console.error('Error resetting homeSections setting:', error);
+    }
+  };
+
   const updateLastSeenVersion = async (value) => {
     try {
       setLastSeenVersion(value);
@@ -448,6 +476,7 @@ export function AppSettingsProvider({ children }) {
     autoScrollSpeed,
     keepAwakeEnabled,
     autoTranslate,
+    homeSections,
     isLoading,
     updateFeedRegion,
     markTranslationTargetUserSet,
@@ -459,6 +488,8 @@ export function AppSettingsProvider({ children }) {
     updateAutoScrollSpeed,
     updateKeepAwakeEnabled,
     updateAutoTranslate,
+    updateHomeSections,
+    resetHomeSections,
     updateShowImages,
     updateAutoRefresh,
     updateArticleFilter,
