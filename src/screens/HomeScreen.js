@@ -8,13 +8,12 @@ import {
   Image,
   RefreshControl,
   Modal,
-  Switch,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
 import { useFeed } from '../context/FeedContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { useAppSettings } from '../context/AppSettingsContext';
@@ -26,6 +25,8 @@ import CustomAlert from '../components/CustomAlert';
 import { useTranslation } from '../context/LanguageContext';
 import { formatRelativeDate } from '../utils/formatDate';
 import { HOME_SECTIONS } from '../config/homeSections';
+import { useUi, ListCard, SectionTitle, ThemedSwitch } from '../theme/ui';
+import { FONT, TYPE } from '../theme/type';
 
 const BOOKMARK_PREFIX = 'reading_bookmark_';
 const LIST_LIMIT = 5;
@@ -51,9 +52,9 @@ export default function HomeScreen({ navigation }) {
   const [bookmarks, setBookmarks] = useState([]);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
-  const rowDirection = isRTL ? 'row-reverse' : 'row';
-  const textAlign = isRTL ? 'right' : 'left';
-  const writingDirection = isRTL ? 'rtl' : 'ltr';
+  const ui = useUi();
+  const styles = useStyles(isRTL);
+  const insets = useSafeAreaInsets();
 
   // Opens a screen in a tab with only that tab's list beneath it. A plain
   // navigate() would stack it on top of whatever the tab last showed, often an
@@ -232,41 +233,33 @@ export default function HomeScreen({ navigation }) {
     updateHomeSections(next);
   };
 
-  const renderOverviewCard = (title, value, icon, color, onPress) => (
-    <TouchableOpacity
-      style={[styles.overviewCard, { backgroundColor: theme.colors.surface }]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.overviewIcon, { backgroundColor: color + '20' }]}>
-        <Ionicons name={icon} size={24} color={color} />
+  const iconColor = theme.colors.accentInk;
+
+  // An overview tile: an accent icon circle over the figure and its label
+  const renderOverviewCard = (title, value, icon, onPress, highlight) => (
+    <TouchableOpacity style={[ui.tile, styles.overviewCard]} onPress={onPress} activeOpacity={0.7}>
+      <View style={[ui.iconCircle, styles.overviewIcon]}>
+        <Ionicons name={icon} size={20} color={iconColor} />
       </View>
-      <View style={styles.overviewContent}>
-        <Text style={[styles.overviewValue, { color: theme.colors.text }]}>
-          {formatNumber(value)}
-        </Text>
-        <Text style={[styles.overviewTitle, { color: theme.colors.textSecondary }]}>
-          {title}
-        </Text>
-      </View>
+      <Text style={[styles.overviewValue, highlight && styles.overviewValueHighlight]}>
+        {formatNumber(value)}
+      </Text>
+      <Text style={styles.overviewTitle} numberOfLines={1}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 
-  // One row in a list section: a title, a line under it, and a chevron.
+  // One row in a list card: a title, a line under it, and a chevron.
   const renderRow = ({ key, title, subtitle, onPress, leading }) => (
-    <TouchableOpacity
-      key={key}
-      style={[styles.recentArticle, { backgroundColor: theme.colors.surface, flexDirection: rowDirection }]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity key={key} style={styles.row} onPress={onPress} activeOpacity={0.7}>
       {leading}
-      <View style={styles.recentArticleContent}>
-        <Text style={[styles.recentArticleTitle, { color: theme.colors.text, textAlign, writingDirection }]} numberOfLines={2}>
+      <View style={styles.rowText}>
+        <Text style={ui.rowTitle} numberOfLines={2}>
           {title}
         </Text>
         {!!subtitle && (
-          <Text style={[styles.recentArticleFeed, { color: theme.colors.textSecondary, textAlign, writingDirection }]} numberOfLines={1}>
+          <Text style={[ui.secondary, styles.rowSubtitle]} numberOfLines={1}>
             {subtitle}
           </Text>
         )}
@@ -276,16 +269,11 @@ export default function HomeScreen({ navigation }) {
   );
 
   const renderQuickAction = (key, label, icon, onPress) => (
-    <TouchableOpacity
-      key={key}
-      style={[styles.quickAction, { backgroundColor: theme.colors.surface }]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.quickActionIcon, { backgroundColor: theme.colors.primary + '20' }]}>
-        <Ionicons name={icon} size={20} color={theme.colors.primary} />
+    <TouchableOpacity key={key} style={[ui.tile, styles.quickAction]} onPress={onPress} activeOpacity={0.7}>
+      <View style={ui.iconCircle}>
+        <Ionicons name={icon} size={20} color={iconColor} />
       </View>
-      <Text style={[styles.quickActionLabel, { color: theme.colors.text }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+      <Text style={styles.quickActionLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -299,15 +287,15 @@ export default function HomeScreen({ navigation }) {
     switch (id) {
       case 'overview':
         return (
-          <View style={[styles.overviewGrid, { flexDirection: rowDirection }]}>
-            {renderOverviewCard(t('home.feeds'), totalFeeds, 'newspaper', theme.colors.primary, () => openInFeeds('AddFeed'))}
-            {renderOverviewCard(t('home.unread'), unreadCount, 'mail-unread', theme.colors.primary, () => openFeedList({ filter: 'unread' }))}
-            {renderOverviewCard(t('home.saved'), readLaterCount, 'save', theme.colors.primary, () => navigation.navigate('ReadLater'))}
+          <View style={styles.overviewGrid}>
+            {renderOverviewCard(t('home.feeds'), totalFeeds, 'newspaper-outline', () => openInFeeds('AddFeed'))}
+            {renderOverviewCard(t('home.unread'), unreadCount, 'mail-unread-outline', () => openFeedList({ filter: 'unread' }), true)}
+            {renderOverviewCard(t('home.saved'), readLaterCount, 'save-outline', () => navigation.navigate('ReadLater'))}
           </View>
         );
       case 'quickActions':
         return (
-          <View style={[styles.quickActions, { flexDirection: rowDirection }]}>
+          <View style={styles.quickActions}>
             {renderQuickAction('refresh', t('home.actionRefresh'), 'refresh-outline', onRefresh)}
             {renderQuickAction('add', t('addFeed.addButton'), 'add-circle-outline', () => openInFeeds('AddFeed'))}
             {renderQuickAction('search', t('common.search'), 'search-outline', () => openFeedList({ focusSearchAt: Date.now() }))}
@@ -317,43 +305,43 @@ export default function HomeScreen({ navigation }) {
       case 'continueReading':
         if (continueReading.length === 0) return null;
         return (
-          <View style={styles.recentArticlesContainer}>
+          <ListCard>
             {continueReading.map((entry) => renderRow({
               key: entry.article.id,
               title: entry.article.title,
               subtitle: articleSubtitle(entry.article, t('home.percentRead', { percent: formatNumber(Math.round(entry.scrollPercent * 100)) })),
               onPress: () => openArticle(entry),
             }))}
-          </View>
+          </ListCard>
         );
       case 'recentArticles':
         if (recentArticles.length === 0) return null;
         return (
-          <View style={styles.recentArticlesContainer}>
+          <ListCard>
             {recentArticles.map((article) => renderRow({
               key: article.id,
               title: article.title,
               subtitle: articleSubtitle(article, formatTimeAgo(article.publishedDate || article.pubDate)),
               onPress: () => openInFeeds('ArticleReader', { article }),
             }))}
-          </View>
+          </ListCard>
         );
       case 'savedArticles':
         if (recentlySaved.length === 0) return null;
         return (
-          <View style={styles.recentArticlesContainer}>
+          <ListCard>
             {recentlySaved.map((article) => renderRow({
               key: article.id,
               title: article.title,
               subtitle: articleSubtitle(article, formatTimeAgo(article.addedToReadLater)),
               onPress: () => openArticle({ article, saved: true }),
             }))}
-          </View>
+          </ListCard>
         );
       case 'yourFeeds':
         if (yourFeeds.length === 0) return null;
         return (
-          <View style={styles.recentArticlesContainer}>
+          <ListCard>
             {yourFeeds.map(({ feed, unread }) => renderRow({
               key: feed.id || feed.url,
               title: feed.title || feed.url,
@@ -363,19 +351,19 @@ export default function HomeScreen({ navigation }) {
                 <Ionicons name="star" size={16} color={theme.colors.warning} style={styles.rowLeading} />
               ) : null,
             }))}
-          </View>
+          </ListCard>
         );
       case 'recentNotes':
         if (recentNotes.length === 0) return null;
         return (
-          <View style={styles.recentArticlesContainer}>
+          <ListCard>
             {recentNotes.map((entry) => renderRow({
               key: entry.article.id,
               title: entry.text,
               subtitle: entry.article.title,
               onPress: () => openArticle(entry),
             }))}
-          </View>
+          </ListCard>
         );
       default:
         return null;
@@ -393,14 +381,16 @@ export default function HomeScreen({ navigation }) {
       visible={customizeVisible}
       transparent
       animationType="slide"
+      statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={() => setCustomizeVisible(false)}
     >
-      <View style={styles.sheetOverlay}>
+      <View style={ui.scrim}>
         <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={() => setCustomizeVisible(false)} />
-        <View style={[styles.sheet, { backgroundColor: theme.colors.surface }]}>
-          <View style={[styles.sheetHandle, { backgroundColor: theme.colors.border }]} />
-          <Text style={[styles.sheetTitle, { color: theme.colors.text, textAlign, writingDirection }]}>{t('home.customize')}</Text>
-          <Text style={[styles.sheetHint, { color: theme.colors.textSecondary, textAlign, writingDirection }]}>{t('home.customizeHint')}</Text>
+        <View style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+          <View style={ui.sheetHandle} />
+          <Text style={[ui.title, styles.sheetTitle]}>{t('home.customize')}</Text>
+          <Text style={[ui.secondary, styles.sheetHint]}>{t('home.customizeHint')}</Text>
           <ScrollView style={styles.sheetList}>
             {homeSections.map((section, index) => {
               const info = sectionInfo.get(section.id);
@@ -408,13 +398,10 @@ export default function HomeScreen({ navigation }) {
               const isFirst = index === 0;
               const isLast = index === homeSections.length - 1;
               return (
-                <View
-                  key={section.id}
-                  style={[styles.customizeRow, { flexDirection: rowDirection, borderBottomColor: theme.colors.border }, isLast && styles.customizeRowLast]}
-                >
-                  <Ionicons name={info.icon} size={20} color={section.visible ? theme.colors.primary : theme.colors.textSecondary} />
+                <View key={section.id} style={[styles.customizeRow, isLast && styles.customizeRowLast]}>
+                  <Ionicons name={info.icon} size={20} color={section.visible ? iconColor : theme.colors.textSecondary} />
                   <Text
-                    style={[styles.customizeLabel, { color: section.visible ? theme.colors.text : theme.colors.textSecondary, textAlign, writingDirection }]}
+                    style={[ui.body, styles.customizeLabel, !section.visible && styles.customizeLabelHidden]}
                     numberOfLines={1}
                   >
                     {t(info.titleKey)}
@@ -425,7 +412,7 @@ export default function HomeScreen({ navigation }) {
                     style={styles.arrowButton}
                     accessibilityLabel={t('home.moveUp')}
                   >
-                    <Ionicons name="arrow-up" size={20} color={isFirst ? theme.colors.border : theme.colors.text} />
+                    <Ionicons name="arrow-up" size={20} color={isFirst ? theme.colors.disabled : theme.colors.text} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => moveSection(index, 1)}
@@ -433,28 +420,23 @@ export default function HomeScreen({ navigation }) {
                     style={styles.arrowButton}
                     accessibilityLabel={t('home.moveDown')}
                   >
-                    <Ionicons name="arrow-down" size={20} color={isLast ? theme.colors.border : theme.colors.text} />
+                    <Ionicons name="arrow-down" size={20} color={isLast ? theme.colors.disabled : theme.colors.text} />
                   </TouchableOpacity>
-                  <Switch
+                  <ThemedSwitch
                     value={section.visible}
                     onValueChange={() => toggleSection(section.id)}
-                    trackColor={{ false: '#767577', true: theme.colors.primary }}
-                    thumbColor={section.visible ? '#fff' : '#f4f3f4'}
                     accessibilityLabel={t(info.titleKey)}
                   />
                 </View>
               );
             })}
           </ScrollView>
-          <View style={[styles.sheetButtons, { flexDirection: rowDirection }]}>
-            <TouchableOpacity style={styles.sheetTextButton} onPress={resetHomeSections}>
-              <Text style={[styles.sheetTextButtonLabel, { color: theme.colors.primary }]}>{t('home.resetLayout')}</Text>
+          <View style={styles.sheetButtons}>
+            <TouchableOpacity style={styles.textButton} onPress={resetHomeSections}>
+              <Text style={styles.textButtonLabel}>{t('home.resetLayout')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.sheetDoneButton, { backgroundColor: theme.colors.primary }]}
-              onPress={() => setCustomizeVisible(false)}
-            >
-              <Text style={styles.addFeedButtonText}>{t('common.done')}</Text>
+            <TouchableOpacity style={[ui.primaryButton, styles.doneButton]} onPress={() => setCustomizeVisible(false)}>
+              <Text style={ui.primaryLabel}>{t('common.done')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -463,7 +445,7 @@ export default function HomeScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -472,49 +454,47 @@ export default function HomeScreen({ navigation }) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={theme.colors.primary}
-            colors={[theme.colors.primary]}
+            tintColor={theme.colors.mainInk}
+            colors={[theme.colors.mainInk]}
+            progressBackgroundColor={theme.colors.surface}
           />
         }
       >
-        {/* Header */}
+        {/* Header: the logo, the welcome as the screen's title, and a round
+            button to customize the sections below */}
         <View style={styles.header}>
-          <View style={[styles.headerContent, { flexDirection: rowDirection }]}>
-            <Image
-              source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
-              style={[styles.logoIcon, { marginRight: isRTL ? 0 : 8, marginLeft: isRTL ? 8 : 0 }]}
-              resizeMode="contain"
-            />
-            <View style={styles.headerText}>
-              <Text style={[styles.welcomeText, { color: theme.colors.text, textAlign, writingDirection }]}>
-                {t('home.welcome')}
-              </Text>
-              <Text style={[styles.subtitleText, { color: theme.colors.textSecondary, textAlign, writingDirection }]}>
-                {t('home.subtitle')}
-              </Text>
-            </View>
-            <TouchableOpacity
-              ref={tourCustomizeRef}
-              style={[styles.customizeButton, { backgroundColor: theme.colors.surface }]}
-              onPress={() => setCustomizeVisible(true)}
-              accessibilityLabel={t('home.customize')}
-            >
-              <Ionicons name="grid-outline" size={20} color={theme.colors.text} />
-            </TouchableOpacity>
+          <Image
+            source={isDarkMode ? require('../../assets/logo-invert.png') : require('../../assets/logo.png')}
+            style={styles.logoIcon}
+            resizeMode="contain"
+          />
+          <View style={styles.headerText}>
+            <Text style={ui.screenTitle} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>
+              {t('home.welcome')}
+            </Text>
+            <Text style={[ui.secondaryOnWash, styles.subtitleText]}>
+              {t('home.subtitle')}
+            </Text>
           </View>
+          <TouchableOpacity
+            ref={tourCustomizeRef}
+            style={ui.roundButton}
+            onPress={() => setCustomizeVisible(true)}
+            accessibilityLabel={t('home.customize')}
+          >
+            <Ionicons name="grid-outline" size={20} color={theme.colors.text} />
+          </TouchableOpacity>
         </View>
 
         {visibleSections.map(({ id, body }) => (
           <View key={id} style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.colors.text, textAlign, writingDirection }]}>
-              {t(sectionInfo.get(id).titleKey)}
-            </Text>
+            <SectionTitle title={t(sectionInfo.get(id).titleKey)} />
             {body}
           </View>
         ))}
 
         {allHidden && totalFeeds > 0 && (
-          <Text style={[styles.allHiddenText, { color: theme.colors.textSecondary }]}>
+          <Text style={[ui.secondaryOnWash, styles.allHiddenText]}>
             {t('home.allSectionsHidden')}
           </Text>
         )}
@@ -527,17 +507,17 @@ export default function HomeScreen({ navigation }) {
               size={64}
               color={theme.colors.textSecondary}
             />
-            <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+            <Text style={styles.emptyTitle}>
               {t('home.getStarted')}
             </Text>
-            <Text style={[styles.emptyMessage, { color: theme.colors.textSecondary }]}>
+            <Text style={styles.emptyMessage}>
               {t('home.getStartedMessage')}
             </Text>
             <TouchableOpacity
-              style={[styles.addFeedButton, { backgroundColor: theme.colors.primary }]}
+              style={ui.primaryButton}
               onPress={() => openInFeeds('AddFeed')}
             >
-              <Text style={styles.addFeedButtonText}>{t('home.addFirstFeed')}</Text>
+              <Text style={ui.primaryLabel}>{t('home.addFirstFeed')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -557,253 +537,178 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoIcon: {
-    width: 56,
-    height: 56,
-    marginRight: 8,
-  },
-  headerText: {
-    flex: 1,
-  },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitleText: {
-    fontSize: 16,
-  },
-  customizeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginStart: 8,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  overviewGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  overviewCard: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  overviewIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  overviewContent: {
-    alignItems: 'center',
-  },
-  overviewValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  overviewTitle: {
-    fontSize: 12,
-    marginTop: 2,
-    textAlign: 'center',
-  },
-  quickActions: {
-    gap: 12,
-  },
-  quickAction: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  quickActionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  quickActionLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  recentArticlesContainer: {
-    gap: 8,
-  },
-  recentArticle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  rowLeading: {
-    marginHorizontal: 8,
-  },
-  recentArticleContent: {
-    flex: 1,
-  },
-  recentArticleTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  recentArticleFeed: {
-    fontSize: 12,
-  },
-  allHiddenText: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginTop: 8,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptyMessage: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  addFeedButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  addFeedButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  sheetOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  sheetBackdrop: {
-    flex: 1,
-  },
-  sheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 24,
-    maxHeight: '85%',
-  },
-  sheetHandle: {
-    alignSelf: 'center',
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    marginBottom: 14,
-  },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  sheetHint: {
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 8,
-  },
-  sheetList: {
-    flexGrow: 0,
-  },
-  customizeRow: {
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  customizeRowLast: {
-    borderBottomWidth: 0,
-  },
-  customizeLabel: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  arrowButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sheetButtons: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    gap: 12,
-  },
-  sheetTextButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  sheetTextButtonLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  sheetDoneButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 24,
-  },
+const useStyles = makeStyles(({ colors: c }, isRTL) => {
+  const row = isRTL ? 'row-reverse' : 'row';
+  return {
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 24,
+    },
+    header: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 8,
+    },
+    logoIcon: {
+      width: 48,
+      height: 48,
+    },
+    headerText: {
+      flex: 1,
+    },
+    subtitleText: {
+      marginTop: 2,
+    },
+    section: {
+      marginBottom: 4,
+    },
+    overviewGrid: {
+      flexDirection: row,
+      gap: 12,
+    },
+    overviewCard: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 8,
+    },
+    overviewIcon: {
+      marginBottom: 8,
+    },
+    overviewValue: {
+      ...TYPE.count,
+      fontSize: 22,
+      color: c.text,
+    },
+    // The unread count is what to notice: accent ink
+    overviewValueHighlight: {
+      color: c.accentInk,
+    },
+    overviewTitle: {
+      ...TYPE.secondary,
+      color: c.textSecondary,
+      marginTop: 2,
+      textAlign: 'center',
+    },
+    quickActions: {
+      flexDirection: row,
+      gap: 12,
+    },
+    quickAction: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 4,
+    },
+    quickActionLabel: {
+      ...TYPE.label,
+      color: c.text,
+      marginTop: 6,
+    },
+    row: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 12,
+      minHeight: 48,
+    },
+    rowLeading: {
+      marginHorizontal: 2,
+    },
+    rowText: {
+      flex: 1,
+    },
+    rowSubtitle: {
+      marginTop: 3,
+    },
+    allHiddenText: {
+      textAlign: 'center',
+      marginTop: 16,
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 40,
+    },
+    emptyTitle: {
+      fontFamily: FONT.bold,
+      fontSize: 22,
+      color: c.text,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    emptyMessage: {
+      ...TYPE.body,
+      fontSize: 15,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: 24,
+    },
+    sheetBackdrop: {
+      flex: 1,
+    },
+    sheet: {
+      paddingHorizontal: 20,
+      maxHeight: '85%',
+    },
+    sheetTitle: {
+      marginTop: 14,
+    },
+    sheetHint: {
+      marginTop: 4,
+      marginBottom: 8,
+    },
+    sheetList: {
+      flexGrow: 0,
+    },
+    customizeRow: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+      paddingVertical: 8,
+      minHeight: 52,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    customizeRowLast: {
+      borderBottomWidth: 0,
+    },
+    customizeLabel: {
+      flex: 1,
+      fontFamily: FONT.medium,
+    },
+    customizeLabelHidden: {
+      color: c.textSecondary,
+    },
+    arrowButton: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    sheetButtons: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      marginTop: 16,
+    },
+    textButton: {
+      minHeight: 46,
+      justifyContent: 'center',
+      paddingHorizontal: 8,
+    },
+    textButtonLabel: {
+      ...TYPE.button,
+      color: c.mainInk,
+    },
+    doneButton: {
+      flex: 1,
+    },
+  };
 });

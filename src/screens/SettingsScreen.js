@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Switch,
   Platform,
   Linking,
   Modal,
@@ -24,7 +23,9 @@ import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { APP_VERSION } from '../config/version';
 import { useFeed, REMOVED_ARTICLES_KEY } from '../context/FeedContext';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles, COLOR_THEMES } from '../context/ThemeContext';
+import { useUi, ListCard, SectionTitle, ThemedSwitch } from '../theme/ui';
+import { FONT, TYPE, RADIUS } from '../theme/type';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 import { APP_LANGUAGES, getAppLanguage } from '../i18n/appLanguages';
@@ -62,13 +63,15 @@ const SEMO_LAB_APPS = [
 
 export default function SettingsScreen({ navigation }) {
   const { feeds, articles, clearAllData } = useFeed();
-  const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, LIGHT_PALETTES, DARK_PALETTES, amoledBlack, toggleAmoledBlack } = useTheme();
+  const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, accentIndex, setAccent, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled, autoTranslate, updateAutoTranslate } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
   const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
   const insets = useSafeAreaInsets();
+  const ui = useUi();
+  const styles = useStyles(isRTL);
   const tour = useTour();
   const tourHeaderRef = useTourTarget('settings.header');
   const [showAppLangPicker, setShowAppLangPicker] = useState(false);
@@ -651,640 +654,288 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
-  const SettingItem = ({ title, description, onPress, rightElement, showArrow = false, isLast = false }) => (
-    <TouchableOpacity
-      style={[styles.settingItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }, isLast && styles.settingItemLast]}
-      onPress={onPress}
-      disabled={!onPress && !showArrow}
-    >
-      <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{title}</Text>
-        {description && <Text style={[styles.settingDescription, { textAlign: isRTL ? 'right' : 'left' }]}>{description}</Text>}
-      </View>
-      {rightElement || (showArrow && <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color="#ccc" />)}
-    </TouchableOpacity>
-  );
+  const colors = theme.colors;
+  const chevron = <Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={18} color={colors.textSecondary} />;
+  // Sheets run under the navigation bar and end above it
+  const sheetPadding = { paddingBottom: Math.max(insets.bottom, 12) + 12 };
 
-  const SectionHeader = ({ title }) => (
-    <Text style={styles.sectionHeader}>{title}</Text>
-  );
-
-  const TesterItem = ({ children, isNote = false, isLast = false }) => (
-    <View style={styles.testerItem}>
-      <Text style={[isNote ? styles.thanksNote : styles.testerName, { textAlign: isRTL ? 'right' : 'left' }]}>{children}</Text>
+  // One row of the five colors, for the main color and for the accent. Each
+  // name stays on one line under its swatch.
+  const renderSwatches = (selectedIndex, onSelect) => (
+    <View style={styles.swatchRow}>
+      {COLOR_THEMES.map((option, index) => {
+        const selected = index === selectedIndex;
+        return (
+          <TouchableOpacity
+            key={option.key}
+            style={styles.swatchItem}
+            onPress={() => onSelect(index)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            accessibilityLabel={t(option.nameKey)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.swatchRing, selected && styles.swatchRingSelected]}>
+              <View style={[styles.swatch, { backgroundColor: isDarkMode ? option.dark : option.light }]} />
+            </View>
+            <Text
+              style={[styles.swatchName, selected && styles.swatchNameSelected]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+            >
+              {t(option.nameKey)}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 16,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: theme.colors.text,
-      [isRTL ? 'marginRight' : 'marginLeft']: 16,
-      textAlign: isRTL ? 'right' : 'left',
-    },
-    content: {
-      flex: 1,
-    },
-    section: {
-      backgroundColor: theme.colors.surface,
-      marginHorizontal: 16,
-      marginTop: 16,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    sectionHeader: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: theme.colors.textTertiary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      marginTop: 24,
-      marginBottom: 8,
-      marginHorizontal: 16,
-      textAlign: isRTL ? 'right' : 'left',
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginLeft: 8,
-    },
-    settingItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    settingItemLast: {
-      borderBottomWidth: 0,
-    },
-    settingContent: {
-      flex: 1,
-    },
-    settingTitle: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: theme.colors.text,
-      marginBottom: 2,
-    },
-    settingDescription: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-    },
-    actionButton: {
-      backgroundColor: theme.colors.primary,
-      marginHorizontal: 16,
-      marginTop: 16,
-      paddingVertical: 12,
-      borderRadius: 8,
-      alignItems: 'center',
-    },
-    actionButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    dangerButton: {
-      backgroundColor: theme.colors.error,
-    },
-    footer: {
-      paddingHorizontal: 16,
-      paddingVertical: 32,
-    },
-    footerText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 20,
-    },
-    copyrightText: {
-      fontSize: 12,
-      color: theme.colors.textTertiary,
-      textAlign: 'center',
-      marginTop: 12,
-      lineHeight: 16,
-    },
-    testerItem: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-    },
-    thanksNote: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: 8,
-    },
-    testerName: {
-      fontSize: 14,
-      fontWeight: '400',
-      color: theme.colors.textSecondary,
-      marginBottom: 4,
-    },
-    // Translation modal styles
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'flex-end',
-    },
-    modalContainer: {
-      backgroundColor: theme.colors.surface,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      height: '75%',
-      paddingBottom: Math.max(insets.bottom, 16),
-    },
-    modalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    modalTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    modalCloseButton: {
-      padding: 4,
-    },
-    modalSearchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      margin: 16,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: theme.colors.background,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    modalSearchInput: {
-      flex: 1,
-      fontSize: 15,
-      color: theme.colors.text,
-      marginLeft: 8,
-      paddingVertical: 4,
-    },
-    langList: {
-      flex: 1,
-    },
-    langItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    langItemSelected: {
-      backgroundColor: (theme.colors.primary) + '15',
-    },
-    langItemText: {
-      fontSize: 15,
-      color: theme.colors.text,
-    },
-    langItemTextSelected: {
-      color: theme.colors.primary,
-      fontWeight: '600',
-    },
-    modelLoadingContainer: {
-      alignItems: 'center',
-      padding: 40,
-    },
-    modelLoadingText: {
-      marginTop: 16,
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-    },
-    modelEmptyContainer: {
-      alignItems: 'center',
-      padding: 32,
-    },
-    modelEmptyTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginTop: 16,
-      marginBottom: 8,
-    },
-    modelEmptyText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 20,
-    },
-    modelItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    modelItemInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-    },
-    modelItemText: {
-      fontSize: 15,
-      color: theme.colors.text,
-    },
-    modelItemSize: {
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-    },
-    modelListHeader: {
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      backgroundColor: theme.colors.background,
-    },
-    modelListHeaderText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    modelListSubtext: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      marginTop: 4,
-      lineHeight: 16,
-    },
-    modelActionButton: {
-      padding: 8,
-    },
-    modeItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 16,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    modeItemContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-      gap: 14,
-    },
-    modeItemText: {
-      flex: 1,
-    },
-    modeItemTitle: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    modeItemDesc: {
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-      marginTop: 2,
-    },
-  });
+  // A slider in a card: its name and value above it, its two ends below
+  const renderSlider = ({ title, valueLabel, valueStyle, ends, ...slider }) => (
+    <View style={styles.block}>
+      <View style={styles.sliderHeader}>
+        <Text style={[ui.rowTitle, styles.flexText]}>{title}</Text>
+        <Text style={[styles.sliderValue, valueStyle]}>{valueLabel}</Text>
+      </View>
+      <Slider
+        style={styles.slider}
+        minimumTrackTintColor={colors.primary}
+        maximumTrackTintColor={colors.outline}
+        thumbTintColor={colors.primary}
+        {...slider}
+      />
+      {ends && (
+        <View style={styles.sliderEnds}>
+          <Text style={ui.secondary}>{ends[0]}</Text>
+          <Text style={ui.secondary}>{ends[1]}</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  // A sheet's top: the handle, the title and a close button
+  const renderSheetHeader = (title, onClose) => (
+    <>
+      <View style={ui.sheetHandle} />
+      <View style={styles.modalHeader}>
+        <Text style={[ui.title, styles.flexText]}>{title}</Text>
+        <TouchableOpacity
+          onPress={onClose}
+          style={styles.modalCloseButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="close" size={22} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+    </>
+  );
+
+  // A choice in a picker sheet: an icon, the choice and a line about it, and
+  // a check on the one in use
+  const renderChoice = ({ key, icon, title, description, selected, onPress, titleStyle, selectedTitleStyle = styles.choiceTitleSelected, descriptionStyle, numberOfLines }) => (
+    <TouchableOpacity key={key} style={[styles.modeItem, selected && styles.choiceSelected]} onPress={onPress}>
+      <View style={styles.modeItemContent}>
+        <Ionicons name={icon} size={22} color={selected ? colors.mainInk : colors.textSecondary} />
+        <View style={styles.flexText}>
+          <Text style={[ui.rowTitle, titleStyle, selected && selectedTitleStyle]}>{title}</Text>
+          {!!description && (
+            <Text style={[ui.secondary, styles.modeItemDesc, descriptionStyle]} numberOfLines={numberOfLines}>
+              {description}
+            </Text>
+          )}
+        </View>
+      </View>
+      {selected && <Ionicons name="checkmark" size={20} color={colors.mainInk} />}
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
-      <View ref={tourHeaderRef} collapsable={false} style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-        <Text style={styles.headerTitle}>{t('tab.settings')}</Text>
+    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
+      <View ref={tourHeaderRef} collapsable={false} style={styles.header}>
+        <Text style={ui.screenTitle}>{t('tab.settings')}</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <SectionHeader title={t('settings.sectionPreferences')} />
-        <View style={styles.section}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <SectionTitle title={t('settings.sectionPreferences')} />
+        <ListCard>
           <SettingItem
             title={t('settings.autoRefresh')}
             description={t('settings.autoRefreshDesc')}
-            rightElement={
-              <Switch
-                value={autoRefresh}
-                onValueChange={updateAutoRefresh}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={autoRefresh ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={autoRefresh} onValueChange={updateAutoRefresh} />}
           />
-          
           <SettingItem
             title={t('settings.showImages')}
             description={t('settings.showImagesDesc')}
-            rightElement={
-              <Switch
-                value={showImages}
-                onValueChange={updateShowImages}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={showImages ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={showImages} onValueChange={updateShowImages} />}
           />
-          
           <SettingItem
             title={t('settings.darkMode')}
             description={t('settings.darkModeDesc')}
-            rightElement={
-              <Switch
-                value={isDarkMode}
-                onValueChange={toggleTheme}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={isDarkMode} onValueChange={toggleTheme} />}
           />
           {isDarkMode && (
             <SettingItem
               title={t('settings.amoledBlack')}
               description={t('settings.amoledBlackDesc')}
-              rightElement={
-                <Switch
-                  value={amoledBlack}
-                  onValueChange={toggleAmoledBlack}
-                  trackColor={{ false: '#767577', true: theme.colors.primary }}
-                  thumbColor={amoledBlack ? '#fff' : '#f4f3f4'}
-                />
-              }
+              rightElement={<ThemedSwitch value={amoledBlack} onValueChange={toggleAmoledBlack} />}
             />
           )}
           <SettingItem
             title={t('settings.readingFont')}
             description={getReadingFont(readingFont).label || t(getReadingFont(readingFont).labelKey)}
             onPress={() => setShowFontPicker(true)}
-            rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+            rightElement={chevron}
           />
           <SettingItem
             title={t('language.appTitle')}
             description={getAppLanguage(language).nativeLabel}
             onPress={() => setShowAppLangPicker(true)}
-            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
+            rightElement={chevron}
           />
-          <SettingItem
-            title={t('settings.themeColor')}
-            description={t(LIGHT_PALETTES[paletteIndex].nameKey)}
-            rightElement={
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {LIGHT_PALETTES.map((p, i) => (
-                  <TouchableOpacity key={i} onPress={() => setPalette(i)} style={{ marginLeft: i > 0 ? 6 : 0 }}>
-                    <View style={{
-                      width: 26, height: 26, borderRadius: 13,
-                      backgroundColor: isDarkMode ? DARK_PALETTES[i].primary : p.primary,
-                      borderWidth: paletteIndex === i ? 2.5 : 1.5,
-                      borderColor: paletteIndex === i ? theme.colors.text : theme.colors.border,
-                    }} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            }
-          />
+          {/* Two colors: the main color is what you tap, the accent what to notice */}
+          <View style={styles.block}>
+            <Text style={ui.rowTitle}>{t('settings.mainColor')}</Text>
+            <Text style={[ui.secondary, styles.hint]}>{t('settings.mainColorHint')}</Text>
+            {renderSwatches(paletteIndex, setPalette)}
+          </View>
+          <View style={styles.block}>
+            <Text style={ui.rowTitle}>{t('settings.accentColor')}</Text>
+            <Text style={[ui.secondary, styles.hint]}>{t('settings.accentColorHint')}</Text>
+            {renderSwatches(accentIndex, setAccent)}
+          </View>
           <SettingItem
             title={t('settings.bookmarkIndicators')}
             description={t('settings.bookmarkIndicatorsDesc')}
-            rightElement={
-              <Switch
-                value={showBookmarkIndicators}
-                onValueChange={updateShowBookmarkIndicators}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={showBookmarkIndicators ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={showBookmarkIndicators} onValueChange={updateShowBookmarkIndicators} />}
           />
           <SettingItem
             title={t('settings.openReaderDirectly')}
             description={t('settings.openReaderDirectlyDesc')}
-            rightElement={
-              <Switch
-                value={skipArticleView}
-                onValueChange={updateSkipArticleView}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={skipArticleView ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={skipArticleView} onValueChange={updateSkipArticleView} />}
           />
           <SettingItem
             title={t('settings.readingPositionInFeeds')}
             description={t('settings.readingPositionInFeedsDesc')}
-            rightElement={
-              <Switch
-                value={showReadingPositionInFeeds}
-                onValueChange={updateShowReadingPositionInFeeds}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={showReadingPositionInFeeds ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={showReadingPositionInFeeds} onValueChange={updateShowReadingPositionInFeeds} />}
           />
           <SettingItem
             title={t('settings.screenRotation')}
             description={t('settings.screenRotationDesc')}
-            rightElement={
-              <Switch
-                value={allowRotation}
-                onValueChange={updateAllowRotation}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={allowRotation ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={allowRotation} onValueChange={updateAllowRotation} />}
           />
           <SettingItem
             title={t('settings.reduceMotion')}
             description={t('settings.reduceMotionDesc')}
-            rightElement={
-              <Switch
-                value={reduceMotion}
-                onValueChange={updateReduceMotion}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={reduceMotion ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={reduceMotion} onValueChange={updateReduceMotion} />}
           />
           <SettingItem
             title={t('settings.readingReminder')}
             description={readingReminder ? t('settings.readingReminderOnDesc') : t('settings.readingReminderOffDesc')}
-            rightElement={
-              <Switch
-                value={readingReminder}
-                onValueChange={updateReadingReminder}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={readingReminder ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={readingReminder} onValueChange={updateReadingReminder} />}
           />
           <SettingItem
             title={t('settings.autoScroll')}
             description={t('settings.autoScrollDesc')}
-            rightElement={
-              <Switch
-                value={autoScrollEnabled}
-                onValueChange={updateAutoScrollEnabled}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={autoScrollEnabled ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={autoScrollEnabled} onValueChange={updateAutoScrollEnabled} />}
           />
           {autoScrollEnabled && (
             <SettingItem
               title={t('settings.autoScrollDelay')}
               description={t('settings.autoScrollDelayValue', { count: formatNumber(autoScrollDelay) })}
               onPress={() => setShowAutoScrollDelayPicker(true)}
-              rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+              rightElement={chevron}
             />
           )}
-          {autoScrollEnabled && (
-            <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.colors.border }}>
-              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                <Text style={{ fontSize: 15, color: theme.colors.text }}>{t('settings.autoScrollSpeed')}</Text>
-                <Text style={{ fontSize: 14, color: theme.colors.textSecondary }}>{t('settings.percent', { value: formatNumber(autoScrollSpeed) })}</Text>
-              </View>
-              <Slider
-                minimumValue={25}
-                maximumValue={250}
-                step={25}
-                value={autoScrollSpeed}
-                onSlidingComplete={(v) => updateAutoScrollSpeed(Math.round(v))}
-                minimumTrackTintColor={theme.colors.primary}
-                maximumTrackTintColor={theme.colors.border}
-                thumbTintColor={theme.colors.primary}
-              />
-              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
-                <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedSlow')}</Text>
-                <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedFast')}</Text>
-              </View>
-            </View>
-          )}
+          {autoScrollEnabled && renderSlider({
+            title: t('settings.autoScrollSpeed'),
+            valueLabel: t('settings.percent', { value: formatNumber(autoScrollSpeed) }),
+            ends: [t('settings.speedSlow'), t('settings.speedFast')],
+            minimumValue: 25,
+            maximumValue: 250,
+            step: 25,
+            value: autoScrollSpeed,
+            onSlidingComplete: (v) => updateAutoScrollSpeed(Math.round(v)),
+          })}
           {autoScrollEnabled && (
             <SettingItem
               title={t('settings.keepAwake')}
               description={t('settings.keepAwakeDesc')}
-              rightElement={
-                <Switch
-                  value={keepAwakeEnabled}
-                  onValueChange={updateKeepAwakeEnabled}
-                  trackColor={{ false: '#767577', true: theme.colors.primary }}
-                  thumbColor={keepAwakeEnabled ? '#fff' : '#f4f3f4'}
-                />
-              }
+              rightElement={<ThemedSwitch value={keepAwakeEnabled} onValueChange={updateKeepAwakeEnabled} />}
             />
           )}
           <SettingItem
             title={t('settings.articleAgeFilter')}
             description={maxArticleAge === 0 ? t('settings.articleAgeFilterNoLimitDesc') : t('settings.articleAgeFilterDesc', { period: getArticleAgeLabel(maxArticleAge) })}
             onPress={() => setShowArticleAgePicker(true)}
-            isLast={true}
-            rightElement={<Ionicons name="chevron-forward" size={20} color={theme.colors.primary} />}
+            rightElement={chevron}
           />
-        </View>
+        </ListCard>
 
         {Platform.OS === 'android' && (
           <>
-            <SectionHeader title={t('settings.sectionWidget')} />
-            <View style={styles.section}>
+            <SectionTitle title={t('settings.sectionWidget')} />
+            <ListCard>
               <SettingItem
                 title={t('settings.addWidget')}
                 description={t('settings.addWidgetDesc')}
                 onPress={handleAddWidget}
-                rightElement={<Ionicons name="add-circle-outline" size={22} color={theme.colors.primary} />}
+                rightElement={<Ionicons name="add-circle-outline" size={22} color={colors.mainInk} />}
               />
               <SettingItem
                 title={t('settings.widgetTheme')}
                 description={widgetThemeLabel}
                 onPress={() => setShowWidgetThemePicker(true)}
-                rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+                rightElement={chevron}
               />
               <SettingItem
                 title={t('settings.widgetImages')}
                 description={t('settings.widgetImagesDesc')}
-                rightElement={
-                  <Switch
-                    value={widgetShowImages}
-                    onValueChange={handleWidgetShowImagesChange}
-                    trackColor={{ false: '#767577', true: theme.colors.primary }}
-                    thumbColor={widgetShowImages ? '#fff' : '#f4f3f4'}
-                  />
-                }
+                rightElement={<ThemedSwitch value={widgetShowImages} onValueChange={handleWidgetShowImagesChange} />}
               />
-              <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
-                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text style={{ fontSize: 15, color: theme.colors.text }}>{t('settings.widgetOpacity')}</Text>
-                  <Text style={{ fontSize: 14, color: theme.colors.textSecondary }}>{t('settings.percent', { value: formatNumber(widgetOpacity) })}</Text>
-                </View>
-                <Slider
-                  minimumValue={20}
-                  maximumValue={100}
-                  step={5}
-                  value={widgetOpacity}
-                  onValueChange={(v) => setWidgetOpacity(Math.round(v))}
-                  onSlidingComplete={handleWidgetOpacityChange}
-                  minimumTrackTintColor={theme.colors.primary}
-                  maximumTrackTintColor={theme.colors.border}
-                  thumbTintColor={theme.colors.primary}
-                />
-              </View>
-            </View>
+              {renderSlider({
+                title: t('settings.widgetOpacity'),
+                valueLabel: t('settings.percent', { value: formatNumber(widgetOpacity) }),
+                minimumValue: 20,
+                maximumValue: 100,
+                step: 5,
+                value: widgetOpacity,
+                onValueChange: (v) => setWidgetOpacity(Math.round(v)),
+                onSlidingComplete: handleWidgetOpacityChange,
+              })}
+            </ListCard>
           </>
         )}
 
-        <SectionHeader title={t('settings.sectionAmbientSounds')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionAmbientSounds')} />
+        <ListCard>
           <SettingItem
             title={t('settings.autoPlayStartup')}
             description={autoPlay ? t('settings.autoPlayOnDesc', { sound: currentSound ? t(currentSound.nameKey) : t('settings.lastSound') }) : t('settings.autoPlayOffDesc')}
             onPress={() => setAutoPlay(!autoPlay)}
-            isLast={true}
-            rightElement={
-              <Switch
-                value={autoPlay}
-                onValueChange={setAutoPlay}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={autoPlay ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={autoPlay} onValueChange={setAutoPlay} />}
           />
-        </View>
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionReadAloud')} />
-        <View style={styles.section}>
-          <View style={[styles.settingItem, { flexDirection: 'column', alignItems: 'stretch', borderBottomWidth: 0 }]}>
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <Text style={[styles.settingTitle, { color: theme.colors.text }]}>{t('settings.speechSpeed')}</Text>
-              <Text style={[styles.settingTitle, { color: theme.colors.primary, fontWeight: '700' }]}>{t('settings.speedMultiplier', { rate: formatNumber(speechRate) })}</Text>
-            </View>
-            <Slider
-              style={{ width: '100%', height: 40 }}
-              minimumValue={0.5}
-              maximumValue={2.0}
-              step={0.25}
-              value={speechRate}
-              onSlidingComplete={(val) => updateSpeechRate(Math.round(val * 100) / 100)}
-              minimumTrackTintColor={theme.colors.primary}
-              maximumTrackTintColor={theme.colors.border}
-              thumbTintColor={theme.colors.primary}
-            />
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedSlow')}</Text>
-              <Text style={[styles.settingDescription, { color: theme.colors.textSecondary }]}>{t('settings.speedFast')}</Text>
-            </View>
-          </View>
-        </View>
+        <SectionTitle title={t('settings.sectionReadAloud')} />
+        <ListCard>
+          {renderSlider({
+            title: t('settings.speechSpeed'),
+            valueLabel: t('settings.speedMultiplier', { rate: formatNumber(speechRate) }),
+            // The speed is the value this card sets: in main ink
+            valueStyle: styles.sliderValueMain,
+            ends: [t('settings.speedSlow'), t('settings.speedFast')],
+            minimumValue: 0.5,
+            maximumValue: 2.0,
+            step: 0.25,
+            value: speechRate,
+            onSlidingComplete: (val) => updateSpeechRate(Math.round(val * 100) / 100),
+          })}
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionTranslation')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionTranslation')} />
+        <ListCard>
           <SettingItem
             title={t('settings.translationMode')}
             description={
@@ -1293,71 +944,61 @@ export default function SettingsScreen({ navigation }) {
               t('settings.translationModeOfflineDesc')
             }
             onPress={() => setShowTranslationModePicker(true)}
-            rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+            rightElement={chevron}
           />
           <SettingItem
             title={t('settings.defaultLanguage')}
             description={t('settings.defaultLanguageDesc', { language: getDisplayName(targetLangCode) })}
             onPress={() => setShowLangPicker(true)}
-            rightElement={<Ionicons name={isRTL ? 'chevron-back' : 'chevron-forward'} size={20} color={theme.colors.primary} />}
+            rightElement={chevron}
           />
           <SettingItem
             title={t('settings.autoTranslate')}
             description={t('settings.autoTranslateDesc', { language: getDisplayName(targetLangCode) })}
-            rightElement={
-              <Switch
-                value={autoTranslate}
-                onValueChange={updateAutoTranslate}
-                trackColor={{ false: '#767577', true: theme.colors.primary }}
-                thumbColor={autoTranslate ? '#fff' : '#f4f3f4'}
-              />
-            }
+            rightElement={<ThemedSwitch value={autoTranslate} onValueChange={updateAutoTranslate} />}
           />
           <SettingItem
             title={t('settings.downloadedModels')}
             description={t('settings.downloadedModelsDesc')}
             onPress={handleOpenModelManager}
-            isLast={true}
-            rightElement={<Ionicons name="cloud-download-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="cloud-download-outline" size={20} color={colors.mainInk} />}
           />
-        </View>
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionHelp')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionHelp')} />
+        <ListCard>
           <SettingItem
             title={t('settings.appTour')}
             description={t('settings.appTourDesc')}
             onPress={() => tour?.startTour()}
-            isLast={true}
-            rightElement={<Ionicons name="help-circle-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="help-circle-outline" size={20} color={colors.mainInk} />}
           />
-        </View>
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionData')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionData')} />
+        <ListCard>
           <SettingItem
             title={t('settings.backupData')}
             description={t('settings.backupDataDesc')}
             onPress={handleBackupData}
-            rightElement={<Ionicons name="push-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="push-outline" size={20} color={colors.mainInk} />}
           />
           <SettingItem
             title={t('settings.restoreData')}
             description={t('settings.restoreDataDesc')}
             onPress={handleRestoreData}
-            rightElement={<Ionicons name="download-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="download-outline" size={20} color={colors.mainInk} />}
           />
           <SettingItem
             title={t('settings.clearAllData')}
             description={t('settings.clearAllDataDesc')}
             onPress={handleClearAllData}
-            isLast={true}
-            rightElement={<Ionicons name="trash-outline" size={20} color={theme.colors.error} />}
+            rightElement={<Ionicons name="trash-outline" size={20} color={colors.error} />}
           />
-        </View>
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionTesters')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionTesters')} />
+        <View style={[ui.card, styles.testersCard]}>
           <TesterItem isNote={true}>{t('settings.testersThankYou')}</TesterItem>
           <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
           <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
@@ -1369,11 +1010,11 @@ export default function SettingsScreen({ navigation }) {
           <TesterItem>Mojtaba Alehosseini</TesterItem>
           <TesterItem>Sadeq Hayati</TesterItem>
           <TesterItem>Saeed Abdollahi Taromsari</TesterItem>
-          <TesterItem isLast={true}>Ulas Altun</TesterItem>
+          <TesterItem>Ulas Altun</TesterItem>
         </View>
 
-        <SectionHeader title={t('settings.sectionAbout')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionAbout')} />
+        <ListCard>
           <SettingItem
             title="FeedWell"
             description={t('settings.aboutTagline')}
@@ -1386,45 +1027,43 @@ export default function SettingsScreen({ navigation }) {
             title={t('settings.developer')}
             description="SeMo Lab"
             onPress={handleOpenWebsite}
-            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
           />
           <SettingItem
             title={t('settings.privacy')}
             description={t('settings.privacyDesc')}
             onPress={() => handleOpenWebsite('https://semo-lab.com/feedwell/privacy-policy/')}
-            isLast={true}
-            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
           />
-        </View>
+        </ListCard>
 
-        <SectionHeader title={t('settings.sectionMoreApps')} />
-        <View style={styles.section}>
+        <SectionTitle title={t('settings.sectionMoreApps')} />
+        <ListCard>
           {SEMO_LAB_APPS.map((app) => (
             <SettingItem
               key={app.packageName}
               title={app.name}
               description={t(app.descKey)}
               onPress={() => openPlayListing(app.packageName)}
-              rightElement={<Ionicons name="logo-google-playstore" size={20} color={theme.colors.primary} />}
+              rightElement={<Ionicons name="logo-google-playstore" size={20} color={colors.mainInk} />}
             />
           ))}
           <SettingItem
             title={t('settings.allApps')}
             description={t('settings.allAppsDesc')}
             onPress={openDeveloperPage}
-            isLast={true}
-            rightElement={<Ionicons name="open-outline" size={20} color={theme.colors.primary} />}
+            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
           />
-        </View>
+        </ListCard>
 
         <View style={styles.footer}>
           {/* Centered like every language; explicit writingDirection keeps the bidi
               base stable so the line doesn't flip when it starts with a Latin word. */}
-          <Text style={[styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: 'center' }]}>
+          <Text style={[ui.secondaryOnWash, styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
             {t('settings.footerText')}
           </Text>
           {/* Keep the copyright in English + LTR for RTL languages (it's brand + year). */}
-          <Text style={[styles.copyrightText, { writingDirection: 'ltr', textAlign: 'center' }]}>
+          <Text style={[ui.secondaryOnWash, styles.copyrightText, { writingDirection: 'ltr' }]}>
             {isRTL ? tStatic('settings.copyright', 'en') : t('settings.copyright')}
           </Text>
         </View>
@@ -1436,32 +1075,26 @@ export default function SettingsScreen({ navigation }) {
         visible={showLangPicker}
         animationType="slide"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => {
           setShowLangPicker(false);
           setLangSearchQuery('');
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.defaultTranslateLangTitle')}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowLangPicker(false);
-                  setLangSearchQuery('');
-                }}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+            {renderSheetHeader(t('settings.defaultTranslateLangTitle'), () => {
+              setShowLangPicker(false);
+              setLangSearchQuery('');
+            })}
 
-            <View style={[styles.modalSearchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
+            <View style={styles.modalSearchContainer}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
               <TextInput
-                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left', marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }]}
+                style={styles.modalSearchInput}
                 placeholder={t('settings.searchLanguagesPlaceholder')}
-                placeholderTextColor={theme.colors.textTertiary}
+                placeholderTextColor={colors.textSecondary}
                 value={langSearchQuery}
                 onChangeText={setLangSearchQuery}
                 autoCapitalize="none"
@@ -1469,7 +1102,7 @@ export default function SettingsScreen({ navigation }) {
               />
               {langSearchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => setLangSearchQuery('')}>
-                  <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
+                  <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -1479,24 +1112,14 @@ export default function SettingsScreen({ navigation }) {
               keyExtractor={(item) => item.code}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[
-                    styles.langItem,
-                    { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                    item.code === targetLangCode && styles.langItemSelected,
-                  ]}
+                  style={[styles.langItem, item.code === targetLangCode && styles.choiceSelected]}
                   onPress={() => handleChangeDefaultLang(item.code)}
                 >
-                  <Text
-                    style={[
-                      styles.langItemText,
-                      { textAlign: isRTL ? 'right' : 'left' },
-                      item.code === targetLangCode && styles.langItemTextSelected,
-                    ]}
-                  >
+                  <Text style={[ui.body, styles.flexText, item.code === targetLangCode && styles.choiceTitleSelected]}>
                     {item.displayName}
                   </Text>
                   {item.code === targetLangCode && (
-                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                    <Ionicons name="checkmark" size={20} color={colors.mainInk} />
                   )}
                 </TouchableOpacity>
               )}
@@ -1512,43 +1135,27 @@ export default function SettingsScreen({ navigation }) {
         visible={showAppLangPicker}
         animationType="slide"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowAppLangPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('language.pickerTitle')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowAppLangPicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+            {renderSheetHeader(t('language.pickerTitle'), () => setShowAppLangPicker(false))}
 
             <FlatList
               data={APP_LANGUAGES}
               keyExtractor={(item) => item.code}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={[
-                    styles.langItem,
-                    { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                    item.code === language && styles.langItemSelected,
-                  ]}
+                  style={[styles.langItem, item.code === language && styles.choiceSelected]}
                   onPress={() => handleChangeAppLanguage(item.code)}
                 >
-                  <Text
-                    style={[
-                      styles.langItemText,
-                      { textAlign: isRTL ? 'right' : 'left' },
-                      item.code === language && styles.langItemTextSelected,
-                    ]}
-                  >
+                  <Text style={[ui.body, styles.flexText, item.code === language && styles.choiceTitleSelected]}>
                     {item.nativeLabel}{item.code !== 'en' ? `  ·  ${item.englishLabel}` : ''}
                   </Text>
                   {item.code === language && (
-                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                    <Ionicons name="checkmark" size={20} color={colors.mainInk} />
                   )}
                 </TouchableOpacity>
               )}
@@ -1564,32 +1171,26 @@ export default function SettingsScreen({ navigation }) {
         visible={showModelManager}
         animationType="slide"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => {
           setShowModelManager(false);
           setModelSearchQuery('');
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.offlineModelsTitle')}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowModelManager(false);
-                  setModelSearchQuery('');
-                }}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+            {renderSheetHeader(t('settings.offlineModelsTitle'), () => {
+              setShowModelManager(false);
+              setModelSearchQuery('');
+            })}
 
-            <View style={[styles.modalSearchContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
+            <View style={styles.modalSearchContainer}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
               <TextInput
-                style={[styles.modalSearchInput, { textAlign: isRTL ? 'right' : 'left', marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }]}
+                style={styles.modalSearchInput}
                 placeholder={t('settings.searchLanguagesPlaceholder')}
-                placeholderTextColor={theme.colors.textTertiary}
+                placeholderTextColor={colors.textSecondary}
                 value={modelSearchQuery}
                 onChangeText={setModelSearchQuery}
                 autoCapitalize="none"
@@ -1597,15 +1198,15 @@ export default function SettingsScreen({ navigation }) {
               />
               {modelSearchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => setModelSearchQuery('')}>
-                  <Ionicons name="close-circle" size={18} color={theme.colors.textSecondary} />
+                  <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
               )}
             </View>
 
             {loadingModels ? (
               <View style={styles.modelLoadingContainer}>
-                <ActivityIndicator size="large" color={theme.colors.primary} />
-                <Text style={styles.modelLoadingText}>{t('settings.checkingModels')}</Text>
+                <ActivityIndicator size="large" color={colors.mainInk} />
+                <Text style={[ui.secondary, styles.modelLoadingText]}>{t('settings.checkingModels')}</Text>
               </View>
             ) : (
               <FlatList
@@ -1615,30 +1216,30 @@ export default function SettingsScreen({ navigation }) {
                 }
                 keyExtractor={(item) => item.code}
                 renderItem={({ item }) => (
-                  <View style={[styles.modelItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    <View style={[styles.modelItemInfo, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <View style={styles.modelItem}>
+                    <View style={styles.modelItemInfo}>
                       <Ionicons
                         name={item.downloaded ? 'checkmark-circle' : 'cloud-download-outline'}
                         size={20}
-                        color={item.downloaded ? theme.colors.success : theme.colors.textSecondary}
+                        color={item.downloaded ? colors.success : colors.textSecondary}
                       />
-                      <Text style={[styles.modelItemText, { textAlign: isRTL ? 'right' : 'left' }, item.downloaded && { fontWeight: '600' }]}>{item.displayName}</Text>
+                      <Text style={[ui.body, styles.flexText, item.downloaded && styles.modelItemDownloaded]}>{item.displayName}</Text>
                     </View>
                     {downloadingModel === item.code ? (
-                      <ActivityIndicator size="small" color={theme.colors.primary} />
+                      <ActivityIndicator size="small" color={colors.mainInk} />
                     ) : item.downloaded ? (
                       <TouchableOpacity
                         onPress={() => handleDeleteModel(item)}
                         style={styles.modelActionButton}
                       >
-                        <Ionicons name="trash-outline" size={18} color={theme.colors.error || '#FF3B30'} />
+                        <Ionicons name="trash-outline" size={18} color={colors.error} />
                       </TouchableOpacity>
                     ) : (
                       <TouchableOpacity
                         onPress={() => handleDownloadModel(item)}
                         style={styles.modelActionButton}
                       >
-                        <Ionicons name="download-outline" size={18} color={theme.colors.primary} />
+                        <Ionicons name="download-outline" size={18} color={colors.mainInk} />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -1647,12 +1248,12 @@ export default function SettingsScreen({ navigation }) {
                 style={styles.langList}
                 ListHeaderComponent={
                   <View style={styles.modelListHeader}>
-                    <Text style={[styles.modelListHeaderText, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    <Text style={ui.rowTitle}>
                       {downloadedModels.length === 1
                         ? t('settings.modelsDownloadedOne', { count: formatNumber(downloadedModels.length) })
                         : t('settings.modelsDownloadedOther', { count: formatNumber(downloadedModels.length) })}
                     </Text>
-                    <Text style={[styles.modelListSubtext, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    <Text style={[ui.secondary, styles.hint]}>
                       {t('settings.modelsDownloadedSubtext')}
                     </Text>
                   </View>
@@ -1668,67 +1269,26 @@ export default function SettingsScreen({ navigation }) {
         visible={showTranslationModePicker}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowTranslationModePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.translationMode')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowTranslationModePicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.translationMode'), () => setShowTranslationModePicker(false))}
 
-            <TouchableOpacity
-              style={[styles.modeItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }, translationMode === TRANSLATION_MODES.AUTO && styles.langItemSelected]}
-              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.AUTO)}
-            >
-              <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Ionicons name="sync-outline" size={22} color={translationMode === TRANSLATION_MODES.AUTO ? theme.colors.primary : theme.colors.text} />
-                <View style={styles.modeItemText}>
-                  <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, translationMode === TRANSLATION_MODES.AUTO && { color: theme.colors.primary }]}>{t('settings.translationModeAutoTitle')}</Text>
-                  <Text style={[styles.modeItemDesc, { textAlign: isRTL ? 'right' : 'left' }]}>{t('settings.translationModeAutoLong')}</Text>
-                </View>
-              </View>
-              {translationMode === TRANSLATION_MODES.AUTO && (
-                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.modeItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }, translationMode === TRANSLATION_MODES.ONLINE && styles.langItemSelected]}
-              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.ONLINE)}
-            >
-              <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Ionicons name="cloud-outline" size={22} color={translationMode === TRANSLATION_MODES.ONLINE ? theme.colors.primary : theme.colors.text} />
-                <View style={styles.modeItemText}>
-                  <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, translationMode === TRANSLATION_MODES.ONLINE && { color: theme.colors.primary }]}>{t('settings.translationModeOnlineTitle')}</Text>
-                  <Text style={[styles.modeItemDesc, { textAlign: isRTL ? 'right' : 'left' }]}>{t('settings.translationModeOnlineLong')}</Text>
-                </View>
-              </View>
-              {translationMode === TRANSLATION_MODES.ONLINE && (
-                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.modeItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }, { borderBottomWidth: 0 }, translationMode === TRANSLATION_MODES.OFFLINE && styles.langItemSelected]}
-              onPress={() => handleSelectTranslationMode(TRANSLATION_MODES.OFFLINE)}
-            >
-              <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                <Ionicons name="phone-portrait-outline" size={22} color={translationMode === TRANSLATION_MODES.OFFLINE ? theme.colors.primary : theme.colors.text} />
-                <View style={styles.modeItemText}>
-                  <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, translationMode === TRANSLATION_MODES.OFFLINE && { color: theme.colors.primary }]}>{t('settings.translationModeOfflineTitle')}</Text>
-                  <Text style={[styles.modeItemDesc, { textAlign: isRTL ? 'right' : 'left' }]}>{t('settings.translationModeOfflineLong')}</Text>
-                </View>
-              </View>
-              {translationMode === TRANSLATION_MODES.OFFLINE && (
-                <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-              )}
-            </TouchableOpacity>
+            {[
+              { mode: TRANSLATION_MODES.AUTO, icon: 'sync-outline', title: t('settings.translationModeAutoTitle'), description: t('settings.translationModeAutoLong') },
+              { mode: TRANSLATION_MODES.ONLINE, icon: 'cloud-outline', title: t('settings.translationModeOnlineTitle'), description: t('settings.translationModeOnlineLong') },
+              { mode: TRANSLATION_MODES.OFFLINE, icon: 'phone-portrait-outline', title: t('settings.translationModeOfflineTitle'), description: t('settings.translationModeOfflineLong') },
+            ].map((option) => renderChoice({
+              key: option.mode,
+              icon: option.icon,
+              title: option.title,
+              description: option.description,
+              selected: translationMode === option.mode,
+              onPress: () => handleSelectTranslationMode(option.mode),
+            }))}
           </View>
         </View>
       </Modal>
@@ -1738,55 +1298,28 @@ export default function SettingsScreen({ navigation }) {
         visible={showArticleAgePicker}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowArticleAgePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.articleAgeFilter')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowArticleAgePicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.articleAgeFilter'), () => setShowArticleAgePicker(false))}
 
-            <Text style={[styles.modeItemDesc, { paddingHorizontal: 16, paddingBottom: 8, textAlign: isRTL ? 'right' : 'left' }]}>
+            <Text style={[ui.secondary, styles.modalDescription]}>
               {t('settings.articleAgeFilterModalDesc')}
             </Text>
 
-            {articleAgeOptions.map((option, index) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[
-                  styles.modeItem,
-                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                  maxArticleAge === option.value && styles.langItemSelected,
-                  index === articleAgeOptions.length - 1 && { borderBottomWidth: 0 },
-                ]}
-                onPress={() => {
-                  updateMaxArticleAge(option.value);
-                  setShowArticleAgePicker(false);
-                }}
-              >
-                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Ionicons
-                    name={option.value === 0 ? 'infinite-outline' : 'time-outline'}
-                    size={22}
-                    color={maxArticleAge === option.value ? theme.colors.primary : theme.colors.text}
-                  />
-                  <View style={styles.modeItemText}>
-                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, maxArticleAge === option.value && { color: theme.colors.primary }]}>
-                      {option.label}
-                    </Text>
-                  </View>
-                </View>
-                {maxArticleAge === option.value && (
-                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
+            {articleAgeOptions.map((option) => renderChoice({
+              key: option.value,
+              icon: option.value === 0 ? 'infinite-outline' : 'time-outline',
+              title: option.label,
+              selected: maxArticleAge === option.value,
+              onPress: () => {
+                updateMaxArticleAge(option.value);
+                setShowArticleAgePicker(false);
+              },
+            }))}
           </View>
         </View>
       </Modal>
@@ -1796,51 +1329,24 @@ export default function SettingsScreen({ navigation }) {
         visible={showAutoScrollDelayPicker}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowAutoScrollDelayPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.autoScrollDelay')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowAutoScrollDelayPicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.autoScrollDelay'), () => setShowAutoScrollDelayPicker(false))}
 
-            {[3, 5, 10, 15].map((seconds, index, arr) => (
-              <TouchableOpacity
-                key={seconds}
-                style={[
-                  styles.modeItem,
-                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                  autoScrollDelay === seconds && styles.langItemSelected,
-                  index === arr.length - 1 && { borderBottomWidth: 0 },
-                ]}
-                onPress={() => {
-                  updateAutoScrollDelay(seconds);
-                  setShowAutoScrollDelayPicker(false);
-                }}
-              >
-                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Ionicons
-                    name="timer-outline"
-                    size={22}
-                    color={autoScrollDelay === seconds ? theme.colors.primary : theme.colors.text}
-                  />
-                  <View style={styles.modeItemText}>
-                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, autoScrollDelay === seconds && { color: theme.colors.primary }]}>
-                      {t('settings.autoScrollDelayValue', { count: formatNumber(seconds) })}
-                    </Text>
-                  </View>
-                </View>
-                {autoScrollDelay === seconds && (
-                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
+            {[3, 5, 10, 15].map((seconds) => renderChoice({
+              key: seconds,
+              icon: 'timer-outline',
+              title: t('settings.autoScrollDelayValue', { count: formatNumber(seconds) }),
+              selected: autoScrollDelay === seconds,
+              onPress: () => {
+                updateAutoScrollDelay(seconds);
+                setShowAutoScrollDelayPicker(false);
+              },
+            }))}
           </View>
         </View>
       </Modal>
@@ -1850,65 +1356,31 @@ export default function SettingsScreen({ navigation }) {
         visible={showFontPicker}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowFontPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '70%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.readingFont')}</Text>
-              <TouchableOpacity onPress={() => setShowFontPicker(false)} style={styles.modalCloseButton}>
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+            {renderSheetHeader(t('settings.readingFont'), () => setShowFontPicker(false))}
             <ScrollView>
-              {READING_FONTS.map((font, index, arr) => (
-                <TouchableOpacity
-                  key={font.key}
-                  style={[
-                    styles.modeItem,
-                    { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                    readingFont === font.key && styles.langItemSelected,
-                    index === arr.length - 1 && { borderBottomWidth: 0 },
-                  ]}
-                  onPress={() => {
-                    updateReadingFont(font.key);
-                    setShowFontPicker(false);
-                  }}
-                >
-                  <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    <Ionicons
-                      name="text-outline"
-                      size={22}
-                      color={readingFont === font.key ? theme.colors.primary : theme.colors.text}
-                    />
-                    <View style={styles.modeItemText}>
-                      <Text
-                        style={[
-                          styles.modeItemTitle,
-                          { textAlign: isRTL ? 'right' : 'left' },
-                          readingFontStyle(font.key),
-                          readingFont === font.key && { color: theme.colors.primary },
-                        ]}
-                      >
-                        {font.label || t(font.labelKey)}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.settingDescription,
-                          { color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left' },
-                          readingFontStyle(font.key),
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {t('settings.fontPreview')}
-                      </Text>
-                    </View>
-                  </View>
-                  {readingFont === font.key && (
-                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                  )}
-                </TouchableOpacity>
-              ))}
+              {/* Each font shows itself: its name and a preview in it */}
+              {READING_FONTS.map((font) => renderChoice({
+                key: font.key,
+                icon: 'text-outline',
+                title: font.label || t(font.labelKey),
+                // Not Inter, so a weight applies: semi-bold in the font itself
+                titleStyle: [readingFontStyle(font.key), styles.fontTitle],
+                selectedTitleStyle: styles.choiceInk,
+                description: t('settings.fontPreview'),
+                descriptionStyle: readingFontStyle(font.key),
+                numberOfLines: 1,
+                selected: readingFont === font.key,
+                onPress: () => {
+                  updateReadingFont(font.key);
+                  setShowFontPicker(false);
+                },
+              }))}
             </ScrollView>
           </View>
         </View>
@@ -1919,53 +1391,26 @@ export default function SettingsScreen({ navigation }) {
         visible={showWidgetThemePicker}
         animationType="fade"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowWidgetThemePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { height: 'auto', maxHeight: '50%' }]}>
-            <View style={[styles.modalHeader, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('settings.widgetTheme')}</Text>
-              <TouchableOpacity
-                onPress={() => setShowWidgetThemePicker(false)}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.widgetTheme'), () => setShowWidgetThemePicker(false))}
 
             {[
               { value: 'app', label: t('settings.widgetThemeApp'), desc: t('settings.widgetThemeAppDesc'), icon: 'phone-portrait-outline' },
               { value: 'light', label: t('settings.widgetThemeLight'), desc: t('settings.widgetThemeLightDesc'), icon: 'sunny-outline' },
               { value: 'dark', label: t('settings.widgetThemeDark'), desc: t('settings.widgetThemeDarkDesc'), icon: 'moon-outline' },
-            ].map((option, index) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[
-                  styles.modeItem,
-                  { flexDirection: isRTL ? 'row-reverse' : 'row' },
-                  widgetTheme === option.value && styles.langItemSelected,
-                  index === 2 && { borderBottomWidth: 0 },
-                ]}
-                onPress={() => handleWidgetThemeChange(option.value)}
-              >
-                <View style={[styles.modeItemContent, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Ionicons
-                    name={option.icon}
-                    size={22}
-                    color={widgetTheme === option.value ? theme.colors.primary : theme.colors.text}
-                  />
-                  <View style={styles.modeItemText}>
-                    <Text style={[styles.modeItemTitle, { textAlign: isRTL ? 'right' : 'left' }, widgetTheme === option.value && { color: theme.colors.primary }]}>
-                      {option.label}
-                    </Text>
-                    <Text style={[styles.modeItemDesc, { textAlign: isRTL ? 'right' : 'left' }]}>{option.desc}</Text>
-                  </View>
-                </View>
-                {widgetTheme === option.value && (
-                  <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
-            ))}
+            ].map((option) => renderChoice({
+              key: option.value,
+              icon: option.icon,
+              title: option.label,
+              description: option.desc,
+              selected: widgetTheme === option.value,
+              onPress: () => handleWidgetThemeChange(option.value),
+            }))}
           </View>
         </View>
       </Modal>
@@ -1988,3 +1433,294 @@ export default function SettingsScreen({ navigation }) {
   );
 }
 
+// A row of a card in Settings: a title, a line under it, and an optional
+// control or icon at the end. The card draws the hairlines between rows.
+function SettingItem({ title, description, onPress, rightElement }) {
+  const ui = useUi();
+  const { isRTL } = useTranslation();
+  const styles = useStyles(isRTL);
+  return (
+    <TouchableOpacity style={styles.settingItem} onPress={onPress} disabled={!onPress} activeOpacity={0.7}>
+      <View style={styles.flexText}>
+        <Text style={ui.rowTitle}>{title}</Text>
+        {!!description && <Text style={[ui.secondary, styles.hint]}>{description}</Text>}
+      </View>
+      {rightElement}
+    </TouchableOpacity>
+  );
+}
+
+// The testers card: the thanks as its title, then one name per line
+function TesterItem({ children, isNote = false }) {
+  const ui = useUi();
+  const { isRTL } = useTranslation();
+  const styles = useStyles(isRTL);
+  return (
+    <View style={isNote ? styles.testersNote : styles.testerItem}>
+      <Text style={isNote ? ui.title : ui.body}>{children}</Text>
+    </View>
+  );
+}
+
+// Built once per theme and direction. FeedWell lays out right to left per
+// component, so rows reverse themselves in RTL.
+const useStyles = makeStyles(({ colors: c }, isRTL) => {
+  const row = isRTL ? 'row-reverse' : 'row';
+  const textAlign = isRTL ? 'right' : 'left';
+  return {
+    header: {
+      flexDirection: row,
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 4,
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 24,
+    },
+    flexText: {
+      flex: 1,
+    },
+    hint: {
+      marginTop: 2,
+    },
+    // A row: a control beside its name
+    settingItem: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 12,
+      minHeight: 56,
+    },
+    // A block: a control under its name (the color rows, the sliders)
+    block: {
+      paddingVertical: 14,
+    },
+    // Two rows of the five colors. Each name sits on one line under its
+    // swatch, a little wider than its column so a long name stays whole.
+    swatchRow: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      marginTop: 12,
+    },
+    swatchItem: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    // The selected swatch has a ring in the text color
+    swatchRing: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      borderWidth: 2,
+      borderColor: 'transparent',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    swatchRingSelected: {
+      borderColor: c.text,
+    },
+    swatch: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+    },
+    swatchName: {
+      ...TYPE.small,
+      color: c.textSecondary,
+      marginTop: 4,
+      marginHorizontal: -8,
+      textAlign: 'center',
+    },
+    swatchNameSelected: {
+      fontFamily: FONT.semiBold,
+      color: c.text,
+    },
+    sliderHeader: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      marginBottom: 4,
+    },
+    sliderValue: {
+      ...TYPE.secondary,
+      ...TYPE.count,
+      color: c.textSecondary,
+    },
+    sliderValueMain: {
+      fontSize: 14.5,
+      color: c.mainInk,
+    },
+    slider: {
+      width: '100%',
+      height: 40,
+    },
+    sliderEnds: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+    },
+    testersCard: {
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      gap: 6,
+    },
+    testersNote: {
+      marginBottom: 4,
+    },
+    testerItem: {
+      paddingVertical: 1,
+    },
+    footer: {
+      paddingHorizontal: 16,
+      paddingTop: 24,
+      paddingBottom: 16,
+    },
+    footerText: {
+      textAlign: 'center',
+      lineHeight: 19,
+    },
+    copyrightText: {
+      textAlign: 'center',
+      marginTop: 12,
+    },
+    // Sheets: over a 40% scrim, rising from the bottom
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      height: '75%',
+    },
+    modalContainerShort: {
+      height: 'auto',
+      maxHeight: '60%',
+    },
+    modalContainerTall: {
+      height: 'auto',
+      maxHeight: '75%',
+    },
+    modalHeader: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 8,
+    },
+    modalCloseButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    modalDescription: {
+      paddingHorizontal: 20,
+      paddingBottom: 8,
+    },
+    // A round search field on the sheet, with a hairline
+    modalSearchContainer: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+      marginHorizontal: 16,
+      marginTop: 4,
+      marginBottom: 8,
+      paddingHorizontal: 16,
+      minHeight: 44,
+      backgroundColor: c.surface,
+      borderRadius: RADIUS.round,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    modalSearchInput: {
+      ...TYPE.body,
+      flex: 1,
+      color: c.text,
+      paddingVertical: 8,
+      textAlign,
+    },
+    langList: {
+      flex: 1,
+    },
+    langItem: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    // The choice in use: the main tint, its name in main ink
+    choiceSelected: {
+      backgroundColor: c.mainTint,
+    },
+    choiceTitleSelected: {
+      fontFamily: FONT.semiBold,
+      color: c.mainInk,
+    },
+    choiceInk: {
+      color: c.mainInk,
+    },
+    fontTitle: {
+      fontWeight: '600',
+    },
+    modelLoadingContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    modelLoadingText: {
+      marginTop: 16,
+    },
+    modelItem: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    modelItemInfo: {
+      flex: 1,
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 10,
+    },
+    modelItemDownloaded: {
+      fontFamily: FONT.semiBold,
+    },
+    modelListHeader: {
+      paddingHorizontal: 20,
+      paddingTop: 4,
+      paddingBottom: 12,
+    },
+    modelActionButton: {
+      padding: 8,
+    },
+    modeItem: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+    },
+    modeItemContent: {
+      flexDirection: row,
+      alignItems: 'center',
+      flex: 1,
+      gap: 14,
+    },
+    modeItemDesc: {
+      marginTop: 2,
+    },
+  };
+});

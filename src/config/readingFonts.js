@@ -12,6 +12,8 @@
 // `label` is a proper noun and is never translated; `labelKey` entries are
 // generic names and resolve through i18n.
 
+import { Platform } from 'react-native';
+
 export const READING_FONTS = [
   { key: 'system', labelKey: 'font.system', regular: null, bold: null },
   { key: 'serif', labelKey: 'font.serif', regular: 'serif', bold: 'serif' },
@@ -39,10 +41,15 @@ export function getReadingFont(key) {
   return READING_FONTS.find((f) => f.key === key) || READING_FONTS[0];
 }
 
-// Style fragment for body text in the chosen font. Returns {} for the system
-// default so the platform font keeps applying.
+// The phone's own font. The interface text is Inter (utils/defaultFont), so on
+// Android the System choice names the platform family rather than leaving the
+// family out, which would now mean Inter.
+const SYSTEM_FONT = Platform.OS === 'android' ? { fontFamily: 'sans-serif' } : {};
+
+// Style fragment for body text in the chosen font. The system default gives
+// the phone's own font.
 export function readingFontStyle(key, { bold = false } = {}) {
   const font = getReadingFont(key);
   const family = bold ? font.bold : font.regular;
-  return family ? { fontFamily: family } : {};
+  return family ? { fontFamily: family } : SYSTEM_FONT;
 }

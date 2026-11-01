@@ -339,7 +339,7 @@ export default {
   "settings.sectionTranslation": "Překlad",
   "settings.sectionHelp": "Nápověda",
   "settings.sectionData": "Data",
-  "settings.sectionTesters": "TESTEŘI",
+  "settings.sectionTesters": "Testeři",
   "settings.sectionAbout": "O aplikaci",
   "settings.autoRefresh": "Automatické obnovení",
   "settings.autoRefreshDesc": "Automaticky obnovit kanály při otevření aplikace",
@@ -356,7 +356,10 @@ export default {
   "font.mono": "Neproporcionální",
   "settings.amoledBlack": "Černá AMOLED",
   "settings.amoledBlackDesc": "Použít pro karty a nabídky čistou černou — šetří baterii na OLED displejích",
-  "settings.themeColor": "Barva motivu",
+  "settings.mainColor": "Hlavní barva",
+  "settings.mainColorHint": "Tlačítka, karty a zvýraznění",
+  "settings.accentColor": "Akcentová barva",
+  "settings.accentColorHint": "Nadpisy, ikony a odstíny textu",
   "settings.bookmarkIndicators": "Značky záložek",
   "settings.bookmarkIndicatorsDesc": "Zobrazovat značky pozice čtení ve čtečce článků",
   "settings.openReaderDirectly": "Otevírat čtečku přímo",
@@ -585,9 +588,9 @@ export default {
   "sound.nature.study": "Pomáhají zotavit se ze stresu při přestávkách ve čtení",
 
   // --- Theme color names ---
-  "color.warmBeige": "Teplá béžová",
+  "color.warmBeige": "Béžová",
   "color.sage": "Šalvějová",
   "color.sky": "Nebeská",
-  "color.lavender": "Levandulová",
+  "color.lavender": "Levandule",
   "color.rose": "Růžová",
 };

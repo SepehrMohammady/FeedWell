@@ -1,3 +1,5 @@
+// Inter for all text, before anything renders (Calm Surfaces 3)
+import './src/utils/defaultFont';
 import { registerRootComponent } from 'expo';
 
 import App from './App';

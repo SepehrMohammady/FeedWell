@@ -339,7 +339,7 @@ export default {
   "settings.sectionTranslation": "Übersetzung",
   "settings.sectionHelp": "Hilfe",
   "settings.sectionData": "Daten",
-  "settings.sectionTesters": "TESTER",
+  "settings.sectionTesters": "Tester",
   "settings.sectionAbout": "Über",
   "settings.autoRefresh": "Automatisch aktualisieren",
   "settings.autoRefreshDesc": "Feeds beim Öffnen der App automatisch aktualisieren",
@@ -356,7 +356,10 @@ export default {
   "font.mono": "Monospace",
   "settings.amoledBlack": "AMOLED-Schwarz",
   "settings.amoledBlackDesc": "Reines Schwarz für Karten und Menüs – spart Akku auf OLED-Displays",
-  "settings.themeColor": "Designfarbe",
+  "settings.mainColor": "Hauptfarbe",
+  "settings.mainColorHint": "Schaltflächen, Tabs und Hervorhebungen",
+  "settings.accentColor": "Akzentfarbe",
+  "settings.accentColorHint": "Überschriften, Symbole und Textfarben",
   "settings.bookmarkIndicators": "Lesezeichen-Markierungen",
   "settings.bookmarkIndicatorsDesc": "Lesepositionsmarkierungen im Artikel-Reader anzeigen",
   "settings.openReaderDirectly": "Reader direkt öffnen",
@@ -585,9 +588,9 @@ export default {
   "sound.nature.study": "Hilft beim Stressabbau in Lesepausen",
 
   // --- Theme color names ---
-  "color.warmBeige": "Warmes Beige",
+  "color.warmBeige": "Beige",
   "color.sage": "Salbei",
-  "color.sky": "Himmelblau",
+  "color.sky": "Himmel",
   "color.lavender": "Lavendel",
   "color.rose": "Rosé",
 };

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   Image,
   ScrollView,
   Linking,
@@ -12,7 +11,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
+import { useUi } from '../theme/ui';
+import { FONT, TYPE, RADIUS } from '../theme/type';
 import { useFeed } from '../context/FeedContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -25,8 +26,9 @@ export default function ArticleActionsScreen({ route, navigation }) {
   const { markArticleRead } = useFeed();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const { t, isRTL, formatNumber, language } = useTranslation();
+  const ui = useUi();
+  const styles = useStyles(isRTL);
 
-  
   // Track if we've already marked this article as read to prevent infinite loops
   const hasMarkedReadRef = useRef(false);
 
@@ -80,244 +82,84 @@ export default function ArticleActionsScreen({ route, navigation }) {
     localeOptions: { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' },
   });
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    header: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    backButton: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
-      paddingVertical: 4,
-      minWidth: 44,
-    },
-    headerButton: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
-      paddingVertical: 4,
-      minWidth: 44,
-    },
-    headerButtonLabel: {
-      fontSize: 9,
-      marginTop: 2,
-      fontWeight: '500',
-      color: theme.colors.textSecondary,
-    },
-    headerActions: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    content: {
-      flex: 1,
-      padding: 16,
-    },
-    articleHeader: {
-      marginBottom: 16,
-    },
-    feedTitle: {
-      fontSize: 14,
-      color: theme.colors.primary,
-      fontWeight: '600',
-      marginBottom: 4,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    articleDate: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    articleTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: theme.colors.text,
-      lineHeight: 32,
-      marginBottom: 16,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    articleImage: {
-      width: '100%',
-      height: 200,
-      borderRadius: 12,
-      marginBottom: 16,
-      backgroundColor: theme.colors.border,
-    },
-    articleDescription: {
-      fontSize: 16,
-      color: theme.colors.textSecondary,
-      lineHeight: 24,
-      marginBottom: 24,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    actionsContainer: {
-      gap: 12,
-      paddingVertical: 16,
-    },
-    actionButton: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 16,
-      borderRadius: 12,
-      gap: 8,
-    },
-    browserButton: {
-      backgroundColor: theme.colors.primary,
-    },
-    readerButton: {
-      backgroundColor: theme.colors.success,
-    },
-    shareButton: {
-      backgroundColor: theme.colors.warning,
-    },
-    notesButton: {
-      backgroundColor: theme.colors.textSecondary,
-    },
-    actionButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    notesModalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'flex-end',
-    },
-    notesModalContainer: {
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      paddingBottom: 24,
-      maxHeight: '70%',
-    },
-    notesModalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 16,
-      borderBottomWidth: 1,
-    },
-    notesModalTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-    },
-    notesModalCloseButton: {
-      padding: 4,
-    },
-    notesInput: {
-      margin: 16,
-      padding: 14,
-      borderRadius: 12,
-      borderWidth: 1,
-      fontSize: 15,
-      lineHeight: 22,
-      minHeight: 150,
-      maxHeight: 300,
-    },
-    notesSaveButton: {
-      marginHorizontal: 16,
-      paddingVertical: 14,
-      borderRadius: 10,
-      alignItems: 'center',
-    },
-    notesSaveButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-  });
+  const colors = theme.colors;
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
+    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={styles.headerButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={20} color={theme.colors.text} />
-          <Text style={styles.headerButtonLabel}>{t('articleActions.back')}</Text>
+          <Ionicons name={isRTL ? "arrow-forward" : "arrow-back"} size={20} color={colors.text} />
+          <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('articleActions.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('articleActions.headerTitle')}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>{t('articleActions.headerTitle')}</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.headerButton} onPress={handleOpenInBrowser}>
-            <Ionicons name="globe-outline" size={20} color={theme.colors.text} />
-            <Text style={styles.headerButtonLabel}>{t('articleActions.browser')}</Text>
+            <Ionicons name="globe-outline" size={20} color={colors.text} />
+            <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('articleActions.browser')}</Text>
           </TouchableOpacity>
           <SaveButton article={article} size={20} variant="header" label={t('common.save')} />
           <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
-            <Ionicons name="share-outline" size={20} color={theme.colors.text} />
-            <Text style={styles.headerButtonLabel}>{t('articleActions.share')}</Text>
+            <Ionicons name="share-outline" size={20} color={colors.text} />
+            <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('articleActions.share')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton} onPress={() => openSoundPlaylist(true)}>
-            <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
-            <Text style={styles.headerButtonLabel}>{t('articleActions.sounds')}</Text>
+            <Ionicons name="musical-notes-outline" size={20} color={colors.text} />
+            <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('articleActions.sounds')}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.articleHeader}>
-          <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
-          <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
+      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* The article's preview, in one card */}
+        <View style={[ui.card, styles.articleCard]}>
+          <View style={styles.articleHeader}>
+            <Text selectable={true} style={styles.feedTitle}>{article.feedTitle}</Text>
+            <Text selectable={true} style={styles.articleDate}>{formatDate(article.publishedDate)}</Text>
+          </View>
+
+          <Text selectable={true} style={styles.articleTitle}>{article.title}</Text>
+
+          {article.imageUrl && (
+            <Image
+              source={{ uri: article.imageUrl }}
+              style={styles.articleImage}
+              resizeMode="cover"
+            />
+          )}
+
+          {article.description && (
+            <Text selectable={true} style={styles.articleDescription}>{article.description}</Text>
+          )}
         </View>
 
-        <Text selectable={true} style={styles.articleTitle}>{article.title}</Text>
-
-        {article.imageUrl && (
-          <Image
-            source={{ uri: article.imageUrl }}
-            style={styles.articleImage}
-            resizeMode="cover"
-          />
-        )}
-
-        {article.description && (
-          <Text selectable={true} style={styles.articleDescription}>{article.description}</Text>
-        )}
-
+        {/* One primary action, the others secondary: red, green and amber are
+            kept for states */}
         <View style={styles.actionsContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.browserButton]}
+            style={[ui.primaryButton, styles.actionButton]}
             onPress={handleOpenInBrowser}
           >
-            <Ionicons name="globe-outline" size={24} color="#fff" />
-            <Text style={styles.actionButtonText}>{t('articleActions.openInBrowser')}</Text>
+            <Ionicons name="globe-outline" size={22} color={colors.onPrimary} />
+            <Text style={[ui.primaryLabel, styles.actionButtonText]}>{t('articleActions.openInBrowser')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.readerButton]}
+            style={[ui.secondaryButton, styles.actionButton]}
             onPress={handleReadInApp}
           >
-            <Ionicons name="reader-outline" size={24} color="#fff" />
-            <Text style={styles.actionButtonText}>{t('articleActions.readInApp')}</Text>
+            <Ionicons name="reader-outline" size={22} color={colors.mainInk} />
+            <Text style={[ui.secondaryLabel, styles.actionButtonText]}>{t('articleActions.readInApp')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButton, styles.shareButton]}
+            style={[ui.secondaryButton, styles.actionButton]}
             onPress={handleShare}
           >
-            <Ionicons name="share-outline" size={24} color="#fff" />
-            <Text style={styles.actionButtonText}>{t('articleActions.share')}</Text>
+            <Ionicons name="share-outline" size={22} color={colors.mainInk} />
+            <Text style={[ui.secondaryLabel, styles.actionButtonText]}>{t('articleActions.share')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -326,3 +168,105 @@ export default function ArticleActionsScreen({ route, navigation }) {
     </SafeAreaView>
   );
 }
+
+// Styles built once per theme and direction (Calm Surfaces 3)
+const useStyles = makeStyles(({ colors: c }, isRTL) => {
+  const row = isRTL ? 'row-reverse' : 'row';
+  const textAlign = isRTL ? 'right' : 'left';
+  const writingDirection = isRTL ? 'rtl' : 'ltr';
+  return {
+    header: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    headerButton: {
+      flexShrink: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+      minHeight: 44,
+    },
+    // Straight on the wash, so in the tone that reads on its glows
+    headerButtonLabel: {
+      fontFamily: FONT.medium,
+      fontSize: 10,
+      marginTop: 2,
+      color: c.textSecondaryOnWash,
+    },
+    headerActions: {
+      flexDirection: row,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      ...TYPE.title,
+      flexShrink: 1,
+      color: c.text,
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: 16,
+    },
+    articleCard: {
+      padding: 16,
+    },
+    articleHeader: {
+      marginBottom: 12,
+    },
+    feedTitle: {
+      fontFamily: FONT.semiBold,
+      fontSize: 14,
+      color: c.mainInk,
+      marginBottom: 4,
+      textAlign,
+      writingDirection,
+    },
+    articleDate: {
+      ...TYPE.secondary,
+      color: c.textSecondary,
+      textAlign,
+      writingDirection,
+    },
+    articleTitle: {
+      fontFamily: FONT.bold,
+      fontSize: 24,
+      letterSpacing: -0.3,
+      color: c.text,
+      lineHeight: 31,
+      marginBottom: 16,
+      textAlign,
+      writingDirection,
+    },
+    articleImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: RADIUS.tile,
+      marginBottom: 16,
+      backgroundColor: c.surface2,
+    },
+    articleDescription: {
+      ...TYPE.body,
+      fontSize: 16,
+      color: c.textSecondary,
+      lineHeight: 24,
+      textAlign,
+      writingDirection,
+    },
+    actionsContainer: {
+      gap: 12,
+      paddingVertical: 16,
+    },
+    actionButton: {
+      minHeight: 50,
+    },
+    actionButtonText: {
+      fontSize: 15,
+    },
+  };
+});

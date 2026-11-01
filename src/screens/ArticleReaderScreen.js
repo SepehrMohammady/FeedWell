@@ -19,10 +19,12 @@ import {
   BackHandler,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
+import { FONT, TYPE, RADIUS } from '../theme/type';
+import { withAlpha } from '../theme/palette';
 import { useTranslation } from '../context/LanguageContext';
 import { formatLocalizedDate } from '../utils/formatDate';
 import { useAppSettings } from '../context/AppSettingsContext';
@@ -87,6 +89,8 @@ function ArticleReaderScreenContent({ route, navigation }) {
   } = route.params;
   const { theme } = useTheme();
   const { t, isRTL: appRTL, formatNumber, language } = useTranslation();
+  const styles = useReaderStyles(appRTL);
+  const insets = useSafeAreaInsets();
   const { showImages, showBookmarkIndicators, speechRate, readerHeaderActions, updateReaderHeaderActions, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled, readingFont, autoTranslate } = useAppSettings();
   const { markArticleRead, articles: allArticles } = useFeed();
   
@@ -1069,7 +1073,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionBookmark'),
       shortLabel: t('reader.actionBookmarkShort'),
       icon: hasBookmark ? 'bookmark' : 'bookmark-outline',
-      color: hasBookmark ? theme.colors.primary : theme.colors.text,
+      color: hasBookmark ? theme.colors.mainInk : theme.colors.text,
       onPress: handleBookmarkPress,
     },
     {
@@ -1077,7 +1081,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionTranslate'),
       shortLabel: t('reader.actionTranslateShort'),
       icon: isTranslated ? 'swap-horizontal' : 'language-outline',
-      color: isTranslated ? theme.colors.success : theme.colors.text,
+      color: isTranslated ? theme.colors.mainInk : theme.colors.text,
       onPress: isSameLanguage ? () => setShowLanguagePicker(true) : handleTranslate,
       onLongPress: () => setShowLanguagePicker(true),
       disabled: translating,
@@ -1088,7 +1092,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionReadAloud'),
       shortLabel: t('reader.actionReadAloudShort'),
       icon: isSpeaking ? 'volume-high' : 'volume-high-outline',
-      color: isSpeaking ? theme.colors.primary : theme.colors.text,
+      color: isSpeaking ? theme.colors.mainInk : theme.colors.text,
       onPress: handleReadAloud,
     },
     {
@@ -1104,7 +1108,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: isSaved ? t('reader.actionUnsave') : t('reader.actionSaveForLater'),
       shortLabel: isSaved ? t('reader.actionUnsaveShort') : t('reader.actionSaveShort'),
       icon: isSaved ? 'save' : 'save-outline',
-      color: isSaved ? theme.colors.primary : theme.colors.text,
+      color: isSaved ? theme.colors.mainInk : theme.colors.text,
       onPress: handleSaveArticle,
       loading: isSaving,
     },
@@ -1113,7 +1117,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionNotes'),
       shortLabel: t('reader.actionNotesShort'),
       icon: hasNote(article?.id) ? 'document-text' : 'document-text-outline',
-      color: hasNote(article?.id) ? theme.colors.primary : theme.colors.text,
+      color: hasNote(article?.id) ? theme.colors.mainInk : theme.colors.text,
       onPress: () => { setNoteText(articleNote ? articleNote.text : ''); setShowNotesModal(true); },
     },
     {
@@ -1121,7 +1125,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionHighlight'),
       shortLabel: t('reader.actionHighlightShort'),
       icon: highlightMode ? 'color-wand' : 'color-wand-outline',
-      color: highlightMode ? theme.colors.primary : theme.colors.text,
+      color: highlightMode ? theme.colors.mainInk : theme.colors.text,
       onPress: handleHighlightAction,
     },
     {
@@ -1137,7 +1141,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
       label: t('reader.actionAmbientSounds'),
       shortLabel: t('reader.actionAmbientSoundsShort'),
       icon: isSoundPlaying ? 'musical-notes' : 'musical-notes-outline',
-      color: isSoundPlaying ? theme.colors.primary : theme.colors.text,
+      color: isSoundPlaying ? theme.colors.mainInk : theme.colors.text,
       onPress: () => openSoundPlaylist(true),
     },
   ], [hasBookmark, isTranslated, isSameLanguage, translating, isSpeaking, isSaved, isSaving, isSoundPlaying, highlightMode, article?.id, articleNote, theme.colors, t, handleBookmarkPress, handleTranslate, handleReadAloud, handleOpenBrowser, handleSaveArticle, handleShare, handleHighlightAction, openSoundPlaylist]);
@@ -1191,536 +1195,14 @@ function ArticleReaderScreenContent({ route, navigation }) {
     localeOptions: { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' },
   });
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.surface,
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    headerButton: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
-      paddingVertical: 4,
-      minWidth: 44,
-    },
-    headerButtonLabel: {
-      fontSize: 9,
-      marginTop: 2,
-      fontWeight: '500',
-    },
-    headerActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-      flex: 1,
-      textAlign: 'center',
-    },
-    content: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    contentInner: {
-      paddingVertical: 20,
-      paddingHorizontal: 32,
-      backgroundColor: theme.colors.background,
-    },
-    articleHeader: {
-      marginBottom: 16,
-    },
-    feedTitle: {
-      fontSize: 14,
-      color: theme.colors.primary,
-      fontWeight: '600',
-      marginBottom: 4,
-    },
-    articleDate: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-    },
-    articleTitle: {
-      fontSize: 28,
-      fontWeight: 'bold',
-      color: theme.colors.text,
-      lineHeight: 36,
-      marginBottom: 8,
-    },
-    articleAuthor: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      fontStyle: 'italic',
-      marginBottom: 16,
-    },
-    articleImage: {
-      width: '100%',
-      height: 200,
-      borderRadius: 12,
-      marginBottom: 20,
-      backgroundColor: theme.colors.border,
-    },
-    articleContent: {
-      marginBottom: 24,
-    },
-    articleText: {
-      fontSize: 18,
-      color: theme.colors.text,
-      lineHeight: 28,
-      // Settings > Reading Font. 'system' contributes no fontFamily, so the
-      // long-standing default (Georgia on iOS, serif on Android) still applies.
-      ...(readingFont === 'system'
-        ? { fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' }
-        : readingFontStyle(readingFont)),
-    },
-    inlineImageContainer: {
-      marginVertical: 12,
-      borderRadius: 8,
-      overflow: 'hidden',
-    },
-    inlineImage: {
-      width: '100%',
-      height: undefined,
-      aspectRatio: 16 / 9,
-      borderRadius: 8,
-      backgroundColor: theme.colors.border,
-    },
-    imageCaption: {
-      fontSize: 13,
-      lineHeight: 18,
-      marginTop: 6,
-      fontStyle: 'italic',
-      textAlign: 'center',
-    },
-    languageInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      backgroundColor: theme.colors.border,
-      borderRadius: 16,
-      alignSelf: 'flex-start',
-    },
-    languageText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      fontWeight: '500',
-      marginLeft: 6,
-    },
-    translationBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flexWrap: 'wrap',
-      gap: 8,
-      marginBottom: 12,
-    },
-    translateButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 16,
-      gap: 6,
-    },
-    translateButtonActive: {
-      backgroundColor: theme.colors.success || '#4CAF50',
-    },
-    translateButtonDisabled: {
-      opacity: 0.7,
-    },
-    translateButtonText: {
-      fontSize: 12,
-      color: '#fff',
-      fontWeight: '600',
-    },
-    translationProgressContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: theme.colors.border,
-      borderRadius: 8,
-    },
-    translationProgressText: {
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-    },
-    translatedBanner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      marginBottom: 12,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: (theme.colors.success || '#4CAF50') + '15',
-      borderRadius: 8,
-      borderLeftWidth: 3,
-      borderLeftColor: theme.colors.success || '#4CAF50',
-    },
-    translatedBannerText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      fontWeight: '500',
-    },
-    // Modal styles
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'flex-end',
-    },
-    modalContainer: {
-      backgroundColor: theme.colors.surface,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      height: '75%',
-      paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-    },
-    modalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    modalTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    modalCloseButton: {
-      padding: 4,
-    },
-    modalSearchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      margin: 16,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      backgroundColor: theme.colors.background,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    modalSearchInput: {
-      flex: 1,
-      fontSize: 15,
-      color: theme.colors.text,
-      marginLeft: appRTL ? 0 : 8,
-      marginRight: appRTL ? 8 : 0,
-      paddingVertical: 4,
-    },
-    languageList: {
-      flex: 1,
-    },
-    languageItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    languageItemSelected: {
-      backgroundColor: (theme.colors.primary) + '15',
-    },
-    languageItemText: {
-      fontSize: 15,
-      color: theme.colors.text,
-    },
-    languageItemTextSelected: {
-      color: theme.colors.primary,
-      fontWeight: '600',
-    },
-    loadingContainer: {
-      alignItems: 'center',
-      padding: 40,
-    },
-    loadingText: {
-      marginTop: 16,
-      color: theme.colors.textSecondary,
-      fontSize: 16,
-    },
-    errorContainer: {
-      alignItems: 'center',
-      padding: 40,
-    },
-    errorTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.error,
-      marginTop: 16,
-      marginBottom: 8,
-    },
-    errorText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      marginBottom: 16,
-    },
-    retryButton: {
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: 24,
-      paddingVertical: 12,
-      borderRadius: 8,
-    },
-    retryButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    noContentContainer: {
-      alignItems: 'center',
-      padding: 40,
-    },
-    noContentTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.textSecondary,
-      marginTop: 16,
-      marginBottom: 8,
-    },
-    noContentText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-    },
-    scrollToTopButton: {
-      position: 'absolute',
-      bottom: 30,
-      right: 20,
-      backgroundColor: theme.colors.primary || '#007AFF',
-      borderRadius: 20,
-      width: 40,
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
-      opacity: 0.75,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-    },
-    bookmarkToast: {
-      position: 'absolute',
-      bottom: 90,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      backgroundColor: theme.colors.primary || '#007AFF',
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 20,
-      elevation: 6,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-    },
-    bookmarkToastText: {
-      color: '#fff',
-      fontSize: 14,
-      fontWeight: '600',
-    },
-    savedBookmarkLine: {
-      position: 'absolute',
-      left: 4,
-      right: 4,
-      flexDirection: 'row',
-      alignItems: 'center',
-      zIndex: 10,
-    },
-    savedBookmarkBar: {
-      flex: 1,
-      height: 1.5,
-      borderRadius: 1,
-      opacity: 0.5,
-    },
-    savedBookmarkIcon: {
-      width: 18,
-      height: 18,
-      borderRadius: 9,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    aimLineContainer: {
-      position: 'absolute',
-      top: '50%',
-      left: 4,
-      right: 4,
-      flexDirection: 'row',
-      alignItems: 'center',
-      opacity: 0.35,
-    },
-    aimLineBar: {
-      flex: 1,
-      height: 0,
-      borderStyle: 'dashed',
-      borderTopWidth: 1.5,
-    },
-    aimLineIcon: {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      borderWidth: 1.5,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: theme.colors.surface + 'CC',
-    },
-    notesModalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'flex-end',
-    },
-    notesModalContainer: {
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      paddingBottom: 24,
-      maxHeight: '70%',
-    },
-    notesModalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingVertical: 16,
-      borderBottomWidth: 1,
-    },
-    notesModalTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-    },
-    notesModalCloseButton: {
-      padding: 4,
-    },
-    notesInput: {
-      margin: 16,
-      padding: 14,
-      borderRadius: 12,
-      borderWidth: 1,
-      fontSize: 15,
-      lineHeight: 22,
-      minHeight: 150,
-      maxHeight: 300,
-    },
-    notesSaveButton: {
-      marginHorizontal: 16,
-      paddingVertical: 14,
-      borderRadius: 10,
-      alignItems: 'center',
-    },
-    notesSaveButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    ttsFloatingBar: {
-      position: 'absolute',
-      bottom: 16,
-      left: 16,
-      right: 16,
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 10,
-      borderRadius: 12,
-      elevation: 6,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-    },
-    ttsFloatingBarText: {
-      color: '#fff',
-      fontSize: 14,
-      fontWeight: '600',
-      flex: 1,
-      marginLeft: appRTL ? 0 : 10,
-      marginRight: appRTL ? 10 : 0,
-    },
-    ttsStopButton: {
-      padding: 4,
-    },
-    ttsHighlight: {
-      borderRadius: 6,
-      paddingHorizontal: 4,
-      paddingVertical: 2,
-      marginHorizontal: -4,
-    },
-    overflowBackdrop: {
-      flex: 1,
-      justifyContent: 'flex-start',
-      alignItems: 'flex-end',
-    },
-    overflowMenu: {
-      marginTop: Platform.OS === 'ios' ? 90 : 60,
-      marginRight: 12,
-      borderRadius: 12,
-      paddingVertical: 4,
-      minWidth: 240,
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-    },
-    overflowItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    overflowItemText: {
-      fontSize: 16,
-      marginLeft: appRTL ? 0 : 14,
-      marginRight: appRTL ? 14 : 0,
-      fontWeight: '500',
-      flex: 1,
-    },
-    overflowItemContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-    },
-    overflowPinButton: {
-      padding: 8,
-      marginLeft: appRTL ? 0 : 8,
-      marginRight: appRTL ? 8 : 0,
-    },
-    overflowDivider: {
-      height: StyleSheet.hairlineWidth,
-      marginVertical: 4,
-    },
-    overflowSectionLabel: {
-      fontSize: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 6,
-      fontWeight: '600',
-    },
-  });
+  // Settings > Reading Font for the paragraphs. 'system' keeps the long-standing
+  // default, Georgia on iOS and serif on Android.
+  const articleFont = useMemo(
+    () => (readingFont === 'system'
+      ? { fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' }
+      : readingFontStyle(readingFont)),
+    [readingFont]
+  );
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
@@ -1746,7 +1228,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
               ) : (
                 <Ionicons name={action.icon} size={20} color={action.color} />
               )}
-              <Text style={[styles.headerButtonLabel, { color: action.color }]} numberOfLines={1}>{action.shortLabel}</Text>
+              <Text style={[styles.headerButtonLabel, { color: action.color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{action.shortLabel}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -1754,7 +1236,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
             onPress={() => setShowOverflowMenu(true)}
           >
             <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.text} />
-            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]}>{t('reader.more')}</Text>
+            <Text style={[styles.headerButtonLabel, { color: theme.colors.textSecondary }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('reader.more')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1784,7 +1266,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         <View
           onLayout={(e) => { titleYRef.current = e.nativeEvent.layout.y; }}
-          style={isSpeaking && ttsCurrentIndex === 0 && ttsBodyOffsetRef.current > 0 ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }] : null}
+          style={isSpeaking && ttsCurrentIndex === 0 && ttsBodyOffsetRef.current > 0 ? [styles.ttsHighlight, { backgroundColor: theme.colors.accentTint }] : null}
         >
           <Text 
             selectable={true}
@@ -1816,7 +1298,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {loading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <ActivityIndicator size="large" color={theme.colors.mainInk} />
             <Text style={styles.loadingText}>{t('reader.loadingArticle')}</Text>
           </View>
         )}
@@ -1841,7 +1323,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
             {/* Translation progress */}
             {translating && translationProgress ? (
               <View style={styles.translationProgressContainer}>
-                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <ActivityIndicator size="small" color={theme.colors.mainInk} />
                 <Text style={styles.translationProgressText}>{translationProgress}</Text>
               </View>
             ) : null}
@@ -1915,7 +1397,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                     onLayout={(e) => { paragraphYRef.current[index] = e.nativeEvent.layout.y; }}
                     style={
                       isHighlighted
-                        ? [styles.ttsHighlight, { backgroundColor: theme.colors.primary + '18' }]
+                        ? [styles.ttsHighlight, { backgroundColor: theme.colors.accentTint }]
                         : (highlights.includes(index)
                           ? [styles.ttsHighlight, { backgroundColor: theme.colors.warning + '2E' }]
                           : null)
@@ -1926,6 +1408,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                       onPress={highlightMode && isSaved ? () => toggleHighlight(index) : undefined}
                       style={[
                         styles.articleText,
+                        articleFont,
                         { writingDirection: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' },
                         index < displayParas.length - 1 ? { marginBottom: 16 } : null,
                       ]}
@@ -1941,7 +1424,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
 
         {!loading && !error && (!fullContent || fullContent.length === 0) && (
           <View style={styles.noContentContainer}>
-            <Ionicons name="document-text-outline" size={48} color="#666" />
+            <Ionicons name="document-text-outline" size={48} color={theme.colors.textSecondary} />
             <Text style={styles.noContentTitle}>{t('reader.noContentTitle')}</Text>
             <Text style={styles.noContentText}>
               {t('reader.noContentMessage')}
@@ -1958,10 +1441,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
             onPress={handleIndicatorPress}
             style={[styles.savedBookmarkLine, { top: bookmarkLineY, flexDirection: isRTL ? 'row-reverse' : 'row' }]}
           >
-            <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.primary }]}>
-              <Ionicons name="bookmark" size={10} color="#fff" />
+            <View style={[styles.savedBookmarkIcon, { backgroundColor: theme.colors.accentFill }]}>
+              <Ionicons name="bookmark" size={10} color={theme.colors.onAccentFill} />
             </View>
-            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.primary + '50' }]} />
+            <View style={[styles.savedBookmarkBar, { backgroundColor: theme.colors.accentFill + '50' }]} />
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -1986,16 +1469,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
           style={styles.scrollToTopButton}
           onPress={handleScrollToTop}
         >
-          <Ionicons name="chevron-up" size={20} color="#fff" />
+          <Ionicons name="chevron-up" size={20} color={theme.colors.onPrimary} />
         </TouchableOpacity>
       )}
 
       {isSpeaking && (
-        <View style={[styles.ttsFloatingBar, { backgroundColor: theme.colors.primary, flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
-          <Ionicons name="volume-high" size={18} color="#fff" />
+        <View style={[styles.ttsFloatingBar, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
+          <Ionicons name="volume-high" size={18} color={theme.colors.onPrimary} />
           <Text style={styles.ttsFloatingBarText}>{t('reader.readingAloud')}</Text>
           <TouchableOpacity onPress={handleStopSpeech} style={styles.ttsStopButton}>
-            <Ionicons name="stop-circle" size={28} color="#fff" />
+            <Ionicons name="stop-circle" size={28} color={theme.colors.onPrimary} />
           </TouchableOpacity>
         </View>
       )}
@@ -2009,7 +1492,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
           { opacity: bookmarkFlashAnim, flexDirection: appRTL ? 'row-reverse' : 'row' },
         ]}
       >
-        <Ionicons name="bookmark" size={16} color="#fff" />
+        <Ionicons name="bookmark" size={16} color={theme.colors.onPrimary} />
         <Text style={styles.bookmarkToastText}>
           {hasBookmark ? t('reader.bookmarkSaved') : t('reader.scrolledToBookmark')}
         </Text>
@@ -2020,13 +1503,16 @@ function ArticleReaderScreenContent({ route, navigation }) {
         visible={showLanguagePicker}
         animationType="slide"
         transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => {
           setShowLanguagePicker(false);
           setLanguageSearchQuery('');
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+            <View style={styles.sheetHandle} />
             <View style={[styles.modalHeader, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
               <Text style={styles.modalTitle}>{t('reader.translateTo')}</Text>
               <TouchableOpacity
@@ -2045,7 +1531,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
               <TextInput
                 style={[styles.modalSearchInput, { textAlign: appRTL ? 'right' : 'left' }]}
                 placeholder={t('reader.searchLanguages')}
-                placeholderTextColor={theme.colors.textTertiary}
+                placeholderTextColor={theme.colors.textSecondary}
                 value={languageSearchQuery}
                 onChangeText={setLanguageSearchQuery}
                 autoCapitalize="none"
@@ -2079,7 +1565,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                     {item.displayName}
                   </Text>
                   {item.code === targetLangCode && (
-                    <Ionicons name="checkmark" size={20} color={theme.colors.primary} />
+                    <Ionicons name="checkmark" size={20} color={theme.colors.mainInk} />
                   )}
                 </TouchableOpacity>
               )}
@@ -2111,9 +1597,10 @@ function ArticleReaderScreenContent({ route, navigation }) {
           style={styles.notesModalOverlay}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <View style={[styles.notesModalContainer, { backgroundColor: theme.colors.surface }]}>
-            <View style={[styles.notesModalHeader, { borderBottomColor: theme.colors.border, flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={[styles.notesModalTitle, { color: theme.colors.text }]}>{t('reader.notesTitle')}</Text>
+          <View style={styles.notesModalContainer}>
+            <View style={styles.sheetHandle} />
+            <View style={[styles.notesModalHeader, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
+              <Text style={styles.notesModalTitle}>{t('reader.notesTitle')}</Text>
               <View style={{ flexDirection: appRTL ? 'row-reverse' : 'row', gap: 8 }}>
                 {noteText.trim() !== '' && (
                   <TouchableOpacity
@@ -2136,17 +1623,17 @@ function ArticleReaderScreenContent({ route, navigation }) {
               </View>
             </View>
             <TextInput
-              style={[styles.notesInput, { color: theme.colors.text, borderColor: theme.colors.border, backgroundColor: theme.colors.background, textAlign: appRTL ? 'right' : 'left' }]}
+              style={[styles.notesInput, { textAlign: appRTL ? 'right' : 'left' }]}
               multiline
               placeholder={t('reader.notesPlaceholder')}
-              placeholderTextColor={theme.colors.textTertiary}
+              placeholderTextColor={theme.colors.textSecondary}
               value={noteText}
               onChangeText={setNoteText}
               textAlignVertical="top"
               autoFocus={true}
             />
             <TouchableOpacity
-              style={[styles.notesSaveButton, { backgroundColor: theme.colors.primary }]}
+              style={styles.notesSaveButton}
               onPress={() => {
                 setNote(article.id, noteText);
                 setShowNotesModal(false);
@@ -2170,7 +1657,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
           activeOpacity={1}
           onPress={() => setShowOverflowMenu(false)}
         >
-          <View style={[styles.overflowMenu, { backgroundColor: theme.colors.surface }]}>
+          <View style={styles.overflowMenu}>
             {overflowActions.map((action, index) => (
               <View
                 key={action.id}
@@ -2200,7 +1687,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                   <Ionicons
                     name="pin-outline"
                     size={16}
-                    color={pinnedActions.length >= MAX_PINNED ? theme.colors.textTertiary : theme.colors.textSecondary}
+                    color={pinnedActions.length >= MAX_PINNED ? theme.colors.disabled : theme.colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -2229,7 +1716,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
                       <Ionicons
                         name="pin"
                         size={16}
-                        color={theme.colors.primary}
+                        color={theme.colors.mainInk}
                       />
                     </TouchableOpacity>
                   </View>
@@ -2242,6 +1729,510 @@ function ArticleReaderScreenContent({ route, navigation }) {
     </SafeAreaView>
   );
 }
+
+// Styles built once per theme and direction (Calm Surfaces 3). The reader keeps
+// a plain page without the wash: long reading is calmer on it.
+const useReaderStyles = makeStyles(({ colors: c }, isRTL) => {
+  // Floating pieces: a soft shadow in light mode only
+  const floatShadow = c.hasShadows
+    ? { elevation: 4, shadowColor: '#000000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.14, shadowRadius: 6 }
+    : {};
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: c.background,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    headerButton: {
+      flexShrink: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+      minHeight: 44,
+    },
+    headerButtonLabel: {
+      fontFamily: FONT.medium,
+      fontSize: 10,
+      marginTop: 2,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      ...TYPE.title,
+      color: c.text,
+      flex: 1,
+      textAlign: 'center',
+    },
+    content: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    contentInner: {
+      paddingVertical: 20,
+      paddingHorizontal: 32,
+      backgroundColor: c.background,
+    },
+    articleHeader: {
+      marginBottom: 16,
+    },
+    feedTitle: {
+      fontFamily: FONT.semiBold,
+      fontSize: 14,
+      color: c.mainInk,
+      marginBottom: 4,
+    },
+    articleDate: {
+      ...TYPE.secondary,
+      color: c.textSecondary,
+    },
+    articleTitle: {
+      fontFamily: FONT.bold,
+      fontSize: 28,
+      letterSpacing: -0.4,
+      color: c.text,
+      lineHeight: 36,
+      marginBottom: 8,
+    },
+    // Inter has no italics here: the byline is set apart by its tone
+    articleAuthor: {
+      ...TYPE.body,
+      color: c.textSecondary,
+      marginBottom: 16,
+    },
+    articleImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: RADIUS.tile,
+      marginBottom: 20,
+      backgroundColor: c.surface2,
+    },
+    articleContent: {
+      marginBottom: 24,
+    },
+    // The paragraphs take Settings > Reading Font on top of this
+    articleText: {
+      fontSize: 18,
+      color: c.text,
+      lineHeight: 28,
+    },
+    inlineImageContainer: {
+      marginVertical: 12,
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    inlineImage: {
+      width: '100%',
+      height: undefined,
+      aspectRatio: 16 / 9,
+      borderRadius: 12,
+      backgroundColor: c.surface2,
+    },
+    imageCaption: {
+      ...TYPE.secondary,
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: 6,
+      textAlign: 'center',
+    },
+    translationProgressContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: c.surface2,
+      borderRadius: 12,
+    },
+    translationProgressText: {
+      ...TYPE.secondary,
+      fontSize: 13,
+      color: c.textSecondary,
+    },
+    // Translated is a state: green, on its tint
+    translatedBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      backgroundColor: c.successTint,
+      borderRadius: 12,
+      [isRTL ? 'borderRightWidth' : 'borderLeftWidth']: 3,
+      [isRTL ? 'borderRightColor' : 'borderLeftColor']: c.success,
+    },
+    translatedBannerText: {
+      ...TYPE.secondary,
+      fontFamily: FONT.medium,
+      color: c.textSecondary,
+      flexShrink: 1,
+    },
+    // The translation language sheet
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      backgroundColor: c.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      height: '75%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 8,
+    },
+    modalTitle: {
+      ...TYPE.title,
+      color: c.text,
+    },
+    modalCloseButton: {
+      padding: 4,
+    },
+    sheetHandle: {
+      alignSelf: 'center',
+      width: 36,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: c.outline,
+      marginTop: 8,
+    },
+    modalSearchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: 16,
+      marginTop: 4,
+      marginBottom: 8,
+      paddingHorizontal: 16,
+      minHeight: 44,
+      backgroundColor: c.surface,
+      borderRadius: RADIUS.round,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    modalSearchInput: {
+      ...TYPE.body,
+      flex: 1,
+      color: c.text,
+      marginLeft: isRTL ? 0 : 8,
+      marginRight: isRTL ? 8 : 0,
+      paddingVertical: 8,
+    },
+    languageList: {
+      flex: 1,
+    },
+    languageItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    languageItemSelected: {
+      backgroundColor: c.mainTint,
+    },
+    languageItemText: {
+      ...TYPE.body,
+      fontSize: 15,
+      color: c.text,
+    },
+    languageItemTextSelected: {
+      fontFamily: FONT.semiBold,
+      color: c.mainInk,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    loadingText: {
+      ...TYPE.body,
+      fontSize: 16,
+      marginTop: 16,
+      color: c.textSecondary,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    errorTitle: {
+      ...TYPE.title,
+      fontSize: 18,
+      color: c.error,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    errorText: {
+      ...TYPE.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    retryButton: {
+      backgroundColor: c.primary,
+      paddingHorizontal: 24,
+      minHeight: 46,
+      justifyContent: 'center',
+      borderRadius: RADIUS.round,
+    },
+    retryButtonText: {
+      ...TYPE.button,
+      fontSize: 15,
+      color: c.onPrimary,
+    },
+    noContentContainer: {
+      alignItems: 'center',
+      padding: 40,
+    },
+    noContentTitle: {
+      ...TYPE.title,
+      fontSize: 18,
+      color: c.textSecondary,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    noContentText: {
+      ...TYPE.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    scrollToTopButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      backgroundColor: c.primary,
+      borderRadius: 20,
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+      opacity: 0.75,
+      ...floatShadow,
+    },
+    bookmarkToast: {
+      position: 'absolute',
+      bottom: 90,
+      alignSelf: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: c.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: RADIUS.round,
+      ...floatShadow,
+    },
+    bookmarkToastText: {
+      ...TYPE.button,
+      fontSize: 14,
+      color: c.onPrimary,
+    },
+    savedBookmarkLine: {
+      position: 'absolute',
+      left: 4,
+      right: 4,
+      flexDirection: 'row',
+      alignItems: 'center',
+      zIndex: 10,
+    },
+    savedBookmarkBar: {
+      flex: 1,
+      height: 1.5,
+      borderRadius: 1,
+      opacity: 0.5,
+    },
+    savedBookmarkIcon: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    aimLineContainer: {
+      position: 'absolute',
+      top: '50%',
+      left: 4,
+      right: 4,
+      flexDirection: 'row',
+      alignItems: 'center',
+      opacity: 0.35,
+    },
+    aimLineBar: {
+      flex: 1,
+      height: 0,
+      borderStyle: 'dashed',
+      borderTopWidth: 1.5,
+    },
+    aimLineIcon: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: withAlpha(c.surface, 0.8),
+    },
+    // The notes sheet
+    notesModalOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'flex-end',
+    },
+    notesModalContainer: {
+      backgroundColor: c.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingBottom: 24,
+      maxHeight: '70%',
+    },
+    notesModalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 4,
+    },
+    notesModalTitle: {
+      ...TYPE.title,
+      color: c.text,
+    },
+    notesModalCloseButton: {
+      padding: 4,
+    },
+    notesInput: {
+      ...TYPE.body,
+      fontSize: 15,
+      margin: 16,
+      marginTop: 8,
+      padding: 14,
+      borderRadius: RADIUS.tile,
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+      color: c.text,
+      lineHeight: 22,
+      minHeight: 150,
+      maxHeight: 300,
+    },
+    notesSaveButton: {
+      marginHorizontal: 16,
+      minHeight: 48,
+      borderRadius: RADIUS.round,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: c.primary,
+    },
+    notesSaveButtonText: {
+      ...TYPE.button,
+      fontSize: 15,
+      color: c.onPrimary,
+    },
+    ttsFloatingBar: {
+      position: 'absolute',
+      bottom: 16,
+      left: 16,
+      right: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: RADIUS.card,
+      backgroundColor: c.primary,
+      ...floatShadow,
+    },
+    ttsFloatingBarText: {
+      ...TYPE.button,
+      fontSize: 14,
+      color: c.onPrimary,
+      flex: 1,
+      marginLeft: isRTL ? 0 : 10,
+      marginRight: isRTL ? 10 : 0,
+    },
+    ttsStopButton: {
+      padding: 4,
+    },
+    ttsHighlight: {
+      borderRadius: 6,
+      paddingHorizontal: 4,
+      paddingVertical: 2,
+      marginHorizontal: -4,
+    },
+    overflowBackdrop: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      alignItems: 'flex-end',
+    },
+    overflowMenu: {
+      marginTop: Platform.OS === 'ios' ? 90 : 60,
+      marginRight: 12,
+      borderRadius: RADIUS.tile,
+      paddingVertical: 4,
+      minWidth: 240,
+      backgroundColor: c.surface,
+      ...(c.hasShadows
+        ? { elevation: 8, shadowColor: '#000000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.16, shadowRadius: 12 }
+        : { borderWidth: 1, borderColor: c.border }),
+    },
+    overflowItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: c.border,
+    },
+    overflowItemText: {
+      ...TYPE.body,
+      fontFamily: FONT.medium,
+      fontSize: 15,
+      marginLeft: isRTL ? 0 : 14,
+      marginRight: isRTL ? 14 : 0,
+      flex: 1,
+    },
+    overflowItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    overflowPinButton: {
+      padding: 8,
+      marginLeft: isRTL ? 0 : 8,
+      marginRight: isRTL ? 8 : 0,
+    },
+    overflowDivider: {
+      height: StyleSheet.hairlineWidth,
+      marginVertical: 4,
+    },
+    overflowSectionLabel: {
+      ...TYPE.small,
+      fontFamily: FONT.semiBold,
+      fontSize: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+    },
+  };
+});
 
 // Export wrapped with ErrorBoundary to catch any rendering crashes
 export default function ArticleReaderScreen(props) {

@@ -339,7 +339,7 @@ export default {
   "settings.sectionTranslation": "Dịch thuật",
   "settings.sectionHelp": "Trợ giúp",
   "settings.sectionData": "Dữ liệu",
-  "settings.sectionTesters": "NGƯỜI THỬ NGHIỆM",
+  "settings.sectionTesters": "Người thử nghiệm",
   "settings.sectionAbout": "Giới thiệu",
   "settings.autoRefresh": "Tự động làm mới",
   "settings.autoRefreshDesc": "Tự động làm mới các nguồn cấp khi mở ứng dụng",
@@ -356,7 +356,10 @@ export default {
   "font.mono": "Monospace",
   "settings.amoledBlack": "Đen AMOLED",
   "settings.amoledBlackDesc": "Dùng màu đen tuyệt đối cho thẻ và menu — tiết kiệm pin trên màn hình OLED",
-  "settings.themeColor": "Màu giao diện",
+  "settings.mainColor": "Màu chính",
+  "settings.mainColorHint": "Nút, thẻ và phần làm nổi bật",
+  "settings.accentColor": "Màu nhấn",
+  "settings.accentColorHint": "Tiêu đề, biểu tượng và sắc độ chữ",
   "settings.bookmarkIndicators": "Chỉ báo dấu trang",
   "settings.bookmarkIndicatorsDesc": "Hiển thị chỉ báo vị trí đọc trong trình đọc bài viết",
   "settings.openReaderDirectly": "Mở thẳng trình đọc",
@@ -586,8 +589,8 @@ export default {
 
   // --- Theme color names ---
   "color.warmBeige": "Be ấm",
-  "color.sage": "Xanh xô thơm",
+  "color.sage": "Xô thơm",
   "color.sky": "Xanh da trời",
-  "color.lavender": "Tím oải hương",
+  "color.lavender": "Oải hương",
   "color.rose": "Hồng phấn",
 };

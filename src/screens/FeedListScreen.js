@@ -16,7 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
+import { FONT, TYPE, RADIUS } from '../theme/type';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import ArticleImage from '../components/ArticleImage';
@@ -522,12 +523,19 @@ export default function FeedListScreen({ navigation, route }) {
       readingPosition.afterArticleId === item.id;
     
     const isSelected = selectedArticles.has(item.id);
-    
+    const isFirst = index === 0;
+    const isLast = index === filteredAndSortedArticles.length - 1;
+    // The reading position line sits between rows and is their divider; a
+    // hairline takes its place when the line is off or articles are selected.
+    const showIndicator = showReadingPositionInFeeds && !selectionMode;
+
     return (
-      <View>
+      <View style={[styles.item, isFirst && styles.itemFirst, isLast && styles.itemLast]}>
         <TouchableOpacity
           style={[
             styles.articleItem,
+            isFirst && styles.articleItemFirst,
+            isLast && !showIndicator && styles.articleItemLast,
             isBeforeReadingPosition && styles.readPositionArticle,
             isSelected && styles.selectedArticle
           ]}
@@ -545,7 +553,7 @@ export default function FeedListScreen({ navigation, route }) {
               <Ionicons 
                 name={isSelected ? "checkmark-circle" : "ellipse-outline"} 
                 size={28} 
-                color={isSelected ? theme.colors.primary : theme.colors.textSecondary} 
+                color={isSelected ? theme.colors.mainInk : theme.colors.outline} 
               />
             </View>
           )}
@@ -586,7 +594,7 @@ export default function FeedListScreen({ navigation, route }) {
                   resizeMode="cover"
                 />
               ) : (
-                <View style={[styles.articleImage, styles.placeholderImage, { backgroundColor: theme.colors.border }]}>
+                <View style={[styles.articleImage, styles.placeholderImage]}>
                   <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
                 </View>
               )}
@@ -633,6 +641,7 @@ export default function FeedListScreen({ navigation, route }) {
           />
         )}
         </View>
+        {!showIndicator && !isLast && <View style={styles.rowDivider} />}
       </View>
     );
   };
@@ -770,299 +779,7 @@ export default function FeedListScreen({ navigation, route }) {
     return sortOrder === 'newest' ? 'arrow-down' : 'arrow-up';
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    header: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 16,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    headerTitle: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: theme.colors.text,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    addButton: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
-      paddingVertical: 4,
-      minWidth: 40,
-    },
-    headerRightGroup: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      flex: 1,
-      justifyContent: 'space-between',
-      gap: 8,
-    },
-    filterPill: {
-      marginRight: isRTL ? 0 : 8,
-      marginLeft: isRTL ? 8 : 0,
-    },
-    headerButtons: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      flexShrink: 1,
-    },
-    headerButton: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 6,
-      paddingVertical: 4,
-      minWidth: 40,
-    },
-    headerButtonLabel: {
-      fontSize: 9,
-      marginTop: 2,
-      fontWeight: '500',
-      color: theme.colors.textSecondary,
-    },
-    filterButtonText: {
-      fontSize: 12,
-      color: theme.colors.text,
-      fontWeight: '600',
-    },
-    filterButton: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      backgroundColor: theme.colors.background,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: theme.colors.text,
-    },
-    searchContainer: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      backgroundColor: theme.colors.surface,
-      marginHorizontal: 16,
-      marginVertical: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    sourceBar: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginHorizontal: 16,
-      marginBottom: 8,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 12,
-      backgroundColor: theme.colors.primary + '1A',
-    },
-    sourceBarText: {
-      flex: 1,
-      fontSize: 14,
-      fontWeight: '600',
-      color: theme.colors.text,
-      textAlign: isRTL ? 'right' : 'left',
-    },
-    searchIcon: {
-      marginRight: isRTL ? 0 : 8,
-      marginLeft: isRTL ? 8 : 0,
-    },
-    searchInput: {
-      flex: 1,
-      fontSize: 16,
-      color: theme.colors.text,
-      paddingVertical: 4,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    clearSearch: {
-      padding: 4,
-    },
-    articleItem: {
-      backgroundColor: theme.colors.surface,
-      marginHorizontal: 16,
-      marginVertical: 8,
-      borderRadius: 12,
-      padding: 16,
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'flex-start',
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    articleContent: {
-      flex: 1,
-      marginRight: isRTL ? 0 : 12,
-      marginLeft: isRTL ? 12 : 0,
-    },
-    articleHeader: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 8,
-    },
-    titleRow: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      flex: 1,
-    },
-    unreadBullet: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.colors.primary,
-      marginRight: isRTL ? 0 : 8,
-      marginLeft: isRTL ? 8 : 0,
-    },
-    feedTitle: {
-      fontSize: 12,
-      color: theme.colors.primary,
-      fontWeight: '600',
-      flex: 1,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    articleMeta: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      gap: 8,
-    },
-    articleDate: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-    },
-    readPositionArticle: {
-      opacity: 0.7,
-      borderLeftWidth: 3,
-      borderLeftColor: theme.colors.accent,
-    },
-    articleTitle: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: 6,
-      lineHeight: 21,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    articleDescription: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      lineHeight: 20,
-      textAlign: isRTL ? 'right' : 'left',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    imageContainer: {
-      marginLeft: isRTL ? 0 : 12,
-      marginRight: isRTL ? 12 : 0,
-    },
-    articleImage: {
-      width: 80,
-      height: 80,
-      borderRadius: 8,
-      backgroundColor: theme.colors.border,
-    },
-    placeholderImage: {
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    imageActions: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      marginTop: 4,
-      gap: 4,
-    },
-    imageActionButton: {
-      padding: 4,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    emptyState: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 32,
-    },
-    emptyList: {
-      flexGrow: 1,
-    },
-    emptyTitle: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginTop: 16,
-      marginBottom: 8,
-    },
-    emptyDescription: {
-      fontSize: 16,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 22,
-      marginBottom: 24,
-    },
-    primaryButton: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.primary,
-      paddingHorizontal: 24,
-      paddingVertical: 12,
-      borderRadius: 12,
-      marginBottom: 32,
-      gap: 8,
-    },
-    primaryButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    featuresContainer: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
-      justifyContent: 'space-around',
-      width: '100%',
-      paddingHorizontal: 20,
-    },
-    featureItem: {
-      alignItems: 'center',
-      flex: 1,
-    },
-    featureText: {
-      fontSize: 12,
-      color: theme.colors.textSecondary,
-      marginTop: 8,
-      textAlign: 'center',
-    },
-    loadingContainer: {
-      padding: 20,
-      alignItems: 'center',
-    },
-    loadingText: {
-      marginTop: 10,
-      color: theme.colors.textSecondary,
-    },
-    selectionCheckbox: {
-      width: 28,
-      height: 28,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginRight: isRTL ? 0 : 12,
-      marginLeft: isRTL ? 12 : 0,
-    },
-    selectedArticle: {
-      backgroundColor: theme.colors.primary + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: theme.colors.primary,
-    },
-  });
+  const styles = useFeedListStyles(isRTL);
 
   if (feeds.length === 0) {
     return (
@@ -1074,12 +791,12 @@ export default function FeedListScreen({ navigation, route }) {
             style={styles.addButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
-            <Ionicons name="add" size={24} color={theme.colors.primary} />
+            <Ionicons name="add" size={24} color={theme.colors.mainInk} />
           </TouchableOpacity>
         </View>
         
         <View style={styles.emptyState}>
-          <Ionicons name="newspaper-outline" size={100} color={theme.colors.border} />
+          <Ionicons name="newspaper-outline" size={100} color={theme.colors.outline} />
           <Text style={styles.emptyTitle}>{t('feedList.welcomeTitle')}</Text>
           <Text style={styles.emptyDescription}>
             {t('feedList.welcomeDescription')}
@@ -1088,21 +805,21 @@ export default function FeedListScreen({ navigation, route }) {
             style={styles.primaryButton}
             onPress={() => navigation.navigate('AddFeed')}
           >
-            <Ionicons name="add-circle-outline" size={20} color="#fff" />
+            <Ionicons name="add-circle-outline" size={20} color={theme.colors.onPrimary} />
             <Text style={styles.primaryButtonText}>{t('feedList.addFirstFeed')}</Text>
           </TouchableOpacity>
 
           <View style={styles.featuresContainer}>
             <View style={styles.featureItem}>
-              <Ionicons name="shield-checkmark" size={24} color={theme.colors.success} />
+              <Ionicons name="shield-checkmark-outline" size={24} color={theme.colors.accentInk} />
               <Text style={styles.featureText}>{t('feedList.featureAdFree')}</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="reader" size={24} color={theme.colors.primary} />
+              <Ionicons name="reader-outline" size={24} color={theme.colors.accentInk} />
               <Text style={styles.featureText}>{t('feedList.featureReaderMode')}</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="share" size={24} color={theme.colors.warning} />
+              <Ionicons name="share-outline" size={24} color={theme.colors.accentInk} />
               <Text style={styles.featureText}>{t('feedList.featureSharing')}</Text>
             </View>
           </View>
@@ -1121,14 +838,14 @@ export default function FeedListScreen({ navigation, route }) {
               onPress={selectAllArticles}
             >
               <Ionicons name="checkbox" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>{t('feedList.selectAll')}</Text>
+              <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.selectAll')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={deselectAllArticles}
             >
               <Ionicons name="square-outline" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>{t('feedList.selectNone')}</Text>
+              <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.selectNone')}</Text>
             </TouchableOpacity>
             {(() => {
               // Check if selection contains any unread articles
@@ -1154,7 +871,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasUnread}
                     >
                       <Ionicons name="mail-open-outline" size={20} color={selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.text} />
-                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('feedList.markReadLabel')}</Text>
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasUnread ? theme.colors.disabled : theme.colors.textSecondaryOnWash }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.markReadLabel')}</Text>
                     </TouchableOpacity>
                   )}
                   {showMarkUnread && (
@@ -1164,7 +881,7 @@ export default function FeedListScreen({ navigation, route }) {
                       disabled={selectedArticles.size === 0 || !hasRead}
                     >
                       <Ionicons name="mail-unread-outline" size={20} color={selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.text} />
-                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('feedList.markUnreadLabel')}</Text>
+                      <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 || !hasRead ? theme.colors.disabled : theme.colors.textSecondaryOnWash }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.markUnreadLabel')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -1176,14 +893,14 @@ export default function FeedListScreen({ navigation, route }) {
               disabled={selectedArticles.size === 0}
             >
               <Ionicons name="trash-outline" size={20} color={selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.error} />
-              <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.textSecondary }]}>{t('common.remove')}</Text>
+              <Text style={[styles.headerButtonLabel, { color: selectedArticles.size === 0 ? theme.colors.disabled : theme.colors.textSecondaryOnWash }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('common.remove')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.headerButton}
               onPress={toggleSelectionMode}
             >
               <Ionicons name="close" size={20} color={theme.colors.text} />
-              <Text style={styles.headerButtonLabel}>{t('common.cancel')}</Text>
+              <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -1203,7 +920,7 @@ export default function FeedListScreen({ navigation, route }) {
                 onPress={() => openSoundPlaylist(true)}
               >
                 <Ionicons name="musical-notes-outline" size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>{t('feedList.soundsLabel')}</Text>
+                <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.soundsLabel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 ref={tourSortRef}
@@ -1211,7 +928,7 @@ export default function FeedListScreen({ navigation, route }) {
                 onPress={toggleSort}
               >
                 <Ionicons name={getSortButtonIcon()} size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>{t('feedList.sortLabel')}</Text>
+                <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.sortLabel')}</Text>
               </TouchableOpacity>
               {articleFilter !== 'read' && (
                 <TouchableOpacity
@@ -1220,7 +937,7 @@ export default function FeedListScreen({ navigation, route }) {
                   onPress={handleMarkAllRead}
                 >
                   <Ionicons name="checkmark-done" size={20} color={theme.colors.text} />
-                  <Text style={styles.headerButtonLabel}>{t('feedList.readAllLabel')}</Text>
+                  <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.readAllLabel')}</Text>
                 </TouchableOpacity>
               )}
               {articleFilter !== 'unread' && (
@@ -1229,7 +946,7 @@ export default function FeedListScreen({ navigation, route }) {
                   onPress={handleMarkAllUnread}
                 >
                   <Ionicons name="mail-unread-outline" size={20} color={theme.colors.text} />
-                  <Text style={styles.headerButtonLabel}>{t('feedList.unreadAllLabel')}</Text>
+                  <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('feedList.unreadAllLabel')}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -1238,7 +955,7 @@ export default function FeedListScreen({ navigation, route }) {
                 onPress={() => navigation.navigate('AddFeed')}
               >
                 <Ionicons name="add" size={20} color={theme.colors.text} />
-                <Text style={styles.headerButtonLabel}>{t('common.add')}</Text>
+                <Text style={styles.headerButtonLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1268,21 +985,21 @@ export default function FeedListScreen({ navigation, route }) {
       {/* One source only, picked in Your Feeds on Home. Closing the chip shows every feed again. */}
       {sourceFeed && (
         <View style={styles.sourceBar}>
-          <Ionicons name="newspaper-outline" size={16} color={theme.colors.primary} />
+          <Ionicons name="newspaper-outline" size={16} color={theme.colors.accentInk} />
           <Text style={styles.sourceBarText} numberOfLines={1}>{sourceFeed.title || sourceFeed.url}</Text>
           <TouchableOpacity
             onPress={() => setSourceFeedUrl(null)}
             accessibilityLabel={t('feedList.showAllFeeds')}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="close-circle" size={20} color={theme.colors.textSecondary} />
+            <Ionicons name="close-circle" size={20} color={theme.colors.accentInk} />
           </TouchableOpacity>
         </View>
       )}
 
       {loading && !refreshing && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ActivityIndicator size="large" color={theme.colors.mainInk} />
           <Text style={styles.loadingText}>{t('feedList.loadingArticles')}</Text>
         </View>
       )}
@@ -1306,13 +1023,19 @@ export default function FeedListScreen({ navigation, route }) {
         onLayout={(e) => { listViewportHeightRef.current = e.nativeEvent.layout.height; }}
         extraData={listExtraData}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.colors.mainInk}
+            colors={[theme.colors.mainInk]}
+            progressBackgroundColor={theme.colors.surface}
+          />
         }
-        contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : null}
+        contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : styles.listContent}
         ListEmptyComponent={
           !loading && (
             <View style={styles.emptyState}>
-              <Ionicons name="refresh-outline" size={60} color="#ccc" />
+              <Ionicons name="refresh-outline" size={60} color={theme.colors.outline} />
               <Text style={styles.emptyTitle}>
                 {articleFilter === 'unread' ? t('feedList.emptyUnreadTitle') :
                  articleFilter === 'read' ? t('feedList.emptyReadTitle') : t('feedList.emptyAllTitle')}
@@ -1339,3 +1062,348 @@ export default function FeedListScreen({ navigation, route }) {
     </SafeAreaView>
   );
 }
+
+// Styles built once per theme and direction (Calm Surfaces 3). The list is one
+// card made of its rows: each row on the surface, the first and last with the
+// card's round corners, so virtualization stays exactly as it was.
+const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
+  const row = isRTL ? 'row-reverse' : 'row';
+  const textAlign = isRTL ? 'right' : 'left';
+  const writingDirection = isRTL ? 'rtl' : 'ltr';
+  const startSide = isRTL ? 'Right' : 'Left';
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    header: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 4,
+    },
+    headerTitle: {
+      ...TYPE.screenTitle,
+      color: c.text,
+      textAlign,
+      writingDirection,
+    },
+    addButton: {
+      flexShrink: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+      minHeight: 44,
+    },
+    headerRightGroup: {
+      flexDirection: row,
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'space-between',
+      gap: 8,
+    },
+    filterPill: {
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
+    },
+    headerButtons: {
+      flexDirection: row,
+      alignItems: 'center',
+      flexShrink: 1,
+    },
+    headerButton: {
+      flexShrink: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 6,
+      paddingVertical: 4,
+      minWidth: 44,
+      minHeight: 44,
+    },
+    // Straight on the wash, so in the tone that reads on its glows
+    headerButtonLabel: {
+      fontFamily: FONT.medium,
+      fontSize: 10,
+      marginTop: 2,
+      color: c.textSecondaryOnWash,
+    },
+    filterButtonText: {
+      ...TYPE.label,
+      color: c.text,
+    },
+    filterButton: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 14,
+      minHeight: 38,
+      backgroundColor: c.surface,
+      borderRadius: RADIUS.round,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    searchContainer: {
+      flexDirection: row,
+      alignItems: 'center',
+      backgroundColor: c.surface,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      paddingHorizontal: 16,
+      minHeight: 48,
+      borderRadius: RADIUS.round,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    sourceBar: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      paddingHorizontal: 14,
+      minHeight: 40,
+      borderRadius: RADIUS.round,
+      backgroundColor: c.accentTint,
+    },
+    sourceBarText: {
+      flex: 1,
+      fontFamily: FONT.semiBold,
+      fontSize: 14,
+      color: c.accentInk,
+      textAlign,
+    },
+    searchIcon: {
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
+    },
+    searchInput: {
+      flex: 1,
+      ...TYPE.body,
+      fontSize: 15,
+      color: c.text,
+      paddingVertical: 8,
+      textAlign,
+      writingDirection,
+    },
+    clearSearch: {
+      padding: 4,
+    },
+    listContent: {
+      paddingTop: 4,
+    },
+    // A row of the list's card. Rows overlap by a pixel: FlatList places each
+    // row on the pixel grid apart from its height, which can leave a one-pixel
+    // gap between two rows where the page shows through.
+    item: {
+      backgroundColor: c.surface,
+      marginHorizontal: 16,
+      paddingBottom: StyleSheet.hairlineWidth,
+      marginBottom: -StyleSheet.hairlineWidth,
+      ...(c.amoled ? { borderLeftWidth: 1, borderRightWidth: 1, borderColor: c.cardBorder } : null),
+    },
+    // The first and last rows round the card's corners. Their touchable rows
+    // round themselves too, so a selected row's tint keeps the corners
+    // without clipping (a clipped edge shows a faint seam on Android).
+    itemFirst: {
+      borderTopLeftRadius: RADIUS.card,
+      borderTopRightRadius: RADIUS.card,
+      ...(c.amoled ? { borderTopWidth: 1 } : null),
+    },
+    itemLast: {
+      borderBottomLeftRadius: RADIUS.card,
+      borderBottomRightRadius: RADIUS.card,
+      marginBottom: 16,
+      ...(c.amoled ? { borderBottomWidth: 1 } : null),
+    },
+    articleItemFirst: {
+      borderTopLeftRadius: RADIUS.card,
+      borderTopRightRadius: RADIUS.card,
+    },
+    articleItemLast: {
+      borderBottomLeftRadius: RADIUS.card,
+      borderBottomRightRadius: RADIUS.card,
+    },
+    rowDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: c.border,
+      marginHorizontal: 16,
+    },
+    articleItem: {
+      padding: 16,
+      flexDirection: row,
+      alignItems: 'flex-start',
+    },
+    articleContent: {
+      flex: 1,
+      marginRight: isRTL ? 0 : 12,
+      marginLeft: isRTL ? 12 : 0,
+    },
+    articleHeader: {
+      flexDirection: row,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 6,
+    },
+    titleRow: {
+      flexDirection: row,
+      alignItems: 'center',
+      flex: 1,
+    },
+    // Unread is what to notice: the accent
+    unreadBullet: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: c.accentFill,
+      marginRight: isRTL ? 0 : 8,
+      marginLeft: isRTL ? 8 : 0,
+    },
+    feedTitle: {
+      fontFamily: FONT.semiBold,
+      fontSize: 12.5,
+      color: c.mainInk,
+      flex: 1,
+      textAlign,
+      writingDirection,
+    },
+    articleMeta: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+    },
+    articleDate: {
+      ...TYPE.secondary,
+      color: c.textSecondary,
+    },
+    readPositionArticle: {
+      opacity: 0.7,
+      [`border${startSide}Width`]: 3,
+      [`border${startSide}Color`]: c.accentInk,
+    },
+    articleTitle: {
+      ...TYPE.rowTitle,
+      color: c.text,
+      marginBottom: 4,
+      lineHeight: 20,
+      textAlign,
+      writingDirection,
+    },
+    articleDescription: {
+      ...TYPE.body,
+      fontSize: 13.5,
+      color: c.textSecondary,
+      lineHeight: 19,
+      textAlign,
+      writingDirection,
+    },
+    imageContainer: {
+      marginLeft: isRTL ? 0 : 12,
+      marginRight: isRTL ? 12 : 0,
+    },
+    articleImage: {
+      width: 80,
+      height: 80,
+      borderRadius: 12,
+      backgroundColor: c.surface2,
+    },
+    placeholderImage: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    imageActions: {
+      flexDirection: row,
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      marginTop: 4,
+      gap: 4,
+    },
+    imageActionButton: {
+      padding: 4,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyState: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    emptyList: {
+      flexGrow: 1,
+    },
+    emptyTitle: {
+      ...TYPE.title,
+      fontSize: 20,
+      color: c.text,
+      marginTop: 16,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    emptyDescription: {
+      ...TYPE.body,
+      fontSize: 15,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: 24,
+    },
+    primaryButton: {
+      flexDirection: row,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: c.primary,
+      paddingHorizontal: 24,
+      minHeight: 46,
+      borderRadius: RADIUS.round,
+      marginBottom: 32,
+      gap: 8,
+    },
+    primaryButtonText: {
+      ...TYPE.button,
+      fontSize: 15,
+      color: c.onPrimary,
+    },
+    featuresContainer: {
+      flexDirection: row,
+      justifyContent: 'space-around',
+      width: '100%',
+      paddingHorizontal: 20,
+    },
+    featureItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    featureText: {
+      ...TYPE.secondary,
+      color: c.textSecondary,
+      marginTop: 8,
+      textAlign: 'center',
+    },
+    loadingContainer: {
+      padding: 20,
+      alignItems: 'center',
+    },
+    loadingText: {
+      ...TYPE.secondary,
+      marginTop: 10,
+      color: c.textSecondary,
+    },
+    selectionCheckbox: {
+      width: 28,
+      height: 28,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: isRTL ? 0 : 12,
+      marginLeft: isRTL ? 12 : 0,
+    },
+    selectedArticle: {
+      backgroundColor: c.mainTint,
+      [`border${startSide}Width`]: 4,
+      [`border${startSide}Color`]: c.primary,
+    },
+  };
+});

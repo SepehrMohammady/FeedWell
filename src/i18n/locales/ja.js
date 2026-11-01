@@ -356,7 +356,10 @@ export default {
   "font.mono": "等幅",
   "settings.amoledBlack": "AMOLEDブラック",
   "settings.amoledBlackDesc": "カードやメニューに純黒を使用します。有機ELディスプレイでは電池を節約できます",
-  "settings.themeColor": "テーマカラー",
+  "settings.mainColor": "メインカラー",
+  "settings.mainColorHint": "ボタン、タブ、強調表示",
+  "settings.accentColor": "アクセントカラー",
+  "settings.accentColorHint": "見出し、アイコン、文字の色合い",
   "settings.bookmarkIndicators": "ブックマークマーカー",
   "settings.bookmarkIndicatorsDesc": "記事リーダーに読書位置のマーカーを表示します",
   "settings.openReaderDirectly": "リーダーを直接開く",
@@ -585,7 +588,7 @@ export default {
   "sound.nature.study": "読書の合間のストレス回復に役立ちます",
 
   // --- Theme color names ---
-  "color.warmBeige": "ウォームベージュ",
+  "color.warmBeige": "ベージュ",
   "color.sage": "セージ",
   "color.sky": "スカイ",
   "color.lavender": "ラベンダー",

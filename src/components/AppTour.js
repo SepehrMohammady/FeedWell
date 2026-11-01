@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { FONT, TYPE, RADIUS } from '../theme/type';
 import { useTranslation } from '../context/LanguageContext';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTour } from '../context/TourContext';
@@ -251,12 +252,13 @@ export default function AppTour({ navigationRef }) {
           borderColor: theme.colors.border,
           opacity: fade,
         },
+        theme.colors.hasShadows && styles.cardShadow,
         cardPlacement ? { position: 'absolute', left: cardLeft, ...cardPlacement } : null,
       ]}
     >
       <View style={[styles.cardHeader, { flexDirection: row }]}>
-        <View style={[styles.iconBadge, { backgroundColor: theme.colors.primary + '22' }]}>
-          <Ionicons name={step.icon} size={20} color={theme.colors.primary} />
+        <View style={[styles.iconBadge, { backgroundColor: theme.colors.accentTint }]}>
+          <Ionicons name={step.icon} size={20} color={theme.colors.accentInk} />
         </View>
         <Text
           style={[styles.title, { color: theme.colors.text, textAlign: align, writingDirection: isRTL ? 'rtl' : 'ltr' }]}
@@ -282,11 +284,11 @@ export default function AppTour({ navigationRef }) {
         <View style={styles.spacer} />
         {!isFirst && (
           <TouchableOpacity onPress={goBack} style={styles.textButton} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Text style={[styles.textButtonLabel, { color: theme.colors.primary }]}>{t('tour.back')}</Text>
+            <Text style={[styles.textButtonLabel, { color: theme.colors.mainInk }]}>{t('tour.back')}</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={goNext} style={[styles.primaryButton, { backgroundColor: theme.colors.primary }]}>
-          <Text style={styles.primaryButtonLabel}>{isLast ? t('common.done') : t('tour.next')}</Text>
+          <Text style={[styles.primaryButtonLabel, { color: theme.colors.onPrimary }]}>{isLast ? t('common.done') : t('tour.next')}</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -315,7 +317,7 @@ export default function AppTour({ navigationRef }) {
               left: hole.left,
               width: hole.width,
               height: hole.height,
-              borderColor: theme.colors.primary,
+              borderColor: theme.colors.accentFill,
             }]}
           />
         </>
@@ -338,7 +340,7 @@ const styles = StyleSheet.create({
   ring: {
     position: 'absolute',
     borderWidth: 2,
-    borderRadius: 12,
+    borderRadius: 16,
   },
   centerWrap: {
     ...StyleSheet.absoluteFillObject,
@@ -346,12 +348,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    borderRadius: 16,
+    borderRadius: RADIUS.dialog,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 16,
+  },
+  cardShadow: {
     elevation: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
+    shadowColor: '#000000',
+    shadowOpacity: 0.16,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
@@ -367,15 +371,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
+    ...TYPE.title,
     flex: 1,
-    fontSize: 17,
-    fontWeight: '700',
   },
   counter: {
+    ...TYPE.count,
+    fontFamily: FONT.medium,
     fontSize: 12,
-    fontVariant: ['tabular-nums'],
   },
   body: {
+    ...TYPE.body,
     fontSize: 14.5,
     lineHeight: 21,
     marginTop: 10,
@@ -393,17 +398,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   textButtonLabel: {
+    ...TYPE.button,
     fontSize: 14,
-    fontWeight: '600',
   },
   primaryButton: {
-    paddingVertical: 9,
-    paddingHorizontal: 18,
-    borderRadius: 10,
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    borderRadius: RADIUS.round,
   },
   primaryButtonLabel: {
-    color: '#fff',
+    ...TYPE.button,
     fontSize: 14,
-    fontWeight: '700',
   },
 });

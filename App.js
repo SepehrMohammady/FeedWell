@@ -1,7 +1,8 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { AppState, Linking, I18nManager } from 'react-native';
+import { AppState, Appearance, Linking, I18nManager, Platform, StyleSheet, View } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { NavigationContainer, createNavigationContainerRef, CommonActions, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -19,6 +20,8 @@ import AppTour from './src/components/AppTour';
 import { TourProvider, useTour } from './src/context/TourContext';
 import WhatsNewModal from './src/components/WhatsNewModal';
 import KinetosisOverlay from './src/components/KinetosisOverlay';
+import ScreenWash from './src/components/ScreenWash';
+import { FONT } from './src/theme/type';
 import * as Font from 'expo-font';
 import { BUNDLED_FONT_ASSETS } from './src/config/readingFonts';
 import { APP_VERSION } from './src/config/version';
@@ -30,6 +33,41 @@ import { setupNotificationChannel, scheduleReminderNotification, cancelReminderN
 try { I18nManager.allowRTL(false); } catch (e) { /* no-op */ }
 
 const NAV_STATE_KEY = 'feedwell_nav_state';
+
+// React Navigation draws some text itself (its labels and titles): Inter too,
+// through the family of each weight and never a bold fontWeight, which would
+// fall back to Roboto.
+const NAV_FONTS = {
+  regular: { fontFamily: FONT.regular, fontWeight: '400' },
+  medium: { fontFamily: FONT.medium, fontWeight: '400' },
+  bold: { fontFamily: FONT.semiBold, fontWeight: '400' },
+  heavy: { fontFamily: FONT.bold, fontWeight: '400' },
+};
+
+// React Navigation's own colors, built once per colors object. The screens are
+// transparent: the wash behind the navigator shows through.
+const navigationThemes = new WeakMap();
+const navigationThemeFor = (colors) => {
+  let navTheme = navigationThemes.get(colors);
+  if (!navTheme) {
+    const base = colors.isDark ? DarkTheme : DefaultTheme;
+    navTheme = {
+      ...base,
+      fonts: NAV_FONTS,
+      colors: {
+        ...base.colors,
+        primary: colors.mainInk,
+        background: 'transparent',
+        card: colors.surface,
+        text: colors.text,
+        border: colors.border,
+        notification: colors.accentFill,
+      },
+    };
+    navigationThemes.set(colors, navTheme);
+  }
+  return navTheme;
+};
 const navigationRef = createNavigationContainerRef();
 let pendingDeepLinkUrl = null;
 
@@ -238,20 +276,29 @@ function AppContent() {
     tour?.startTour();
   };
 
+  // The navigation bar follows the app's light or dark mode, not the phone's.
+  // This window's buttons are set here; sheets and other Modals open windows
+  // of their own, which take their buttons from the app's night mode, so that
+  // follows the app's mode too (the phone's own setting stays as it is).
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    Appearance.setColorScheme(isDarkMode ? 'dark' : 'light');
+    NavigationBar.setButtonStyleAsync(isDarkMode ? 'light' : 'dark').catch(() => undefined);
+  }, [isDarkMode]);
+
   if (isLoading || langLoading || !navStateReady) {
     return null; // Wait for settings + language so the first paint is correct (no flash)
   }
 
   return (
-    <>
+    <View style={styles.fill}>
+      {/* The wash sits behind every screen; the pages are transparent over it */}
+      <ScreenWash />
       <NavigationContainer
         ref={navigationRef}
         initialState={initialNavState}
         onStateChange={onNavStateChange}
-        theme={isDarkMode
-          ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: theme.colors.background } }
-          : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: theme.colors.background } }
-        }
+        theme={navigationThemeFor(theme.colors)}
         onReady={() => {
           if (pendingDeepLinkUrl) {
             handleDeepLink(pendingDeepLinkUrl);
@@ -260,7 +307,7 @@ function AppContent() {
       >
         <AppNavigator />
         <KinetosisOverlay />
-        <StatusBar style={isDarkMode ? "light" : "dark"} />
+        <StatusBar style={theme.colors.statusBarStyle} />
       </NavigationContainer>
       <AppTour navigationRef={navigationRef} />
       <WhatsNewModal
@@ -268,9 +315,13 @@ function AppContent() {
         onClose={handleWhatsNewClose}
         onTakeTour={handleWhatsNewTour}
       />
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  fill: { flex: 1 },
+});
 
 export default function App() {
   return (

@@ -339,7 +339,7 @@ export default {
   "settings.sectionTranslation": "Terjemahan",
   "settings.sectionHelp": "Bantuan",
   "settings.sectionData": "Data",
-  "settings.sectionTesters": "PENGUJI",
+  "settings.sectionTesters": "Penguji",
   "settings.sectionAbout": "Tentang",
   "settings.autoRefresh": "Segarkan Otomatis",
   "settings.autoRefreshDesc": "Segarkan feed secara otomatis saat membuka aplikasi",
@@ -356,7 +356,10 @@ export default {
   "font.mono": "Monospace",
   "settings.amoledBlack": "Hitam AMOLED",
   "settings.amoledBlackDesc": "Gunakan hitam pekat untuk kartu dan menu — menghemat baterai di layar OLED",
-  "settings.themeColor": "Warna Tema",
+  "settings.mainColor": "Warna Utama",
+  "settings.mainColorHint": "Tombol, tab, dan sorotan",
+  "settings.accentColor": "Warna Aksen",
+  "settings.accentColorHint": "Judul, ikon, dan nuansa teks",
   "settings.bookmarkIndicators": "Indikator Penanda",
   "settings.bookmarkIndicatorsDesc": "Tampilkan penanda posisi membaca di pembaca artikel",
   "settings.openReaderDirectly": "Buka Pembaca Langsung",
@@ -585,9 +588,9 @@ export default {
   "sound.nature.study": "Membantu pemulihan stres saat jeda membaca",
 
   // --- Theme color names ---
-  "color.warmBeige": "Krem Hangat",
-  "color.sage": "Hijau Sage",
-  "color.sky": "Biru Langit",
+  "color.warmBeige": "Krem",
+  "color.sage": "Hijau",
+  "color.sky": "Langit",
   "color.lavender": "Lavender",
   "color.rose": "Mawar",
 };

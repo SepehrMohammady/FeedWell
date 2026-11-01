@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { FONT } from '../theme/type';
 import { useTranslation } from '../context/LanguageContext';
 import { useReadLater } from '../context/ReadLaterContext';
 import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
@@ -144,7 +145,7 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
       <TouchableOpacity
       style={[
         variant === 'header' || variant === 'simple' ? styles.headerButton : styles.button,
-        variant === 'header' || variant === 'simple' ? {} : { backgroundColor: theme.colors.surface },
+        variant === 'header' || variant === 'simple' ? {} : [{ backgroundColor: theme.colors.surface }, theme.colors.hasShadows && styles.buttonShadow],
         style
       ]}
       onPress={handlePress}
@@ -153,18 +154,18 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
     >
       {isLoading ? (
         <ActivityIndicator 
-          size={size > 20 ? "small" : size} 
-          color={theme.colors.primary} 
+          size={size > 20 ? "small" : size}
+          color={theme.colors.mainInk}
         />
       ) : (
         <Ionicons
           name={isBookmarked ? 'save' : 'save-outline'}
           size={size}
-          color={isBookmarked ? theme.colors.primary : theme.colors.text}
+          color={isBookmarked ? theme.colors.mainInk : theme.colors.text}
         />
       )}
       {label && (
-        <Text style={{ fontSize: 9, marginTop: 2, fontWeight: '500', color: theme.colors.textSecondary, writingDirection: isRTL ? 'rtl' : 'ltr' }} numberOfLines={1}>
+        <Text style={[styles.label, { color: theme.colors.textSecondaryOnWash, writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
           {isBookmarked ? t('saveButton.unsave') : label}
         </Text>
       )}
@@ -194,13 +195,19 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+  },
+  // A soft shadow in light mode only
+  buttonShadow: {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  // A header button's label, as the other header labels
+  label: {
+    fontFamily: FONT.medium,
+    fontSize: 10,
+    marginTop: 2,
   },
 });

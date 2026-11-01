@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
@@ -12,10 +11,12 @@ import {
   ActionSheetIOS,
   Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
+import { useUi, ListCard, SectionTitle } from '../theme/ui';
+import { FONT, TYPE, RADIUS } from '../theme/type';
 import { parseRSSFeed, isValidRSSUrl, discoverFeedUrl } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 import { useAppSettings } from '../context/AppSettingsContext';
@@ -43,6 +44,9 @@ export default function AddFeedScreen({ navigation }) {
   const { theme } = useTheme();
   const { maxArticleAge, feedRegion, feedRegionUserSet, updateFeedRegion } = useAppSettings();
   const { t, language, isRTL, formatNumber } = useTranslation();
+  const ui = useUi();
+  const styles = useStyles(isRTL);
+  const insets = useSafeAreaInsets();
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
 
   // Effective feed region: an explicit user choice wins; otherwise follow the app
@@ -369,318 +373,75 @@ export default function AddFeedScreen({ navigation }) {
     locale: language,
   });
 
-  const SectionHeader = ({ title }) => (
-    <Text style={styles.sectionHeader}>{title}</Text>
-  );
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-    },
-    keyboardContainer: {
-      flex: 1,
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor: theme.colors.surface,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-    },
-    headerButton: {
-      padding: 8,
-      minWidth: 40,
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-    },
-    content: {
-      flex: 1,
-    },
-    inputSection: {
-      backgroundColor: theme.colors.surface,
-      margin: 16,
-      padding: 20,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: 8,
-    },
-    sectionDescription: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      lineHeight: 20,
-      marginBottom: 20,
-    },
-    inputContainer: {
-      position: 'relative',
-      marginBottom: 20,
-    },
-    textInput: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: 8,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      fontSize: 16,
-      backgroundColor: theme.colors.surface,
-      paddingRight: 40,
-      color: theme.colors.text,
-    },
-    clearButton: {
-      position: 'absolute',
-      right: 12,
-      top: 12,
-    },
-    addButton: {
-      backgroundColor: theme.colors.primary,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 14,
-      borderRadius: 8,
-    },
-    addButtonDisabled: {
-      backgroundColor: theme.colors.textTertiary,
-    },
-    addButtonText: {
-      color: '#fff',
-      fontSize: 16,
-      fontWeight: '600',
-      marginLeft: 8,
-    },
-    categoriesSection: {
-      backgroundColor: theme.colors.surface,
-      margin: 16,
-      marginTop: 0,
-      padding: 20,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    categoryContainer: {
-      marginBottom: 20,
-    },
-    categoryTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: 8,
-    },
-    feedGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-    },
-    feedChip: {
-      backgroundColor: theme.colors.background,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 16,
-      marginRight: 8,
-      marginBottom: 8,
-    },
-    feedChipText: {
-      fontSize: 12,
-      color: theme.colors.primary,
-      fontWeight: '500',
-    },
-    helpSection: {
-      backgroundColor: theme.colors.surface,
-      margin: 16,
-      marginTop: 0,
-      padding: 20,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    helpItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 16,
-    },
-    helpText: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      marginLeft: 12,
-      flex: 1,
-      lineHeight: 20,
-    },
-    sectionHeader: {
-      fontSize: 17,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginHorizontal: 16,
-      marginTop: 20,
-      marginBottom: 8,
-    },
-    section: {
-      backgroundColor: theme.colors.surface,
-      margin: 16,
-      marginTop: 0,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    feedItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 16,
-      paddingHorizontal: 16,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.colors.border,
-    },
-    feedContent: {
-      flex: 1,
-    },
-    feedTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginBottom: 4,
-    },
-    feedUrl: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      marginBottom: 2,
-    },
-    feedDate: {
-      fontSize: 12,
-      color: theme.colors.textTertiary,
-    },
-    trashButton: {
-      padding: 8,
-      marginLeft: 8,
-    },
-    priorityButton: {
-      padding: 8,
-      marginLeft: 4,
-    },
-    emptyState: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 40,
-      margin: 16,
-      marginTop: 0,
-      backgroundColor: theme.colors.surface,
-      borderRadius: 12,
-      ...(Platform.OS === 'web' ? theme.shadows.cardWeb : theme.shadows.card),
-    },
-    emptyText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.colors.textSecondary,
-      marginTop: 12,
-      marginBottom: 4,
-    },
-    emptySubText: {
-      fontSize: 14,
-      color: theme.colors.textTertiary,
-      textAlign: 'center',
-    },
-    loadingOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    loadingBox: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 16,
-      padding: 28,
-      alignItems: 'center',
-      minWidth: 200,
-      elevation: 5,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-    },
-    loadingText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: theme.colors.text,
-      marginTop: 16,
-    },
-    loadingSubtext: {
-      fontSize: 13,
-      color: theme.colors.textSecondary,
-      marginTop: 6,
-    },
-  });
+  const colors = theme.colors;
+  const region = FEED_REGIONS.find((r) => r.code === selectedRegion) || FEED_REGIONS[0];
 
   return (
-    <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
+    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={[styles.header, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <View style={styles.header}>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={ui.roundButton}
             onPress={() => navigation.reset({
               index: 0,
               routes: [{ name: 'FeedList' }],
             })}
           >
-            <Ionicons name="close" size={24} color={theme.colors.primary} />
+            <Ionicons name="close" size={22} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('addFeed.addButton')}</Text>
-          <View style={styles.headerButton} />
+          <Text style={[ui.screenTitle, styles.headerTitle]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+            {t('addFeed.addButton')}
+          </Text>
         </View>
 
-        <ScrollView ref={scrollRef} style={styles.content} showsVerticalScrollIndicator={false}>
-          <SectionHeader title={t('addFeed.yourFeeds', { count: formatNumber(feeds.length) })} />
+        <ScrollView ref={scrollRef} style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <SectionTitle title={t('addFeed.yourFeeds', { count: formatNumber(feeds.length) })} />
           {feeds.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Ionicons name="newspaper-outline" size={48} color="#ccc" />
-              <Text style={styles.emptyText}>{t('addFeed.noFeedsYet')}</Text>
-              <Text style={styles.emptySubText}>{t('addFeed.noFeedsSubtext')}</Text>
+            <View style={[ui.card, styles.emptyState]}>
+              <Ionicons name="newspaper-outline" size={48} color={colors.outline} />
+              <Text style={[ui.rowTitle, styles.emptyText]}>{t('addFeed.noFeedsYet')}</Text>
+              <Text style={[ui.secondary, styles.centered]}>{t('addFeed.noFeedsSubtext')}</Text>
             </View>
           ) : (
-            <View style={styles.section}>
+            <ListCard>
               {feeds.map((feed, index) => (
                 <View
                   key={feed.id || feed.url || index}
-                  style={[styles.feedItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
+                  style={styles.feedItem}
                 >
                   <View style={styles.feedContent}>
-                    <Text style={[styles.feedTitle, { textAlign: isRTL ? 'right' : 'left' }, feed.isHidden && { opacity: 0.5 }]} numberOfLines={1}>
+                    <Text style={[ui.rowTitle, feed.isHidden && styles.hiddenFeed]} numberOfLines={1}>
                       {feed.title || feed.url || t('addFeed.unknownFeed')}
                     </Text>
-                    <Text style={[styles.feedUrl, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>
+                    <Text style={[ui.secondary, styles.feedUrl]} numberOfLines={1}>
                       {feed.url || t('addFeed.noUrl')}
                     </Text>
-                    <Text style={[styles.feedDate, { textAlign: isRTL ? 'right' : 'left' }]}>
+                    <Text style={ui.secondary}>
                       {t('addFeed.addedDate', { date: formatDate(feed.addedAt) })}
                     </Text>
                   </View>
                   <TouchableOpacity
                     onPress={() => toggleFeedHidden(feed.id)}
-                    style={[styles.priorityButton, isRTL && { marginLeft: 0, marginRight: 4 }]}
+                    style={styles.feedButton}
                     accessibilityLabel={feed.isHidden ? t('addFeed.showFeed') : t('addFeed.hideFeed')}
                   >
                     <Ionicons
                       name={feed.isHidden ? 'eye-off-outline' : 'eye-outline'}
                       size={20}
-                      color={feed.isHidden ? theme.colors.textTertiary : theme.colors.textSecondary}
+                      color={feed.isHidden ? colors.disabled : colors.textSecondary}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => toggleFeedPriority(feed.id)}
-                    style={[styles.priorityButton, isRTL && { marginLeft: 0, marginRight: 4 }]}
+                    style={styles.feedButton}
                   >
                     <Ionicons
                       name={feed.isPriority ? 'star' : 'star-outline'}
                       size={20}
-                      color={feed.isPriority ? theme.colors.warning : theme.colors.textSecondary}
+                      color={feed.isPriority ? colors.warning : colors.textSecondary}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -688,28 +449,29 @@ export default function AddFeedScreen({ navigation }) {
                       console.log('Trash icon pressed for feed:', feed);
                       handleRemoveFeed(feed);
                     }}
-                    style={[styles.trashButton, isRTL && { marginLeft: 0, marginRight: 8 }]}
+                    style={styles.feedButton}
                   >
-                    <Ionicons name="trash-outline" size={20} color={theme.colors.error} />
+                    <Ionicons name="trash-outline" size={20} color={colors.error} />
                   </TouchableOpacity>
                 </View>
               ))}
-            </View>
+            </ListCard>
           )}
 
-          <View style={styles.inputSection} onLayout={(e) => { inputYRef.current = e.nativeEvent.layout.y; }}>
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t('addFeed.rssFeedUrl')}</Text>
-            <Text style={[styles.sectionDescription, { textAlign: isRTL ? 'right' : 'left' }]}>
+          <View style={[ui.card, styles.cardSection]} onLayout={(e) => { inputYRef.current = e.nativeEvent.layout.y; }}>
+            <Text style={ui.title}>{t('addFeed.rssFeedUrl')}</Text>
+            <Text style={[ui.secondary, styles.sectionDescription]}>
               {t('addFeed.rssFeedUrlDescription')}
             </Text>
-            
+
             <View ref={tourUrlRef} collapsable={false} style={styles.inputContainer}>
+              {/* An address reads left to right in every language */}
               <TextInput
-                style={styles.textInput}
+                style={[ui.input, styles.textInput]}
                 value={url}
                 onChangeText={setUrl}
                 placeholder="https://example.com/feed.xml"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="url"
@@ -719,66 +481,55 @@ export default function AddFeedScreen({ navigation }) {
               />
               {url.length > 0 && (
                 <TouchableOpacity style={styles.clearButton} onPress={clearInput}>
-                  <Ionicons name="close-circle" size={20} color="#999" />
+                  <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
                 </TouchableOpacity>
               )}
             </View>
 
             <TouchableOpacity
-              style={[styles.addButton, { flexDirection: isRTL ? 'row-reverse' : 'row' }, loading && styles.addButtonDisabled]}
+              style={[ui.primaryButton, loading && styles.addButtonDisabled]}
               onPress={handleAddFeed}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={colors.onPrimary} size="small" />
               ) : (
                 <>
-                  <Ionicons name="add" size={20} color="#fff" />
-                  <Text style={[styles.addButtonText, isRTL && { marginLeft: 0, marginRight: 8 }]}>{t('addFeed.addButton')}</Text>
+                  <Ionicons name="add" size={20} color={colors.onPrimary} />
+                  <Text style={ui.primaryLabel}>{t('addFeed.addButton')}</Text>
                 </>
               )}
             </TouchableOpacity>
           </View>
 
-          <View style={styles.categoriesSection} onLayout={(e) => { categoriesYRef.current = e.nativeEvent.layout.y; }}>
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t('addFeed.popularCategories')}</Text>
-            <Text style={[styles.sectionDescription, { textAlign: isRTL ? 'right' : 'left' }]}>
+          <View style={[ui.card, styles.cardSection]} onLayout={(e) => { categoriesYRef.current = e.nativeEvent.layout.y; }}>
+            <Text style={ui.title}>{t('addFeed.popularCategories')}</Text>
+            <Text style={[ui.secondary, styles.sectionDescription]}>
               {t('addFeed.popularDescription')}
             </Text>
 
-            <Text style={{ color: theme.colors.textSecondary, textAlign: isRTL ? 'right' : 'left', fontSize: 13, fontWeight: '600', marginTop: 12, marginBottom: 8 }}>
+            <Text style={styles.regionLabel}>
               {t('region.label')}
             </Text>
             <TouchableOpacity
               ref={tourRegionRef}
               onPress={() => setShowRegionPicker(true)}
-              style={{
-                flexDirection: isRTL ? 'row-reverse' : 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: theme.colors.surface,
-                borderWidth: 1,
-                borderColor: theme.colors.border,
-                borderRadius: 12,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                marginBottom: 14,
-              }}
+              style={styles.regionButton}
             >
-              <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: '600' }}>
-                {t((FEED_REGIONS.find((r) => r.code === selectedRegion) || FEED_REGIONS[0]).labelKey)}
+              <Text style={[ui.rowTitle, styles.flexText]}>
+                {t(region.labelKey)}
               </Text>
-              <Ionicons name="chevron-down" size={20} color={theme.colors.textSecondary} />
+              <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
 
             {feedCategories.map((category, index) => (
               <View key={index} style={styles.categoryContainer}>
-                <Text style={[styles.categoryTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{category.title}</Text>
-                <View style={[styles.feedGrid, isRTL && { flexDirection: 'row-reverse' }]}>
+                <Text style={[ui.rowTitle, styles.categoryTitle]}>{category.title}</Text>
+                <View style={styles.feedGrid}>
                   {category.feeds.map((feed, feedIndex) => (
                     <TouchableOpacity
                       key={feedIndex}
-                      style={styles.feedChip}
+                      style={[ui.chip, styles.feedChip]}
                       onPress={() => handleDirectAddFeed(feed)}
                       disabled={loading}
                     >
@@ -790,26 +541,22 @@ export default function AddFeedScreen({ navigation }) {
             ))}
           </View>
 
-          <View style={styles.helpSection}>
-            <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left' }]}>{t('addFeed.howToFind')}</Text>
-            <View style={[styles.helpItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Ionicons name="search-outline" size={20} color="#666" />
-              <Text style={[styles.helpText, isRTL && { marginLeft: 0, marginRight: 12, textAlign: 'right' }]}>
-                {t('addFeed.helpLookForLinks')}
-              </Text>
-            </View>
-            <View style={[styles.helpItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Ionicons name="globe-outline" size={20} color="#666" />
-              <Text style={[styles.helpText, isRTL && { marginLeft: 0, marginRight: 12, textAlign: 'right' }]}>
-                {t('addFeed.helpFeedPaths')}
-              </Text>
-            </View>
-            <View style={[styles.helpItem, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <Ionicons name="shield-checkmark-outline" size={20} color={theme.colors.textSecondary} />
-              <Text style={[styles.helpText, isRTL && { marginLeft: 0, marginRight: 12, textAlign: 'right' }]}>
-                {t('addFeed.helpAdsRemoved')}
-              </Text>
-            </View>
+          <View style={[ui.card, styles.cardSection]}>
+            <Text style={[ui.title, styles.helpTitle]}>{t('addFeed.howToFind')}</Text>
+            {[
+              { icon: 'search-outline', key: 'addFeed.helpLookForLinks' },
+              { icon: 'globe-outline', key: 'addFeed.helpFeedPaths' },
+              { icon: 'shield-checkmark-outline', key: 'addFeed.helpAdsRemoved' },
+            ].map((item) => (
+              <View key={item.key} style={styles.helpItem}>
+                <View style={ui.iconCircle}>
+                  <Ionicons name={item.icon} size={19} color={colors.accentInk} />
+                </View>
+                <Text style={[ui.body, styles.helpText]}>
+                  {t(item.key)}
+                </Text>
+              </View>
+            ))}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -820,12 +567,13 @@ export default function AddFeedScreen({ navigation }) {
         transparent={true}
         animationType="fade"
         statusBarTranslucent={true}
+        navigationBarTranslucent
       >
         <View style={styles.loadingOverlay}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={theme.colors.primary} size="large" />
-            <Text style={styles.loadingText}>{discovering ? t('addFeed.lookingForFeed') : t('addFeed.addingFeed')}</Text>
-            <Text style={styles.loadingSubtext}>{t('addFeed.fetchingArticles')}</Text>
+          <View style={[ui.dialog, styles.loadingBox]}>
+            <ActivityIndicator color={colors.mainInk} size="large" />
+            <Text style={[ui.title, styles.loadingText]}>{discovering ? t('addFeed.lookingForFeed') : t('addFeed.addingFeed')}</Text>
+            <Text style={[ui.secondary, styles.loadingSubtext]}>{t('addFeed.fetchingArticles')}</Text>
           </View>
         </View>
       </Modal>
@@ -835,18 +583,21 @@ export default function AddFeedScreen({ navigation }) {
         visible={showRegionPicker}
         transparent
         animationType="slide"
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setShowRegionPicker(false)}
       >
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => setShowRegionPicker(false)}
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          style={styles.sheetOverlay}
         >
-          <View style={{ backgroundColor: theme.colors.surface, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 24, maxHeight: '70%' }}>
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.border }}>
-              <Text style={{ color: theme.colors.text, fontSize: 17, fontWeight: '700' }}>{t('region.label')}</Text>
-              <TouchableOpacity onPress={() => setShowRegionPicker(false)}>
-                <Ionicons name="close" size={24} color={theme.colors.text} />
+          <View style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+            <View style={ui.sheetHandle} />
+            <View style={styles.sheetHeader}>
+              <Text style={[ui.title, styles.flexText]}>{t('region.label')}</Text>
+              <TouchableOpacity onPress={() => setShowRegionPicker(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close" size={22} color={colors.text} />
               </TouchableOpacity>
             </View>
             <ScrollView>
@@ -856,19 +607,12 @@ export default function AddFeedScreen({ navigation }) {
                   <TouchableOpacity
                     key={r.code}
                     onPress={() => { handleSelectRegion(r.code); setShowRegionPicker(false); }}
-                    style={{
-                      flexDirection: isRTL ? 'row-reverse' : 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      paddingHorizontal: 20,
-                      paddingVertical: 16,
-                      backgroundColor: active ? theme.colors.primary + '15' : 'transparent',
-                    }}
+                    style={[styles.regionItem, active && styles.regionItemActive]}
                   >
-                    <Text style={{ color: active ? theme.colors.primary : theme.colors.text, fontSize: 16, fontWeight: active ? '700' : '500' }}>
+                    <Text style={[ui.body, styles.regionItemText, active && styles.regionItemTextActive]}>
                       {t(r.labelKey)}
                     </Text>
-                    {active && <Ionicons name="checkmark" size={20} color={theme.colors.primary} />}
+                    {active && <Ionicons name="checkmark" size={20} color={colors.mainInk} />}
                   </TouchableOpacity>
                 );
               })}
@@ -888,3 +632,201 @@ export default function AddFeedScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
+// Styles built once per theme and direction (Calm Surfaces 3)
+const useStyles = makeStyles(({ colors: c }, isRTL) => {
+  const row = isRTL ? 'row-reverse' : 'row';
+  const textAlign = isRTL ? 'right' : 'left';
+  return {
+    keyboardContainer: {
+      flex: 1,
+    },
+    // A round close button, then the screen's title
+    header: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 4,
+    },
+    headerTitle: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 24,
+    },
+    flexText: {
+      flex: 1,
+    },
+    centered: {
+      textAlign: 'center',
+    },
+    cardSection: {
+      marginTop: 16,
+      padding: 16,
+    },
+    sectionDescription: {
+      lineHeight: 18,
+      marginTop: 4,
+      marginBottom: 16,
+    },
+    inputContainer: {
+      position: 'relative',
+      marginBottom: 14,
+    },
+    textInput: {
+      paddingRight: 44,
+      textAlign: 'left',
+      writingDirection: 'ltr',
+    },
+    clearButton: {
+      position: 'absolute',
+      right: 14,
+      top: 14,
+    },
+    addButtonDisabled: {
+      backgroundColor: c.disabled,
+    },
+    regionLabel: {
+      ...TYPE.label,
+      color: c.textSecondary,
+      textAlign,
+      marginBottom: 8,
+    },
+    // The region opens a picker: a round field with a hairline
+    regionButton: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: RADIUS.round,
+      paddingHorizontal: 18,
+      minHeight: 48,
+      marginBottom: 16,
+    },
+    categoryContainer: {
+      marginBottom: 16,
+    },
+    categoryTitle: {
+      marginBottom: 8,
+    },
+    feedGrid: {
+      flexDirection: row,
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    feedChip: {
+      minHeight: 36,
+      paddingVertical: 6,
+    },
+    // Each chip adds its feed: what you tap, in main ink
+    feedChipText: {
+      ...TYPE.label,
+      color: c.mainInk,
+    },
+    helpTitle: {
+      marginBottom: 12,
+    },
+    helpItem: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      marginBottom: 12,
+    },
+    helpText: {
+      flex: 1,
+      color: c.textSecondary,
+      lineHeight: 20,
+    },
+    feedItem: {
+      flexDirection: row,
+      alignItems: 'center',
+      paddingVertical: 12,
+      gap: 4,
+    },
+    feedContent: {
+      flex: 1,
+    },
+    feedUrl: {
+      marginTop: 2,
+    },
+    hiddenFeed: {
+      opacity: 0.5,
+    },
+    feedButton: {
+      padding: 8,
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 32,
+    },
+    emptyText: {
+      color: c.textSecondary,
+      marginTop: 12,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    loadingOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingBox: {
+      padding: 28,
+      alignItems: 'center',
+      minWidth: 200,
+    },
+    loadingText: {
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    loadingSubtext: {
+      marginTop: 6,
+      textAlign: 'center',
+    },
+    sheetOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      maxHeight: '70%',
+    },
+    sheetHeader: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 8,
+    },
+    regionItem: {
+      flexDirection: row,
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+    },
+    // The region in use: the main tint, its name in main ink
+    regionItemActive: {
+      backgroundColor: c.mainTint,
+    },
+    regionItemText: {
+      fontFamily: FONT.medium,
+      fontSize: 15,
+    },
+    regionItemTextActive: {
+      fontFamily: FONT.semiBold,
+      color: c.mainInk,
+    },
+  };
+});

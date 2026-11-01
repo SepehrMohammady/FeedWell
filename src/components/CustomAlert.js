@@ -6,10 +6,11 @@ import {
   Modal,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme, makeStyles } from '../context/ThemeContext';
+import { useUi } from '../theme/ui';
+import { TYPE } from '../theme/type';
 import { useTranslation } from '../context/LanguageContext';
 
 /**
@@ -32,104 +33,13 @@ import { useTranslation } from '../context/LanguageContext';
 export default function CustomAlert({ visible, title, message, icon, buttons = [], onDismiss }) {
   const { theme } = useTheme();
   const { isRTL } = useTranslation();
+  const ui = useUi();
+  const styles = useStyles(isRTL);
 
   const handleButtonPress = (button) => {
     button.onPress?.();
     onDismiss?.();
   };
-
-  const styles = StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.55)',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 32,
-    },
-    container: {
-      backgroundColor: theme.colors.surface,
-      borderRadius: 16,
-      width: '100%',
-      maxWidth: 340,
-      overflow: 'hidden',
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-    },
-    header: {
-      paddingTop: 24,
-      paddingHorizontal: 24,
-      paddingBottom: icon ? 12 : 0,
-      alignItems: 'center',
-    },
-    iconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: (theme.colors.primary || '#007AFF') + '15',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 12,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: theme.colors.text,
-      textAlign: 'center',
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    messageContainer: {
-      paddingHorizontal: 24,
-      paddingTop: 8,
-      paddingBottom: 20,
-    },
-    message: {
-      fontSize: 14,
-      color: theme.colors.textSecondary,
-      textAlign: 'center',
-      lineHeight: 20,
-      writingDirection: isRTL ? 'rtl' : 'ltr',
-    },
-    divider: {
-      height: StyleSheet.hairlineWidth,
-      backgroundColor: theme.colors.border,
-    },
-    buttonsContainer: {
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      gap: 8,
-    },
-    button: {
-      paddingVertical: 12,
-      paddingHorizontal: 20,
-      borderRadius: 10,
-      alignItems: 'center',
-    },
-    buttonDefault: {
-      backgroundColor: theme.colors.primary || '#007AFF',
-    },
-    buttonCancel: {
-      backgroundColor: theme.colors.border || '#E0E0E0',
-    },
-    buttonDestructive: {
-      backgroundColor: (theme.colors.error || '#FF3B30') + '15',
-    },
-    buttonText: {
-      fontSize: 15,
-      fontWeight: '600',
-    },
-    buttonTextDefault: {
-      color: '#fff',
-    },
-    buttonTextCancel: {
-      color: theme.colors.textSecondary,
-    },
-    buttonTextDestructive: {
-      color: theme.colors.error || '#FF3B30',
-    },
-  });
 
   // Sort buttons: destructive first, then default actions, cancel last
   const sortedButtons = [...buttons].sort((a, b) => {
@@ -139,21 +49,27 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
     return aOrder - bOrder;
   });
 
+  // The icon sits in an accent circle, or a red one when the alert asks to
+  // delete or remove something
+  const isDestructiveAlert = buttons.some((button) => button.style === 'destructive');
+
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onDismiss}
     >
       <TouchableWithoutFeedback onPress={onDismiss}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.container}>
-              <View style={styles.header}>
+            <View style={[ui.dialog, styles.container]}>
+              <View style={[styles.header, icon && styles.headerWithIcon]}>
                 {icon && (
-                  <View style={styles.iconContainer}>
-                    <Ionicons name={icon} size={24} color={theme.colors.primary} />
+                  <View style={[styles.iconContainer, isDestructiveAlert && styles.iconContainerError]}>
+                    <Ionicons name={icon} size={24} color={isDestructiveAlert ? theme.colors.error : theme.colors.accentInk} />
                   </View>
                 )}
                 <Text style={styles.title}>{title}</Text>
@@ -165,6 +81,8 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
               ) : null}
               <View style={styles.divider} />
               <View style={styles.buttonsContainer}>
+                {/* Fully round buttons: the main fill for the action, the main
+                    tint for Cancel, red for what can't be undone */}
                 {sortedButtons.map((button, index) => {
                   const isCancel = button.style === 'cancel';
                   const isDestructive = button.style === 'destructive';
@@ -172,24 +90,24 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
                     <TouchableOpacity
                       key={index}
                       style={[
-                        styles.button,
                         isCancel
-                          ? styles.buttonCancel
+                          ? ui.secondaryButton
                           : isDestructive
-                          ? styles.buttonDestructive
-                          : styles.buttonDefault,
+                          ? ui.dangerButton
+                          : ui.primaryButton,
+                        styles.button,
                       ]}
                       onPress={() => handleButtonPress(button)}
                       activeOpacity={0.7}
                     >
                       <Text
                         style={[
-                          styles.buttonText,
                           isCancel
-                            ? styles.buttonTextCancel
+                            ? ui.secondaryLabel
                             : isDestructive
-                            ? styles.buttonTextDestructive
-                            : styles.buttonTextDefault,
+                            ? ui.dangerLabel
+                            : ui.primaryLabel,
+                          styles.buttonText,
                         ]}
                       >
                         {button.text}
@@ -205,3 +123,76 @@ export default function CustomAlert({ visible, title, message, icon, buttons = [
     </Modal>
   );
 }
+
+// Built once per theme and direction (Calm Surfaces 3): a dialog of radius 20
+// over a 40% scrim
+const useStyles = makeStyles(({ colors: c }, isRTL) => ({
+  overlay: {
+    flex: 1,
+    backgroundColor: c.overlay,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  container: {
+    width: '100%',
+    maxWidth: 340,
+    overflow: 'hidden',
+    ...(c.hasShadows
+      ? { elevation: 8, shadowColor: '#000000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.16, shadowRadius: 12 }
+      : c.amoled ? { borderWidth: 1, borderColor: c.cardBorder } : null),
+  },
+  header: {
+    paddingTop: 24,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  headerWithIcon: {
+    paddingBottom: 12,
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: c.accentTint,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  iconContainerError: {
+    backgroundColor: c.errorTint,
+  },
+  title: {
+    ...TYPE.title,
+    color: c.text,
+    textAlign: 'center',
+    writingDirection: isRTL ? 'rtl' : 'ltr',
+  },
+  messageContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 20,
+  },
+  message: {
+    ...TYPE.body,
+    color: c.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    writingDirection: isRTL ? 'rtl' : 'ltr',
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: c.border,
+  },
+  buttonsContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 8,
+  },
+  button: {
+    minHeight: 46,
+  },
+  buttonText: {
+    fontSize: 15,
+  },
+}));

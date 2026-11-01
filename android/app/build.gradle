@@ -148,6 +148,9 @@ android {
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+        // Inter (Calm Surfaces 3) stays uncompressed, so Android reads it
+        // straight from the APK instead of copying it into memory.
+        noCompress 'Inter-Regular.ttf', 'Inter-Medium.ttf', 'Inter-SemiBold.ttf', 'Inter-Bold.ttf'
     }
 }
 

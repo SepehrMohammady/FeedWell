@@ -1,8 +1,11 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme, makeStyles } from '../context/ThemeContext';
 import { useTranslation } from '../context/LanguageContext';
+import { useUi } from '../theme/ui';
+import { TYPE } from '../theme/type';
 import { WHATS_NEW_RELEASES } from '../config/whatsNew';
 
 // One-time "What's New" popup shown after the app is updated to a new version.
@@ -10,35 +13,46 @@ import { WHATS_NEW_RELEASES } from '../config/whatsNew';
 export default function WhatsNewModal({ visible, onClose, onTakeTour }) {
   const { theme } = useTheme();
   const { t, isRTL } = useTranslation();
-
-  const rowDir = isRTL ? 'row-reverse' : 'row';
-  const textAlign = isRTL ? 'right' : 'left';
+  const insets = useSafeAreaInsets();
+  const ui = useUi();
+  const styles = useStyles(isRTL);
 
   const Feature = ({ icon, title, body }) => (
-    <View style={[styles.feature, { flexDirection: rowDir }]}>
-      <View style={[styles.featureIcon, { backgroundColor: theme.colors.primary + '1A' }]}>
-        <Ionicons name={icon} size={20} color={theme.colors.primary} />
+    <View style={styles.feature}>
+      <View style={ui.iconCircle}>
+        <Ionicons name={icon} size={19} color={theme.colors.accentInk} />
       </View>
       <View style={styles.featureText}>
-        <Text style={[styles.featureTitle, { color: theme.colors.text, textAlign }]}>{title}</Text>
-        <Text style={[styles.featureBody, { color: theme.colors.textSecondary, textAlign }]}>{body}</Text>
+        <Text style={styles.featureTitle}>{title}</Text>
+        <Text style={styles.featureBody}>{body}</Text>
       </View>
     </View>
   );
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
-        <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-          <View style={[styles.header, { backgroundColor: theme.colors.primary + '14' }]}>
-            <Ionicons name="sparkles" size={28} color={theme.colors.primary} />
-            <Text style={[styles.title, { color: theme.colors.text }]}>{t('whatsNew.title')}</Text>
+        <View style={[ui.dialog, styles.card, { marginTop: insets.top + 16, marginBottom: insets.bottom + 16 }]}>
+          <View style={styles.header}>
+            {/* A large accent icon circle */}
+            <View style={styles.headerIcon}>
+              <Ionicons name="sparkles" size={28} color={theme.colors.accentInk} />
+            </View>
+            <Text style={styles.title}>{t('whatsNew.title')}</Text>
           </View>
 
           <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
             {WHATS_NEW_RELEASES.map((release, i) => (
-              <View key={release.version} style={i > 0 && [styles.release, { borderTopColor: theme.colors.border }]}>
-                <Text style={[styles.releaseVersion, { color: theme.colors.primary, textAlign }]}>
+              <View key={release.version} style={i > 0 ? styles.release : null}>
+                {/* Each release's heading, a section title in accent ink */}
+                <Text style={styles.releaseVersion}>
                   {t('whatsNew.version', { version: release.version })}
                 </Text>
                 {release.items.map((item) => (
@@ -48,17 +62,13 @@ export default function WhatsNewModal({ visible, onClose, onTakeTour }) {
             ))}
           </ScrollView>
 
+          {/* The main action in the main fill, the other in the main tint */}
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
-              onPress={onTakeTour}
-            >
-              <Text style={styles.primaryBtnText}>{t('whatsNew.takeTour')}</Text>
+            <TouchableOpacity style={ui.primaryButton} onPress={onTakeTour} activeOpacity={0.85}>
+              <Text style={ui.primaryLabel}>{t('whatsNew.takeTour')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={onClose}>
-              <Text style={[styles.secondaryBtnText, { color: theme.colors.textSecondary }]}>
-                {t('common.gotIt')}
-              </Text>
+            <TouchableOpacity style={ui.secondaryButton} onPress={onClose}>
+              <Text style={ui.secondaryLabel}>{t('common.gotIt')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -67,91 +77,88 @@ export default function WhatsNewModal({ visible, onClose, onTakeTour }) {
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    borderRadius: 20,
-    overflow: 'hidden',
-    maxHeight: '85%',
-  },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginTop: 8,
-  },
-  body: {
-    paddingHorizontal: 20,
-  },
-  bodyContent: {
-    paddingVertical: 16,
-  },
-  release: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 16,
-  },
-  releaseVersion: {
-    fontSize: 13,
-    fontWeight: '700',
-    marginBottom: 14,
-  },
-  feature: {
-    alignItems: 'flex-start',
-    marginBottom: 18,
-  },
-  featureIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 12,
-  },
-  featureText: {
-    flex: 1,
-  },
-  featureTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 3,
-  },
-  featureBody: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  actions: {
-    padding: 16,
-    paddingTop: 4,
-  },
-  primaryBtn: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  primaryBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryBtn: {
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  secondaryBtnText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-})
+// Built once per theme and direction (Calm Surfaces 3), as LedgerWell's
+const useStyles = makeStyles(({ colors: c }, isRTL) => {
+  const textAlign = isRTL ? 'right' : 'left';
+  return {
+    overlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+    },
+    // A dialog (ui.dialog): the surface, radius 20
+    card: {
+      width: '100%',
+      maxWidth: 420,
+      flexShrink: 1,
+      overflow: 'hidden',
+      ...(c.amoled ? { borderWidth: 1, borderColor: c.cardBorder } : null),
+    },
+    header: {
+      alignItems: 'center',
+      paddingTop: 24,
+      paddingBottom: 4,
+      paddingHorizontal: 20,
+    },
+    headerIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: c.accentTint,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    title: {
+      ...TYPE.title,
+      color: c.text,
+      textAlign: 'center',
+      marginTop: 12,
+    },
+    body: {
+      paddingHorizontal: 20,
+      flexShrink: 1,
+    },
+    bodyContent: {
+      paddingVertical: 16,
+    },
+    release: {
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: c.border,
+      paddingTop: 16,
+    },
+    releaseVersion: {
+      ...TYPE.section,
+      color: c.accentInk,
+      marginBottom: 14,
+      textAlign,
+    },
+    feature: {
+      flexDirection: isRTL ? 'row-reverse' : 'row',
+      alignItems: 'flex-start',
+      gap: 12,
+      marginBottom: 16,
+    },
+    featureText: {
+      flex: 1,
+    },
+    featureTitle: {
+      ...TYPE.rowTitle,
+      color: c.text,
+      marginBottom: 3,
+      textAlign,
+    },
+    featureBody: {
+      ...TYPE.body,
+      lineHeight: 20,
+      color: c.textSecondary,
+      textAlign,
+    },
+    actions: {
+      gap: 8,
+      padding: 16,
+      paddingTop: 4,
+    },
+  };
+});

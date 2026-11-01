@@ -339,7 +339,7 @@ export default {
   "settings.sectionTranslation": "Tafsiri",
   "settings.sectionHelp": "Msaada",
   "settings.sectionData": "Data",
-  "settings.sectionTesters": "WAJARIBAJI",
+  "settings.sectionTesters": "Wajaribaji",
   "settings.sectionAbout": "Kuhusu",
   "settings.autoRefresh": "Kuonyesha Upya Kiotomatiki",
   "settings.autoRefreshDesc": "Onyesha upya mipasho kiotomatiki unapofungua programu",
@@ -356,7 +356,10 @@ export default {
   "font.mono": "Monospace",
   "settings.amoledBlack": "Nyeusi ya AMOLED",
   "settings.amoledBlackDesc": "Tumia nyeusi halisi kwa kadi na menyu — huokoa betri kwenye skrini za OLED",
-  "settings.themeColor": "Rangi ya Mandhari",
+  "settings.mainColor": "Rangi Kuu",
+  "settings.mainColorHint": "Vitufe, vichupo na maeneo yaliyoangaziwa",
+  "settings.accentColor": "Rangi ya Msisitizo",
+  "settings.accentColorHint": "Vichwa, aikoni na vivuli vya maandishi",
   "settings.bookmarkIndicators": "Viashiria vya Alamisho",
   "settings.bookmarkIndicatorsDesc": "Onyesha alama za nafasi ya kusoma katika kisomaji cha makala",
   "settings.openReaderDirectly": "Fungua Kisomaji Moja kwa Moja",
@@ -585,9 +588,9 @@ export default {
   "sound.nature.study": "Husaidia kupunguza msongo wakati wa mapumziko ya kusoma",
 
   // --- Theme color names ---
-  "color.warmBeige": "Beji ya Joto",
+  "color.warmBeige": "Beige",
   "color.sage": "Kijani Hafifu",
-  "color.sky": "Buluu ya Anga",
-  "color.lavender": "Zambarau Hafifu",
+  "color.sky": "Anga",
+  "color.lavender": "Lavenda",
   "color.rose": "Waridi",
 };

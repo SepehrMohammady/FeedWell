@@ -14,8 +14,9 @@ export default function ArticleImage({ uri, style, resizeMode = 'cover', showPla
   if (!safeUri || loadError) {
     if (!showPlaceholder) return null;
     
-    // Use FeedWell logo as default image - use inverted logo for dark mode
-    const placeholderBg = isDarkMode ? '#3A3A3C' : theme.colors.border;
+    // Use FeedWell logo as default image - use inverted logo for dark mode.
+    // The well behind it is Surface 2, as for every empty image.
+    const placeholderBg = theme.colors.surface2;
     
     return (
       <View style={[styles.placeholder, style, { backgroundColor: placeholderBg }]}>
