@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,36 +6,59 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  BackHandler,
   Linking,
   Modal,
   FlatList,
   TextInput,
   ActivityIndicator,
   NativeModules,
+  AppState,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { READING_FONTS, getReadingFont, readingFontStyle } from '../config/readingFonts';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system/legacy';
+import { useFocusEffect } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { APP_VERSION } from '../config/version';
-import { useFeed, REMOVED_ARTICLES_KEY } from '../context/FeedContext';
 import { useTheme, makeStyles, COLOR_THEMES } from '../context/ThemeContext';
-import { useUi, ListCard, SectionTitle, ThemedSwitch } from '../theme/ui';
+import { useUi, ListCard, SectionTitle, Segmented, ThemedSwitch } from '../theme/ui';
 import { FONT, TYPE, RADIUS } from '../theme/type';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
 import { APP_LANGUAGES, getAppLanguage } from '../i18n/appLanguages';
 import { tStatic } from '../i18n';
 import { formatLocalizedDate } from '../utils/formatDate';
-import { useReadLater } from '../context/ReadLaterContext';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTour, useTourTarget } from '../context/TourContext';
 import CustomAlert from '../components/CustomAlert';
-import { SafeStorage } from '../utils/SafeStorage';
+import { useAppReload } from '../context/AppReloadContext';
+import {
+  BACKUP_MIME,
+  BackupError,
+  applyRestore,
+  applyWidgetSettings,
+  autoBackupAvailable,
+  changeBackupFolder,
+  clearAllData,
+  createBackup,
+  currentCounts,
+  downloadOnWeb,
+  folderNameOf,
+  getAutoBackupState,
+  listAutomaticBackups,
+  readAutomaticBackup,
+  readBackup,
+  readPickedFile,
+  resetSettings,
+  runAutomaticBackup,
+  turnOffAutomaticBackup,
+  turnOnAutomaticBackup,
+  writeShareCopy,
+} from '../services/BackupService';
 import {
   AVAILABLE_LANGUAGES,
   getPopularLanguages,
@@ -58,22 +81,42 @@ const SEMO_LAB_DEVELOPER_ID = '6449174405168948991';
 const SEMO_LAB_APPS = [
   { name: 'LedgerWell', packageName: 'com.ledgerwell.app', descKey: 'settings.appLedgerWellDesc' },
   { name: 'ThinkWell', packageName: 'com.thinkwell.app', descKey: 'settings.appThinkWellDesc' },
+  { name: 'TuneWell', packageName: 'com.tunewell.app', descKey: 'settings.appTuneWellDesc' },
   { name: 'WeatherWell', packageName: 'com.weatherwell.app', descKey: 'settings.appWeatherWellDesc' },
 ];
 
+// What a restore, Reset Settings or Clear All Data did, said by the screen
+// that mounts after the providers reload (translation keys, so it's said in
+// the language in use then)
+let pendingNotice = null;
+
 export default function SettingsScreen({ navigation }) {
-  const { feeds, articles, clearAllData } = useFeed();
-  const { theme, isDarkMode, toggleTheme, paletteIndex, setPalette, accentIndex, setAccent, amoledBlack, toggleAmoledBlack } = useTheme();
+  const { theme, isDarkMode, themeMode, setThemeMode, paletteIndex, setPalette, accentIndex, setAccent, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled, autoTranslate, updateAutoTranslate } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
-  const { articles: readLaterArticles } = useReadLater();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
   const insets = useSafeAreaInsets();
   const ui = useUi();
   const styles = useStyles(isRTL);
   const tour = useTour();
-  const tourHeaderRef = useTourTarget('settings.header');
+  const reloadApp = useAppReload();
+  // Settings opens on a list of categories; each opens a page of its own
+  const [page, setPage] = useState(null);
+  // The tour points at the list's rows, so it brings the list back first
+  const tourAppearanceRef = useTourTarget('settings.appearance', () => setPage(null));
+  const tourDataRef = useTourTarget('settings.data', () => setPage(null));
+  // Android's back button on a page returns to the list
+  useFocusEffect(
+    useCallback(() => {
+      if (!page) return undefined;
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        setPage(null);
+        return true;
+      });
+      return () => subscription.remove();
+    }, [page])
+  );
   const [showAppLangPicker, setShowAppLangPicker] = useState(false);
 
   // Translation settings state
@@ -92,7 +135,12 @@ export default function SettingsScreen({ navigation }) {
   const [showAutoScrollDelayPicker, setShowAutoScrollDelayPicker] = useState(false);
   const [showFontPicker, setShowFontPicker] = useState(false);
   const [alertConfig, setAlertConfig] = useState({ visible: false, title: '', message: '', buttons: [] });
-  const restoreResolveRef = useRef(null);
+  // Data: busy while a file is made or read; the automatic backup's state;
+  // Restore's sheet of automatic backups
+  const [busy, setBusy] = useState(false);
+  const [autoBackup, setAutoBackup] = useState({ enabled: false, folder: null, files: [] });
+  const [showRestoreSheet, setShowRestoreSheet] = useState(false);
+  const [automaticBackups, setAutomaticBackups] = useState([]);
 
   // Widget settings state
   const [widgetTheme, setWidgetTheme] = useState('app'); // 'app', 'light', 'dark'
@@ -304,30 +352,228 @@ export default function SettingsScreen({ navigation }) {
     );
   })();
 
-  const handleClearAllData = () => {
-    console.log('Attempting to clear all data');
-    
-    // For web platform, use window.confirm for better compatibility
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
-      const confirmed = window.confirm(`${t('settings.clearAllDataTitle')}?\n\n${t('settings.clearAllDataConfirm')}`);
-      if (confirmed) {
-        performClearAllData();
+  // ---- Data: backup, restore, the automatic backup, Reset Settings, Clear All Data
+
+  const showError = (message) =>
+    setAlertConfig({ visible: true, title: t('common.error'), message, icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
+
+  // Making or reading a file blocks for a moment: show that first
+  const whileBusy = async (work) => {
+    setBusy(true);
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    try {
+      return await work();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const refreshAutoBackup = useCallback(async () => {
+    if (autoBackupAvailable) setAutoBackup(await getAutoBackupState());
+  }, []);
+  // The automatic backup can change behind this screen (it runs as FeedWell goes
+  // to the background, and its folder can go away), so read it again whenever
+  // Settings comes into view, FeedWell comes back, or the Data page opens
+  useFocusEffect(
+    useCallback(() => {
+      refreshAutoBackup();
+      const subscription = AppState.addEventListener('change', (state) => {
+        if (state === 'active') refreshAutoBackup();
+      });
+      return () => subscription.remove();
+    }, [refreshAutoBackup])
+  );
+  useEffect(() => {
+    if (page === 'data') refreshAutoBackup();
+  }, [page, refreshAutoBackup]);
+
+  // With the time: the automatic backups of one day differ only in it. Latin
+  // digits, as in the rest of the app (Farsi's become Persian through formatNumber).
+  const formatBackupDate = (iso) => formatLocalizedDate(iso, language, formatNumber, {
+    withYear: true,
+    withTime: true,
+    locale: `${language}-u-nu-latn`,
+    localeOptions: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' },
+  });
+
+  // A restore, Reset Settings and Clear All Data reload every provider, which
+  // remounts this screen: it says what happened once it's back
+  useEffect(() => {
+    if (pendingNotice) {
+      const notice = pendingNotice;
+      pendingNotice = null;
+      setAlertConfig({ visible: true, title: t(notice.titleKey), message: t(notice.messageKey), icon: notice.icon || 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const reloadWith = (notice) => {
+    pendingNotice = notice;
+    reloadApp();
+  };
+
+  const handleBackupData = async () => {
+    try {
+      const backup = await whileBusy(() => createBackup());
+      if (Platform.OS === 'web') {
+        downloadOnWeb(backup);
+        setAlertConfig({ visible: true, title: t('common.success'), message: t('settings.backupDownloadedMessage'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
+        return;
       }
+      // The share sheet's copy goes to the cache directory
+      const uri = writeShareCopy(backup);
+      if (await Sharing.isAvailableAsync()) {
+        try {
+          await Sharing.shareAsync(uri, { mimeType: BACKUP_MIME, dialogTitle: t('settings.backupShareDialogTitle'), UTI: 'public.data' });
+        } catch (shareError) {
+          console.log('Share dismissed:', shareError?.message);
+        }
+      }
+      setAlertConfig({ visible: true, title: t('settings.backupSuccessTitle'), message: t('settings.backupSuccessMessage'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      showError(t('settings.backupError'));
+    }
+  };
+
+  const applyBackup = async (backup, mode) => {
+    try {
+      await whileBusy(async () => {
+        // Replace can't be undone: the automatic backup, if it's on, saves the phone's state first
+        if (mode === 'replace') await runAutomaticBackup('beforeReplace');
+        await applyRestore(backup, mode);
+        await applyWidgetSettings(WidgetBridge);
+      });
+      reloadWith({ titleKey: 'settings.restoreCompleteTitle', messageKey: 'backup.restoreDone' });
+    } catch (error) {
+      // Some of it may be written by now: reload, so every screen shows what's stored
+      console.error('Error restoring backup:', error);
+      reloadWith({ titleKey: 'common.error', messageKey: 'settings.restoreError', icon: 'alert-circle-outline' });
+    }
+  };
+
+  // Checks the file, then shows what it holds and offers Replace or Merge
+  const restoreFromBytes = async (bytes) => {
+    let backup;
+    try {
+      backup = await whileBusy(() => readBackup(bytes));
+    } catch (error) {
+      if (!(error instanceof BackupError)) throw error;
+      const message =
+        error.code === 'otherApp' && error.details.app ? t('backup.otherAppMessage', { app: error.details.app })
+          : error.code === 'newer' ? t('backup.newerMessage')
+            : error.code === 'damaged' ? t('backup.damagedMessage')
+              : t('settings.restoreInvalidFormat');
+      setAlertConfig({ visible: true, title: t('settings.restoreBackupTitle'), message, icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
-
-    // For mobile platforms, use CustomAlert
+    const { counts } = backup;
     setAlertConfig({
       visible: true,
-      title: t('settings.clearAllDataTitle'),
-      message: t('settings.clearAllDataConfirm'),
-      icon: 'trash-outline',
+      title: t('settings.restoreBackupTitle'),
+      message: t('backup.previewMessage', {
+        date: backup.createdAt ? formatBackupDate(backup.createdAt) : t('settings.restoreUnknownDate'),
+        feeds: formatNumber(counts.feeds),
+        articles: formatNumber(counts.articles),
+        saved: formatNumber(counts.saved),
+        notes: formatNumber(counts.notes),
+      }),
+      icon: 'cloud-download-outline',
+      buttons: [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('backup.merge'), onPress: () => applyBackup(backup, 'merge') },
+        { text: t('backup.replace'), style: 'destructive', onPress: () => applyBackup(backup, 'replace') },
+      ],
+    });
+  };
+
+  const pickBackupFile = async () => {
+    setShowRestoreSheet(false);
+    try {
+      const result = await DocumentPicker.getDocumentAsync({ type: '*/*', copyToCacheDirectory: true });
+      if (result.canceled || !result.assets || result.assets.length === 0) return;
+      await restoreFromBytes(await readPickedFile(result.assets[0].uri));
+    } catch (error) {
+      console.error('Error restoring backup:', error);
+      showError(t('settings.restoreError'));
+    }
+  };
+
+  const pickWebFile = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.feedwell,.json,application/json,application/octet-stream';
+    input.onchange = async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      try {
+        await restoreFromBytes(await readPickedFile(file));
+      } catch (error) {
+        showError(t('settings.restoreError'));
+      }
+    };
+    input.click();
+  };
+
+  const restoreFromAutomatic = async (entry) => {
+    setShowRestoreSheet(false);
+    try {
+      await restoreFromBytes(await readAutomaticBackup(entry));
+    } catch (error) {
+      console.error('Error restoring automatic backup:', error);
+      showError(t('settings.restoreError'));
+    }
+  };
+
+  // The automatic backups come first: the copies in FeedWell's own storage
+  // can't be reached with the file picker
+  const handleRestoreData = async () => {
+    if (Platform.OS === 'web') {
+      pickWebFile();
+      return;
+    }
+    const automatic = await listAutomaticBackups();
+    if (automatic.length > 0) {
+      setAutomaticBackups(automatic);
+      setShowRestoreSheet(true);
+    } else {
+      pickBackupFile();
+    }
+  };
+
+  const handleAutoBackupChange = async (value) => {
+    if (value) await whileBusy(() => turnOnAutomaticBackup());
+    else await turnOffAutomaticBackup();
+    refreshAutoBackup();
+  };
+
+  const handleChangeBackupFolder = async () => {
+    if (await changeBackupFolder()) await whileBusy(() => runAutomaticBackup('folderChanged'));
+    refreshAutoBackup();
+  };
+
+  const handleResetSettings = () => {
+    setAlertConfig({
+      visible: true,
+      title: t('settings.resetTitle'),
+      message: t('settings.resetConfirm'),
+      icon: 'refresh-outline',
       buttons: [
         { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t('settings.clearAction'),
+          text: t('settings.resetTitle'),
           style: 'destructive',
-          onPress: () => performClearAllData(),
+          onPress: async () => {
+            try {
+              await whileBusy(async () => {
+                await resetSettings();
+                await applyWidgetSettings(WidgetBridge);
+              });
+              reloadWith({ titleKey: 'settings.resetTitle', messageKey: 'settings.resetDone' });
+            } catch (error) {
+              console.error('Error resetting settings:', error);
+              showError(t('settings.restoreError'));
+            }
+          },
         },
       ],
     });
@@ -335,26 +581,40 @@ export default function SettingsScreen({ navigation }) {
 
   const performClearAllData = async () => {
     try {
-      console.log('Performing clear all data operation');
-      await clearAllData();
-      console.log('All data cleared successfully');
-      
-      // Show success message
-      if (Platform.OS === 'web') {
-        window.alert(t('settings.clearAllDataSuccess'));
-      } else {
-        setAlertConfig({ visible: true, title: t('common.success'), message: t('settings.clearAllDataSuccess'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
-      }
+      await whileBusy(async () => {
+        // It can't be undone: the automatic backup, if it's on, saves the data first
+        await runAutomaticBackup('beforeClear');
+        await clearAllData();
+      });
+      reloadWith({ titleKey: 'common.success', messageKey: 'settings.clearAllDataSuccess' });
     } catch (error) {
       console.error('Error clearing data:', error);
-
-      // Show error message
-      if (Platform.OS === 'web') {
-        window.alert(t('settings.clearAllDataError'));
-      } else {
-        setAlertConfig({ visible: true, title: t('common.error'), message: t('settings.clearAllDataError'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
-      }
+      reloadWith({ titleKey: 'common.error', messageKey: 'settings.clearAllDataError', icon: 'alert-circle-outline' });
     }
+  };
+
+  const handleClearAllData = async () => {
+    const counts = await currentCounts();
+    const message = t('settings.clearAllDataConfirm', {
+      feeds: formatNumber(counts.feeds),
+      articles: formatNumber(counts.articles),
+      saved: formatNumber(counts.saved),
+      notes: formatNumber(counts.notes),
+    });
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      if (window.confirm(`${t('settings.clearAllDataTitle')}?\n\n${message}`)) performClearAllData();
+      return;
+    }
+    setAlertConfig({
+      visible: true,
+      title: t('settings.clearAllDataTitle'),
+      message,
+      icon: 'trash-outline',
+      buttons: [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('settings.clearAction'), style: 'destructive', onPress: performClearAllData },
+      ],
+    });
   };
 
   const handleOpenWebsite = async (target) => {
@@ -391,266 +651,6 @@ export default function SettingsScreen({ navigation }) {
       await Linking.openURL(`market://dev?id=${SEMO_LAB_DEVELOPER_ID}`);
     } catch (e) {
       handleOpenWebsite(`https://play.google.com/store/apps/dev?id=${SEMO_LAB_DEVELOPER_ID}`);
-    }
-  };
-
-  const handleBackupData = async () => {
-    try {
-      // Articles the reader removed, so a restore keeps them out of the list
-      let removedArticles = [];
-      try {
-        const storedRemoved = await SafeStorage.getItem(REMOVED_ARTICLES_KEY);
-        removedArticles = storedRemoved ? JSON.parse(storedRemoved) : [];
-      } catch (e) { /* none removed yet */ }
-
-      // Gather all data
-      const backupData = {
-        version: APP_VERSION.version,
-        timestamp: new Date().toISOString(),
-        feeds: feeds,
-        articles: articles,
-        readLater: readLaterArticles,
-        removedArticles,
-        settings: {
-          showImages,
-          autoRefresh,
-          isDarkMode,
-          maxArticleAge,
-          reduceMotion,
-          readingReminder,
-          showBookmarkIndicators,
-          skipArticleView,
-          showReadingPositionInFeeds,
-          allowRotation,
-          speechRate,
-          readerHeaderActions,
-          targetLangCode,
-          translationMode,
-        },
-      };
-
-      const jsonString = JSON.stringify(backupData, null, 2);
-      const now = new Date();
-      const dateStr = now.toISOString().split('T')[0];
-      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-      const fileName = `FeedWell_Backup_${dateStr}_${timeStr}.feedwell`;
-
-      if (Platform.OS === 'web') {
-        // Web platform: Download file
-        const blob = new Blob([jsonString], { type: 'application/octet-stream' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        setAlertConfig({ visible: true, title: t('common.success'), message: t('settings.backupDownloadedMessage'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
-      } else {
-        // Mobile: Save to file system and share
-        const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-        await FileSystem.writeAsStringAsync(fileUri, jsonString);
-
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
-          try {
-            await Sharing.shareAsync(fileUri, {
-              mimeType: 'application/octet-stream',
-              dialogTitle: t('settings.backupShareDialogTitle'),
-              UTI: 'public.data',
-            });
-          } catch (shareError) {
-            // Share sheet dismissed/failed — the backup file is already written, so still a success.
-            console.log('Share dismissed (backup file already saved):', shareError?.message);
-          }
-          setAlertConfig({ visible: true, title: t('settings.backupSuccessTitle'), message: t('settings.backupSuccessMessage'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
-        } else {
-          setAlertConfig({ visible: true, title: t('settings.backupSuccessTitle'), message: t('settings.backupSavedTo', { path: fileUri }), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
-        }
-      }
-    } catch (error) {
-      console.error('Error creating backup:', error);
-      setAlertConfig({ visible: true, title: t('common.error'), message: t('settings.backupError'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
-    }
-  };
-
-  const handleRestoreData = async () => {
-    try {
-      let jsonString;
-
-      if (Platform.OS === 'web') {
-        // Web platform: Use file input
-        setAlertConfig({ visible: true, title: t('settings.restoreBackupTitle'), message: t('settings.restoreSelectFileMessage'), icon: 'cloud-upload-outline', buttons: [{ text: t('common.ok') }] });
-        
-        // Create file input dynamically
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.feedwell,.json,application/json,application/octet-stream';
-        
-        input.onchange = async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            try {
-              jsonString = event.target.result;
-              await processRestore(jsonString);
-            } catch (error) {
-              setAlertConfig({ visible: true, title: t('common.error'), message: t('settings.restoreInvalidFormat'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
-            }
-          };
-          reader.readAsText(file);
-        };
-        
-        input.click();
-      } else {
-        // Mobile: Use document picker
-        const result = await DocumentPicker.getDocumentAsync({
-          type: '*/*',
-          copyToCacheDirectory: true,
-        });
-
-        if (result.canceled || !result.assets || result.assets.length === 0) {
-          return;
-        }
-
-        const fileUri = result.assets[0].uri;
-        jsonString = await FileSystem.readAsStringAsync(fileUri);
-
-        await processRestore(jsonString);
-      }
-    } catch (error) {
-      console.error('Error restoring backup:', error);
-      setAlertConfig({ visible: true, title: t('common.error'), message: t('settings.restoreError'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
-    }
-  };
-
-  const processRestore = async (jsonString) => {
-    try {
-      const backupData = JSON.parse(jsonString);
-
-      // Validate backup structure
-      if (!backupData.feeds || !backupData.articles) {
-        throw new Error('Invalid backup format');
-      }
-
-      // Confirm restore
-      const confirmRestore = () => {
-        const restoreDate = backupData.timestamp
-          ? formatLocalizedDate(backupData.timestamp, language, formatNumber, { withTime: false, locale: language })
-          : t('settings.restoreUnknownDate');
-        const restoreMessage = t('settings.restoreConfirmMessage', {
-          date: restoreDate,
-          feeds: formatNumber(backupData.feeds.length),
-          articles: formatNumber(backupData.articles.length),
-          saved: formatNumber(backupData.readLater?.length || 0),
-        });
-        return new Promise((resolve) => {
-          if (Platform.OS === 'web') {
-            resolve(window.confirm(restoreMessage));
-          } else {
-            restoreResolveRef.current = resolve;
-            setAlertConfig({
-              visible: true,
-              title: t('settings.restoreBackupTitle'),
-              message: restoreMessage,
-              icon: 'cloud-download-outline',
-              buttons: [
-                { text: t('common.cancel'), style: 'cancel', onPress: () => { restoreResolveRef.current?.(false); restoreResolveRef.current = null; } },
-                { text: t('settings.restoreAction'), style: 'destructive', onPress: () => { restoreResolveRef.current?.(true); restoreResolveRef.current = null; } },
-              ],
-            });
-          }
-        });
-      };
-
-      const confirmed = await confirmRestore();
-      if (!confirmed) return;
-
-      // Restore feeds
-      await SafeStorage.setItem('feeds', JSON.stringify(backupData.feeds));
-      
-      // Restore articles
-      await SafeStorage.setItem('articles', JSON.stringify(backupData.articles));
-      
-      // Restore read later
-      if (backupData.readLater) {
-        await SafeStorage.setItem('feedwell_read_later_articles', JSON.stringify(backupData.readLater));
-      }
-
-      // Restore the removed articles (backups from 1.19.0 on carry them)
-      if (Array.isArray(backupData.removedArticles)) {
-        await SafeStorage.setItem(REMOVED_ARTICLES_KEY, JSON.stringify(backupData.removedArticles));
-      }
-
-      // Restore settings
-      if (backupData.settings) {
-        if (typeof backupData.settings.showImages === 'boolean') {
-          await updateShowImages(backupData.settings.showImages);
-        }
-        if (typeof backupData.settings.autoRefresh === 'boolean') {
-          await updateAutoRefresh(backupData.settings.autoRefresh);
-        }
-        if (typeof backupData.settings.isDarkMode === 'boolean' && backupData.settings.isDarkMode !== isDarkMode) {
-          await toggleTheme();
-        }
-        if (typeof backupData.settings.maxArticleAge === 'number') {
-          await updateMaxArticleAge(backupData.settings.maxArticleAge);
-        }
-        if (typeof backupData.settings.reduceMotion === 'boolean') {
-          await updateReduceMotion(backupData.settings.reduceMotion);
-        }
-        if (typeof backupData.settings.readingReminder === 'boolean') {
-          await updateReadingReminder(backupData.settings.readingReminder);
-        }
-        if (typeof backupData.settings.showBookmarkIndicators === 'boolean') {
-          await updateShowBookmarkIndicators(backupData.settings.showBookmarkIndicators);
-        }
-        if (typeof backupData.settings.skipArticleView === 'boolean') {
-          await updateSkipArticleView(backupData.settings.skipArticleView);
-        }
-        if (typeof backupData.settings.showReadingPositionInFeeds === 'boolean') {
-          await updateShowReadingPositionInFeeds(backupData.settings.showReadingPositionInFeeds);
-        }
-        if (typeof backupData.settings.allowRotation === 'boolean') {
-          await updateAllowRotation(backupData.settings.allowRotation);
-        }
-        if (typeof backupData.settings.speechRate === 'number') {
-          await updateSpeechRate(backupData.settings.speechRate);
-        }
-        if (Array.isArray(backupData.settings.readerHeaderActions)) {
-          await updateReaderHeaderActions(backupData.settings.readerHeaderActions);
-        }
-        if (backupData.settings.targetLangCode) {
-          await saveTargetLanguage(backupData.settings.targetLangCode);
-          setTargetLangCode(backupData.settings.targetLangCode);
-        }
-        if (backupData.settings.translationMode) {
-          await saveTranslationMode(backupData.settings.translationMode);
-          setTranslationMode(backupData.settings.translationMode);
-        }
-      }
-
-      // Show success message and reload the app
-      if (Platform.OS === 'web') {
-        if (window.confirm(t('settings.restoreCompleteWebMessage'))) {
-          window.location.reload();
-        }
-      } else {
-        setAlertConfig({
-          visible: true,
-          title: t('settings.restoreCompleteTitle'),
-          message: t('settings.restoreCompleteMessage'),
-          icon: 'checkmark-circle-outline',
-          buttons: [{ text: t('common.ok') }],
-        });
-      }
-    } catch (error) {
-      console.error('Error processing restore:', error);
-      throw error;
     }
   };
 
@@ -751,243 +751,380 @@ export default function SettingsScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  return (
-    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
-      <View ref={tourHeaderRef} collapsable={false} style={styles.header}>
-        <Text style={ui.screenTitle}>{t('tab.settings')}</Text>
+  // ---- The list Settings opens on: one row per category, each saying what is
+  // set now in the words its page already uses
+
+  const join = (parts) => parts.filter(Boolean).join(' · ');
+  const colorName = (index) => t(COLOR_THEMES[index].nameKey);
+  const modeLabel =
+    themeMode === 'light' ? t('settings.modeLight') : themeMode === 'dark' ? t('settings.modeDark') : t('settings.modeSystem');
+  const translationModeTitle =
+    translationMode === TRANSLATION_MODES.AUTO ? t('settings.translationModeAutoTitle')
+      : translationMode === TRANSLATION_MODES.ONLINE ? t('settings.translationModeOnlineTitle')
+        : t('settings.translationModeOfflineTitle');
+  const lastAutoBackup = autoBackup.files.length ? autoBackup.files[autoBackup.files.length - 1] : null;
+
+  const pageTitles = {
+    appearance: t('settings.appearance'),
+    feeds: t('tab.feeds'),
+    reading: t('settings.sectionReading'),
+    translation: t('settings.sectionTranslation'),
+    widget: t('settings.sectionWidget'),
+    data: t('settings.sectionData'),
+    about: t('settings.sectionAbout'),
+  };
+  const summaries = {
+    appearance: join([
+      modeLabel,
+      themeMode !== 'light' && amoledBlack && t('settings.amoledBlack'),
+      colorName(paletteIndex),
+      colorName(accentIndex),
+      getAppLanguage(language).nativeLabel,
+    ]),
+    feeds: join([
+      autoRefresh && t('settings.autoRefresh'),
+      showImages && t('settings.showImages'),
+      getArticleAgeLabel(maxArticleAge),
+    ]),
+    reading: join([
+      getReadingFont(readingFont).label || t(getReadingFont(readingFont).labelKey),
+      skipArticleView && t('settings.openReaderDirectly'),
+      autoScrollEnabled && t('settings.autoScroll'),
+      reduceMotion && t('settings.reduceMotion'),
+    ]),
+    translation: join([
+      translationModeTitle,
+      getDisplayName(targetLangCode),
+      autoTranslate && t('settings.autoTranslate'),
+    ]),
+    widget: join([widgetThemeLabel, t('settings.percent', { value: formatNumber(widgetOpacity) })]),
+    data: autoBackup.enabled
+      ? join([t('backup.autoBackup'), lastAutoBackup && formatBackupDate(lastAutoBackup.createdAt)])
+      : join([t('settings.backupData'), t('settings.restoreData')]),
+    about: `FeedWell ${formatNumber(APP_VERSION.version)}`,
+  };
+
+  const categoryRow = (key, icon, title, summary, onPress, ref) => (
+    <TouchableOpacity
+      key={key}
+      ref={ref}
+      collapsable={false}
+      style={styles.categoryRow}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={ui.iconCircle}>
+        <Ionicons name={icon} size={19} color={colors.accentInk} />
       </View>
+      <View style={styles.flexText}>
+        <Text style={ui.rowTitle} numberOfLines={1}>{title}</Text>
+        {!!summary && <Text style={[ui.secondary, styles.hint]} numberOfLines={1}>{summary}</Text>}
+      </View>
+      {chevron}
+    </TouchableOpacity>
+  );
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <SectionTitle title={t('settings.sectionPreferences')} />
+  // The family order: FeedWell's own categories, then Data, then the tour and
+  // What's New, then About
+  const renderCategories = () => (
+    <>
+      <ListCard>
+        {categoryRow('appearance', 'color-palette-outline', pageTitles.appearance, summaries.appearance, () => setPage('appearance'), tourAppearanceRef)}
+        {categoryRow('feeds', 'newspaper-outline', pageTitles.feeds, summaries.feeds, () => setPage('feeds'))}
+        {categoryRow('reading', 'book-outline', pageTitles.reading, summaries.reading, () => setPage('reading'))}
+        {categoryRow('translation', 'language-outline', pageTitles.translation, summaries.translation, () => setPage('translation'))}
+        {Platform.OS === 'android' && categoryRow('widget', 'apps-outline', pageTitles.widget, summaries.widget, () => setPage('widget'))}
+      </ListCard>
+      <View style={styles.group}>
         <ListCard>
-          <SettingItem
-            title={t('settings.autoRefresh')}
-            description={t('settings.autoRefreshDesc')}
-            rightElement={<ThemedSwitch value={autoRefresh} onValueChange={updateAutoRefresh} />}
-          />
-          <SettingItem
-            title={t('settings.showImages')}
-            description={t('settings.showImagesDesc')}
-            rightElement={<ThemedSwitch value={showImages} onValueChange={updateShowImages} />}
-          />
-          <SettingItem
-            title={t('settings.darkMode')}
-            description={t('settings.darkModeDesc')}
-            rightElement={<ThemedSwitch value={isDarkMode} onValueChange={toggleTheme} />}
-          />
-          {isDarkMode && (
-            <SettingItem
-              title={t('settings.amoledBlack')}
-              description={t('settings.amoledBlackDesc')}
-              rightElement={<ThemedSwitch value={amoledBlack} onValueChange={toggleAmoledBlack} />}
-            />
-          )}
-          <SettingItem
-            title={t('settings.readingFont')}
-            description={getReadingFont(readingFont).label || t(getReadingFont(readingFont).labelKey)}
-            onPress={() => setShowFontPicker(true)}
-            rightElement={chevron}
-          />
-          <SettingItem
-            title={t('language.appTitle')}
-            description={getAppLanguage(language).nativeLabel}
-            onPress={() => setShowAppLangPicker(true)}
-            rightElement={chevron}
-          />
-          {/* Two colors: the main color is what you tap, the accent what to notice */}
-          <View style={styles.block}>
-            <Text style={ui.rowTitle}>{t('settings.mainColor')}</Text>
-            <Text style={[ui.secondary, styles.hint]}>{t('settings.mainColorHint')}</Text>
-            {renderSwatches(paletteIndex, setPalette)}
-          </View>
-          <View style={styles.block}>
-            <Text style={ui.rowTitle}>{t('settings.accentColor')}</Text>
-            <Text style={[ui.secondary, styles.hint]}>{t('settings.accentColorHint')}</Text>
-            {renderSwatches(accentIndex, setAccent)}
-          </View>
-          <SettingItem
-            title={t('settings.bookmarkIndicators')}
-            description={t('settings.bookmarkIndicatorsDesc')}
-            rightElement={<ThemedSwitch value={showBookmarkIndicators} onValueChange={updateShowBookmarkIndicators} />}
-          />
-          <SettingItem
-            title={t('settings.openReaderDirectly')}
-            description={t('settings.openReaderDirectlyDesc')}
-            rightElement={<ThemedSwitch value={skipArticleView} onValueChange={updateSkipArticleView} />}
-          />
-          <SettingItem
-            title={t('settings.readingPositionInFeeds')}
-            description={t('settings.readingPositionInFeedsDesc')}
-            rightElement={<ThemedSwitch value={showReadingPositionInFeeds} onValueChange={updateShowReadingPositionInFeeds} />}
-          />
-          <SettingItem
-            title={t('settings.screenRotation')}
-            description={t('settings.screenRotationDesc')}
-            rightElement={<ThemedSwitch value={allowRotation} onValueChange={updateAllowRotation} />}
-          />
-          <SettingItem
-            title={t('settings.reduceMotion')}
-            description={t('settings.reduceMotionDesc')}
-            rightElement={<ThemedSwitch value={reduceMotion} onValueChange={updateReduceMotion} />}
-          />
-          <SettingItem
-            title={t('settings.readingReminder')}
-            description={readingReminder ? t('settings.readingReminderOnDesc') : t('settings.readingReminderOffDesc')}
-            rightElement={<ThemedSwitch value={readingReminder} onValueChange={updateReadingReminder} />}
-          />
-          <SettingItem
-            title={t('settings.autoScroll')}
-            description={t('settings.autoScrollDesc')}
-            rightElement={<ThemedSwitch value={autoScrollEnabled} onValueChange={updateAutoScrollEnabled} />}
-          />
-          {autoScrollEnabled && (
-            <SettingItem
-              title={t('settings.autoScrollDelay')}
-              description={t('settings.autoScrollDelayValue', { count: formatNumber(autoScrollDelay) })}
-              onPress={() => setShowAutoScrollDelayPicker(true)}
-              rightElement={chevron}
-            />
-          )}
-          {autoScrollEnabled && renderSlider({
-            title: t('settings.autoScrollSpeed'),
-            valueLabel: t('settings.percent', { value: formatNumber(autoScrollSpeed) }),
-            ends: [t('settings.speedSlow'), t('settings.speedFast')],
-            minimumValue: 25,
-            maximumValue: 250,
-            step: 25,
-            value: autoScrollSpeed,
-            onSlidingComplete: (v) => updateAutoScrollSpeed(Math.round(v)),
-          })}
-          {autoScrollEnabled && (
-            <SettingItem
-              title={t('settings.keepAwake')}
-              description={t('settings.keepAwakeDesc')}
-              rightElement={<ThemedSwitch value={keepAwakeEnabled} onValueChange={updateKeepAwakeEnabled} />}
-            />
-          )}
-          <SettingItem
-            title={t('settings.articleAgeFilter')}
-            description={maxArticleAge === 0 ? t('settings.articleAgeFilterNoLimitDesc') : t('settings.articleAgeFilterDesc', { period: getArticleAgeLabel(maxArticleAge) })}
-            onPress={() => setShowArticleAgePicker(true)}
-            rightElement={chevron}
-          />
+          {categoryRow('data', 'save-outline', pageTitles.data, summaries.data, () => setPage('data'), tourDataRef)}
         </ListCard>
+      </View>
+      <View style={styles.group}>
+        <ListCard>
+          {categoryRow('tour', 'compass-outline', t('settings.appTour'), t('settings.appTourDesc'), () => tour?.startTour())}
+          {categoryRow('whatsNew', 'sparkles-outline', t('settings.whatsNew'), t('settings.whatsNewDesc'), () => tour?.setWhatsNewOpen(true))}
+        </ListCard>
+      </View>
+      <View style={styles.group}>
+        <ListCard>
+          {categoryRow('about', 'information-circle-outline', pageTitles.about, summaries.about, () => setPage('about'))}
+        </ListCard>
+      </View>
+    </>
+  );
 
-        {Platform.OS === 'android' && (
-          <>
-            <SectionTitle title={t('settings.sectionWidget')} />
-            <ListCard>
-              <SettingItem
-                title={t('settings.addWidget')}
-                description={t('settings.addWidgetDesc')}
-                onPress={handleAddWidget}
-                rightElement={<Ionicons name="add-circle-outline" size={22} color={colors.mainInk} />}
-              />
-              <SettingItem
-                title={t('settings.widgetTheme')}
-                description={widgetThemeLabel}
-                onPress={() => setShowWidgetThemePicker(true)}
-                rightElement={chevron}
-              />
-              <SettingItem
-                title={t('settings.widgetImages')}
-                description={t('settings.widgetImagesDesc')}
-                rightElement={<ThemedSwitch value={widgetShowImages} onValueChange={handleWidgetShowImagesChange} />}
-              />
-              {renderSlider({
-                title: t('settings.widgetOpacity'),
-                valueLabel: t('settings.percent', { value: formatNumber(widgetOpacity) }),
-                minimumValue: 20,
-                maximumValue: 100,
-                step: 5,
-                value: widgetOpacity,
-                onValueChange: (v) => setWidgetOpacity(Math.round(v)),
-                onSlidingComplete: handleWidgetOpacityChange,
-              })}
-            </ListCard>
-          </>
+  // ---- The pages
+
+  const renderAppearance = () => (
+    <ListCard>
+      {/* System follows the phone while the app is open */}
+      <View style={styles.block}>
+        <Segmented
+          framed
+          options={[
+            { value: 'system', label: t('settings.modeSystem'), icon: (c) => <Ionicons name="contrast-outline" size={15} color={c} /> },
+            { value: 'light', label: t('settings.modeLight'), icon: (c) => <Ionicons name="sunny-outline" size={15} color={c} /> },
+            { value: 'dark', label: t('settings.modeDark'), icon: (c) => <Ionicons name="moon-outline" size={15} color={c} /> },
+          ]}
+          value={themeMode}
+          onChange={setThemeMode}
+        />
+      </View>
+      {/* Two colors: the main color is what you tap, the accent what to notice */}
+      <View style={styles.block}>
+        <Text style={ui.rowTitle}>{t('settings.mainColor')}</Text>
+        <Text style={[ui.secondary, styles.hint]}>{t('settings.mainColorHint')}</Text>
+        {renderSwatches(paletteIndex, setPalette)}
+      </View>
+      <View style={styles.block}>
+        <Text style={ui.rowTitle}>{t('settings.accentColor')}</Text>
+        <Text style={[ui.secondary, styles.hint]}>{t('settings.accentColorHint')}</Text>
+        {renderSwatches(accentIndex, setAccent)}
+      </View>
+      {themeMode !== 'light' && (
+        <SettingItem
+          title={t('settings.amoledBlack')}
+          description={t('settings.amoledBlackDesc')}
+          rightElement={<ThemedSwitch value={amoledBlack} onValueChange={toggleAmoledBlack} />}
+        />
+      )}
+      <SettingItem
+        title={t('language.appTitle')}
+        description={getAppLanguage(language).nativeLabel}
+        onPress={() => setShowAppLangPicker(true)}
+        rightElement={chevron}
+      />
+    </ListCard>
+  );
+
+  const renderFeeds = () => (
+    <ListCard>
+      <SettingItem
+        title={t('settings.autoRefresh')}
+        description={t('settings.autoRefreshDesc')}
+        rightElement={<ThemedSwitch value={autoRefresh} onValueChange={updateAutoRefresh} />}
+      />
+      <SettingItem
+        title={t('settings.showImages')}
+        description={t('settings.showImagesDesc')}
+        rightElement={<ThemedSwitch value={showImages} onValueChange={updateShowImages} />}
+      />
+      <SettingItem
+        title={t('settings.articleAgeFilter')}
+        description={maxArticleAge === 0 ? t('settings.articleAgeFilterNoLimitDesc') : t('settings.articleAgeFilterDesc', { period: getArticleAgeLabel(maxArticleAge) })}
+        onPress={() => setShowArticleAgePicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.readingPositionInFeeds')}
+        description={t('settings.readingPositionInFeedsDesc')}
+        rightElement={<ThemedSwitch value={showReadingPositionInFeeds} onValueChange={updateShowReadingPositionInFeeds} />}
+      />
+    </ListCard>
+  );
+
+  const renderReading = () => (
+    <>
+      <ListCard>
+        <SettingItem
+          title={t('settings.readingFont')}
+          description={getReadingFont(readingFont).label || t(getReadingFont(readingFont).labelKey)}
+          onPress={() => setShowFontPicker(true)}
+          rightElement={chevron}
+        />
+        <SettingItem
+          title={t('settings.openReaderDirectly')}
+          description={t('settings.openReaderDirectlyDesc')}
+          rightElement={<ThemedSwitch value={skipArticleView} onValueChange={updateSkipArticleView} />}
+        />
+        {/* The reader's own markers, so with the reader's settings */}
+        <SettingItem
+          title={t('settings.bookmarkIndicators')}
+          description={t('settings.bookmarkIndicatorsDesc')}
+          rightElement={<ThemedSwitch value={showBookmarkIndicators} onValueChange={updateShowBookmarkIndicators} />}
+        />
+        <SettingItem
+          title={t('settings.autoScroll')}
+          description={t('settings.autoScrollDesc')}
+          rightElement={<ThemedSwitch value={autoScrollEnabled} onValueChange={updateAutoScrollEnabled} />}
+        />
+        {autoScrollEnabled && (
+          <SettingItem
+            title={t('settings.autoScrollDelay')}
+            description={t('settings.autoScrollDelayValue', { count: formatNumber(autoScrollDelay) })}
+            onPress={() => setShowAutoScrollDelayPicker(true)}
+            rightElement={chevron}
+          />
         )}
-
-        <SectionTitle title={t('settings.sectionAmbientSounds')} />
-        <ListCard>
+        {autoScrollEnabled && renderSlider({
+          title: t('settings.autoScrollSpeed'),
+          valueLabel: t('settings.percent', { value: formatNumber(autoScrollSpeed) }),
+          ends: [t('settings.speedSlow'), t('settings.speedFast')],
+          minimumValue: 25,
+          maximumValue: 250,
+          step: 25,
+          value: autoScrollSpeed,
+          onSlidingComplete: (v) => updateAutoScrollSpeed(Math.round(v)),
+        })}
+        {autoScrollEnabled && (
           <SettingItem
-            title={t('settings.autoPlayStartup')}
-            description={autoPlay ? t('settings.autoPlayOnDesc', { sound: currentSound ? t(currentSound.nameKey) : t('settings.lastSound') }) : t('settings.autoPlayOffDesc')}
-            onPress={() => setAutoPlay(!autoPlay)}
-            rightElement={<ThemedSwitch value={autoPlay} onValueChange={setAutoPlay} />}
+            title={t('settings.keepAwake')}
+            description={t('settings.keepAwakeDesc')}
+            rightElement={<ThemedSwitch value={keepAwakeEnabled} onValueChange={updateKeepAwakeEnabled} />}
           />
-        </ListCard>
+        )}
+        <SettingItem
+          title={t('settings.screenRotation')}
+          description={t('settings.screenRotationDesc')}
+          rightElement={<ThemedSwitch value={allowRotation} onValueChange={updateAllowRotation} />}
+        />
+        <SettingItem
+          title={t('settings.reduceMotion')}
+          description={t('settings.reduceMotionDesc')}
+          rightElement={<ThemedSwitch value={reduceMotion} onValueChange={updateReduceMotion} />}
+        />
+        <SettingItem
+          title={t('settings.readingReminder')}
+          description={readingReminder ? t('settings.readingReminderOnDesc') : t('settings.readingReminderOffDesc')}
+          rightElement={<ThemedSwitch value={readingReminder} onValueChange={updateReadingReminder} />}
+        />
+      </ListCard>
 
-        <SectionTitle title={t('settings.sectionReadAloud')} />
-        <ListCard>
-          {renderSlider({
-            title: t('settings.speechSpeed'),
-            valueLabel: t('settings.speedMultiplier', { rate: formatNumber(speechRate) }),
-            // The speed is the value this card sets: in main ink
-            valueStyle: styles.sliderValueMain,
-            ends: [t('settings.speedSlow'), t('settings.speedFast')],
-            minimumValue: 0.5,
-            maximumValue: 2.0,
-            step: 0.25,
-            value: speechRate,
-            onSlidingComplete: (val) => updateSpeechRate(Math.round(val * 100) / 100),
-          })}
-        </ListCard>
+      <SectionTitle title={t('settings.sectionReadAloud')} />
+      <ListCard>
+        {renderSlider({
+          title: t('settings.speechSpeed'),
+          valueLabel: t('settings.speedMultiplier', { rate: formatNumber(speechRate) }),
+          // The speed is the value this card sets: in main ink
+          valueStyle: styles.sliderValueMain,
+          ends: [t('settings.speedSlow'), t('settings.speedFast')],
+          minimumValue: 0.5,
+          maximumValue: 2.0,
+          step: 0.25,
+          value: speechRate,
+          onSlidingComplete: (val) => updateSpeechRate(Math.round(val * 100) / 100),
+        })}
+      </ListCard>
 
-        <SectionTitle title={t('settings.sectionTranslation')} />
-        <ListCard>
+      <SectionTitle title={t('settings.sectionAmbientSounds')} />
+      <ListCard>
+        <SettingItem
+          title={t('settings.autoPlayStartup')}
+          description={autoPlay ? t('settings.autoPlayOnDesc', { sound: currentSound ? t(currentSound.nameKey) : t('settings.lastSound') }) : t('settings.autoPlayOffDesc')}
+          onPress={() => setAutoPlay(!autoPlay)}
+          rightElement={<ThemedSwitch value={autoPlay} onValueChange={setAutoPlay} />}
+        />
+      </ListCard>
+    </>
+  );
+
+  const renderTranslation = () => (
+    <ListCard>
+      <SettingItem
+        title={t('settings.translationMode')}
+        description={
+          translationMode === TRANSLATION_MODES.AUTO ? t('settings.translationModeAutoDesc') :
+          translationMode === TRANSLATION_MODES.ONLINE ? t('settings.translationModeOnlineDesc') :
+          t('settings.translationModeOfflineDesc')
+        }
+        onPress={() => setShowTranslationModePicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.defaultLanguage')}
+        description={t('settings.defaultLanguageDesc', { language: getDisplayName(targetLangCode) })}
+        onPress={() => setShowLangPicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.autoTranslate')}
+        description={t('settings.autoTranslateDesc', { language: getDisplayName(targetLangCode) })}
+        rightElement={<ThemedSwitch value={autoTranslate} onValueChange={updateAutoTranslate} />}
+      />
+      <SettingItem
+        title={t('settings.downloadedModels')}
+        description={t('settings.downloadedModelsDesc')}
+        onPress={handleOpenModelManager}
+        rightElement={<Ionicons name="cloud-download-outline" size={20} color={colors.mainInk} />}
+      />
+    </ListCard>
+  );
+
+  const renderWidget = () => (
+    <ListCard>
+      <SettingItem
+        title={t('settings.addWidget')}
+        description={t('settings.addWidgetDesc')}
+        onPress={handleAddWidget}
+        rightElement={<Ionicons name="add-circle-outline" size={22} color={colors.mainInk} />}
+      />
+      <SettingItem
+        title={t('settings.widgetTheme')}
+        description={widgetThemeLabel}
+        onPress={() => setShowWidgetThemePicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.widgetImages')}
+        description={t('settings.widgetImagesDesc')}
+        rightElement={<ThemedSwitch value={widgetShowImages} onValueChange={handleWidgetShowImagesChange} />}
+      />
+      {renderSlider({
+        title: t('settings.widgetOpacity'),
+        valueLabel: t('settings.percent', { value: formatNumber(widgetOpacity) }),
+        minimumValue: 20,
+        maximumValue: 100,
+        step: 5,
+        value: widgetOpacity,
+        onValueChange: (v) => setWidgetOpacity(Math.round(v)),
+        onSlidingComplete: handleWidgetOpacityChange,
+      })}
+    </ListCard>
+  );
+
+  const renderData = () => (
+    <>
+      <ListCard>
+        <SettingItem
+          title={t('settings.backupData')}
+          description={t('settings.backupDataDesc')}
+          onPress={handleBackupData}
+          rightElement={<Ionicons name="push-outline" size={20} color={colors.mainInk} />}
+        />
+        <SettingItem
+          title={t('settings.restoreData')}
+          description={t('settings.restoreDataDesc')}
+          onPress={handleRestoreData}
+          rightElement={<Ionicons name="download-outline" size={20} color={colors.mainInk} />}
+        />
+        {autoBackupAvailable && (
           <SettingItem
-            title={t('settings.translationMode')}
+            title={t('backup.autoBackup')}
             description={
-              translationMode === TRANSLATION_MODES.AUTO ? t('settings.translationModeAutoDesc') :
-              translationMode === TRANSLATION_MODES.ONLINE ? t('settings.translationModeOnlineDesc') :
-              t('settings.translationModeOfflineDesc')
+              !autoBackup.enabled ? t('backup.autoBackupDesc')
+                : lastAutoBackup ? `${t('backup.lastBackup')}: ${formatBackupDate(lastAutoBackup.createdAt)}`
+                  : t('backup.noBackupYet')
             }
-            onPress={() => setShowTranslationModePicker(true)}
+            rightElement={<ThemedSwitch value={autoBackup.enabled} onValueChange={handleAutoBackupChange} />}
+          />
+        )}
+        {autoBackupAvailable && autoBackup.enabled && (
+          <SettingItem
+            title={t('backup.folder')}
+            description={autoBackup.folder ? folderNameOf(autoBackup.folder.uri) : t('backup.folderAppStorage')}
+            onPress={handleChangeBackupFolder}
             rightElement={chevron}
           />
-          <SettingItem
-            title={t('settings.defaultLanguage')}
-            description={t('settings.defaultLanguageDesc', { language: getDisplayName(targetLangCode) })}
-            onPress={() => setShowLangPicker(true)}
-            rightElement={chevron}
-          />
-          <SettingItem
-            title={t('settings.autoTranslate')}
-            description={t('settings.autoTranslateDesc', { language: getDisplayName(targetLangCode) })}
-            rightElement={<ThemedSwitch value={autoTranslate} onValueChange={updateAutoTranslate} />}
-          />
-          <SettingItem
-            title={t('settings.downloadedModels')}
-            description={t('settings.downloadedModelsDesc')}
-            onPress={handleOpenModelManager}
-            rightElement={<Ionicons name="cloud-download-outline" size={20} color={colors.mainInk} />}
-          />
-        </ListCard>
-
-        <SectionTitle title={t('settings.sectionHelp')} />
+        )}
+      </ListCard>
+      <View style={styles.group}>
         <ListCard>
           <SettingItem
-            title={t('settings.appTour')}
-            description={t('settings.appTourDesc')}
-            onPress={() => tour?.startTour()}
-            rightElement={<Ionicons name="help-circle-outline" size={20} color={colors.mainInk} />}
-          />
-        </ListCard>
-
-        <SectionTitle title={t('settings.sectionData')} />
-        <ListCard>
-          <SettingItem
-            title={t('settings.backupData')}
-            description={t('settings.backupDataDesc')}
-            onPress={handleBackupData}
-            rightElement={<Ionicons name="push-outline" size={20} color={colors.mainInk} />}
-          />
-          <SettingItem
-            title={t('settings.restoreData')}
-            description={t('settings.restoreDataDesc')}
-            onPress={handleRestoreData}
-            rightElement={<Ionicons name="download-outline" size={20} color={colors.mainInk} />}
+            title={t('settings.resetTitle')}
+            description={t('settings.resetSettingsDesc')}
+            onPress={handleResetSettings}
+            rightElement={<Ionicons name="refresh-outline" size={20} color={colors.mainInk} />}
           />
           <SettingItem
             title={t('settings.clearAllData')}
@@ -996,79 +1133,111 @@ export default function SettingsScreen({ navigation }) {
             rightElement={<Ionicons name="trash-outline" size={20} color={colors.error} />}
           />
         </ListCard>
+      </View>
+    </>
+  );
 
-        <SectionTitle title={t('settings.sectionTesters')} />
-        <View style={[ui.card, styles.testersCard]}>
-          <TesterItem isNote={true}>{t('settings.testersThankYou')}</TesterItem>
-          <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
-          <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
-          <TesterItem>Basel Badich</TesterItem>
-          <TesterItem>Chris (few-thoughts)</TesterItem>
-          <TesterItem>Danoush Faryar</TesterItem>
-          <TesterItem>Houriyeh Emadoleslami</TesterItem>
-          <TesterItem>Mohammad Torabi</TesterItem>
-          <TesterItem>Mojtaba Alehosseini</TesterItem>
-          <TesterItem>Sadeq Hayati</TesterItem>
-          <TesterItem>Saeed Abdollahi Taromsari</TesterItem>
-          <TesterItem>Ulas Altun</TesterItem>
-        </View>
+  const renderAbout = () => (
+    <>
+      <ListCard>
+        <SettingItem
+          title="FeedWell"
+          description={t('settings.aboutTagline')}
+        />
+        <SettingItem
+          title={t('settings.version')}
+          description={formatNumber(APP_VERSION.version)}
+        />
+        <SettingItem
+          title={t('settings.developer')}
+          description="SeMo Lab"
+          onPress={handleOpenWebsite}
+          rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
+        />
+        <SettingItem
+          title={t('settings.privacy')}
+          description={t('settings.privacyDesc')}
+          onPress={() => handleOpenWebsite('https://semo-lab.com/feedwell/privacy-policy/')}
+          rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
+        />
+      </ListCard>
 
-        <SectionTitle title={t('settings.sectionAbout')} />
-        <ListCard>
-          <SettingItem
-            title="FeedWell"
-            description={t('settings.aboutTagline')}
-          />
-          <SettingItem
-            title={t('settings.version')}
-            description={formatNumber(APP_VERSION.version)}
-          />
-          <SettingItem
-            title={t('settings.developer')}
-            description="SeMo Lab"
-            onPress={handleOpenWebsite}
-            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
-          />
-          <SettingItem
-            title={t('settings.privacy')}
-            description={t('settings.privacyDesc')}
-            onPress={() => handleOpenWebsite('https://semo-lab.com/feedwell/privacy-policy/')}
-            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
-          />
-        </ListCard>
+      <SectionTitle title={t('settings.sectionTesters')} />
+      <View style={[ui.card, styles.testersCard]}>
+        <TesterItem isNote={true}>{t('settings.testersThankYou')}</TesterItem>
+        <TesterItem>Amir Arsalan Serajoddin Mirghaed</TesterItem>
+        <TesterItem>Amirhossein Yaghoubnezhad</TesterItem>
+        <TesterItem>Basel Badich</TesterItem>
+        <TesterItem>Chris (few-thoughts)</TesterItem>
+        <TesterItem>Danoush Faryar</TesterItem>
+        <TesterItem>Houriyeh Emadoleslami</TesterItem>
+        <TesterItem>Mohammad Torabi</TesterItem>
+        <TesterItem>Mojtaba Alehosseini</TesterItem>
+        <TesterItem>Sadeq Hayati</TesterItem>
+        <TesterItem>Saeed Abdollahi Taromsari</TesterItem>
+        <TesterItem>Ulas Altun</TesterItem>
+      </View>
 
-        <SectionTitle title={t('settings.sectionMoreApps')} />
-        <ListCard>
-          {SEMO_LAB_APPS.map((app) => (
-            <SettingItem
-              key={app.packageName}
-              title={app.name}
-              description={t(app.descKey)}
-              onPress={() => openPlayListing(app.packageName)}
-              rightElement={<Ionicons name="logo-google-playstore" size={20} color={colors.mainInk} />}
-            />
-          ))}
+      <SectionTitle title={t('settings.sectionMoreApps')} />
+      <ListCard>
+        {SEMO_LAB_APPS.map((app) => (
           <SettingItem
-            title={t('settings.allApps')}
-            description={t('settings.allAppsDesc')}
-            onPress={openDeveloperPage}
-            rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
+            key={app.packageName}
+            title={app.name}
+            description={t(app.descKey)}
+            onPress={() => openPlayListing(app.packageName)}
+            rightElement={<Ionicons name="logo-google-playstore" size={20} color={colors.mainInk} />}
           />
-        </ListCard>
+        ))}
+        <SettingItem
+          title={t('settings.allApps')}
+          description={t('settings.allAppsDesc')}
+          onPress={openDeveloperPage}
+          rightElement={<Ionicons name="open-outline" size={20} color={colors.mainInk} />}
+        />
+      </ListCard>
 
-        <View style={styles.footer}>
-          {/* Centered like every language; explicit writingDirection keeps the bidi
-              base stable so the line doesn't flip when it starts with a Latin word. */}
-          <Text style={[ui.secondaryOnWash, styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
-            {t('settings.footerText')}
-          </Text>
-          {/* Keep the copyright in English + LTR for RTL languages (it's brand + year). */}
-          <Text style={[ui.secondaryOnWash, styles.copyrightText, { writingDirection: 'ltr' }]}>
-            {isRTL ? tStatic('settings.copyright', 'en') : t('settings.copyright')}
-          </Text>
-        </View>
+      <View style={styles.footer}>
+        {/* Centered like every language; explicit writingDirection keeps the bidi
+            base stable so the line doesn't flip when it starts with a Latin word. */}
+        <Text style={[ui.secondaryOnWash, styles.footerText, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}>
+          {t('settings.footerText')}
+        </Text>
+        {/* Keep the copyright in English + LTR for RTL languages (it's brand + year). */}
+        <Text style={[ui.secondaryOnWash, styles.copyrightText, { writingDirection: 'ltr' }]}>
+          {isRTL ? tStatic('settings.copyright', 'en') : t('settings.copyright')}
+        </Text>
+      </View>
+    </>
+  );
+
+  const pages = {
+    appearance: renderAppearance,
+    feeds: renderFeeds,
+    reading: renderReading,
+    translation: renderTranslation,
+    widget: renderWidget,
+    data: renderData,
+    about: renderAbout,
+  };
+
+  return (
+    <SafeAreaView edges={["top", "left", "right"]} style={ui.page}>
+      {/* The list's title, or a page's with a way back to the list */}
+      <View style={styles.header}>
+        {page && (
+          <TouchableOpacity style={ui.roundButton} onPress={() => setPage(null)} accessibilityLabel={t('articleActions.back')}>
+            <Ionicons name={isRTL ? 'arrow-forward' : 'arrow-back'} size={22} color={colors.text} />
+          </TouchableOpacity>
+        )}
+        <Text style={[ui.screenTitle, styles.headerTitle]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+          {page ? pageTitles[page] : t('tab.settings')}
+        </Text>
+      </View>
+
+      <ScrollView key={page || 'list'} style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {page ? pages[page]() : renderCategories()}
       </ScrollView>
-
 
       {/* Default Language Picker Modal */}
       <Modal
@@ -1415,20 +1584,57 @@ export default function SettingsScreen({ navigation }) {
         </View>
       </Modal>
 
+      {/* Restore: the automatic backups, newest first, then choosing a file */}
+      <Modal
+        visible={showRestoreSheet}
+        animationType="slide"
+        transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setShowRestoreSheet(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+            {renderSheetHeader(t('settings.restoreData'), () => setShowRestoreSheet(false))}
+            <Text style={[ui.sectionTitle, styles.sheetSection]}>{t('backup.automaticBackups')}</Text>
+            <ScrollView>
+              {automaticBackups.map((entry) => renderChoice({
+                key: entry.uri,
+                icon: 'time-outline',
+                title: formatBackupDate(entry.createdAt),
+                description: entry.folder ? folderNameOf(entry.folder) : t('backup.folderAppStorage'),
+                selected: false,
+                onPress: () => restoreFromAutomatic(entry),
+              }))}
+              {renderChoice({
+                key: 'file',
+                icon: 'folder-open-outline',
+                title: t('backup.chooseFile'),
+                selected: false,
+                onPress: pickBackupFile,
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       <CustomAlert
         visible={alertConfig.visible}
         title={alertConfig.title}
         message={alertConfig.message}
         icon={alertConfig.icon}
         buttons={alertConfig.buttons}
-        onDismiss={() => {
-          setAlertConfig(prev => ({ ...prev, visible: false }));
-          if (restoreResolveRef.current) {
-            restoreResolveRef.current(false);
-            restoreResolveRef.current = null;
-          }
-        }}
+        onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
+
+      {/* While a backup file is made or read */}
+      {busy && (
+        <View style={styles.busyOverlay}>
+          <View style={[ui.dialog, styles.busyBox]}>
+            <ActivityIndicator size="large" color={colors.mainInk} />
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -1471,15 +1677,45 @@ const useStyles = makeStyles(({ colors: c }, isRTL) => {
     header: {
       flexDirection: row,
       alignItems: 'center',
+      gap: 12,
       paddingHorizontal: 16,
       paddingTop: 8,
       paddingBottom: 4,
+    },
+    headerTitle: {
+      flex: 1,
+    },
+    // The list's rows: an icon circle, the category and a line of what is set
+    categoryRow: {
+      flexDirection: row,
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 11,
+      minHeight: 62,
+    },
+    group: {
+      marginTop: 12,
+    },
+    sheetSection: {
+      paddingHorizontal: 20,
+      paddingTop: 4,
+      paddingBottom: 4,
+    },
+    busyOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: c.overlay,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    busyBox: {
+      padding: 24,
     },
     content: {
       flex: 1,
     },
     scrollContent: {
       paddingHorizontal: 16,
+      paddingTop: 8,
       paddingBottom: 24,
     },
     flexText: {

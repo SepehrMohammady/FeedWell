@@ -1,8 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { AppState, Appearance, Linking, I18nManager, Platform, StyleSheet, View } from 'react-native';
-import * as NavigationBar from 'expo-navigation-bar';
+import { AppState, Linking, I18nManager, StyleSheet, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef, CommonActions, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -24,8 +23,11 @@ import ScreenWash from './src/components/ScreenWash';
 import { FONT } from './src/theme/type';
 import * as Font from 'expo-font';
 import { BUNDLED_FONT_ASSETS } from './src/config/readingFonts';
+import { INTERFACE_FONT_ASSETS } from './src/theme/webFonts';
 import { APP_VERSION } from './src/config/version';
 import { setupNotificationChannel, scheduleReminderNotification, cancelReminderNotification } from './src/utils/notificationService';
+import { AppReloadProvider } from './src/context/AppReloadContext';
+import { runAutomaticBackup } from './src/services/BackupService';
 
 // Keep the native layer LTR so our per-component RTL (for Farsi) is the only
 // RTL source — prevents a Farsi/Arabic *system* locale from auto-mirroring the
@@ -175,7 +177,7 @@ function handleDeepLink(url) {
 
 function AppContent() {
   const { hasSeenOnboarding, completeOnboarding, isLoading, allowRotation, readingReminder, lastSeenVersion, updateLastSeenVersion } = useAppSettings();
-  const { theme, isDarkMode } = useTheme();
+  const { theme } = useTheme();
   const { langLoading, language } = useTranslation();
   const tour = useTour();
   const [showWhatsNew, setShowWhatsNew] = useState(false);
@@ -232,11 +234,20 @@ function AppContent() {
     return () => subscription.remove();
   }, [readingReminder, language]);
 
-  // Load the bundled reading fonts. Deliberately not gated behind a splash
-  // screen: a failure here must never block the app, it just means the reader
-  // falls back to the system font.
+  // The automatic backup, if it's on, runs as the app goes to the background:
+  // at most once a day, and only if something changed (BackupService)
   useEffect(() => {
-    Font.loadAsync(BUNDLED_FONT_ASSETS).catch((e) => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'background') runAutomaticBackup('background');
+    });
+    return () => subscription.remove();
+  }, []);
+
+  // Load the bundled reading fonts (and on the web, Inter). Deliberately not
+  // gated behind a splash screen: a failure here must never block the app, it
+  // just means the reader falls back to the system font.
+  useEffect(() => {
+    Font.loadAsync({ ...BUNDLED_FONT_ASSETS, ...INTERFACE_FONT_ASSETS }).catch((e) => {
       console.warn('Reading fonts failed to load:', e?.message);
     });
   }, []);
@@ -266,8 +277,10 @@ function AppContent() {
     }
   }, [isLoading, hasSeenOnboarding, lastSeenVersion]);
 
+  // Shown once after an update, or opened from Settings
   const handleWhatsNewClose = () => {
     setShowWhatsNew(false);
+    tour?.setWhatsNewOpen(false);
     updateLastSeenVersion(APP_VERSION.version);
   };
 
@@ -275,16 +288,6 @@ function AppContent() {
     handleWhatsNewClose();
     tour?.startTour();
   };
-
-  // The navigation bar follows the app's light or dark mode, not the phone's.
-  // This window's buttons are set here; sheets and other Modals open windows
-  // of their own, which take their buttons from the app's night mode, so that
-  // follows the app's mode too (the phone's own setting stays as it is).
-  useEffect(() => {
-    if (Platform.OS !== 'android') return;
-    Appearance.setColorScheme(isDarkMode ? 'dark' : 'light');
-    NavigationBar.setButtonStyleAsync(isDarkMode ? 'light' : 'dark').catch(() => undefined);
-  }, [isDarkMode]);
 
   if (isLoading || langLoading || !navStateReady) {
     return null; // Wait for settings + language so the first paint is correct (no flash)
@@ -311,7 +314,7 @@ function AppContent() {
       </NavigationContainer>
       <AppTour navigationRef={navigationRef} />
       <WhatsNewModal
-        visible={showWhatsNew && !tour?.active}
+        visible={(showWhatsNew || !!tour?.whatsNewOpen) && !tour?.active}
         onClose={handleWhatsNewClose}
         onTakeTour={handleWhatsNewTour}
       />
@@ -324,10 +327,14 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
+  // A new number remounts every provider, so each loads again from storage
+  const [generation, setGeneration] = useState(0);
+  const reloadApp = useCallback(() => setGeneration((n) => n + 1), []);
   return (
     <ErrorBoundary>
       <SafeAreaProvider>
-        <ThemeProvider>
+        <AppReloadProvider value={reloadApp}>
+        <ThemeProvider key={generation}>
           <LanguageProvider>
             <AppSettingsProvider>
               <ReadLaterProvider>
@@ -344,6 +351,7 @@ export default function App() {
             </AppSettingsProvider>
           </LanguageProvider>
         </ThemeProvider>
+        </AppReloadProvider>
       </SafeAreaProvider>
     </ErrorBoundary>
   );

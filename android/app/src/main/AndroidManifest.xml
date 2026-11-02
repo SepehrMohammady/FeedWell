@@ -19,7 +19,7 @@
       <data android:scheme="https"/>
     </intent>
   </queries>
-  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="true" android:theme="@style/AppTheme" android:supportsRtl="true" android:usesCleartextTraffic="true" android:enableOnBackInvokedCallback="false">
+  <application android:name=".MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:allowBackup="true" android:fullBackupContent="@xml/backup_rules" android:dataExtractionRules="@xml/data_extraction_rules" android:theme="@style/AppTheme" android:supportsRtl="true" android:usesCleartextTraffic="true" android:enableOnBackInvokedCallback="false">
     <!-- Without these, expo-notifications falls back to the full-colour launcher
          icon, which Android masks into a blank silhouette in the status bar. -->
     <meta-data android:name="expo.modules.notifications.default_notification_icon" android:resource="@drawable/ic_notification"/>

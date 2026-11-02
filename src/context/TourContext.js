@@ -14,6 +14,8 @@ export function TourProvider({ children }) {
   // Changes on every start, so the overlay restarts from step one even if a tour
   // is started again straight after the previous one ended.
   const [runId, setRunId] = useState(0);
+  // What's New: shown by App after an update, and opened again from Settings
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
 
   const registerTarget = useCallback((id, node, reveal) => {
     targetsRef.current.set(id, { node, reveal });
@@ -41,8 +43,8 @@ export function TourProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ active, runId, startTour, endTour, registerTarget, unregisterTarget, getTarget }),
-    [active, runId, startTour, endTour, registerTarget, unregisterTarget, getTarget]
+    () => ({ active, runId, startTour, endTour, registerTarget, unregisterTarget, getTarget, whatsNewOpen, setWhatsNewOpen }),
+    [active, runId, startTour, endTour, registerTarget, unregisterTarget, getTarget, whatsNewOpen]
   );
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>;

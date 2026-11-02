@@ -174,6 +174,11 @@ const build = ({ colors: c }, isRTL) => {
     segmentRaised: { backgroundColor: c.surface3, ...(c.hasShadows ? SEGMENT_SHADOW : null) },
     segmentLabel: { ...TYPE.label, color: c.textSecondary },
     segmentLabelRaised: { fontFamily: FONT.semiBold, color: c.text },
+    // Framed like the tab bar's selected tab, so on the surface with a hairline:
+    // on Surface 2 the main tint all but vanishes
+    segmentTrackFramed: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.border },
+    segmentFramed: { backgroundColor: c.mainTint },
+    segmentLabelFramed: { fontFamily: FONT.semiBold, color: c.mainInk },
   };
 };
 
@@ -218,26 +223,30 @@ export function ListCard({ children, style }) {
   );
 }
 
-/** A segmented control: a Surface 2 track with the selected segment raised off it */
-export function Segmented({ options, value, onChange, style, labelStyle }) {
+/**
+ * A segmented control: a Surface 2 track with the selected segment raised off
+ * it, or (framed) a surface track with a hairline and the selected
+ * segment framed in the main tint, labelled in main ink
+ */
+export function Segmented({ options, value, onChange, style, labelStyle, framed = false }) {
   const ui = useUi();
   const { theme } = useTheme();
   return (
-    <View style={[ui.segmentTrack, style]}>
+    <View style={[ui.segmentTrack, framed && ui.segmentTrackFramed, style]}>
       {options.map((option) => {
         const selected = option.value === value;
-        const color = selected ? theme.colors.text : theme.colors.textSecondary;
+        const color = selected ? (framed ? theme.colors.mainInk : theme.colors.text) : theme.colors.textSecondary;
         return (
           <TouchableOpacity
             key={String(option.value)}
-            style={[ui.segment, selected && ui.segmentRaised]}
+            style={[ui.segment, selected && (framed ? ui.segmentFramed : ui.segmentRaised)]}
             onPress={() => onChange(option.value)}
             accessibilityRole="button"
             accessibilityState={{ selected }}
           >
             {option.icon?.(color)}
             <Text
-              style={[ui.segmentLabel, labelStyle, selected && ui.segmentLabelRaised]}
+              style={[ui.segmentLabel, labelStyle, selected && (framed ? ui.segmentLabelFramed : ui.segmentLabelRaised)]}
               numberOfLines={1}
               adjustsFontSizeToFit
               minimumFontScale={0.8}

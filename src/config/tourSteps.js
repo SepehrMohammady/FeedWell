@@ -23,6 +23,8 @@ export const TOUR_STEPS = [
   { key: 'sounds', nav: FEED_LIST, target: 'feeds.sounds', icon: 'musical-notes-outline', titleKey: 'tour.soundsTitle', bodyKey: 'tour.soundsBody' },
   { key: 'reader', icon: 'reader-outline', titleKey: 'tour.readerTitle', bodyKey: 'tour.readerBody' },
   { key: 'saved', nav: ['ReadLater', { screen: 'ReadLaterList', pop: true }], target: 'saved.header', icon: 'save-outline', titleKey: 'tour.savedTitle', bodyKey: 'tour.savedBody' },
-  { key: 'settings', nav: ['Settings'], target: 'settings.header', icon: 'settings-outline', titleKey: 'tour.settingsTitle', bodyKey: 'tour.settingsBody' },
+  // Settings opens on a list of categories: the tour points at two of its rows
+  { key: 'appearance', nav: ['Settings'], target: 'settings.appearance', icon: 'color-palette-outline', titleKey: 'settings.appearance', bodyKey: 'tour.appearanceBody' },
+  { key: 'backup', nav: ['Settings'], target: 'settings.data', icon: 'save-outline', titleKey: 'tour.backupTitle', bodyKey: 'tour.backupBody' },
   { key: 'done', icon: 'checkmark-circle-outline', titleKey: 'tour.doneTitle', bodyKey: 'tour.doneBody' },
 ];

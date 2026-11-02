@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android's own backup, Android 11 and lower. Everything is backed up as
+     before except FeedWell's automatic backup files (files/backups): seven of
+     them could pass the 25 MB that Android backs up for an app. -->
+<full-backup-content>
+    <exclude domain="file" path="backups/" />
+</full-backup-content>

@@ -30,6 +30,10 @@ export function detectDeviceLanguage() {
 
 const LanguageContext = createContext(null);
 
+// The language last in use, for the crash screen, which sits outside the providers
+let lastLanguage = 'en';
+export const getLastLanguage = () => lastLanguage;
+
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState('en');
   const [langLoading, setLangLoading] = useState(true);
@@ -73,6 +77,7 @@ export function LanguageProvider({ children }) {
   }, [language]);
 
   const isRTL = RTL_LANGUAGES.includes(language);
+  lastLanguage = language;
   const dir = isRTL ? 'rtl' : 'ltr';
 
   const value = useMemo(() => ({
