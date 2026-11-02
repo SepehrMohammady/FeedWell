@@ -21,6 +21,8 @@ export function AppSettingsProvider({ children }) {
   const [readerHeaderActions, setReaderHeaderActions] = useState(['bookmark', 'translate', 'readAloud']);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  // What the motion cues show while Reduce Motion is on: 'dots', or 'horizon' (dots and a horizon)
+  const [motionCuesStyle, setMotionCuesStyle] = useState('dots');
   const [readingReminder, setReadingReminder] = useState(true);
   // Local-feeds region for Popular Categories ('global' = English). When the user
   // hasn't explicitly chosen one, screens derive it from the app language.
@@ -71,6 +73,7 @@ export function AppSettingsProvider({ children }) {
       const savedReaderHeaderActions = await AsyncStorage.getItem('readerHeaderActions');
       const savedHasSeenOnboarding = await AsyncStorage.getItem('hasSeenOnboarding');
       const savedReduceMotion = await AsyncStorage.getItem('reduceMotion');
+      const savedMotionCuesStyle = await AsyncStorage.getItem('motionCuesStyle');
       const savedReadingReminder = await AsyncStorage.getItem('readingReminder');
       const savedFeedRegion = await AsyncStorage.getItem('feedRegion');
       const savedFeedRegionUserSet = await AsyncStorage.getItem('feedRegionUserSet');
@@ -135,6 +138,10 @@ export function AppSettingsProvider({ children }) {
 
       if (savedReduceMotion !== null) {
         setReduceMotion(JSON.parse(savedReduceMotion));
+      }
+
+      if (savedMotionCuesStyle === 'dots' || savedMotionCuesStyle === 'horizon') {
+        setMotionCuesStyle(savedMotionCuesStyle);
       }
 
       if (savedReadingReminder !== null) {
@@ -441,6 +448,15 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const updateMotionCuesStyle = async (value) => {
+    try {
+      setMotionCuesStyle(value);
+      await AsyncStorage.setItem('motionCuesStyle', value);
+    } catch (error) {
+      console.error('Error saving motionCuesStyle setting:', error);
+    }
+  };
+
   const updateReadingReminder = async (value) => {
     try {
       setReadingReminder(value);
@@ -464,6 +480,7 @@ export function AppSettingsProvider({ children }) {
     readerHeaderActions,
     hasSeenOnboarding,
     reduceMotion,
+    motionCuesStyle,
     readingReminder,
     feedRegion,
     feedRegionUserSet,
@@ -504,6 +521,7 @@ export function AppSettingsProvider({ children }) {
     completeOnboarding,
     resetOnboarding,
     updateReduceMotion,
+    updateMotionCuesStyle,
     updateReadingReminder,
   };
 

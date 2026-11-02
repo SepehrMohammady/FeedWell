@@ -10,7 +10,8 @@ class WidgetBridgePackage : ReactPackage {
         return listOf(WidgetBridgeModule(reactContext))
     }
 
+    // The app's own views: the motion cues
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
-        return emptyList()
+        return listOf(MotionCuesViewManager())
     }
 }

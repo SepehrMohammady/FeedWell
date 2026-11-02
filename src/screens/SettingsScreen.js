@@ -93,7 +93,7 @@ let pendingNotice = null;
 export default function SettingsScreen({ navigation }) {
   const { theme, isDarkMode, themeMode, setThemeMode, paletteIndex, setPalette, accentIndex, setAccent, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled, autoTranslate, updateAutoTranslate } = useAppSettings();
-  const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont } = useAppSettings();
+  const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont, motionCuesStyle, updateMotionCuesStyle } = useAppSettings();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -402,7 +402,8 @@ export default function SettingsScreen({ navigation }) {
     if (pendingNotice) {
       const notice = pendingNotice;
       pendingNotice = null;
-      setAlertConfig({ visible: true, title: t(notice.titleKey), message: t(notice.messageKey), icon: notice.icon || 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
+      const message = t(notice.messageKey) + (notice.moreKey ? `\n\n${t(notice.moreKey, notice.moreParams)}` : '');
+      setAlertConfig({ visible: true, title: t(notice.titleKey), message, icon: notice.icon || 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -436,19 +437,32 @@ export default function SettingsScreen({ navigation }) {
   };
 
   const applyBackup = async (backup, mode) => {
+    let result;
     try {
-      await whileBusy(async () => {
+      result = await whileBusy(async () => {
         // Replace can't be undone: the automatic backup, if it's on, saves the phone's state first
         if (mode === 'replace') await runAutomaticBackup('beforeReplace');
-        await applyRestore(backup, mode);
+        const applied = await applyRestore(backup, mode);
         await applyWidgetSettings(WidgetBridge);
+        return applied;
       });
-      reloadWith({ titleKey: 'settings.restoreCompleteTitle', messageKey: 'backup.restoreDone' });
     } catch (error) {
+      // No room for its saved articles and notes: refused before anything was written
+      if (error instanceof BackupError && error.code === 'noRoom') {
+        setAlertConfig({ visible: true, title: t('settings.restoreBackupTitle'), message: t('backup.noRoomMessage'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
+        return;
+      }
       // Some of it may be written by now: reload, so every screen shows what's stored
       console.error('Error restoring backup:', error);
       reloadWith({ titleKey: 'common.error', messageKey: 'settings.restoreError', icon: 'alert-circle-outline' });
+      return;
     }
+    reloadWith({
+      titleKey: 'settings.restoreCompleteTitle',
+      messageKey: 'backup.restoreDone',
+      // The oldest articles that didn't fit
+      ...(result && result.leftOut ? { moreKey: 'backup.restoreLeftOut', moreParams: { count: formatNumber(result.leftOut) } } : {}),
+    });
   };
 
   // Checks the file, then shows what it holds and offers Replace or Merge
@@ -984,6 +998,23 @@ export default function SettingsScreen({ navigation }) {
           description={t('settings.reduceMotionDesc')}
           rightElement={<ThemedSwitch value={reduceMotion} onValueChange={updateReduceMotion} />}
         />
+        {/* What the cues show: dots at the sides, or a horizon with them */}
+        {reduceMotion && (
+          <View style={styles.block}>
+            <Text style={ui.rowTitle}>{t('settings.motionCues')}</Text>
+            <Text style={[ui.secondary, styles.hint]}>{t('settings.motionCuesHint')}</Text>
+            <Segmented
+              framed
+              style={styles.cuesChoice}
+              options={[
+                { value: 'dots', label: t('settings.motionCuesDots') },
+                { value: 'horizon', label: t('settings.motionCuesHorizon') },
+              ]}
+              value={motionCuesStyle}
+              onChange={updateMotionCuesStyle}
+            />
+          </View>
+        )}
         <SettingItem
           title={t('settings.readingReminder')}
           description={readingReminder ? t('settings.readingReminderOnDesc') : t('settings.readingReminderOffDesc')}
@@ -1735,6 +1766,9 @@ const useStyles = makeStyles(({ colors: c }, isRTL) => {
     // A block: a control under its name (the color rows, the sliders)
     block: {
       paddingVertical: 14,
+    },
+    cuesChoice: {
+      marginTop: 12,
     },
     // Two rows of the five colors. Each name sits on one line under its
     // swatch, a little wider than its column so a long name stays whole.

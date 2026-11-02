@@ -202,9 +202,16 @@ The config scrolls one long Settings page. Now:
 3. Bookmark Indicators stays under Reading.
 4. The status bar icons over a sheet that's open while the phone switches light/dark keep the
    old color until it closes (Android gives a sheet its own window). Left as it is.
-5. A restore that doesn't fit shows the existing "Failed to restore backup. Please check the
-   file and try again." Not changed; a message that names the cause needs a new string in 30
-   languages.
+5. A restore that doesn't fit: changed in 1.20.1, as you asked ("consider the size ... to don't
+   have any issue on restore"). A restore now measures what it will write first, makes room by
+   removing what the file replaces, and leaves out the oldest feed articles if the rest still
+   doesn't fit, saying how many. Saved articles and notes always come whole. Only if they alone
+   can't fit does it refuse, before changing anything, with its own message. If a write fails
+   anyway (the phone's own storage full), everything it touched is put back. Both messages are
+   new in 30 languages. Found on the way: 1.20.0's "articles first, so the phone is unchanged"
+   didn't hold, because SafeStorage deleted the old pieces before writing the new ones. In a
+   test, 1.20.0 failed to restore 1,700 articles onto a phone holding 1,000 saved articles, with
+   room for the result.
 6. Both branches are merged into main and pushed with 1.20.0.
 
 Also seen, not changed: on the web, the existing portrait lock logs an error in desktop browsers

@@ -11,6 +11,9 @@ export const REMOVED_ARTICLES_KEY = 'removedArticleUrls';
 const REMOVED_ARTICLES_LIMIT = 2000;
 const removedKeyOf = (article) => article.url || `id:${article.id}`;
 
+// How many articles fit in the storage, once a save found it full
+let articlesThatFit = Infinity;
+
 const initialState = {
   feeds: [],
   articles: [],
@@ -394,11 +397,21 @@ export function FeedProvider({ children }) {
       console.log('Unread count being saved:', limitedArticles.filter(a => !a.isRead).length);
       console.log('=========================================');
       
-      const success = await SafeStorage.setItem('articles', JSON.stringify(limitedArticles));
+      // When the storage is full, a failed save leaves no articles stored at
+      // all: the oldest go instead, a sixth at a time, until the rest fit.
+      // Later saves this session start from the number that fit.
+      const newestFirst = (a, b) => new Date(b.publishedDate || 0) - new Date(a.publishedDate || 0);
+      let toSave = limitedArticles.length > articlesThatFit
+        ? [...limitedArticles].sort(newestFirst).slice(0, articlesThatFit)
+        : limitedArticles;
+      let success = await SafeStorage.setItem('articles', JSON.stringify(toSave));
+      for (let tries = 0; !success && tries < 6 && toSave.length > 1; tries++) {
+        toSave = [...toSave].sort(newestFirst).slice(0, Math.ceil((toSave.length * 5) / 6));
+        success = await SafeStorage.setItem('articles', JSON.stringify(toSave));
+        if (success) articlesThatFit = toSave.length;
+      }
       if (!success) {
         console.error('Failed to save articles - storage write failed');
-        // Don't try to restore from backup as it may have stale data
-        // Just log the error and continue
       }
       
       // CRITICAL FIX v1.0.28: Also update read article URLs when saving

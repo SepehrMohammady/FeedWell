@@ -4,6 +4,13 @@
 // locale (titles may reuse existing keys, such as the Settings row names).
 export const WHATS_NEW_RELEASES = [
   {
+    version: '1.20.1',
+    items: [
+      { icon: 'car', title: 'settings.motionCues', body: 'whatsNew.motionCuesBody' },
+      { icon: 'archive', title: 'whatsNew.restoreFitsTitle', body: 'whatsNew.restoreFitsBody' },
+    ],
+  },
+  {
     version: '1.20.0',
     items: [
       { icon: 'color-palette', title: 'whatsNew.newLookTitle', body: 'whatsNew.newLookBody' },
@@ -12,14 +19,6 @@ export const WHATS_NEW_RELEASES = [
       { icon: 'save', title: 'whatsNew.backupTitle', body: 'whatsNew.backupBody' },
       { icon: 'time', title: 'backup.autoBackup', body: 'whatsNew.autoBackupBody' },
       { icon: 'refresh', title: 'settings.resetTitle', body: 'whatsNew.resetBody' },
-    ],
-  },
-  {
-    version: '1.19.0',
-    items: [
-      { icon: 'grid', title: 'home.customize', body: 'whatsNew.customizeHomeBody' },
-      { icon: 'trash', title: 'whatsNew.removeArticlesTitle', body: 'whatsNew.removeArticlesBody' },
-      { icon: 'newspaper', title: 'whatsNew.oneSourceTitle', body: 'whatsNew.oneSourceBody' },
     ],
   },
 ];

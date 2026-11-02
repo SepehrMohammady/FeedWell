@@ -40,13 +40,16 @@ export class SafeStorage {
   }
 
   static async setItem(key, value) {
+    let written = 0;
     try {
       // Check if data needs chunking. Counted in characters, which spares
       // copying the whole value to native code as React Native's Blob did
       // to count its bytes
       if (value.length > this.CHUNK_LENGTH) {
-        // Clear any existing chunks
+        // Clear any existing chunks, and the value if it was stored in one
+        // piece, so the new chunks have its room
         await this.clearChunks(key);
+        await AsyncStorage.removeItem(key);
 
         // Split into chunks, never between the two halves of an emoji
         const chunks = [];
@@ -57,27 +60,32 @@ export class SafeStorage {
           chunks.push(value.substring(i, end));
           i = end;
         }
-        
+
         // Save chunks
         for (let i = 0; i < chunks.length; i++) {
           await AsyncStorage.setItem(`${key}_chunk_${i}`, chunks[i]);
+          written = i + 1;
         }
-        
+
         // Save chunk info
         await AsyncStorage.setItem(`${key}_chunks`, JSON.stringify({ count: chunks.length }));
-        
-        // Remove the main key if it exists
-        await AsyncStorage.removeItem(key);
       } else {
         // Clear any existing chunks
         await this.clearChunks(key);
-        
+
         // Save normally
         await AsyncStorage.setItem(key, value);
       }
       return true;
     } catch (error) {
       console.warn(`SafeStorage.setItem failed for key "${key}":`, error);
+      // The chunks saved before the failure would only take room: no chunk
+      // info points to them
+      for (let i = 0; i < written; i++) {
+        try {
+          await AsyncStorage.removeItem(`${key}_chunk_${i}`);
+        } catch (e) { /* it stays */ }
+      }
       return false;
     }
   }

@@ -13,6 +13,7 @@ import { Zip, ZipDeflate, unzipSync, strToU8 } from 'fflate';
 import * as Crypto from 'expo-crypto';
 import { Directory, File, Paths } from 'expo-file-system';
 import { SafeStorage } from '../utils/SafeStorage';
+import { STORAGE_HEADROOM, STORAGE_LIMIT, storedSize } from '../utils/storageRoom';
 import { APP_VERSION } from '../config/version';
 import {
   AUTO_BACKUP_KEYS,
@@ -31,8 +32,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Why a file can't be restored: 'otherApp' (details.app names it), 'newer'
- * (a later FeedWell made it), 'damaged' (a check failed) or 'invalid' (not a
- * FeedWell backup at all). A file that fails changes nothing.
+ * (a later FeedWell made it), 'damaged' (a check failed), 'invalid' (not a
+ * FeedWell backup at all) or 'noRoom' (its saved articles and notes alone
+ * don't fit in the storage). A file that fails changes nothing.
  */
 export class BackupError extends Error {
   constructor(code, details = {}) {
@@ -413,49 +415,172 @@ export async function readBackup(bytes) {
 }
 
 // ---- Applying a restore
+//
+// A restore fits what it writes into the room the storage has (STORAGE_LIMIT),
+// so a backup never fails for its size. It measures everything first. When the
+// records don't fit, as after a Merge or on a phone that keeps more of its
+// own, the oldest feed articles are left out; saved articles and notes always
+// come whole. Only if those alone can't fit does it refuse, before writing
+// anything. Then it makes room, what gives way going first, and writes; if a
+// write still fails, what it touched is put back.
 
-// SafeStorage answers a failed write with false (on Android the storage holds
-// 6 MB at most): stop rather than report a restore that didn't happen
-const writeJson = async (key, value) => {
-  if (!(await SafeStorage.setItem(key, JSON.stringify(value)))) throw new Error(`Couldn't save ${key}`);
+// SafeStorage answers a failed write with false: stop rather than report a
+// restore that didn't happen
+const writeText = async (key, text) => {
+  if (!(await SafeStorage.setItem(key, text))) throw new Error(`Couldn't save ${key}`);
 };
+const writeJson = (key, value) => writeText(key, JSON.stringify(value));
 
 async function removeKeys(keys) {
   const bases = [...new Set(keys.map(baseKeyOf))];
   for (const key of bases) await SafeStorage.removeItem(key);
 }
 
-async function writeBookmarks(bookmarks, keys) {
-  await AsyncStorage.multiRemove(keys.filter((key) => key.startsWith(READING_BOOKMARK_PREFIX)));
-  const pairs = Object.entries(bookmarks)
-    .filter(([id, bookmark]) => id && isObject(bookmark))
-    .map(([id, bookmark]) => [READING_BOOKMARK_PREFIX + id, JSON.stringify(bookmark)]);
-  if (pairs.length) await AsyncStorage.multiSet(pairs);
+const pairSize = (key, text) => storedSize(key) + storedSize(text);
+const sizeOfPairs = (pairs) => pairs.reduce((total, [key, text]) => total + pairSize(key, text), 0);
+
+/** The given keys with their values as stored, chunks included */
+async function storedPairs(keys) {
+  const pairs = [];
+  for (let i = 0; i < keys.length; i += 20) {
+    for (const [key, value] of await AsyncStorage.multiGet(keys.slice(i, i + 20))) {
+      if (value !== null && value !== undefined) pairs.push([key, value]);
+    }
+  }
+  return pairs;
 }
 
-/** Replace: the file's data and settings take the place of the phone's */
+/** The room the given keys take in storage now */
+const storedSizeOf = async (keys) => sizeOfPairs(await storedPairs(keys));
+
+/**
+ * Runs the writes of a restore. If one fails half way (the phone's own
+ * storage full, say), every key the restore touches is put back as it was,
+ * and the error goes on.
+ */
+async function writeOrPutBack(touches, write) {
+  const before = await storedPairs((await allKeys()).filter(touches));
+  try {
+    await write();
+  } catch (error) {
+    try {
+      await AsyncStorage.multiRemove((await allKeys()).filter(touches));
+      if (before.length) await AsyncStorage.multiSet(before);
+    } catch (e) {
+      console.warn('Restore: putting the phone back failed:', e?.message);
+    }
+    throw error;
+  }
+}
+
+// The records whose contexts keep a safety copy (<key>_backup) of what they
+// last saved: the copy comes back at their next save, so it needs room too
+const COPIED_RECORDS = [DATA_KEYS.readLater, DATA_KEYS.notes];
+const SAFETY_SUFFIX = '_backup';
+
+/** A key that is a record's safety copy, or a piece of one, from this version or an older one */
+const safetyCopyOf = (key) => {
+  const base = baseKeyOf(key);
+  return base.endsWith(SAFETY_SUFFIX) ? base.slice(0, -SAFETY_SUFFIX.length) : null;
+};
+
+/** The newest articles that fit in `room` once stored, in the order they came */
+function newestThatFit(articles, room) {
+  const order = articles
+    .map((article, index) => ({
+      index,
+      time: Date.parse(article && article.publishedDate) || 0,
+      size: storedSize(JSON.stringify(article)) + 1,
+    }))
+    .sort((a, b) => b.time - a.time);
+  const keep = new Set();
+  let used = 2;
+  for (const item of order) {
+    if (used + item.size > room) break;
+    used += item.size;
+    keep.add(item.index);
+  }
+  const kept = articles.filter((article, index) => keep.has(index));
+  return { text: JSON.stringify(kept), leftOut: articles.length - kept.length };
+}
+
+/**
+ * Fits the records (key to JSON text) into the storage next to `others`, the
+ * room everything else takes once the restore is done. Leaves out the oldest
+ * articles if it must and says how many; throws BackupError('noRoom') if
+ * nothing but articles can go and that's not enough.
+ */
+function fitRecords(records, articles, others) {
+  const copies = COPIED_RECORDS.reduce((total, key) => total + (key in records ? pairSize(key + SAFETY_SUFFIX, records[key]) : 0), 0);
+  const recordsBesideArticles = sizeOfPairs(Object.entries(records).filter(([key]) => key !== DATA_KEYS.articles));
+  const room = STORAGE_LIMIT - STORAGE_HEADROOM - others - copies - recordsBesideArticles;
+  if (!(DATA_KEYS.articles in records)) {
+    if (room < 0) throw new BackupError('noRoom');
+    return 0;
+  }
+  const articlesRoom = room - storedSize(DATA_KEYS.articles);
+  if (storedSize(records[DATA_KEYS.articles]) <= articlesRoom) return 0;
+  if (articlesRoom < 2) throw new BackupError('noRoom');
+  const fit = newestThatFit(articles, articlesRoom);
+  records[DATA_KEYS.articles] = fit.text;
+  return fit.leftOut;
+}
+
+const bookmarkPairsOf = (bookmarks) =>
+  Object.entries(bookmarks)
+    .filter(([id, bookmark]) => id && isObject(bookmark))
+    .map(([id, bookmark]) => [READING_BOOKMARK_PREFIX + id, JSON.stringify(bookmark)]);
+
+/** The records the file holds, as the text each is stored as, the articles first */
+function recordTextsOf(data) {
+  const records = {};
+  for (const kind of ['articles', 'feeds', 'readLater', 'notes', 'readArticleUrls', 'removedArticles']) {
+    if (data[kind] !== undefined) records[DATA_KEYS[kind]] = JSON.stringify(data[kind]);
+  }
+  return records;
+}
+
+/**
+ * Replace: the file's data and settings take the place of the phone's.
+ * Returns { leftOut }, the number of the file's oldest articles that didn't fit.
+ */
 async function replaceWith(backup) {
   const { data, settings } = backup;
   const keys = await allKeys();
-  // The articles first: by far the biggest, so if there's no room for them
-  // the rest of the phone hasn't changed yet
-  if (data.articles) await writeJson(DATA_KEYS.articles, data.articles);
-  if (data.feeds) await writeJson(DATA_KEYS.feeds, data.feeds);
-  if (data.readLater) await writeJson(DATA_KEYS.readLater, data.readLater);
-  if (data.notes) await writeJson(DATA_KEYS.notes, data.notes);
-  if (data.readArticleUrls) await writeJson(DATA_KEYS.readArticleUrls, data.readArticleUrls);
-  if (data.removedArticles) await writeJson(DATA_KEYS.removedArticles, data.removedArticles);
-  if ('readingPosition' in data) {
-    if (data.readingPosition) await AsyncStorage.setItem(DATA_KEYS.readingPosition, JSON.stringify(data.readingPosition));
-    else await AsyncStorage.removeItem(DATA_KEYS.readingPosition);
-  }
-  if (data.readingBookmarks) await writeBookmarks(data.readingBookmarks, keys);
+  const records = recordTextsOf(data);
+  const bookmarks = data.readingBookmarks ? bookmarkPairsOf(data.readingBookmarks) : null;
+  const position = 'readingPosition' in data && data.readingPosition ? JSON.stringify(data.readingPosition) : null;
+  const settingPairs = Object.entries(settings);
 
-  // A family file holds every setting, so the phone's give way to it; an old
-  // file writes the few it holds and leaves the rest
-  if (backup.kind === 'family') await removeKeys(keys.filter((key) => kindOfKey(key) === 'setting'));
-  const pairs = Object.entries(settings);
-  if (pairs.length) await AsyncStorage.multiSet(pairs);
+  // What gives way: the records the file brings and their safety copies, the
+  // reading position and bookmarks when the file has its own, and the
+  // settings: all of them for a family file, which holds them all, and for an
+  // old file the few it holds
+  const replaced = new Set(Object.keys(records));
+  if ('readingPosition' in data) replaced.add(DATA_KEYS.readingPosition);
+  const goes = (key) =>
+    replaced.has(baseKeyOf(key)) ||
+    replaced.has(safetyCopyOf(key)) ||
+    (bookmarks !== null && key.startsWith(READING_BOOKMARK_PREFIX)) ||
+    (kindOfKey(key) === 'setting' && (backup.kind === 'family' || key in settings));
+  const going = keys.filter(goes);
+
+  const others =
+    (await storedSizeOf(keys.filter((key) => !goes(key)))) +
+    sizeOfPairs(settingPairs) +
+    sizeOfPairs(bookmarks || []) +
+    (position ? pairSize(DATA_KEYS.readingPosition, position) : 0);
+  const leftOut = fitRecords(records, data.articles, others);
+
+  // Room first: what gives way goes before anything is written
+  await writeOrPutBack(goes, async () => {
+    await AsyncStorage.multiRemove(going);
+    for (const [key, text] of Object.entries(records)) await writeText(key, text);
+    if (position) await AsyncStorage.setItem(DATA_KEYS.readingPosition, position);
+    if (bookmarks && bookmarks.length) await AsyncStorage.multiSet(bookmarks);
+    if (settingPairs.length) await AsyncStorage.multiSet(settingPairs);
+  });
+  return { leftOut };
 }
 
 const union = (a = [], b = []) => [...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])])];
@@ -464,7 +589,8 @@ const union = (a = [], b = []) => [...new Set([...(Array.isArray(a) ? a : []), .
  * Merge: adds what the phone doesn't have (feeds by URL, articles by id, saved
  * articles, notes and reading bookmarks). An article on both keeps the phone's
  * copy, marked read if either copy is. The phone keeps its own settings and
- * its reading position.
+ * its reading position. Returns { leftOut }, the number of the oldest
+ * articles, the phone's or the file's, that didn't fit.
  */
 async function mergeWith(backup) {
   const file = backup.data;
@@ -491,22 +617,42 @@ async function mergeWith(backup) {
 
   // A note or a bookmark the phone has for the same article stays
   const notes = { ...(isObject(file.notes) ? file.notes : {}), ...phone.notes };
-  const bookmarks = { ...(isObject(file.readingBookmarks) ? file.readingBookmarks : {}), ...phone.readingBookmarks };
+  const bookmarks = bookmarkPairsOf({ ...(isObject(file.readingBookmarks) ? file.readingBookmarks : {}), ...phone.readingBookmarks });
 
-  // The articles first, as in Replace
-  await writeJson(DATA_KEYS.articles, articles);
-  await writeJson(DATA_KEYS.feeds, feeds);
-  await writeJson(DATA_KEYS.readLater, readLater);
-  await writeJson(DATA_KEYS.notes, notes);
-  await writeJson(DATA_KEYS.readArticleUrls, union(phone.readArticleUrls, file.readArticleUrls));
-  await writeJson(DATA_KEYS.removedArticles, union(phone.removedArticles, file.removedArticles));
-  await writeBookmarks(bookmarks, keys);
+  const records = recordTextsOf({
+    articles,
+    feeds,
+    readLater,
+    notes,
+    readArticleUrls: union(phone.readArticleUrls, file.readArticleUrls),
+    removedArticles: union(phone.removedArticles, file.removedArticles),
+  });
+  // Every record is written again, so the safety copies of the old ones go;
+  // the reading bookmarks are written again too
+  const rewritten = new Set(Object.keys(records));
+  const goes = (key) => rewritten.has(safetyCopyOf(key)) || key.startsWith(READING_BOOKMARK_PREFIX);
+  const going = keys.filter(goes);
+  const staying = keys.filter((key) => !rewritten.has(baseKeyOf(key)) && !goes(key));
+  const leftOut = fitRecords(records, articles, (await storedSizeOf(staying)) + sizeOfPairs(bookmarks));
+
+  await writeOrPutBack((key) => rewritten.has(baseKeyOf(key)) || goes(key), async () => {
+    await AsyncStorage.multiRemove(going);
+    // The articles first: when some are left out they may take less room
+    // than the phone's did
+    for (const [key, text] of Object.entries(records)) await writeText(key, text);
+    if (bookmarks.length) await AsyncStorage.multiSet(bookmarks);
+  });
+  return { leftOut };
 }
 
-/** Writes a checked backup ('replace' or 'merge'); the caller then reloads the app's state */
+/**
+ * Writes a checked backup ('replace' or 'merge'); the caller then reloads the
+ * app's state. Returns { leftOut }: how many of the oldest articles didn't fit.
+ * Throws BackupError('noRoom'), with nothing changed, when the saved articles
+ * and notes alone don't fit.
+ */
 export async function applyRestore(backup, mode) {
-  if (mode === 'replace') await replaceWith(backup);
-  else await mergeWith(backup);
+  return mode === 'replace' ? replaceWith(backup) : mergeWith(backup);
 }
 
 /** Reads a backup file picked on the phone or in the browser, as bytes */

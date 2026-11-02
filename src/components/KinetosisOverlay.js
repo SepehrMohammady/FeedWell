@@ -1,8 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Dimensions, Animated, Platform, requireNativeComponent } from 'react-native';
 import { Gyroscope } from 'expo-sensors';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTheme } from '../context/ThemeContext';
+import { withAlpha } from '../theme/palette';
+
+// On Android the motion cues are a native view (MotionCuesView.kt): dots at
+// the sides that move with the vehicle, and a horizon in the second style. Its
+// sensors and drawing run at the screen's frame rate without JavaScript.
+const NativeMotionCues = Platform.OS === 'android' ? requireNativeComponent('FeedWellMotionCues') : null;
+
+export default function KinetosisOverlay() {
+  const { reduceMotion, motionCuesStyle } = useAppSettings();
+  const { theme, isDarkMode } = useTheme();
+
+  if (!reduceMotion) return null;
+  if (!NativeMotionCues) return <SensorDots isDarkMode={isDarkMode} />;
+  return (
+    <View style={styles.container} pointerEvents="none">
+      {/* Colors as strings: React Native turns them into numbers for the view itself */}
+      <NativeMotionCues
+        style={StyleSheet.absoluteFill}
+        cueStyle={motionCuesStyle}
+        dotColor={withAlpha(theme.colors.text, isDarkMode ? 0.42 : 0.32)}
+        horizonColor={withAlpha(theme.colors.accent, isDarkMode ? 0.14 : 0.11)}
+      />
+    </View>
+  );
+}
+
+// ---- Elsewhere (the web build): dots near the edges that follow the gyroscope
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DOT_SIZE = 10;
@@ -21,17 +48,13 @@ const DOT_POSITIONS = [
   { x: SCREEN_WIDTH * 0.85, y: SCREEN_HEIGHT * 0.9 },
 ];
 
-export default function KinetosisOverlay() {
-  const { reduceMotion } = useAppSettings();
-  const { isDarkMode } = useTheme();
+function SensorDots({ isDarkMode }) {
   const animX = useRef(new Animated.Value(0)).current;
   const animY = useRef(new Animated.Value(0)).current;
   const velocityRef = useRef({ x: 0, y: 0 });
   const runningAnimRef = useRef(null);
 
   useEffect(() => {
-    if (!reduceMotion) return;
-
     Gyroscope.setUpdateInterval(16); // ~60 fps input sampling
     const subscription = Gyroscope.addListener(({ x, y }) => {
       const vx = velocityRef.current.x * DAMPING + y * 8;
@@ -72,9 +95,7 @@ export default function KinetosisOverlay() {
         runningAnimRef.current.stop();
       }
     };
-  }, [reduceMotion]);
-
-  if (!reduceMotion) return null;
+  }, []);
 
   const dotColor = isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)';
 
