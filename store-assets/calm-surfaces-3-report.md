@@ -199,4 +199,4 @@ and so on), "Dark Mode", "AMOLED Black", "Reading Font", the saved cards ending 
 1. The screenshot config's light shots set only the main color (Sage). The accent now follows the
    main color, so those shots will show a Lavender accent. Keep that, or pick a Sage accent too?
 2. The swatch-name changes above (15 languages): fine as they are?
-3. Push the branch? It's committed locally only.
+3. Push the branch? Merged into main and pushed with 1.20.0.

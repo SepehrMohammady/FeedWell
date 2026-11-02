@@ -66,9 +66,14 @@ articles out of the list, as 1.19.0's own backups do.
 - The automatic backup compares hashes before it builds the ZIP, so a day with no change costs
   0.2 s, not 1.5 s.
 - In the background Android slows the app about twofold (2.8 s to make the demo file).
-- Seven copies: 1.1 MB for the demo phone, 7 MB at 600 articles. FeedWell can't hold much more
-  (see the 6 MB limit below), so seven copies stay well under Android's 25 MB, and the copies in
-  FeedWell's own storage are left out of Android's backup anyway. No reason to keep fewer.
+- Seven copies: 1.1 MB for the demo phone, 7 MB at 600 articles. The copies in FeedWell's own
+  storage are left out of Android's backup, so their total doesn't count against its 25 MB. No
+  reason to keep fewer.
+- 1.20.0 raises the storage limit from 6 to 20 MB. With it, on the phone: 1,000 articles (7.2 MB)
+  restore and stay after a restart; 2,000 articles (14 MB, 20 feeds of 100) restore and stay too.
+  That restore took about 23 s, counting the automatic backup FeedWell first makes of the 1,000
+  articles it replaces. Making a backup of the 2,000 (3.4 MB) takes about 25 s, and its data is
+  byte for byte the file they came from.
 
 ## Checks on the phone
 
@@ -130,6 +135,14 @@ screen shows in English and Arabic, dark, with the version.
   "your feeds (4)" and "Feeds: 4" in the 14 languages where the number changes the word.
 - The web build showed every text in a serif font: Inter was only in the Android app (since the
   restyle). The web build now loads it.
+- In 1.20.0: articles over 2 MB in Farsi (or any script that takes more than one byte a
+  character) saved but couldn't be read back. SafeStorage cut its chunks by characters, and
+  Android reads each one through a 2 MB window counted in bytes. On the phone, 320 Farsi articles
+  (3.1 MB) restored with "Restore Complete", and after a restart Home showed 0 unread; an
+  automatic backup made then held no articles. Chunks now hold a third as many characters, so
+  they fit whatever the script, and never end between the two halves of an emoji. With 1.20.0
+  the same file shows 274 unread before and after a restart. Data an older version already
+  saved that way stays unreadable until FeedWell saves its articles again.
 
 ## Strings
 
@@ -180,21 +193,19 @@ The config scrolls one long Settings page. Now:
 - First run after `pm clear`: What's New ("Got it", "Take the tour") as before; the tour has 16
   steps.
 
-## Decisions for you
+## Decisions
 
-1. What's New version: the new entry is listed as 1.20.0. Which number will the release be?
-2. FeedWell's storage limit: Android's AsyncStorage holds 6 MB unless the app raises it
-   (`AsyncStorage_db_size_in_MB` in `android/gradle.properties`). That's about 800 full-text
-   articles; past it, saving fails quietly in normal use, as it did before this work. Raise it
-   (for example to 50)? Note that app data over 25 MB stops Android's own backup of FeedWell.
-3. Bookmark Indicators moved from Feeds to Reading, since it marks the place in the reader.
-   Keep it there?
-4. When the phone switches light/dark while a sheet is open, the status bar icons over the sheet
-   keep the old color until it closes (Android gives a sheet its own window). Fixing it means
-   touching all 19 sheets. Worth doing?
+1. What's New version: the release is 1.20.0 (144).
+2. FeedWell's storage limit: raised from 6 to 20 MB (`AsyncStorage_db_size_in_MB` in
+   `android/gradle.properties`), about 2,700 full-text articles. 20 rather than more because app
+   data over 25 MB stops Android's own backup of FeedWell.
+3. Bookmark Indicators stays under Reading.
+4. The status bar icons over a sheet that's open while the phone switches light/dark keep the
+   old color until it closes (Android gives a sheet its own window). Left as it is.
 5. A restore that doesn't fit shows the existing "Failed to restore backup. Please check the
-   file and try again." A message that names the cause needs a new string in 30 languages.
-6. Push and merge: `design/calm-surfaces-3` and `family-parts` are local only.
+   file and try again." Not changed; a message that names the cause needs a new string in 30
+   languages.
+6. Both branches are merged into main and pushed with 1.20.0.
 
 Also seen, not changed: on the web, the existing portrait lock logs an error in desktop browsers
 (`screen.orientation.lock()`), as it does on main.
@@ -209,3 +220,8 @@ backup's keys stay in FeedWell's storage in their "off" state (harmless; turning
 folder again), and older Backup Data copies in FeedWell's cache, which the final build removes
 the next time Backup Data runs (it ran once after I installed it) or Android clears with the
 cache. ThinkWell was not touched.
+
+Nov 2, for 1.20.0: the setup was found with its theme following the phone, not Dark, which my
+tests had left. It is restored again from the same copy, Dark included, with 1.20.0 installed and
+automatic backup off. FeedWell's own refresh then added two new NASA articles (89, 86 unread);
+the other 87 are unchanged. The test folders are deleted again.

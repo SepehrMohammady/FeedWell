@@ -4,7 +4,6 @@
 // locale (titles may reuse existing keys, such as the Settings row names).
 export const WHATS_NEW_RELEASES = [
   {
-    // The version is the user's to confirm before the release
     version: '1.20.0',
     items: [
       { icon: 'color-palette', title: 'whatsNew.newLookTitle', body: 'whatsNew.newLookBody' },

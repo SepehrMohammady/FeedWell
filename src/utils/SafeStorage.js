@@ -10,9 +10,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * - Graceful error recovery
  */
 export class SafeStorage {
-  // Maximum size per AsyncStorage entry (2MB is the safe limit)
+  // Maximum size per AsyncStorage entry (2MB is the safe limit): Android reads
+  // an entry through a 2MB window, counted in UTF-8 bytes
   static MAX_CHUNK_SIZE = 2 * 1024 * 1024; // 2MB in bytes
-  
+
+  // Characters per chunk: 90% of the limit at up to 3 bytes a character
+  // (Farsi text takes 2, Chinese 3), so a chunk fits whatever the script
+  static CHUNK_LENGTH = Math.floor((2 * 1024 * 1024 * 0.9) / 3);
+
   static async getItem(key) {
     try {
       // Try to get chunked data first
@@ -36,21 +41,21 @@ export class SafeStorage {
 
   static async setItem(key, value) {
     try {
-      // Check if data needs chunking
-      // Blob may not be available on all Android versions — fallback to byte estimation
-      const dataSize = (typeof Blob !== 'undefined')
-        ? new Blob([value]).size
-        : value.length * 3; // UTF-8 worst-case estimation
-      
-      if (dataSize > this.MAX_CHUNK_SIZE) {
+      // Check if data needs chunking. Counted in characters, which spares
+      // copying the whole value to native code as React Native's Blob did
+      // to count its bytes
+      if (value.length > this.CHUNK_LENGTH) {
         // Clear any existing chunks
         await this.clearChunks(key);
-        
-        // Split into chunks
-        const chunkSize = Math.floor(this.MAX_CHUNK_SIZE * 0.9); // 90% to be safe
+
+        // Split into chunks, never between the two halves of an emoji
         const chunks = [];
-        for (let i = 0; i < value.length; i += chunkSize) {
-          chunks.push(value.substring(i, i + chunkSize));
+        for (let i = 0; i < value.length; ) {
+          let end = Math.min(i + this.CHUNK_LENGTH, value.length);
+          const last = value.charCodeAt(end - 1);
+          if (end < value.length && last >= 0xd800 && last <= 0xdbff) end -= 1;
+          chunks.push(value.substring(i, end));
+          i = end;
         }
         
         // Save chunks
