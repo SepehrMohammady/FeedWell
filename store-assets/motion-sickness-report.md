@@ -163,8 +163,11 @@ Dots and once with Dots and horizon, ideally on the same route as a KineStop rid
 ## Other places to update
 
 - semo-lab.com/feedwell says "a fixed focus dot".
-- Play screenshot 8 ("Kind to motion sickness") shows the 1.20.0 dots: projectwell-40 offered
-  to retake it once 1.20.1 is on the phone.
+- Play screenshot 8 ("Kind to motion sickness"): retaken on 1.20.1 with Dots and horizon, your
+  choice, the phone standing so the horizon shows. Caption: "Dots at the screen's edges move
+  with the vehicle, so your eyes see what your body feels."
+- The screenshot tool: uiautomator reads the screen normally with the dots on (they're on their
+  own surface and aren't in the view tree), so the shot can tap by text again.
 
 ## Sources
 
