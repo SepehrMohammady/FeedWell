@@ -38,6 +38,20 @@ class WidgetBridgeModule(reactContext: ReactApplicationContext) : ReactContextBa
         refreshWidgets(context)
     }
 
+    // The app's language for the widget's dates and digits (WidgetText): sent
+    // when the app starts and whenever its language changes
+    @ReactMethod
+    fun setWidgetLanguage(languageJson: String) {
+        val context = reactApplicationContext
+        val prefs = context.getSharedPreferences(
+            LatestArticlesWidget.PREFS_NAME,
+            Context.MODE_PRIVATE
+        )
+        if (prefs.getString(WidgetText.KEY_LANGUAGE, null) == languageJson) return
+        prefs.edit().putString(WidgetText.KEY_LANGUAGE, languageJson).apply()
+        refreshWidgets(context)
+    }
+
     @ReactMethod
     fun setWidgetShowImages(show: Boolean) {
         val context = reactApplicationContext

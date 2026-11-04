@@ -1,6 +1,29 @@
 import { NativeModules, Platform } from 'react-native';
+import { tStatic } from '../i18n';
+import { digitsOf } from './digits';
 
 const { WidgetBridge } = NativeModules;
+
+/**
+ * The words and digits the widget writes its dates with, in the app's language:
+ * the app's own "just now", "{count}h ago" and "{count}d ago", so the widget
+ * says what the article list says. Older dates the widget writes itself, in the
+ * language (Farsi in the Persian calendar, as the app does).
+ */
+export function updateWidgetLanguage(language) {
+  if (Platform.OS !== 'android' || !WidgetBridge || !WidgetBridge.setWidgetLanguage) return;
+  try {
+    WidgetBridge.setWidgetLanguage(JSON.stringify({
+      language,
+      digits: digitsOf(language),
+      justNow: tStatic('date.justNow', language),
+      hoursAgo: tStatic('date.hoursAgo', language),
+      daysAgo: tStatic('date.daysAgo', language),
+    }));
+  } catch (error) {
+    console.error('Error updating the widget language:', error);
+  }
+}
 
 /**
  * Update the Android home screen widget with latest articles.

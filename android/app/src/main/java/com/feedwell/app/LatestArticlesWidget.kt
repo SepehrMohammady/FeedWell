@@ -413,8 +413,8 @@ class LatestArticlesWidget : AppWidgetProvider() {
         val title = article.optString("title", "Untitled")
         views.setTextViewText(R.id.widget_article_title, title)
         views.setTextViewText(R.id.widget_article_feed, article.optString("feedName", ""))
-        views.setTextViewText(R.id.widget_article_date, formatDate(article.optString("pubDate", "")))
-        views.setTextViewText(R.id.widget_page_indicator, "${index + 1} / ${articles.length()}")
+        views.setTextViewText(R.id.widget_article_date, WidgetText.date(context, article.optString("pubDate", "")))
+        views.setTextViewText(R.id.widget_page_indicator, WidgetText.number(context, "${index + 1} / ${articles.length()}"))
         views.setOnClickPendingIntent(R.id.widget_article_container, openArticlePendingIntent(context, article))
 
         // Preview image: above the text when the widget is tall, beside it when it
@@ -456,43 +456,6 @@ class LatestArticlesWidget : AppWidgetProvider() {
                 views.setInt(R.id.widget_article_description, "setMaxLines", lines)
                 views.setViewVisibility(R.id.widget_article_description, View.VISIBLE)
             }
-        }
-    }
-
-    private fun formatDate(dateString: String): String {
-        if (dateString.isEmpty()) return ""
-        return try {
-            val formats = arrayOf(
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US),
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US),
-                java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", java.util.Locale.US),
-                java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-            )
-            var date: java.util.Date? = null
-            for (fmt in formats) {
-                fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
-                try {
-                    date = fmt.parse(dateString)
-                    if (date != null) break
-                } catch (e: Exception) { /* try next */ }
-            }
-            if (date == null) return dateString
-
-            val now = System.currentTimeMillis()
-            val diffMs = now - date.time
-            val diffMin = diffMs / 60000
-            val diffHr = diffMin / 60
-            val diffDay = diffHr / 24
-
-            when {
-                diffMin < 1 -> "Just now"
-                diffMin < 60 -> "${diffMin}m ago"
-                diffHr < 24 -> "${diffHr}h ago"
-                diffDay < 7 -> "${diffDay}d ago"
-                else -> java.text.SimpleDateFormat("MMM d", java.util.Locale.US).format(date)
-            }
-        } catch (e: Exception) {
-            dateString
         }
     }
 }

@@ -370,7 +370,6 @@ export default function AddFeedScreen({ navigation }) {
   const formatDate = (dateString) => formatLocalizedDate(dateString, language, formatNumber, {
     withYear: true,
     withTime: false,
-    locale: language,
   });
 
   const colors = theme.colors;

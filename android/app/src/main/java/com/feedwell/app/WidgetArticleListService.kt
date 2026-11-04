@@ -48,7 +48,7 @@ class WidgetArticleListFactory(private val context: Context) : RemoteViewsServic
 
             views.setTextViewText(R.id.widget_item_title, title)
             views.setTextViewText(R.id.widget_item_feed, feedName)
-            views.setTextViewText(R.id.widget_item_date, formatDate(pubDate))
+            views.setTextViewText(R.id.widget_item_date, WidgetText.date(context, pubDate))
 
             // Set fill-in intent for item click (deep link)
             val fillIntent = Intent().apply {
@@ -83,41 +83,4 @@ class WidgetArticleListFactory(private val context: Context) : RemoteViewsServic
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun hasStableIds(): Boolean = false
-
-    private fun formatDate(dateString: String): String {
-        if (dateString.isEmpty()) return ""
-        return try {
-            val formats = arrayOf(
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US),
-                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US),
-                java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", java.util.Locale.US),
-                java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-            )
-            var date: java.util.Date? = null
-            for (fmt in formats) {
-                fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
-                try {
-                    date = fmt.parse(dateString)
-                    if (date != null) break
-                } catch (e: Exception) { /* try next */ }
-            }
-            if (date == null) return dateString
-
-            val now = System.currentTimeMillis()
-            val diffMs = now - date.time
-            val diffMin = diffMs / 60000
-            val diffHr = diffMin / 60
-            val diffDay = diffHr / 24
-
-            when {
-                diffMin < 1 -> "Just now"
-                diffMin < 60 -> "${diffMin}m ago"
-                diffHr < 24 -> "${diffHr}h ago"
-                diffDay < 7 -> "${diffDay}d ago"
-                else -> java.text.SimpleDateFormat("MMM d", java.util.Locale.US).format(date)
-            }
-        } catch (e: Exception) {
-            dateString
-        }
-    }
 }

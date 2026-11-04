@@ -388,7 +388,8 @@ export default function SettingsScreen({ navigation }) {
   }, [page, refreshAutoBackup]);
 
   // With the time: the automatic backups of one day differ only in it. Latin
-  // digits, as in the rest of the app (Farsi's become Persian through formatNumber).
+  // digits, which formatNumber writes in the language's own (Persian in Farsi,
+  // Arabic-Indic in Arabic).
   const formatBackupDate = (iso) => formatLocalizedDate(iso, language, formatNumber, {
     withYear: true,
     withTime: true,
@@ -815,7 +816,8 @@ export default function SettingsScreen({ navigation }) {
     data: autoBackup.enabled
       ? join([t('backup.autoBackup'), lastAutoBackup && formatBackupDate(lastAutoBackup.createdAt)])
       : join([t('settings.backupData'), t('settings.restoreData')]),
-    about: `FeedWell ${formatNumber(APP_VERSION.version)}`,
+    // A version number keeps its Latin digits in every language
+    about: `FeedWell ${APP_VERSION.version}`,
   };
 
   const categoryRow = (key, icon, title, summary, onPress, ref) => (
@@ -1177,7 +1179,7 @@ export default function SettingsScreen({ navigation }) {
         />
         <SettingItem
           title={t('settings.version')}
-          description={formatNumber(APP_VERSION.version)}
+          description={APP_VERSION.version}
         />
         <SettingItem
           title={t('settings.developer')}

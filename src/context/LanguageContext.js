@@ -3,7 +3,8 @@ import { NativeModules, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { tStatic } from '../i18n';
 import { SUPPORTED_LANGUAGES, RTL_LANGUAGES } from '../i18n/appLanguages';
-import { toPersianDigits } from '../utils/persianDigits';
+import { localDigits } from '../utils/digits';
+import { updateWidgetLanguage } from '../utils/widgetService';
 
 export const APP_LANGUAGE_KEY = 'appLanguage';
 
@@ -71,10 +72,15 @@ export function LanguageProvider({ children }) {
   // when every consumer should re-render).
   const t = useCallback((key, vars) => tStatic(key, language, vars), [language]);
 
-  const formatNumber = useCallback((value) => {
-    const s = String(value);
-    return language === 'fa' ? toPersianDigits(s) : s;
-  }, [language]);
+  // A number FeedWell writes, in the language's digits (Persian in Farsi,
+  // Arabic-Indic in Arabic)
+  const formatNumber = useCallback((value) => localDigits(String(value), language), [language]);
+
+  // The home-screen widget writes its dates itself: it gets the language's
+  // words and digits for them
+  useEffect(() => {
+    if (!langLoading) updateWidgetLanguage(language);
+  }, [language, langLoading]);
 
   const isRTL = RTL_LANGUAGES.includes(language);
   lastLanguage = language;

@@ -1,8 +1,10 @@
 // Localized date/time formatting.
 // - Relative time ("Just now", "3h ago") via the i18n `t` function.
 // - Absolute dates: for Farsi, the Solar Hijri (Jalali) calendar with Farsi month
-//   names + Persian digits; for other languages, the platform locale formatting.
-import { toPersianDigits } from './persianDigits';
+//   names + Persian digits; for other languages, the platform's formatting in
+//   the app's language, in Latin digits that formatNumber then writes in the
+//   language's own (Arabic-Indic in Arabic).
+import { localDigits } from './digits';
 
 const identity = (x) => String(x);
 
@@ -40,22 +42,22 @@ function gregorianToJalali(gy, gm, gd) {
 const pad2 = (n) => String(n).padStart(2, '0');
 
 // Absolute, localized date. Farsi -> Jalali calendar + Persian digits + 24h time.
-// opts: { withYear=true, withTime=true, locale='en-US', localeOptions=null }
-// For non-Farsi the original `toLocaleDateString(locale, localeOptions)` is used so
-// existing per-screen formats are preserved.
+// opts: { withYear=true, withTime=true, locale, localeOptions=null }
+// For non-Farsi `toLocaleDateString(locale, localeOptions)` is used, in the app's
+// language with Latin digits unless the screen names a locale.
 export function formatLocalizedDate(dateString, language, formatNumber = identity, opts = {}) {
   if (!dateString) return '';
   const d = new Date(dateString);
   if (isNaN(d.getTime())) return '';
 
-  const { withYear = true, withTime = true, locale = 'en-US', localeOptions = null } = opts;
+  const { withYear = true, withTime = true, locale = `${language || 'en'}-u-nu-latn`, localeOptions = null } = opts;
 
   if (language === 'fa') {
     const [jy, jm, jd] = gregorianToJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
     let s = `${jd} ${FA_JALALI_MONTHS[jm - 1]}`;
     if (withYear) s += ` ${jy}`;
     if (withTime) s += ` - ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    return toPersianDigits(s);
+    return localDigits(s, 'fa');
   }
 
   try {
