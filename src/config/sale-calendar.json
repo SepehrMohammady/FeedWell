@@ -1,0 +1,928 @@
+{
+  "about": "Sales and cards for every ProjectWell app, from the Sale calendar in projectwell-family-parts.html. Dates are local dates on the device. A sale runs from start to end, both included; during it, the siblings tag the app with its percent in More from SeMo Lab. Each event with a card opens it on its date, or on the first open later in the sale; a day under \"cards\" has a card and no sale, and shows only on its date. Card ids name the words in design-handoff/sale-cards.md; years is the birthday's or anniversary's number.",
+  "made": "2026-11-04",
+  "until": "2028-01-31",
+  "apps": {
+    "feedwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-06-06",
+          "end": "2027-06-12",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-06-11",
+              "card": "release-anniversary",
+              "name": "release anniversary",
+              "years": 1
+            }
+          ]
+        },
+        {
+          "start": "2027-07-12",
+          "end": "2027-07-18",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-07-13",
+              "card": "birthday",
+              "name": "birthday",
+              "years": 2
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-05-03",
+          "card": "world-press-freedom-day",
+          "name": "World Press Freedom Day"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        }
+      ]
+    },
+    "ledgerwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-09-19",
+          "end": "2027-10-02",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-09-22",
+              "card": "release-anniversary",
+              "name": "release anniversary",
+              "years": 1
+            },
+            {
+              "date": "2027-09-29",
+              "card": "birthday",
+              "name": "birthday",
+              "years": 2
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        }
+      ]
+    },
+    "weatherwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-06-14",
+          "end": "2027-06-20",
+          "percent": 25,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-06-17",
+              "card": "world-day-to-combat-desertification-and-drought",
+              "name": "World Day to Combat Desertification and Drought"
+            }
+          ]
+        },
+        {
+          "start": "2027-09-21",
+          "end": "2027-09-27",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-09-22",
+              "card": "release-anniversary",
+              "name": "release anniversary",
+              "years": 1
+            },
+            {
+              "date": "2027-09-25",
+              "card": "birthday",
+              "name": "birthday",
+              "years": 2
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-03-23",
+          "card": "world-meteorological-day",
+          "name": "World Meteorological Day"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        }
+      ]
+    },
+    "thinkwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-06-25",
+          "end": "2027-07-01",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-06-28",
+              "card": "birthday",
+              "name": "birthday",
+              "years": 1
+            }
+          ]
+        },
+        {
+          "start": "2027-09-07",
+          "end": "2027-09-13",
+          "percent": 50,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-09-10",
+              "card": "release-anniversary",
+              "name": "release anniversary",
+              "years": 1
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        }
+      ]
+    },
+    "tunewell": {
+      "sales": [
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-09-29",
+          "end": "2027-10-05",
+          "percent": 25,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-10-01",
+              "card": "international-music-day",
+              "name": "International Music Day"
+            },
+            {
+              "date": "2027-10-02",
+              "card": "audiophile-day",
+              "name": "Audiophile Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2026-12-03",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 1
+        },
+        {
+          "date": "2027-10-29",
+          "card": "release-anniversary",
+          "name": "release anniversary",
+          "years": 1
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-12-03",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 2
+        }
+      ]
+    },
+    "shopwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-02-01",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 1
+        },
+        {
+          "date": "2027-03-15",
+          "card": "world-consumer-rights-day",
+          "name": "World Consumer Rights Day"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        }
+      ]
+    },
+    "matchwell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-06-05",
+          "end": "2027-06-18",
+          "percent": 25,
+          "campaign": null,
+          "events": [
+            {
+              "date": "2027-06-05",
+              "card": "world-environment-day",
+              "name": "World Environment Day"
+            },
+            {
+              "date": "2027-06-08",
+              "card": "world-oceans-day",
+              "name": "World Oceans Day"
+            },
+            {
+              "date": "2027-06-17",
+              "card": "world-day-to-combat-desertification-and-drought",
+              "name": "World Day to Combat Desertification and Drought"
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2026-12-12",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 1
+        },
+        {
+          "date": "2027-03-03",
+          "card": "world-wildlife-day",
+          "name": "World Wildlife Day"
+        },
+        {
+          "date": "2027-03-21",
+          "card": "international-day-of-forests",
+          "name": "International Day of Forests"
+        },
+        {
+          "date": "2027-03-22",
+          "card": "world-water-day",
+          "name": "World Water Day"
+        },
+        {
+          "date": "2027-03-23",
+          "card": "world-meteorological-day",
+          "name": "World Meteorological Day"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-12-12",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 2
+        }
+      ]
+    },
+    "risewell": {
+      "sales": [
+        {
+          "start": "2026-11-21",
+          "end": "2026-11-27",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2026-11-27",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2026-12-29",
+          "end": "2027-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2027-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        },
+        {
+          "start": "2027-04-16",
+          "end": "2027-04-22",
+          "percent": 50,
+          "campaign": "semolab-birthday",
+          "events": [
+            {
+              "date": "2027-04-16",
+              "card": "semolab-birthday",
+              "name": "SeMo Lab's birthday",
+              "years": 1
+            },
+            {
+              "date": "2027-04-22",
+              "card": null,
+              "name": "Earth Day"
+            }
+          ]
+        },
+        {
+          "start": "2027-11-20",
+          "end": "2027-11-26",
+          "percent": 50,
+          "campaign": "black-friday",
+          "events": [
+            {
+              "date": "2027-11-26",
+              "card": "black-friday",
+              "name": "Black Friday"
+            }
+          ]
+        },
+        {
+          "start": "2027-12-29",
+          "end": "2028-01-04",
+          "percent": 50,
+          "campaign": "new-year",
+          "events": [
+            {
+              "date": "2028-01-01",
+              "card": "new-year",
+              "name": "New Year"
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "date": "2026-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2027-01-16",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 1
+        },
+        {
+          "date": "2027-03-19",
+          "card": "world-sleep-day",
+          "name": "World Sleep Day"
+        },
+        {
+          "date": "2027-11-10",
+          "card": "world-science-day-for-peace-and-development",
+          "name": "World Science Day for Peace and Development"
+        },
+        {
+          "date": "2028-01-16",
+          "card": "birthday",
+          "name": "birthday",
+          "years": 2
+        }
+      ]
+    }
+  }
+}

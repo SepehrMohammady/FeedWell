@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AppState, Linking, I18nManager, StyleSheet, View } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef, CommonActions, DefaultTheme, DarkTheme } from '@react-navigation/native';
@@ -28,6 +28,9 @@ import { APP_VERSION } from './src/config/version';
 import { setupNotificationChannel, scheduleReminderNotification, cancelReminderNotification } from './src/utils/notificationService';
 import { AppReloadProvider } from './src/context/AppReloadContext';
 import { runAutomaticBackup } from './src/services/BackupService';
+import SaleCardModal from './src/components/SaleCardModal';
+import { clearSaleCards, loadDebugToday, markCardOpened, nextSaleCard, onDebugToday, setDebugToday, shareApp } from './src/services/sales';
+import { openSettingsAt } from './src/utils/settingsNavigation';
 
 // Keep the native layer LTR so our per-component RTL (for Farsi) is the only
 // RTL source — prevents a Farsi/Arabic *system* locale from auto-mirroring the
@@ -100,6 +103,18 @@ function cleanRestoredNavState(state) {
 
 function handleDeepLink(url) {
   if (!url) return;
+  // Debug builds only, to check the sale cards and tags without touching the
+  // phone's clock: pretend it's another day (feedwell://debug/today/2027-04-16,
+  // or .../today/clear), forget the cards that have opened
+  // (feedwell://debug/cards/clear), or make What's New due at the next start
+  // (feedwell://debug/whatsnew)
+  if (__DEV__ && url.startsWith('feedwell://debug/')) {
+    const what = url.slice('feedwell://debug/'.length);
+    if (what.startsWith('today/')) setDebugToday(what.slice('today/'.length));
+    else if (what === 'cards/clear') clearSaleCards();
+    else if (what === 'whatsnew') AsyncStorage.removeItem('lastSeenVersion').catch(() => {});
+    return;
+  }
   if (!navigationRef.isReady()) {
     pendingDeepLinkUrl = url;
     return;
@@ -289,6 +304,71 @@ function AppContent() {
     tour?.startTour();
   };
 
+  // ---- A sale or thank-you card for today (services/sales.js)
+  // One opens at most once a day, the first time the app opens that day, or
+  // later while its sale runs. Never on a first run, where the tour starts;
+  // when What's New is due on the same open, What's New comes first and the
+  // card waits for the next open (the app back from the background).
+  const [saleCard, setSaleCard] = useState(null);
+  const [navReady, setNavReady] = useState(false);
+  const [opens, setOpens] = useState(0);
+  const [debugDayLoaded, setDebugDayLoaded] = useState(!__DEV__);
+  const openTaken = useRef(false);
+  const whatsNewDue = !isLoading && hasSeenOnboarding && lastSeenVersion !== APP_VERSION.version;
+  const whatsNewVisible = (showWhatsNew || !!tour?.whatsNewOpen) && !tour?.active;
+
+  useEffect(() => {
+    if (__DEV__) loadDebugToday().finally(() => setDebugDayLoaded(true));
+    let state = AppState.currentState;
+    const subscription = AppState.addEventListener('change', (next) => {
+      if (state === 'background' && next === 'active') {
+        openTaken.current = false;
+        setOpens((n) => n + 1);
+      }
+      state = next;
+    });
+    // Debug builds: a new pretend day counts as a new open
+    const removeDebug = onDebugToday(() => {
+      openTaken.current = false;
+      setOpens((n) => n + 1);
+    });
+    return () => {
+      subscription.remove();
+      removeDebug();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isLoading || langLoading || !navReady || !debugDayLoaded || !tour || saleCard) return undefined;
+    if (!hasSeenOnboarding || tour.active || whatsNewDue || whatsNewVisible) {
+      openTaken.current = true;
+      return undefined;
+    }
+    if (openTaken.current) return undefined;
+    let cancelled = false;
+    nextSaleCard()
+      .then(async (card) => {
+        if (!card || cancelled) return;
+        await markCardOpened(card);
+        setSaleCard(card);
+      })
+      .catch((error) => console.error('Failed to check the sale cards:', error));
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading, langLoading, navReady, debugDayLoaded, hasSeenOnboarding, tour?.active, whatsNewDue, whatsNewVisible, opens]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSaleShare = () => {
+    shareApp().catch((error) => console.error('Share failed:', error));
+  };
+
+  const handleSaleSeeOtherApps = () => {
+    setSaleCard(null);
+    if (!navigationRef.isReady()) return;
+    navigationRef.navigate('Settings');
+    openSettingsAt('about', 'moreApps');
+  };
+
   if (isLoading || langLoading || !navStateReady) {
     return null; // Wait for settings + language so the first paint is correct (no flash)
   }
@@ -303,6 +383,7 @@ function AppContent() {
         onStateChange={onNavStateChange}
         theme={navigationThemeFor(theme.colors)}
         onReady={() => {
+          setNavReady(true);
           if (pendingDeepLinkUrl) {
             handleDeepLink(pendingDeepLinkUrl);
           }
@@ -314,9 +395,15 @@ function AppContent() {
       </NavigationContainer>
       <AppTour navigationRef={navigationRef} />
       <WhatsNewModal
-        visible={(showWhatsNew || !!tour?.whatsNewOpen) && !tour?.active}
+        visible={whatsNewVisible}
         onClose={handleWhatsNewClose}
         onTakeTour={handleWhatsNewTour}
+      />
+      <SaleCardModal
+        card={saleCard}
+        onShare={handleSaleShare}
+        onSeeOtherApps={handleSaleSeeOtherApps}
+        onClose={() => setSaleCard(null)}
       />
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,8 @@ import { useTranslation } from '../context/LanguageContext';
 import { APP_LANGUAGES, getAppLanguage } from '../i18n/appLanguages';
 import { tStatic } from '../i18n';
 import { formatLocalizedDate } from '../utils/formatDate';
+import { saleOn, saleTag, useToday } from '../services/sales';
+import { onOpenSettingsAt } from '../utils/settingsNavigation';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTour, useTourTarget } from '../context/TourContext';
 import CustomAlert from '../components/CustomAlert';
@@ -106,6 +108,36 @@ export default function SettingsScreen({ navigation }) {
   // The tour points at the list's rows, so it brings the list back first
   const tourAppearanceRef = useTourTarget('settings.appearance', () => setPage(null));
   const tourDataRef = useTourTarget('settings.data', () => setPage(null));
+  // A sale card's See our other apps opens About at More from SeMo Lab
+  // (utils/settingsNavigation): the page, then the part once it has its place
+  const scrollRef = useRef(null);
+  const anchorPlaces = useRef({});
+  const [anchor, setAnchor] = useState(null);
+  useEffect(() => onOpenSettingsAt((request) => {
+    setPage(request.page);
+    setAnchor({ name: request.anchor });
+  }), []);
+  const scrollToAnchor = useCallback(() => {
+    const y = anchor ? anchorPlaces.current[anchor.name] : undefined;
+    if (y === undefined) return;
+    scrollRef.current?.scrollTo({ y: Math.max(0, y - 8), animated: true });
+    setAnchor(null);
+  }, [anchor]);
+  useEffect(() => {
+    scrollToAnchor();
+  }, [scrollToAnchor]);
+  const anchorPlace = (name) => (event) => {
+    anchorPlaces.current[name] = event.nativeEvent.layout.y;
+    scrollToAnchor();
+  };
+  // A sibling's discount while its sale runs, from the first day to the last:
+  // the tag beside its name in More from SeMo Lab
+  const today = useToday();
+  const siblingSaleTag = (name) => {
+    const sale = saleOn(name.toLowerCase(), today);
+    return sale ? saleTag(sale.percent, language) : null;
+  };
+
   // Android's back button on a page returns to the list
   useFocusEffect(
     useCallback(() => {
@@ -1211,12 +1243,16 @@ export default function SettingsScreen({ navigation }) {
         <TesterItem>Ulas Altun</TesterItem>
       </View>
 
-      <SectionTitle title={t('settings.sectionMoreApps')} />
+      <View onLayout={anchorPlace('moreApps')}>
+        <SectionTitle title={t('settings.sectionMoreApps')} />
+      </View>
       <ListCard>
         {SEMO_LAB_APPS.map((app) => (
           <SettingItem
             key={app.packageName}
             title={app.name}
+            // A sibling on sale today shows its discount, like −50%
+            tag={siblingSaleTag(app.name)}
             description={t(app.descKey)}
             onPress={() => openPlayListing(app.packageName)}
             rightElement={<Ionicons name="logo-google-playstore" size={20} color={colors.mainInk} />}
@@ -1268,7 +1304,7 @@ export default function SettingsScreen({ navigation }) {
         </Text>
       </View>
 
-      <ScrollView key={page || 'list'} style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} key={page || 'list'} style={styles.content} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {page ? pages[page]() : renderCategories()}
       </ScrollView>
 
@@ -1674,14 +1710,22 @@ export default function SettingsScreen({ navigation }) {
 
 // A row of a card in Settings: a title, a line under it, and an optional
 // control or icon at the end. The card draws the hairlines between rows.
-function SettingItem({ title, description, onPress, rightElement }) {
+function SettingItem({ title, tag, description, onPress, rightElement }) {
   const ui = useUi();
   const { isRTL } = useTranslation();
   const styles = useStyles(isRTL);
   return (
     <TouchableOpacity style={styles.settingItem} onPress={onPress} disabled={!onPress} activeOpacity={0.7}>
       <View style={styles.flexText}>
-        <Text style={ui.rowTitle}>{title}</Text>
+        {tag ? (
+          // A small tag beside the name, in the accent colors (a sibling's sale)
+          <View style={styles.titleWithTag}>
+            <Text style={ui.rowTitle}>{title}</Text>
+            <Text style={styles.tag}>{tag}</Text>
+          </View>
+        ) : (
+          <Text style={ui.rowTitle}>{title}</Text>
+        )}
         {!!description && <Text style={[ui.secondary, styles.hint]}>{description}</Text>}
       </View>
       {rightElement}
@@ -1753,6 +1797,23 @@ const useStyles = makeStyles(({ colors: c }, isRTL) => {
     },
     flexText: {
       flex: 1,
+    },
+    // A name with a small tag beside it, like −50% (the family page's minitag)
+    titleWithTag: {
+      flexDirection: row,
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: 6,
+    },
+    tag: {
+      fontFamily: FONT.bold,
+      fontSize: 11,
+      color: c.accentInk,
+      backgroundColor: c.accentTint,
+      borderRadius: RADIUS.round,
+      paddingHorizontal: 7,
+      paddingVertical: 1,
+      overflow: 'hidden',
     },
     hint: {
       marginTop: 2,

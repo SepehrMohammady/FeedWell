@@ -70,6 +70,27 @@ export function formatLocalizedDate(dateString, language, formatNumber = identit
   }
 }
 
+/**
+ * A calendar day ("2027-04-22", a local date) as its day and month, the way
+ * the language writes them, in its own digits: "April 22", "22 avril",
+ * "٢٢ أبريل"; Farsi in the Persian calendar, as the app's other dates
+ * ("۲ اردیبهشت").
+ */
+export function formatDayMonth(dateKey, language) {
+  const [year, month, day] = String(dateKey).split('-').map(Number);
+  const d = new Date(year, month - 1, day, 12);
+  if (isNaN(d.getTime())) return String(dateKey);
+  if (language === 'fa') {
+    const [, jm, jd] = gregorianToJalali(year, month, day);
+    return localDigits(`${jd} ${FA_JALALI_MONTHS[jm - 1]}`, 'fa');
+  }
+  try {
+    return localDigits(d.toLocaleDateString(`${language || 'en'}-u-ca-gregory-nu-latn`, { day: 'numeric', month: 'long' }), language);
+  } catch (e) {
+    return localDigits(`${day}/${month}`, language);
+  }
+}
+
 // Relative time, localized. `language` is used only for the >1 week absolute fallback.
 export function formatRelativeDate(dateString, t, formatNumber = identity, language) {
   if (!dateString) return '';

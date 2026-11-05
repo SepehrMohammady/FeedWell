@@ -31,13 +31,22 @@ export const AUTO_BACKUP_KEYS = {
   lastHashes: 'autoBackup.lastHashes',
 };
 
-// Kept on this phone: navigation state, first-run flags, caches and the
-// automatic backup's state
+// The sale cards that have opened on this phone, and the day the last one did
+// (services/sales.js)
+export const SALE_CARDS_KEY = 'saleCards';
+
+// Debug builds only: the day they pretend it is, to check the sale cards
+export const DEBUG_TODAY_KEY = 'debug.today';
+
+// Kept on this phone: navigation state, first-run flags, caches, the
+// automatic backup's state and the sale cards seen
 const KEPT_KEYS = new Set([
   'feedwell_nav_state',
   'hasSeenOnboarding',
   'lastSeenVersion',
   'ogImageAttemptCache',
+  SALE_CARDS_KEY,
+  DEBUG_TODAY_KEY,
   ...Object.values(AUTO_BACKUP_KEYS),
 ]);
 
