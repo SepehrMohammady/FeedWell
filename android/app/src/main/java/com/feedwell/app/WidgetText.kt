@@ -13,7 +13,7 @@ import java.util.TimeZone
  * The widget's dates and numbers in the app's language. The app sends the
  * language, its digits and its own "just now", "{count}h ago" and "{count}d ago"
  * (WidgetBridge.setWidgetLanguage), so the widget says what the article list
- * says; older dates Android's ICU writes in the language, Farsi in the Persian
+ * says; older dates Android's ICU writes in the language, Farsi in the Iranian
  * calendar as the app does. Persian digits in Farsi, Arabic-Indic in Arabic.
  */
 object WidgetText {

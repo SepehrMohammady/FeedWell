@@ -235,9 +235,10 @@ the other 87 are unchanged. The test folders are deleted again.
 
 ## Arabic digits and sale campaigns (branch `family-next`, 5 Nov 2026)
 
-Branch `family-next`, made from `main` (1.20.1, 145). Not pushed or merged; the version is
-unchanged. Two commits: `56e0499` (Arabic digits) and `4459c8e` (sale campaigns). Checked in the
-Node test harness, on the Doogee S98 Pro with a debug build, and in the web build in headless Edge.
+Branch `family-next`, made from `main` (1.20.1, 145). Commits: `56e0499` (Arabic digits) and
+`4459c8e` (sale campaigns), then the user's decisions and release 1.20.2 (146), below. Pushed to
+`origin/family-next` by FeedWell's release routine; not merged. Checked in the Node test harness,
+on the Doogee S98 Pro with a debug build, and in the web build in headless Edge.
 
 ### What changed
 
@@ -251,7 +252,7 @@ Node test harness, on the Doogee S98 Pro with a debug build, and in the web buil
 | The family sale calendar, copied as it is (same SHA-256 as `sale-calendar/sale-calendar.json` and LedgerWell's copy) | `src/config/sale-calendar.json` (new) |
 | Sales, tags, which card opens, the cards' words, Share | `src/services/sales.js` (new) |
 | Counted forms by the CLDR plural rules, written by hand as in LedgerWell | `src/utils/plural.js` (new) |
-| Day and month in the language (the Persian calendar in Farsi) | `src/utils/formatDate.js` |
+| Day and month in the language (the Iranian calendar in Farsi) | `src/utils/formatDate.js` |
 | The card, drawn like What's New | `src/components/SaleCardModal.js` (new), `App.js` |
 | The tag beside a sibling's name; See our other apps lands on More from SeMo Lab | `src/screens/SettingsScreen.js`, `src/utils/settingsNavigation.js` (new) |
 | Opened cards kept on the phone (`saleCards`), and the debug day (`debug.today`) | `src/config/backupKeys.js` |
@@ -340,7 +341,7 @@ by the day read back at start. The link's day now wins.
 
 ### Decisions for you
 
-1. Farsi dates on the cards. FeedWell writes every Farsi date in the Persian calendar, so its
+1. Farsi dates on the cards. FeedWell writes every Farsi date in the Iranian calendar, so its
    cards say ۲ اردیبهشت for Earth Day; LedgerWell writes Gregorian dates and says ۲۲ آوریل. The
    Farsi sentences read right either way.
 2. A card due with What's New. FeedWell waits for the next open, as the brief says; LedgerWell
@@ -350,6 +351,33 @@ by the day read back at start. The link's day now wins.
    preview. Should they move to Sie?
 4. The Black Friday and New Year cards have one text, whether they open on the day or later in
    the sale, as LedgerWell's do.
+
+### Decided on 5 November, and release 1.20.2 (146)
+
+The user's answers, through the ProjectWell agent (`design-handoff/prompts/feedwell.md`):
+
+1. Farsi dates: the Iranian calendar in every app, the cards included. FeedWell already does;
+   nothing changed.
+2. A card due on the same open as What's New now opens as soon as What's New closes, so a card
+   due only that day isn't lost (`App.js`, as LedgerWell). Still never on a first run, and never
+   over the tour; after a tour started from What's New, the card follows the tour. Checked in the
+   web build: What's New for 1.20.2 due on 3 May 2027 opened alone, and World Press Freedom Day
+   opened right after Got it.
+3. German: Sie everywhere. There were 15 informal strings, not the 8 I counted: 6 left with
+   1.20.0's What's New entries, and 9 now use Sie: `tour.appearanceBody`, `tour.backupBody`,
+   `settings.clearAllDataDesc`, `settings.clearAllDataConfirm`, `settings.resetSettingsDesc`,
+   `settings.resetConfirm`, `backup.previewMessage`, `backup.newerMessage`,
+   `backup.restoreDone`.
+
+The calendar is called the Iranian calendar wherever people read it: this report and the code's
+comments (`formatDate.js`, `widgetService.js`, `WidgetText.kt`). Code names stay as they are.
+
+Release 1.20.2 (146), by FeedWell's release routine: the version in `version.js`, `app.json`,
+`package.json` and `package-lock.json`. What's New covers 1.20.2 and 1.20.1. The 1.20.2 entries,
+written for FeedWell in all 30 languages: `whatsNew.salesTitle`, `whatsNew.salesBody` (Sales and
+thank-you cards) and `whatsNew.datesTitle`, `whatsNew.datesBody` (Dates in your language). Each
+language names More from SeMo Lab, Saved, the reader and the widget as its own catalog does.
+1.20.0's entries left, with their 10 strings in every language.
 
 Seen, not changed (the same on `main`):
 

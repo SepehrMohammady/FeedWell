@@ -306,9 +306,10 @@ function AppContent() {
 
   // ---- A sale or thank-you card for today (services/sales.js)
   // One opens at most once a day, the first time the app opens that day, or
-  // later while its sale runs. Never on a first run, where the tour starts;
-  // when What's New is due on the same open, What's New comes first and the
-  // card waits for the next open (the app back from the background).
+  // later while its sale runs. Never on a first run, where the tour starts:
+  // the next open checks again. Never over the tour or What's New: the card
+  // opens as soon as they close, so a card due only today isn't lost (as in
+  // LedgerWell; design-handoff/sale-cards.md).
   const [saleCard, setSaleCard] = useState(null);
   const [navReady, setNavReady] = useState(false);
   const [opens, setOpens] = useState(0);
@@ -340,15 +341,20 @@ function AppContent() {
 
   useEffect(() => {
     if (isLoading || langLoading || !navReady || !debugDayLoaded || !tour || saleCard) return undefined;
-    if (!hasSeenOnboarding || tour.active || whatsNewDue || whatsNewVisible) {
+    // A first run: the tour starts, and no card opens until the next open
+    if (!hasSeenOnboarding) {
       openTaken.current = true;
       return undefined;
     }
-    if (openTaken.current) return undefined;
+    // The tour or What's New is showing (or due): this runs again when they close
+    if (tour.active || whatsNewDue || whatsNewVisible || openTaken.current) return undefined;
     let cancelled = false;
     nextSaleCard()
       .then(async (card) => {
-        if (!card || cancelled) return;
+        // Something opened over the app meanwhile: the next run checks again
+        if (cancelled) return;
+        openTaken.current = true;
+        if (!card) return;
         await markCardOpened(card);
         setSaleCard(card);
       })

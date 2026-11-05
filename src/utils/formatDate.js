@@ -1,6 +1,6 @@
 // Localized date/time formatting.
 // - Relative time ("Just now", "3h ago") via the i18n `t` function.
-// - Absolute dates: for Farsi, the Solar Hijri (Jalali) calendar with Farsi month
+// - Absolute dates: for Farsi, the Iranian calendar with Farsi month
 //   names + Persian digits; for other languages, the platform's formatting in
 //   the app's language, in Latin digits that formatNumber then writes in the
 //   language's own (Arabic-Indic in Arabic).
@@ -13,7 +13,7 @@ const FA_JALALI_MONTHS = [
   'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
 ];
 
-// Gregorian -> Jalali (Solar Hijri). Standard conversion algorithm.
+// Gregorian -> the Iranian calendar. Standard conversion algorithm.
 function gregorianToJalali(gy, gm, gd) {
   const gDaysToMonth = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
   const gy2 = gm > 2 ? gy + 1 : gy;
@@ -41,7 +41,7 @@ function gregorianToJalali(gy, gm, gd) {
 
 const pad2 = (n) => String(n).padStart(2, '0');
 
-// Absolute, localized date. Farsi -> Jalali calendar + Persian digits + 24h time.
+// Absolute, localized date. Farsi -> the Iranian calendar + Persian digits + 24h time.
 // opts: { withYear=true, withTime=true, locale, localeOptions=null }
 // For non-Farsi `toLocaleDateString(locale, localeOptions)` is used, in the app's
 // language with Latin digits unless the screen names a locale.
@@ -73,7 +73,7 @@ export function formatLocalizedDate(dateString, language, formatNumber = identit
 /**
  * A calendar day ("2027-04-22", a local date) as its day and month, the way
  * the language writes them, in its own digits: "April 22", "22 avril",
- * "٢٢ أبريل"; Farsi in the Persian calendar, as the app's other dates
+ * "٢٢ أبريل"; Farsi in the Iranian calendar, as the app's other dates
  * ("۲ اردیبهشت").
  */
 export function formatDayMonth(dateKey, language) {

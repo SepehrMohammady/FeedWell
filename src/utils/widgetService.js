@@ -8,7 +8,7 @@ const { WidgetBridge } = NativeModules;
  * The words and digits the widget writes its dates with, in the app's language:
  * the app's own "just now", "{count}h ago" and "{count}d ago", so the widget
  * says what the article list says. Older dates the widget writes itself, in the
- * language (Farsi in the Persian calendar, as the app does).
+ * language (Farsi in the Iranian calendar, as the app does).
  */
 export function updateWidgetLanguage(language) {
   if (Platform.OS !== 'android' || !WidgetBridge || !WidgetBridge.setWidgetLanguage) return;
