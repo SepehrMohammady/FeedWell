@@ -236,9 +236,10 @@ the other 87 are unchanged. The test folders are deleted again.
 ## Arabic digits and sale campaigns (branch `family-next`, 5 Nov 2026)
 
 Branch `family-next`, made from `main` (1.20.1, 145). Commits: `56e0499` (Arabic digits) and
-`4459c8e` (sale campaigns), then the user's decisions and release 1.20.2 (146), below. Pushed to
-`origin/family-next` by FeedWell's release routine; not merged. Checked in the Node test harness,
-on the Doogee S98 Pro with a debug build, and in the web build in headless Edge.
+`4459c8e` (sale campaigns), then the user's decisions and release 1.20.2 (146), below. Committed
+locally, not merged; the push to `origin` is waiting for the user (a permission check stopped it).
+Checked in the Node test harness, on the Doogee S98 Pro with a debug build, and in the web build
+in headless Edge. 1.20.2 is installed on the Doogee.
 
 ### What changed
 
