@@ -232,3 +232,154 @@ Nov 2, for 1.20.0: the setup was found with its theme following the phone, not D
 tests had left. It is restored again from the same copy, Dark included, with 1.20.0 installed and
 automatic backup off. FeedWell's own refresh then added two new NASA articles (89, 86 unread);
 the other 87 are unchanged. The test folders are deleted again.
+
+## Arabic digits and sale campaigns (branch `family-next`, 5 Nov 2026)
+
+Branch `family-next`, made from `main` (1.20.1, 145). Not pushed or merged; the version is
+unchanged. Two commits: `56e0499` (Arabic digits) and `4459c8e` (sale campaigns). Checked in the
+Node test harness, on the Doogee S98 Pro with a debug build, and in the web build in headless Edge.
+
+### What changed
+
+| Part | Where |
+|---|---|
+| Arabic-Indic digits in Arabic wherever Farsi has Persian digits, one helper for both | `src/utils/digits.js` (new, replaces `src/utils/persianDigits.js`), `src/context/LanguageContext.js` |
+| Dates in the reader, the article page and Saved in the app's language (they were US English in every language but Farsi) | `src/utils/formatDate.js`, `src/screens/AddFeedScreen.js` |
+| The version number in Latin digits in every language (Farsi showed it in Persian digits) | `src/screens/SettingsScreen.js` |
+| Numbers written inside the Arabic strings, in Arabic-Indic digits (7 strings) | `src/i18n/locales/ar.js` |
+| Widget: article times and dates in the app's language and digits (they were English in every language), the page count too | `WidgetText.kt` (new), `LatestArticlesWidget.kt`, `WidgetArticleListService.kt`, `WidgetBridgeModule.kt`, `src/utils/widgetService.js` |
+| The family sale calendar, copied as it is (same SHA-256 as `sale-calendar/sale-calendar.json` and LedgerWell's copy) | `src/config/sale-calendar.json` (new) |
+| Sales, tags, which card opens, the cards' words, Share | `src/services/sales.js` (new) |
+| Counted forms by the CLDR plural rules, written by hand as in LedgerWell | `src/utils/plural.js` (new) |
+| Day and month in the language (the Persian calendar in Farsi) | `src/utils/formatDate.js` |
+| The card, drawn like What's New | `src/components/SaleCardModal.js` (new), `App.js` |
+| The tag beside a sibling's name; See our other apps lands on More from SeMo Lab | `src/screens/SettingsScreen.js`, `src/utils/settingsNavigation.js` (new) |
+| Opened cards kept on the phone (`saleCards`), and the debug day (`debug.today`) | `src/config/backupKeys.js` |
+| Strings | all 30 files in `src/i18n/locales/` |
+
+No `expo prebuild`; the widget changes are in the committed `android/` folder.
+
+How the card opens: on its event's day, at the first open that day, with its "today" words; if
+FeedWell isn't opened that day, at the first open later while the sale runs, with its "later"
+words; never after the sale. A card with no sale (World Science Day, World Press Freedom Day)
+opens only on its day. One card a day. Never on a first run. When What's New is due on the same
+open, What's New comes first and the card waits for the next open (FeedWell coming back from
+the background). An open is a cold start or a return from the background.
+
+For testing, debug builds only (the code is skipped in release builds):
+
+- `adb shell am start -a android.intent.action.VIEW -d feedwell://debug/today/2027-04-16 com.feedwell.app`
+  pretends it's that day; `.../today/clear` goes back to the phone's date.
+- `feedwell://debug/cards/clear` forgets the cards that opened.
+- `feedwell://debug/whatsnew` makes What's New due at the next start.
+
+Each `am start` sends FeedWell to the background and back, which counts as an open: send the day
+first, then `cards/clear`.
+
+### Strings
+
+Copied from LedgerWell (commit `4501117`, `src/locales/<lang>.json`), all 30 languages, with
+`{{var}}` written `{var}`: `sale.shareApp`, `sale.seeOtherApps`, `sale.blackFridayTitle`,
+`sale.blackFridayBody`, `sale.newYearTitle`, `sale.newYearBody`, `sale.scienceDayTitle`,
+`sale.scienceDayBody`, `sale.semolabTitle`, `sale.semolabToday_<form>`, `sale.semolabLater_<form>`,
+`sale.semolabBody` (LedgerWell's `saleShareApp` and so on). Changed only where FeedWell's
+language differs: Hungarian in the informal te (FeedWell's Hungarian is informal; LedgerWell's is
+Ön) and Portuguese in European Portuguese (Partilhar, as nossas outras apps, a 22 de abril).
+German stays formal (Sie), as LedgerWell and most of FeedWell's German write it.
+
+Written for FeedWell, all 30 languages: `sale.anniversaryTitle_<form>`,
+`sale.anniversaryToday_<form>`, `sale.anniversaryLater_<form>`, `sale.anniversaryBody`,
+`sale.birthdayTitle`, `sale.birthdayToday_<form>`, `sale.birthdayLater_<form>`,
+`sale.birthdayBody`, `sale.pressFreedomTitle`, `sale.pressFreedomBody`. The day's name is the one
+each language's UN and UNESCO sources use (UNRIC for Danish and Finnish, the Swedish UNESCO
+council's "Pressfrihetsdagen", "Internationale Dag van de Persvrijheid" in Dutch). In Arabic,
+Farsi and Hebrew every sentence starts with a word in that script, so the paragraph runs right
+to left. Hungarian writes dates as "{date} napján" and "{lastDay} napjáig", as LedgerWell does.
+
+Counted forms per language, as CLDR: Arabic one, two, few, many, other; Hebrew one, two, other;
+Russian, Ukrainian and Polish one, few, many; Czech and Romanian one, few, other; Japanese,
+Korean, Chinese, Thai, Vietnamese and Indonesian other only; the rest one and other. In Russian,
+Ukrainian and Filipino "one" also covers 21, 31 and so on, so those lines carry the number.
+FeedWell's plural rules match `Intl.PluralRules` for 0 to 1000 in all 30 languages (Romanian
+101, 201 and so on were "other"; they are "few" now, found by LedgerWell's agent).
+
+### Checks
+
+Harness: 10 tests of the cards and tags against the real calendar, and a check that every card
+in every language has all its words and forms, with no English left in the other 29, no
+placeholder left, Arabic-Indic digits in Arabic and Persian digits in Farsi.
+
+On the phone, with the pretend day (the phone's clock untouched):
+
+- Arabic digits: the Settings list (٦ أشهر, the widget's ٧٠, the last backup ٥ نوفمبر ٢٠٢٦), the
+  Data page, Home (٤ feeds, ١٠٥ unread, ٣ saved), article ages (منذ ٣ س), an older date
+  (٢٣/٩/٢٠٢٦), the reader (٤ نوفمبر ٢٠٢٦, ١٠:٠٤ م, while the article text keeps "Oct. 23" and
+  "2028") and the widget (منذ ٣ س, ١ / ٢٠). The version stays "FeedWell 1.20.1". Farsi as before
+  (۴ ساعت پیش, ۱ مهر ۱۴۰۵, widget ۳ ساعت پیش). Hindi and English in Latin digits (4 घंटे पहले, 3h ago).
+- Tags: on 21 and 27 Nov 2026, −50% on LedgerWell, ThinkWell and WeatherWell, none on TuneWell
+  (it skips Black Friday 2026); none on 28 Nov. All four on 29 Dec and 3 Jan, none on 5 Jan.
+  All four on 20 Apr 2027. In English, Arabic (−٥٠٪, right to left) and Farsi (−۵۰٪).
+- Cards: World Science Day on 10 Nov (none on 11 Nov); Black Friday on 27 Nov; New Year
+  opened on 3 Jan, later in the sale; SeMo Lab's birthday on 20 Apr with its later words ("SeMo
+  Lab turned one on April 16"), and no second card when FeedWell opened again that day; World
+  Press Freedom Day on 3 May, without See our other apps (none on 4 May); the release
+  anniversary on 11 Jun with its today words, on 12 Jun with its later words, nothing on 13 Jun;
+  FeedWell's birthday on 16 Jul with its later words in Arabic and in Farsi (۲۲ تیر).
+- Share FeedWell opens the share sheet with
+  `https://play.google.com/store/apps/details?id=com.feedwell.app` (closed with Back). See our
+  other apps, from the Home tab, opens Settings, About, at More from SeMo Lab.
+- What's New and a card both due on a cold start: What's New first, no card under it or after
+  it on that open; the card at the next open.
+- First run (FeedWell's storage cleared, then opened on 3 May): the tour, and no card.
+
+Web (`expo start --web`, headless Edge): it starts, and More from SeMo Lab shows the tags on
+21 Nov in English, Arabic and Farsi.
+
+Found and fixed: in debug builds, the day set by the link that opens FeedWell could be replaced
+by the day read back at start. The link's day now wins.
+
+### Decisions for you
+
+1. Farsi dates on the cards. FeedWell writes every Farsi date in the Persian calendar, so its
+   cards say ۲ اردیبهشت for Earth Day; LedgerWell writes Gregorian dates and says ۲۲ آوریل. The
+   Farsi sentences read right either way.
+2. A card due with What's New. FeedWell waits for the next open, as the brief says; LedgerWell
+   opens the card as soon as What's New closes. One of the two could change so the apps agree.
+3. German. Most of FeedWell's German is formal (Sie, 58 strings), as the cards are. Eight newer
+   strings use du: the What's New entries, the reset and clear confirmations and the backup
+   preview. Should they move to Sie?
+4. The Black Friday and New Year cards have one text, whether they open on the day or later in
+   the sale, as LedgerWell's do.
+
+Seen, not changed (the same on `main`):
+
+- After the first-run tour ends (or is skipped), What's New opens, though `App.js` says it never
+  shows on a fresh install: `completeOnboarding` marks the tour done, then waits for a write
+  before it stamps the version, and one render in between sees an old version. Setting both
+  before the writes would fix it. No card opens either way.
+- Two NASA feeds (science.nasa.gov/feed/ and the Earth Observatory image of the day) fail every
+  refresh: the XML reader stops at `attribute space is required "xmlns:apod"`. Release builds
+  fail silently; debug builds show it.
+- On the web, the Home tab shows through the other tabs: the screens are transparent since Calm
+  Surfaces 3, and the web build doesn't hide tabs that aren't in front.
+- After a restore, FeedWell handles the link it was opened with a second time, so an article
+  opened from the widget would open again.
+- Android writes Arabic date and time with a Latin comma ("٥ نوفمبر ٢٠٢٦, ١:٢٠ ص").
+
+For the store-screenshot config: from 10 Nov 2026 a card can open at the first open of a day
+(see the calendar), so a run on such a day should close it ("Close"). A first run after
+`pm clear` never shows one.
+
+### The test phone
+
+The debug build was signed with the upload key for the test (a Gradle init script outside the
+repo, not committed), so it installed over 1.20.1 and kept FeedWell's data, and the release
+build went back the same way. Before: a backup file from FeedWell's automatic backup and a copy
+of its storage. After: restored with Replace, then compared key by key with the copy taken
+before: the 25 data and settings keys are the same; the navigation state and an image cache
+differ, and automatic backup is off as it was. FeedWell 1.20.1 is installed again (the same APK
+as before), with 4 feeds, 108 articles (3 read), 3 saved with the highlight, Dark, Lavender,
+Warm Beige accent, English. No card record and no debug day are left. Font size 1.0 and night
+mode are as found; the test folder in Download is deleted and nothing else there was touched.
+No FeedWell widget was on the home screens, so I placed one for the widget check and removed it.
+The phone's date and time were not changed, and ThinkWell was not touched.
