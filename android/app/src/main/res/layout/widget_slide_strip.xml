@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One article of the playing slideshow in the one-row size: the title, then
+     the controls, with room left at the end for the refresh button above it -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/slide_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/slide_strip_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text=""
+        android:textColor="@color/widget_title"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <ImageButton
+        android:id="@+id/slide_prev"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_widget_prev"
+        android:contentDescription="Previous article"
+        android:scaleType="centerInside"
+        android:layout_marginStart="4dp" />
+
+    <ImageButton
+        android:id="@+id/slide_pause"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_widget_pause"
+        android:contentDescription="Pause slideshow"
+        android:scaleType="centerInside"
+        android:layout_marginStart="2dp" />
+
+    <ImageButton
+        android:id="@+id/slide_next"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_widget_next"
+        android:contentDescription="Next article"
+        android:scaleType="centerInside"
+        android:layout_marginStart="2dp" />
+
+    <FrameLayout
+        android:id="@+id/slide_refresh_space"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="2dp" />
+</LinearLayout>

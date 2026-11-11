@@ -57,6 +57,21 @@ object WidgetText {
     /** A number the widget writes (the page counter), in the language's digits */
     fun number(context: Context, text: String): String = localDigits(text, words(context).digits)
 
+    /**
+     * One of the words the app sends with its language: the controls' names
+     * (previous, play, pause, next, refresh) and what an empty widget says
+     * (emptyTitle, emptyBody, for the articles it is set to show)
+     */
+    fun label(context: Context, key: String, fallback: String): String {
+        val json = context.getSharedPreferences(LatestArticlesWidget.PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_LANGUAGE, null) ?: return fallback
+        return try {
+            JSONObject(json).optString(key, "").ifEmpty { fallback }
+        } catch (e: Exception) {
+            fallback
+        }
+    }
+
     private fun parse(dateString: String): Date? {
         val formats = arrayOf(
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",

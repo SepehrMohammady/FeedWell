@@ -38,6 +38,7 @@ import { detectLanguage, getTextDirection, getTextAlignment, getLanguageName } f
 import ArticleImage from '../components/ArticleImage';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CustomAlert from '../components/CustomAlert';
+import { DragSheet, SheetDragArea } from '../components/DragSheet';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
 import { readingFontStyle } from '../config/readingFonts';
@@ -1511,20 +1512,26 @@ function ArticleReaderScreenContent({ route, navigation }) {
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
-            <View style={styles.sheetHandle} />
-            <View style={[styles.modalHeader, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
-              <Text style={styles.modalTitle}>{t('reader.translateTo')}</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowLanguagePicker(false);
-                  setLanguageSearchQuery('');
-                }}
-                style={styles.modalCloseButton}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
+          <DragSheet onClose={() => {
+          setShowLanguagePicker(false);
+          setLanguageSearchQuery('');
+        }} style={[styles.modalContainer, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+            <SheetDragArea>
+              <View style={styles.sheetHandle} />
+              <View style={[styles.modalHeader, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.modalTitle}>{t('reader.translateTo')}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowLanguagePicker(false);
+                    setLanguageSearchQuery('');
+                  }}
+                  style={styles.modalCloseButton}
+                  accessibilityLabel={t('common.close')}
+                >
+                  <Ionicons name="close" size={24} color={theme.colors.text} />
+                </TouchableOpacity>
+              </View>
+            </SheetDragArea>
 
             <View style={[styles.modalSearchContainer, { flexDirection: appRTL ? 'row-reverse' : 'row' }]}>
               <Ionicons name="search" size={18} color={theme.colors.textSecondary} />
@@ -1572,7 +1579,7 @@ function ArticleReaderScreenContent({ route, navigation }) {
               showsVerticalScrollIndicator={false}
               style={styles.languageList}
             />
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 

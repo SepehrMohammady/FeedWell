@@ -2,5 +2,5 @@
   <string name="app_name">FeedWell</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
   <string name="expo_splash_screen_status_bar_translucent" translatable="false">false</string>
-  <string name="widget_description">Shows your latest RSS articles with swipe navigation</string>
+  <string name="widget_description">Your latest articles, one at a time or as a slideshow</string>
 </resources>

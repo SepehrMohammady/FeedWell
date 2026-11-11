@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { tStatic } from '../i18n';
 import { SUPPORTED_LANGUAGES, RTL_LANGUAGES } from '../i18n/appLanguages';
 import { localDigits } from '../utils/digits';
-import { updateWidgetLanguage } from '../utils/widgetService';
 
 export const APP_LANGUAGE_KEY = 'appLanguage';
 
@@ -76,11 +75,8 @@ export function LanguageProvider({ children }) {
   // Arabic-Indic in Arabic)
   const formatNumber = useCallback((value) => localDigits(String(value), language), [language]);
 
-  // The home-screen widget writes its dates itself: it gets the language's
-  // words and digits for them
-  useEffect(() => {
-    if (!langLoading) updateWidgetLanguage(language);
-  }, [language, langLoading]);
+  // The home-screen widget gets the language's words and digits through
+  // WidgetSync (App.js)
 
   const isRTL = RTL_LANGUAGES.includes(language);
   lastLanguage = language;

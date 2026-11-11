@@ -56,5 +56,10 @@
         android:name=".WidgetArticleListService"
         android:permission="android.permission.BIND_REMOTEVIEWS"
         android:exported="false" />
+    <!-- The slides of the widget's slideshow -->
+    <service
+        android:name=".WidgetSlideService"
+        android:permission="android.permission.BIND_REMOTEVIEWS"
+        android:exported="false" />
   </application>
 </manifest>

@@ -42,37 +42,46 @@
             android:ellipsize="end"
             android:visibility="gone" />
 
+        <!-- The controls: plain glyphs in the widget's icon color (set in code
+             for the widget's theme), on a round press ripple -->
         <ImageButton
             android:id="@+id/widget_prev_button"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous"
+            android:src="@drawable/ic_widget_prev"
             android:contentDescription="Previous article"
             android:scaleType="centerInside"
-            android:tint="@color/widget_icon"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="2dp" />
+            android:layout_marginStart="4dp" />
+
+        <ImageButton
+            android:id="@+id/widget_play_button"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_widget_play"
+            android:contentDescription="Play slideshow"
+            android:scaleType="centerInside"
+            android:layout_marginStart="2dp" />
 
         <ImageButton
             android:id="@+id/widget_next_button"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_next"
+            android:src="@drawable/ic_widget_next"
             android:contentDescription="Next article"
             android:scaleType="centerInside"
-            android:tint="@color/widget_icon" />
+            android:layout_marginStart="2dp" />
 
         <ImageButton
             android:id="@+id/widget_refresh_button"
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:background="@null"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_widget_refresh"
             android:contentDescription="Refresh"
             android:scaleType="centerInside"
-            android:tint="@color/widget_icon"
             android:layout_marginStart="2dp" />
 
         <ProgressBar

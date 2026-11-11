@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The next article fades in over the one showing. Each slide has the
+     widget's own background, so the controls in its header never flicker. -->
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="alpha"
+    android:valueFrom="0"
+    android:valueTo="1"
+    android:valueType="floatType"
+    android:duration="320" />

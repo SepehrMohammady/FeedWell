@@ -69,6 +69,34 @@ class WidgetBridgeModule(reactContext: ReactApplicationContext) : ReactContextBa
         refreshWidgets(context)
     }
 
+    // Seconds per article in the widget's slideshow (5, 10, 20 or 30)
+    @ReactMethod
+    fun setWidgetSlideSeconds(seconds: Int) {
+        val context = reactApplicationContext
+        val prefs = LatestArticlesWidget.prefs(context)
+        val value = if (seconds in LatestArticlesWidget.SLIDE_SECONDS) seconds else 10
+        if (prefs.getInt(LatestArticlesWidget.KEY_SLIDE_SECONDS, 10) == value) return
+        // A new speed is a new layout, whose slides begin again: from the
+        // article the widget last stopped on
+        prefs.edit()
+            .putInt(LatestArticlesWidget.KEY_SLIDE_SECONDS, value)
+            .putInt(LatestArticlesWidget.KEY_SLIDE_START, LatestArticlesWidget.getCurrentIndex(context))
+            .apply()
+        refreshWidgets(context)
+    }
+
+    // What a tall widget shows: "list" (a scrolling list) or "article" (one
+    // article at a time, with its picture, and the slideshow)
+    @ReactMethod
+    fun setWidgetTallLayout(layout: String) {
+        val context = reactApplicationContext
+        val prefs = LatestArticlesWidget.prefs(context)
+        val value = if (layout == "article") "article" else "list"
+        if (prefs.getString(LatestArticlesWidget.KEY_TALL_LAYOUT, "list") == value) return
+        prefs.edit().putString(LatestArticlesWidget.KEY_TALL_LAYOUT, value).apply()
+        refreshWidgets(context)
+    }
+
     private fun imageUrls(articlesJson: String): List<String> = try {
         LatestArticlesWidget.imageUrlsOf(JSONArray(articlesJson))
     } catch (e: Exception) {

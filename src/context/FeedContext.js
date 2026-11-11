@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeStorage } from '../utils/SafeStorage';
-import { updateWidget } from '../utils/widgetService';
 
 const FeedContext = createContext();
 
@@ -218,12 +217,7 @@ export function FeedProvider({ children }) {
     loadData();
   }, []);
 
-  // Update Android widget whenever articles or feeds change
-  useEffect(() => {
-    if (isInitialized && state.articles.length > 0) {
-      updateWidget(state.articles, state.feeds);
-    }
-  }, [isInitialized, state.articles, state.feeds]);
+  // The home screen widget follows the articles through WidgetSync (App.js)
 
   // Auto refresh on app start - only once after initial load is complete AND articles are loaded
   useEffect(() => {
@@ -1192,6 +1186,7 @@ export function FeedProvider({ children }) {
 
   const value = {
     ...state,
+    isInitialized,
     addFeed,
     removeFeed,
     addArticles,

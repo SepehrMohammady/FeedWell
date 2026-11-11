@@ -29,6 +29,7 @@ import { setupNotificationChannel, scheduleReminderNotification, cancelReminderN
 import { AppReloadProvider } from './src/context/AppReloadContext';
 import { runAutomaticBackup } from './src/services/BackupService';
 import SaleCardModal from './src/components/SaleCardModal';
+import WidgetSync from './src/components/WidgetSync';
 import { clearSaleCards, loadDebugToday, markCardOpened, nextSaleCard, onDebugToday, setDebugToday, shareApp } from './src/services/sales';
 import { openSettingsAt } from './src/utils/settingsNavigation';
 
@@ -383,6 +384,7 @@ function AppContent() {
     <View style={styles.fill}>
       {/* The wash sits behind every screen; the pages are transparent over it */}
       <ScreenWash />
+      <WidgetSync />
       <NavigationContainer
         ref={navigationRef}
         initialState={initialNavState}

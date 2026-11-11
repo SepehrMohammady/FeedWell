@@ -4,6 +4,8 @@ import { DEFAULT_HOME_SECTIONS, normalizeHomeSections } from '../config/homeSect
 import { APP_VERSION } from '../config/version';
 import { normalizeAutoScrollSpeed } from '../hooks/useAutoScroll';
 import { DEFAULT_READING_FONT, getReadingFont } from '../config/readingFonts';
+import { SWIPE_ACTIONS, DEFAULT_SWIPE_RIGHT, DEFAULT_SWIPE_LEFT } from '../config/swipeActions';
+import { EMPTY_FEED_FILTER, normalizeFeedFilter } from '../config/feedFilter';
 
 const AppSettingsContext = createContext();
 
@@ -52,6 +54,18 @@ export function AppSettingsProvider({ children }) {
   const [autoTranslate, setAutoTranslate] = useState(false);
   // Which Home sections show, and in what order (Customize Home).
   const [homeSections, setHomeSections] = useState(DEFAULT_HOME_SECTIONS);
+  // The home screen widget: which articles it shows ('all', 'unread' or
+  // 'saved') and from which feed (null: every feed).
+  const [widgetSource, setWidgetSource] = useState('all');
+  const [widgetFeedUrl, setWidgetFeedUrl] = useState(null);
+  // Articles already read look quieter in the Feeds list: a black and white
+  // picture, lighter text and a dimmer row.
+  const [dimReadArticles, setDimReadArticles] = useState(true);
+  // What swiping an article in the Feeds list does (config/swipeActions).
+  const [swipeRightAction, setSwipeRightAction] = useState(DEFAULT_SWIPE_RIGHT);
+  const [swipeLeftAction, setSwipeLeftAction] = useState(DEFAULT_SWIPE_LEFT);
+  // The Feeds list's filter beyond read and unread (config/feedFilter).
+  const [feedFilter, setFeedFilter] = useState(EMPTY_FEED_FILTER);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -87,6 +101,34 @@ export function AppSettingsProvider({ children }) {
       const savedKeepAwakeEnabled = await AsyncStorage.getItem('keepAwakeEnabled');
       const savedAutoTranslate = await AsyncStorage.getItem('autoTranslate');
       const savedHomeSections = await AsyncStorage.getItem('homeSections');
+      const savedWidgetSource = await AsyncStorage.getItem('widgetSource');
+      const savedWidgetFeedUrl = await AsyncStorage.getItem('widgetFeedUrl');
+      const savedDimReadArticles = await AsyncStorage.getItem('dimReadArticles');
+      const savedSwipeRight = await AsyncStorage.getItem('swipeRightAction');
+      const savedSwipeLeft = await AsyncStorage.getItem('swipeLeftAction');
+      const savedFeedFilter = await AsyncStorage.getItem('feedFilter');
+
+      if (savedWidgetSource !== null) {
+        const value = JSON.parse(savedWidgetSource);
+        if (['all', 'unread', 'saved'].includes(value)) setWidgetSource(value);
+      }
+      if (savedWidgetFeedUrl !== null) {
+        setWidgetFeedUrl(JSON.parse(savedWidgetFeedUrl) || null);
+      }
+      if (savedDimReadArticles !== null) {
+        setDimReadArticles(JSON.parse(savedDimReadArticles));
+      }
+      if (savedSwipeRight !== null) {
+        const value = JSON.parse(savedSwipeRight);
+        if (SWIPE_ACTIONS.includes(value)) setSwipeRightAction(value);
+      }
+      if (savedSwipeLeft !== null) {
+        const value = JSON.parse(savedSwipeLeft);
+        if (SWIPE_ACTIONS.includes(value)) setSwipeLeftAction(value);
+      }
+      if (savedFeedFilter !== null) {
+        setFeedFilter(normalizeFeedFilter(JSON.parse(savedFeedFilter)));
+      }
 
       if (savedShowImages !== null) {
         setShowImages(JSON.parse(savedShowImages));
@@ -409,6 +451,20 @@ export function AppSettingsProvider({ children }) {
     }
   };
 
+  const saveSetting = async (key, value, set) => {
+    try {
+      set(value);
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error(`Error saving ${key} setting:`, error);
+    }
+  };
+  const updateWidgetSource = (value) => saveSetting('widgetSource', value, setWidgetSource);
+  const updateWidgetFeedUrl = (value) => saveSetting('widgetFeedUrl', value || null, setWidgetFeedUrl);
+  const updateDimReadArticles = (value) => saveSetting('dimReadArticles', value, setDimReadArticles);
+  const updateSwipeRightAction = (value) => saveSetting('swipeRightAction', value, setSwipeRightAction);
+  const updateSwipeLeftAction = (value) => saveSetting('swipeLeftAction', value, setSwipeLeftAction);
+  const updateFeedFilter = (value) => saveSetting('feedFilter', normalizeFeedFilter(value), setFeedFilter);
   const updateLastSeenVersion = async (value) => {
     try {
       setLastSeenVersion(value);
@@ -420,11 +476,15 @@ export function AppSettingsProvider({ children }) {
 
   const completeOnboarding = async () => {
     try {
-      setHasSeenOnboarding(true);
-      await AsyncStorage.setItem('hasSeenOnboarding', JSON.stringify(true));
-      // Stamp the current version so a fresh install never sees the What's New popup.
+      // Stamp the current version with the flag, in the same render, so a fresh
+      // install never sees the What's New popup. (With a write in between, the
+      // flag rendered first and opened What's New right after the tour.)
       setLastSeenVersion(APP_VERSION.version);
-      await AsyncStorage.setItem('lastSeenVersion', JSON.stringify(APP_VERSION.version));
+      setHasSeenOnboarding(true);
+      await AsyncStorage.multiSet([
+        ['hasSeenOnboarding', JSON.stringify(true)],
+        ['lastSeenVersion', JSON.stringify(APP_VERSION.version)],
+      ]);
     } catch (error) {
       console.error('Error saving onboarding status:', error);
     }
@@ -494,7 +554,19 @@ export function AppSettingsProvider({ children }) {
     keepAwakeEnabled,
     autoTranslate,
     homeSections,
+    widgetSource,
+    widgetFeedUrl,
+    dimReadArticles,
+    swipeRightAction,
+    swipeLeftAction,
+    feedFilter,
     isLoading,
+    updateWidgetSource,
+    updateWidgetFeedUrl,
+    updateDimReadArticles,
+    updateSwipeRightAction,
+    updateSwipeLeftAction,
+    updateFeedFilter,
     updateFeedRegion,
     markTranslationTargetUserSet,
     updateLastSeenVersion,

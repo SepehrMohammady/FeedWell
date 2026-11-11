@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget while its slideshow plays. The launcher's own flipper moves to
+     the next article, so FeedWell does nothing in the background, and it stops
+     whenever the home screen is out of sight. A widget can set the time per
+     article only in its layout, so each speed has a copy of this file:
+     widget_slideshow_5, _10, _20 and _30, the same but for flipInterval. Each
+     also has a b copy (widget_slideshow_10b and so on): stepping while it plays
+     swaps to the other copy, so a new flipper starts there with a full interval. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- The first slide, still: the launcher shows it the moment the layout
+         arrives, before the flipper has loaded its slides, so nothing blinks -->
+    <FrameLayout
+        android:id="@+id/widget_underlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <AdapterViewFlipper
+        android:id="@+id/widget_flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:autoStart="true"
+        android:flipInterval="10000"
+        android:loopViews="true"
+        android:animateFirstView="false"
+        android:inAnimation="@animator/widget_slide_in"
+        android:outAnimation="@animator/widget_slide_out" />
+
+    <!-- Refresh stays put over the slides, so its spinner can show. Each
+         slide leaves room for it at the end of its controls. -->
+    <LinearLayout
+        android:id="@+id/widget_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="top|end">
+
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_widget_refresh"
+            android:contentDescription="Refresh"
+            android:scaleType="centerInside" />
+
+        <ProgressBar
+            android:id="@+id/widget_refresh_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:padding="4dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/widget_icon"
+            android:visibility="gone" />
+    </LinearLayout>
+</FrameLayout>

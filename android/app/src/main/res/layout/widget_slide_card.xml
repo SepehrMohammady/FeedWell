@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One article of the playing slideshow, laid out like the widget's own card.
+     The controls ride along in each slide, so pausing knows which article was
+     showing. The background is set in code to the widget's own color: the
+     next slide fades in over this one, and identical headers never flicker. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/slide_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/slide_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:id="@+id/slide_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="FeedWell"
+            android:textColor="@color/widget_header"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:maxLines="1" />
+
+        <ImageButton
+            android:id="@+id/slide_prev"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_widget_prev"
+            android:contentDescription="Previous article"
+            android:scaleType="centerInside"
+            android:layout_marginStart="4dp" />
+
+        <ImageButton
+            android:id="@+id/slide_pause"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_widget_pause"
+            android:contentDescription="Pause slideshow"
+            android:scaleType="centerInside"
+            android:layout_marginStart="2dp" />
+
+        <ImageButton
+            android:id="@+id/slide_next"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_widget_next"
+            android:contentDescription="Next article"
+            android:scaleType="centerInside"
+            android:layout_marginStart="2dp" />
+
+        <!-- Where the refresh button sits, over the slides -->
+        <FrameLayout
+            android:id="@+id/slide_refresh_space"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="2dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/slide_article"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/slide_image_top"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/widget_image_background"
+            android:clipToOutline="true"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            tools:targetApi="31" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/slide_image_side"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="10dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/widget_image_background"
+                android:clipToOutline="true"
+                android:importantForAccessibility="no"
+                android:visibility="gone"
+                tools:targetApi="31" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/slide_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/widget_title"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="3"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/slide_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:textColor="@color/widget_feed"
+                    android:textSize="12sp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/slide_feed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text=""
+                    android:textColor="@color/widget_feed"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/slide_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text=""
+                    android:textColor="@color/widget_date"
+                    android:textSize="10sp"
+                    android:maxLines="1" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/slide_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/widget_indicator"
+        android:textSize="9sp"
+        android:paddingTop="2dp" />
+</LinearLayout>

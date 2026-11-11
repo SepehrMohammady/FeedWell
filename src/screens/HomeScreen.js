@@ -22,6 +22,7 @@ import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTourTarget } from '../context/TourContext';
 import { parseRSSFeed } from '../utils/rssParser';
 import CustomAlert from '../components/CustomAlert';
+import { DragSheet, SheetDragArea } from '../components/DragSheet';
 import { useTranslation } from '../context/LanguageContext';
 import { formatRelativeDate } from '../utils/formatDate';
 import { HOME_SECTIONS } from '../config/homeSections';
@@ -387,9 +388,11 @@ export default function HomeScreen({ navigation }) {
     >
       <View style={ui.scrim}>
         <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={() => setCustomizeVisible(false)} />
-        <View style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
-          <View style={ui.sheetHandle} />
-          <Text style={[ui.title, styles.sheetTitle]}>{t('home.customize')}</Text>
+        <DragSheet onClose={() => setCustomizeVisible(false)} style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+          <SheetDragArea>
+            <View style={ui.sheetHandle} />
+            <Text style={[ui.title, styles.sheetTitle]}>{t('home.customize')}</Text>
+          </SheetDragArea>
           <Text style={[ui.secondary, styles.sheetHint]}>{t('home.customizeHint')}</Text>
           <ScrollView style={styles.sheetList}>
             {homeSections.map((section, index) => {
@@ -439,7 +442,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={ui.primaryLabel}>{t('common.done')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </DragSheet>
       </View>
     </Modal>
   );

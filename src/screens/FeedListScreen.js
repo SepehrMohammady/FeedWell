@@ -13,6 +13,7 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFeed } from '../context/FeedContext';
@@ -30,20 +31,60 @@ import { formatRelativeDate } from '../utils/formatDate';
 import { useAutoScroll } from '../hooks/useAutoScroll';
 import { useKeepScreenAwake } from '../hooks/useKeepScreenAwake';
 import { useTour, useTourTarget } from '../context/TourContext';
+import { useReadLater } from '../context/ReadLaterContext';
+import { useNotes } from '../context/NotesContext';
+import SwipeRow from '../components/SwipeRow';
+import UndoToast from '../components/UndoToast';
+import FeedFilterSheet, { publishedLabelKey, onlyLabelKey } from '../components/FeedFilterSheet';
+import {
+  EMPTY_FEED_FILTER,
+  ONLY_CHOICES,
+  PUBLISHED_RANGES,
+  feedFilterCount,
+  passesFeedFilter,
+  passesOnly,
+  publishedSince,
+} from '../config/feedFilter';
+import { withOfflineContent, offlineFields } from '../utils/saveForLater';
+import { mix } from '../theme/palette';
+
+// How long a swiped-away article waits before it is removed for good, while
+// Undo shows
+const REMOVE_UNDO_MS = 5000;
+
+// A read article's row: a step back from the card, toward the page
+const readRowColor = (c) => (c.isDark ? mix(c.surface, c.background, 0.6) : mix(c.surface, c.surface2, 0.6));
 
 export default function FeedListScreen({ navigation, route }) {
   const { feeds, articles, loading, addArticles, setLoading, setError, markAllRead, markAllUnread, markArticlesRead, markArticlesUnread, markArticleRead, markArticleUnread, removeArticles, getUnreadCount, getReadCount, readingPosition, setReadingPosition, clearReadingPosition } = useFeed();
   const { theme } = useTheme();
   const { t, isRTL, formatNumber, language } = useTranslation();
   const { showImages, articleFilter, sortOrder, updateArticleFilter, updateSortOrder, maxArticleAge, skipArticleView, showReadingPositionInFeeds, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, keepAwakeEnabled } = useAppSettings();
+  const { dimReadArticles, swipeRightAction, swipeLeftAction, feedFilter, updateFeedFilter } = useAppSettings();
+  const readLater = useReadLater();
+  const { articles: savedArticles, isInReadLater } = readLater;
+  // Undo runs later, when this render's functions may hold old state
+  const readLaterRef = useRef(readLater);
+  readLaterRef.current = readLater;
+  const { notes } = useNotes();
   const { setShowPlaylist: openSoundPlaylist } = useAmbientSound();
   const [refreshing, setRefreshing] = useState(false);
   const [forceRender, setForceRender] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedArticles, setSelectedArticles] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
-  // One source only, picked in Your Feeds on Home; null shows every feed.
-  const [sourceFeedUrl, setSourceFeedUrl] = useState(null);
+  const [filterSheetVisible, setFilterSheetVisible] = useState(false);
+  // What a swipe just did, with Undo when it can be undone (UndoToast)
+  const [toast, setToast] = useState(null);
+  // Articles swiped away: out of the list while Undo shows, then removed for
+  // good (sooner when another is swiped away, or the list goes)
+  const [pendingRemovals, setPendingRemovals] = useState(() => new Set());
+  const removalTimers = useRef(new Map());
+  // The list as it was last shown, pending removals included, for the
+  // reading position line when a removal goes through
+  const fullListRef = useRef([]);
+  const readingPositionRef = useRef(readingPosition);
+  readingPositionRef.current = readingPosition;
   const flatListRef = useRef(null);
   const searchInputRef = useRef(null);
   // Last measured average item length reported by the FlatList (via
@@ -110,13 +151,22 @@ export default function FeedListScreen({ navigation, route }) {
     return () => clearTimeout(timer);
   }, [route?.params?.focusSearchAt]);
 
-  // Home sets the source (or clears it, with null). sourceAt changes on every
-  // tap, so picking the same feed again after closing its chip still applies.
+  // Home picks the feed to show (or every feed, with null), and the filter
+  // starts over with it. sourceAt changes on every tap, so picking the same
+  // feed again after clearing the filter still applies.
   useEffect(() => {
     if (route?.params?.sourceAt) {
-      setSourceFeedUrl(route.params.sourceFeedUrl || null);
+      const url = route.params.sourceFeedUrl;
+      updateFeedFilter({ ...EMPTY_FEED_FILTER, feeds: url ? [url] : [] });
     }
   }, [route?.params?.sourceAt]);
+
+  // A feed that has gone leaves the filter too
+  useEffect(() => {
+    if (feeds.length === 0 || feedFilter.feeds.length === 0) return;
+    const known = feedFilter.feeds.filter((url) => feeds.some((feed) => feed.url === url));
+    if (known.length !== feedFilter.feeds.length) updateFeedFilter({ ...feedFilter, feeds: known });
+  }, [feeds, feedFilter]);
 
   // Force re-render when screen comes into focus to update read status
   useFocusEffect(
@@ -253,8 +303,8 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const handleMarkAllRead = async () => {
-    // With one source picked, only its articles; otherwise all of them.
-    const unreadIds = sourceFeedUrl ? scopedArticles.filter(a => !a.isRead).map(a => a.id) : null;
+    // With a filter or a search on, only the articles in the list; otherwise all of them.
+    const unreadIds = narrowed ? filteredAndSortedArticles.filter(a => !a.isRead).map(a => a.id) : null;
     const unreadCount = unreadIds ? unreadIds.length : getUnreadCount();
     if (unreadCount === 0) {
       setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noUnreadToMark'), icon: 'checkmark-circle-outline', buttons: [{ text: t('common.ok') }] });
@@ -279,7 +329,7 @@ export default function FeedListScreen({ navigation, route }) {
   };
 
   const handleMarkAllUnread = async () => {
-    const readIds = sourceFeedUrl ? scopedArticles.filter(a => a.isRead).map(a => a.id) : null;
+    const readIds = narrowed ? filteredAndSortedArticles.filter(a => a.isRead).map(a => a.id) : null;
     const readCount = readIds ? readIds.length : getReadCount();
     if (readCount === 0) {
       setAlertConfig({ visible: true, title: t('feedList.infoTitle'), message: t('feedList.noReadToMark'), icon: 'information-circle-outline', buttons: [{ text: t('common.ok') }] });
@@ -474,22 +524,27 @@ export default function FeedListScreen({ navigation, route }) {
     setForceRender(prev => prev + 1);
   };
 
-  // Removes the selected articles from the list for good (a refresh won't bring
-  // them back). If the reading position line sat under one of them, it moves up
-  // to the nearest article that stays, or goes away when none is left above it.
-  const removeSelectedArticles = async () => {
-    const ids = new Set(selectedArticles);
-    if (ids.size === 0) return;
-    if (readingPosition?.afterArticleId && ids.has(readingPosition.afterArticleId)) {
-      const anchorIndex = filteredAndSortedArticles.findIndex(a => a.id === readingPosition.afterArticleId);
-      const above = filteredAndSortedArticles.slice(0, Math.max(anchorIndex, 0)).reverse().find(a => !ids.has(a.id));
+  // Removes articles from the list for good (a refresh won't bring them back).
+  // If the reading position line sat under one of them, it moves up to the
+  // nearest article in `list` that stays, or goes away when none is left above it.
+  const removeKeepingPosition = async (ids, list) => {
+    const position = readingPositionRef.current;
+    if (position?.afterArticleId && ids.has(position.afterArticleId)) {
+      const anchorIndex = list.findIndex(a => a.id === position.afterArticleId);
+      const above = list.slice(0, Math.max(anchorIndex, 0)).reverse().find(a => !ids.has(a.id));
       if (above) {
-        await setReadingPosition(readingPosition.positionId, above.id);
+        await setReadingPosition(position.positionId, above.id);
       } else {
         await clearReadingPosition();
       }
     }
     await removeArticles(Array.from(ids));
+  };
+
+  const removeSelectedArticles = async () => {
+    const ids = new Set(selectedArticles);
+    if (ids.size === 0) return;
+    await removeKeepingPosition(ids, filteredAndSortedArticles);
     setSelectedArticles(new Set());
     setSelectionMode(false);
     setForceRender(prev => prev + 1);
@@ -507,6 +562,95 @@ export default function FeedListScreen({ navigation, route }) {
         { text: t('common.remove'), style: 'destructive', onPress: removeSelectedArticles },
       ],
     });
+  };
+
+  // ---- Swipes (Settings, Feeds): what each does, and Undo for what can be undone
+
+  const showToast = (message, onUndo) => setToast({ id: Date.now() + Math.random(), message, onUndo });
+
+  // A swiped-away article goes for good
+  const commitRemoval = (id) => {
+    const timer = removalTimers.current.get(id);
+    if (timer === undefined) return;
+    clearTimeout(timer);
+    removalTimers.current.delete(id);
+    removeKeepingPosition(new Set([id]), fullListRef.current).finally(() => {
+      setPendingRemovals((prev) => {
+        if (!prev.has(id)) return prev;
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    });
+  };
+  const commitRemovalRef = useRef(commitRemoval);
+  commitRemovalRef.current = commitRemoval;
+
+  const undoRemoval = (id) => {
+    const timer = removalTimers.current.get(id);
+    if (timer === undefined) return;
+    clearTimeout(timer);
+    removalTimers.current.delete(id);
+    setPendingRemovals((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
+  // Out of the list now, gone for good once Undo has had its few seconds.
+  // One waits at a time: an earlier one goes through first.
+  const removeWithUndo = (article) => {
+    Array.from(removalTimers.current.keys()).forEach((id) => commitRemoval(id));
+    setPendingRemovals((prev) => new Set(prev).add(article.id));
+    removalTimers.current.set(article.id, setTimeout(() => commitRemovalRef.current(article.id), REMOVE_UNDO_MS));
+    showToast(t('swipe.removedToast'), () => undoRemoval(article.id));
+  };
+
+  // Whatever is still waiting goes through when the list goes
+  useEffect(() => () => {
+    Array.from(removalTimers.current.keys()).forEach((id) => commitRemovalRef.current(id));
+  }, []);
+
+  const handleSwipeAction = (action, article) => {
+    switch (action) {
+      case 'read': {
+        const toRead = !article.isRead;
+        const apply = (read) => (read
+          ? markArticleRead(article.id, articleFilter, sortOrder)
+          : markArticleUnread(article.id, articleFilter, sortOrder));
+        apply(toRead);
+        // When the row leaves the list (only unread, or only read, shown), say so, with Undo
+        if ((toRead && articleFilter === 'unread') || (!toRead && articleFilter === 'read')) {
+          showToast(t(toRead ? 'swipe.markedReadToast' : 'swipe.markedUnreadToast'), () => apply(!toRead));
+        }
+        break;
+      }
+      case 'save': {
+        const { isInReadLater: isSaved, articles: savedNow, removeFromReadLater, addToReadLater, updateReadLaterArticle } = readLaterRef.current;
+        if (isSaved(article.id)) {
+          const copy = savedNow.find((a) => a.id === article.id);
+          removeFromReadLater(article.id);
+          showToast(t('swipe.unsavedToast'), copy ? () => readLaterRef.current.addToReadLater(copy) : undefined);
+        } else {
+          addToReadLater(article);
+          showToast(t('swipe.savedToast'));
+          // The page's text, for reading offline, follows once it arrives
+          withOfflineContent(article)
+            .then((full) => updateReadLaterArticle(article.id, offlineFields(full)))
+            .catch(() => {});
+        }
+        break;
+      }
+      case 'share':
+        handleShare(article);
+        break;
+      case 'remove':
+        removeWithUndo(article);
+        break;
+      default:
+        break;
+    }
   };
 
   const renderArticle = ({ item, index }) => {
@@ -528,96 +672,117 @@ export default function FeedListScreen({ navigation, route }) {
     // The reading position line sits between rows and is their divider; a
     // hairline takes its place when the line is off or articles are selected.
     const showIndicator = showReadingPositionInFeeds && !selectionMode;
+    // Read articles step back: a quieter row, lighter words and a black and
+    // white picture (Settings, Feeds). Unread ones keep their color, with a
+    // bold title and the accent dot.
+    const dimmed = dimReadArticles && item.isRead;
+    const rowColor = dimmed ? readRow : theme.colors.surface;
 
     return (
-      <View style={[styles.item, isFirst && styles.itemFirst, isLast && styles.itemLast]}>
-        <TouchableOpacity
-          style={[
-            styles.articleItem,
-            isFirst && styles.articleItemFirst,
-            isLast && !showIndicator && styles.articleItemLast,
-            isBeforeReadingPosition && styles.readPositionArticle,
-            isSelected && styles.selectedArticle
-          ]}
-          onPress={() => selectionMode ? toggleArticleSelection(item.id) : handleArticlePress(item)}
-          onLongPress={() => {
-            if (!selectionMode) {
-              setSelectionMode(true);
-              toggleArticleSelection(item.id);
-            }
-          }}
-          delayLongPress={300}
+      <View style={[styles.item, dimmed && { backgroundColor: readRow }, isFirst && styles.itemFirst, isLast && styles.itemLast]}>
+        <SwipeRow
+          enabled={!selectionMode}
+          rightAction={swipeRightAction}
+          leftAction={swipeLeftAction}
+          isRead={!!item.isRead}
+          isSaved={isInReadLater(item.id)}
+          onAction={(action) => handleSwipeAction(action, item)}
+          rowColor={rowColor}
+          style={[isFirst && styles.articleItemFirst, isLast && !showIndicator && styles.articleItemLast]}
         >
-          {selectionMode && (
-            <View style={styles.selectionCheckbox}>
-              <Ionicons 
-                name={isSelected ? "checkmark-circle" : "ellipse-outline"} 
-                size={28} 
-                color={isSelected ? theme.colors.mainInk : theme.colors.outline} 
-              />
-            </View>
-          )}
-          <View style={styles.articleContent}>
-            <View style={styles.articleHeader}>
-              <View style={styles.titleRow}>
-                {!item.isRead && (
-                  <View style={styles.unreadBullet} />
-                )}
-                <Text style={styles.feedTitle} numberOfLines={1}>
-                  {item.feedTitle}
-                </Text>
+          <TouchableOpacity
+            style={[
+              styles.articleItem,
+              isFirst && styles.articleItemFirst,
+              isLast && !showIndicator && styles.articleItemLast,
+              isBeforeReadingPosition && styles.readPositionArticle,
+              isSelected && styles.selectedArticle
+            ]}
+            onPress={() => selectionMode ? toggleArticleSelection(item.id) : handleArticlePress(item)}
+            onLongPress={() => {
+              if (!selectionMode) {
+                setSelectionMode(true);
+                toggleArticleSelection(item.id);
+              }
+            }}
+            delayLongPress={300}
+          >
+            {selectionMode && (
+              <View style={styles.selectionCheckbox}>
+                <Ionicons 
+                  name={isSelected ? "checkmark-circle" : "ellipse-outline"} 
+                  size={28} 
+                  color={isSelected ? theme.colors.mainInk : theme.colors.outline} 
+                />
               </View>
-              <View style={styles.articleMeta}>
-                <Text style={styles.articleDate}>
-                  {formatDate(item.publishedDate)}
-                </Text>
-              </View>
-            </View>
-            
-            <Text style={styles.articleTitle} numberOfLines={3}>
-              {item.title}
-            </Text>
-            
-            {item.description && (
-              <Text style={styles.articleDescription} numberOfLines={2}>
-                {item.description}
-              </Text>
             )}
-          </View>
-          
-          {showImages && !selectionMode && (
-            <View style={styles.imageContainer}>
-              {item.imageUrl ? (
-                <ArticleImage
-                  uri={item.imageUrl}
-                  style={styles.articleImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={[styles.articleImage, styles.placeholderImage]}>
-                  <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
+            <View style={styles.articleContent}>
+              <View style={styles.articleHeader}>
+                <View style={styles.titleRow}>
+                  {!item.isRead && (
+                    <View style={styles.unreadBullet} />
+                  )}
+                  <Text style={[styles.feedTitle, dimmed && styles.feedTitleRead]} numberOfLines={1}>
+                    {item.feedTitle}
+                  </Text>
                 </View>
-              )}
-              <View style={styles.imageActions}>
-                <TouchableOpacity
-                  style={styles.imageActionButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleShare(item);
-                  }}
-                >
-                  <Ionicons name="share-outline" size={20} color={theme.colors.text} />
-                </TouchableOpacity>
-                <SaveButton 
-                  article={item} 
-                  size={20}
-                  variant="simple"
-                  style={styles.imageActionButton}
-                />
+                <View style={styles.articleMeta}>
+                  <Text style={styles.articleDate}>
+                    {formatDate(item.publishedDate)}
+                  </Text>
+                </View>
               </View>
+              
+              <Text
+                style={[styles.articleTitle, item.isRead ? dimmed && styles.articleTitleRead : styles.articleTitleUnread]}
+                numberOfLines={3}
+              >
+                {item.title}
+              </Text>
+              
+              {item.description && (
+                <Text style={styles.articleDescription} numberOfLines={2}>
+                  {item.description}
+                </Text>
+              )}
             </View>
-          )}
-        </TouchableOpacity>
+            
+            {showImages && !selectionMode && (
+              <View style={styles.imageContainer}>
+                <View style={dimmed ? styles.imageRead : null}>
+                  {item.imageUrl ? (
+                    <ArticleImage
+                      uri={item.imageUrl}
+                      style={styles.articleImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={[styles.articleImage, styles.placeholderImage]}>
+                      <Ionicons name="image-outline" size={32} color={theme.colors.textSecondary} />
+                    </View>
+                  )}
+                </View>
+                <View style={styles.imageActions}>
+                  <TouchableOpacity
+                    style={styles.imageActionButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      handleShare(item);
+                    }}
+                  >
+                    <Ionicons name="share-outline" size={20} color={theme.colors.text} />
+                  </TouchableOpacity>
+                  <SaveButton 
+                    article={item} 
+                    size={20}
+                    variant="simple"
+                    style={styles.imageActionButton}
+                  />
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        </SwipeRow>
 
         <View ref={index === 0 ? tourReadingPositionRef : undefined} collapsable={index !== 0}>
         {/* Show reading position line after this article if it matches */}
@@ -659,47 +824,53 @@ export default function FeedListScreen({ navigation, route }) {
     });
   };
 
-  // Filter articles based on read status and search query
-  // The articles the counts and the mark-all actions work on: one source when
-  // one is picked, otherwise all of them.
-  const scopedArticles = sourceFeedUrl ? articles.filter(a => a.feedUrl === sourceFeedUrl) : articles;
-  const sourceFeed = sourceFeedUrl ? (feeds.find(f => f.url === sourceFeedUrl) || { url: sourceFeedUrl }) : null;
+  // ---- What the list shows: the age limit, read or unread, the filter
+  // (config/feedFilter), the search, then the order
+
+  // What the "show only" choices check against
+  const filterContext = React.useMemo(() => ({
+    savedIds: new Set(savedArticles.map((a) => a.id)),
+    noteIds: new Set(Object.keys(notes || {}).filter((id) => notes[id]?.text?.trim())),
+    starredUrls: new Set(feeds.filter((f) => f.isPriority).map((f) => f.url)),
+    since: publishedSince(feedFilter.published),
+  }), [savedArticles, notes, feeds, feedFilter.published]);
+
+  const byStatus = (list, status) =>
+    status === 'unread' ? list.filter((a) => !a.isRead)
+      : status === 'read' ? list.filter((a) => a.isRead)
+        : list;
+
+  // Hidden feeds (eye toggle on the Add Feed screen) stay subscribed but out of
+  // the list, unless the filter picks them. The age filter applies first.
+  const allArticles = Array.isArray(articles) ? articles : [];
+  const hiddenFeedUrls = new Set(feeds.filter((f) => f.isHidden).map((f) => f.url));
+  const ageFiltered = filterByAge(
+    hiddenFeedUrls.size > 0
+      ? allArticles.filter((a) => !hiddenFeedUrls.has(a.feedUrl) || feedFilter.feeds.includes(a.feedUrl))
+      : allArticles
+  );
+  // The filter without read or unread: what the counts on the button read
+  const filteredAnyStatus = ageFiltered.filter((a) => passesFeedFilter(a, feedFilter, filterContext));
+  // An article swiped away is already out of the counts while Undo shows
+  const countable = pendingRemovals.size > 0
+    ? filteredAnyStatus.filter((a) => !pendingRemovals.has(a.id))
+    : filteredAnyStatus;
+  const statusCounts = {
+    all: countable.length,
+    unread: countable.filter((a) => !a.isRead).length,
+    read: countable.filter((a) => a.isRead).length,
+  };
+  const filterCount = feedFilterCount(feedFilter);
+  // Read All and Unread All work on the list as shown once it is narrowed
+  const narrowed = filterCount > 0 || searchQuery.trim().length > 0;
 
   const getFilteredArticles = () => {
-    if (!articles || !Array.isArray(articles)) {
-      return [];
-    }
-    
-    // Age filter first; the read-status filter then narrows THAT list.
-    // (Before v1.13.0 every branch below overwrote the age-filtered list from
-    // `articles`, so the Article Age Filter never applied to the visible list.)
-    // Hidden feeds (eye toggle on the Add Feed screen) stay subscribed but
-    // their articles are kept out of this list.
-    const hiddenFeedUrls = new Set(feeds.filter(f => f.isHidden).map(f => f.url));
-    const visible = hiddenFeedUrls.size > 0
-      ? articles.filter(a => !hiddenFeedUrls.has(a.feedUrl))
-      : articles;
-    // A source picked on Home shows only its articles, even a hidden feed's.
-    const ageFiltered = filterByAge(sourceFeedUrl ? scopedArticles : visible);
-
-    // Apply read status filter
-    let filtered;
-    switch (articleFilter) {
-      case 'unread':
-        filtered = ageFiltered.filter(article => !article.isRead);
-        break;
-      case 'read':
-        filtered = ageFiltered.filter(article => article.isRead);
-        break;
-      default:
-        // Copy: the sort below must never mutate the articles state array.
-        filtered = [...ageFiltered];
-    }
+    let filtered = byStatus(filteredAnyStatus, articleFilter);
 
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(article => 
+      filtered = filtered.filter(article =>
         (article.title && article.title.toLowerCase().includes(query)) ||
         (article.description && article.description.toLowerCase().includes(query)) ||
         (article.feedTitle && article.feedTitle.toLowerCase().includes(query))
@@ -709,12 +880,13 @@ export default function FeedListScreen({ navigation, route }) {
     // Sort articles. Unparseable dates fall back to 0 (as everywhere else in
     // the app) and ties break on a stable key, so the order is deterministic
     // and can't reshuffle when the list re-renders after reading an article.
+    // A copy: the sort must never change the articles state array.
     const timeOf = (article) => {
       const t = new Date(article.publishedDate || 0).getTime();
       return Number.isNaN(t) ? 0 : t;
     };
     const direction = sortOrder === 'newest' ? -1 : 1;
-    const sortedArticles = filtered.sort((a, b) => {
+    const sortedArticles = [...filtered].sort((a, b) => {
       const diff = timeOf(a) - timeOf(b);
       if (diff !== 0) return direction * diff;
       return String(a.id ?? '').localeCompare(String(b.id ?? ''));
@@ -730,48 +902,100 @@ export default function FeedListScreen({ navigation, route }) {
     return sortedArticles;
   };
 
-  const filteredAndSortedArticles = getFilteredArticles();
+  const fullList = getFilteredArticles();
+  fullListRef.current = fullList;
+  // Swiped-away articles leave at once; Undo brings them back
+  const filteredAndSortedArticles = pendingRemovals.size > 0
+    ? fullList.filter((a) => !pendingRemovals.has(a.id))
+    : fullList;
+  const readRow = readRowColor(theme.colors);
   // Stable identity so FlatList only re-renders cells when something real changes.
   const listExtraData = React.useMemo(
-    () => [articles, articleFilter, sortOrder, readingPosition?.afterArticleId],
-    [articles, articleFilter, sortOrder, readingPosition?.afterArticleId]
+    () => [articles, articleFilter, sortOrder, readingPosition?.afterArticleId, dimReadArticles, swipeRightAction, swipeLeftAction, savedArticles, readRow],
+    [articles, articleFilter, sortOrder, readingPosition?.afterArticleId, dimReadArticles, swipeRightAction, swipeLeftAction, savedArticles, readRow]
   );
 
-  const openFilterMenu = () => {
-    setAlertConfig({
-      visible: true,
-      title: t('feedList.filterArticlesTitle'),
-      message: t('feedList.filterArticlesMessage'),
-      icon: 'filter-outline',
-      buttons: [
-        { text: articleFilter === 'all' ? t('feedList.filterAllCurrent') : t('feedList.filterAll'), onPress: () => updateArticleFilter('all') },
-        { text: articleFilter === 'unread' ? t('feedList.filterUnreadCurrent', { count: formatNumber(getAgeFilteredUnreadCount()) }) : t('feedList.filterUnread', { count: formatNumber(getAgeFilteredUnreadCount()) }), onPress: () => updateArticleFilter('unread') },
-        { text: articleFilter === 'read' ? t('feedList.filterReadCurrent', { count: formatNumber(getAgeFilteredReadCount()) }) : t('feedList.filterRead', { count: formatNumber(getAgeFilteredReadCount()) }), onPress: () => updateArticleFilter('read') },
-        { text: t('common.cancel'), style: 'cancel' },
-      ],
-    });
+  // How many articles each choice in the filter sheet would bring, with the
+  // rest of the filter as it is: worked out only while the sheet is open
+  const getSheetCounts = () => {
+    const sinceOf = Object.fromEntries(PUBLISHED_RANGES.map((range) => [range, publishedSince(range)]));
+    const withoutOnly = Object.fromEntries(ONLY_CHOICES.map((choice) => [
+      choice,
+      { ...feedFilter, only: feedFilter.only.filter((c) => c !== choice) },
+    ]));
+    const published = { today: 0, week: 0, month: 0 };
+    const only = { saved: 0, notes: 0, starred: 0, images: 0 };
+    const perFeed = new Map();
+    // What each choice has with nothing else picked: the choices on show stay
+    // the same while picking, so nothing moves under the finger
+    const publishedAll = { today: 0, week: 0, month: 0 };
+    const onlyAll = { saved: 0, notes: 0, starred: 0, images: 0 };
+    const perFeedAll = new Map();
+    // Hidden feeds can be picked here, so they count too
+    const inStatus = byStatus(filterByAge(allArticles), articleFilter);
+    for (const a of inStatus) {
+      const hidden = hiddenFeedUrls.has(a.feedUrl);
+      perFeedAll.set(a.feedUrl, (perFeedAll.get(a.feedUrl) || 0) + 1);
+      if (passesFeedFilter(a, feedFilter, filterContext, 'feeds')) {
+        perFeed.set(a.feedUrl, (perFeed.get(a.feedUrl) || 0) + 1);
+      }
+      if (hidden && !feedFilter.feeds.includes(a.feedUrl)) continue;
+      const time = new Date(a.publishedDate || 0).getTime();
+      const inRange = (range) => !Number.isNaN(time) && time >= sinceOf[range];
+      for (const range of PUBLISHED_RANGES) if (inRange(range)) publishedAll[range] += 1;
+      if (passesFeedFilter(a, feedFilter, filterContext, 'published')) {
+        for (const range of PUBLISHED_RANGES) if (inRange(range)) published[range] += 1;
+      }
+      for (const choice of ONLY_CHOICES) {
+        if (!passesOnly(a, choice, filterContext)) continue;
+        onlyAll[choice] += 1;
+        if (passesFeedFilter(a, withoutOnly[choice], filterContext)) only[choice] += 1;
+      }
+    }
+    const feedList = feeds
+      .map((feed) => ({
+        url: feed.url,
+        title: feed.title,
+        isHidden: !!feed.isHidden,
+        count: perFeed.get(feed.url) || 0,
+        total: perFeedAll.get(feed.url) || 0,
+      }))
+      .sort((x, y) => (x.title || x.url).localeCompare(y.title || y.url));
+    return {
+      status: statusCounts,
+      published,
+      publishedAll,
+      only,
+      onlyAll,
+      feeds: feedList,
+      matching: filteredAndSortedArticles.length,
+    };
+  };
+
+  // The filter in a few words, for the bar under the search field
+  const filterSummary = () => {
+    const parts = [];
+    if (feedFilter.feeds.length > 0) {
+      const names = feedFilter.feeds.map((url) => feeds.find((f) => f.url === url)?.title || url);
+      parts.push(names.length > 2 ? `${names.slice(0, 2).join(', ')} +${formatNumber(names.length - 2)}` : names.join(', '));
+    }
+    if (feedFilter.published !== 'any') parts.push(t(publishedLabelKey(feedFilter.published)));
+    feedFilter.only.forEach((choice) => parts.push(t(onlyLabelKey(choice))));
+    return parts.join(' · ');
   };
 
   const toggleSort = () => {
     updateSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest');
   };
 
-  // v1.1.5: Age-aware counts for the header button
-  const getAgeFilteredUnreadCount = () => {
-    return filterByAge(scopedArticles).filter(a => !a.isRead).length;
-  };
-  const getAgeFilteredReadCount = () => {
-    return filterByAge(scopedArticles).filter(a => a.isRead).length;
-  };
-
   const getFilterButtonText = () => {
     switch (articleFilter) {
       case 'unread':
-        return t('feedList.filterUnread', { count: formatNumber(getAgeFilteredUnreadCount()) });
+        return t('feedList.filterUnread', { count: formatNumber(statusCounts.unread) });
       case 'read':
-        return t('feedList.filterRead', { count: formatNumber(getAgeFilteredReadCount()) });
+        return t('feedList.filterRead', { count: formatNumber(statusCounts.read) });
       default:
-        return t('feedList.filterAllCount', { count: formatNumber(filterByAge(scopedArticles).length) });
+        return t('feedList.filterAllCount', { count: formatNumber(statusCounts.all) });
     }
   };
 
@@ -829,6 +1053,7 @@ export default function FeedListScreen({ navigation, route }) {
   }
 
   return (
+    <GestureHandlerRootView style={styles.container}>
     <SafeAreaView edges={["top", "left", "right"]} style={styles.container}>
       <View style={styles.header}>
         {selectionMode ? (
@@ -907,10 +1132,16 @@ export default function FeedListScreen({ navigation, route }) {
           <View style={styles.headerRightGroup}>
             <TouchableOpacity
               ref={tourFilterRef}
-              style={[styles.filterPill, styles.filterButton]}
-              onPress={openFilterMenu}
+              style={[styles.filterPill, styles.filterButton, filterCount > 0 && styles.filterButtonOn]}
+              onPress={() => setFilterSheetVisible(true)}
+              accessibilityLabel={t('feedFilter.title')}
             >
               <Text style={styles.filterButtonText}>{getFilterButtonText()}</Text>
+              {filterCount > 0 && (
+                <View style={styles.filterBadge}>
+                  <Text style={styles.filterBadgeText}>{formatNumber(filterCount)}</Text>
+                </View>
+              )}
               <Ionicons name="chevron-down" size={14} color={theme.colors.textSecondary} />
             </TouchableOpacity>
             <View style={styles.headerButtons}>
@@ -982,14 +1213,17 @@ export default function FeedListScreen({ navigation, route }) {
         )}
       </View>
 
-      {/* One source only, picked in Your Feeds on Home. Closing the chip shows every feed again. */}
-      {sourceFeed && (
+      {/* What the filter keeps (a feed picked on Home is one): a tap opens
+          the filter, the X shows everything again */}
+      {filterCount > 0 && (
         <View style={styles.sourceBar}>
-          <Ionicons name="newspaper-outline" size={16} color={theme.colors.accentInk} />
-          <Text style={styles.sourceBarText} numberOfLines={1}>{sourceFeed.title || sourceFeed.url}</Text>
+          <Ionicons name="filter-outline" size={16} color={theme.colors.accentInk} />
+          <TouchableOpacity style={styles.sourceBarTap} onPress={() => setFilterSheetVisible(true)}>
+            <Text style={styles.sourceBarText} numberOfLines={1}>{filterSummary()}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setSourceFeedUrl(null)}
-            accessibilityLabel={t('feedList.showAllFeeds')}
+            onPress={() => updateFeedFilter(EMPTY_FEED_FILTER)}
+            accessibilityLabel={t('feedFilter.clear')}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="close-circle" size={20} color={theme.colors.accentInk} />
@@ -1033,7 +1267,16 @@ export default function FeedListScreen({ navigation, route }) {
         }
         contentContainerStyle={filteredAndSortedArticles.length === 0 ? styles.emptyList : styles.listContent}
         ListEmptyComponent={
-          !loading && (
+          !loading && (filterCount > 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="filter-outline" size={60} color={theme.colors.outline} />
+              <Text style={styles.emptyTitle}>{t('feedFilter.noMatchTitle')}</Text>
+              <Text style={styles.emptyDescription}>{t('feedFilter.noMatchBody')}</Text>
+              <TouchableOpacity style={styles.clearFiltersButton} onPress={() => updateFeedFilter(EMPTY_FEED_FILTER)}>
+                <Text style={styles.clearFiltersText}>{t('feedFilter.clear')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
             <View style={styles.emptyState}>
               <Ionicons name="refresh-outline" size={60} color={theme.colors.outline} />
               <Text style={styles.emptyTitle}>
@@ -1046,8 +1289,20 @@ export default function FeedListScreen({ navigation, route }) {
                  t('feedList.emptyAllDescription')}
               </Text>
             </View>
-          )
+          ))
         }
+      />
+
+      <UndoToast toast={toast} onHide={(id) => setToast((current) => (current && current.id === id ? null : current))} />
+
+      <FeedFilterSheet
+        visible={filterSheetVisible}
+        onClose={() => setFilterSheetVisible(false)}
+        status={articleFilter}
+        onStatusChange={updateArticleFilter}
+        filter={feedFilter}
+        onFilterChange={updateFeedFilter}
+        counts={filterSheetVisible ? getSheetCounts() : EMPTY_SHEET_COUNTS}
       />
 
       {/* Custom themed alert dialog */}
@@ -1060,8 +1315,20 @@ export default function FeedListScreen({ navigation, route }) {
         onDismiss={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
       />
     </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
+
+// The filter sheet's counts while it is closed (it isn't drawn then)
+const EMPTY_SHEET_COUNTS = {
+  status: { all: 0, unread: 0, read: 0 },
+  published: { today: 0, week: 0, month: 0 },
+  publishedAll: { today: 0, week: 0, month: 0 },
+  only: { saved: 0, notes: 0, starred: 0, images: 0 },
+  onlyAll: { saved: 0, notes: 0, starred: 0, images: 0 },
+  feeds: [],
+  matching: 0,
+};
 
 // Styles built once per theme and direction (Calm Surfaces 3). The list is one
 // card made of its rows: each row on the surface, the first and last with the
@@ -1135,6 +1402,42 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
       ...TYPE.label,
       color: c.text,
     },
+    filterButtonOn: {
+      backgroundColor: c.mainTint,
+      borderColor: c.mainTint,
+    },
+    // How many filter choices are on
+    filterBadge: {
+      minWidth: 18,
+      height: 18,
+      paddingHorizontal: 4,
+      borderRadius: 9,
+      backgroundColor: c.accentFill,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    filterBadgeText: {
+      ...TYPE.count,
+      fontSize: 10.5,
+      lineHeight: 13,
+      color: c.onAccentFill,
+    },
+    sourceBarTap: {
+      flex: 1,
+      justifyContent: 'center',
+      minHeight: 40,
+    },
+    clearFiltersButton: {
+      minHeight: 44,
+      justifyContent: 'center',
+      paddingHorizontal: 22,
+      borderRadius: RADIUS.round,
+      backgroundColor: c.mainTint,
+    },
+    clearFiltersText: {
+      ...TYPE.button,
+      color: c.mainInk,
+    },
     filterButton: {
       flexDirection: row,
       alignItems: 'center',
@@ -1170,7 +1473,6 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
       backgroundColor: c.accentTint,
     },
     sourceBarText: {
-      flex: 1,
       fontFamily: FONT.semiBold,
       fontSize: 14,
       color: c.accentInk,
@@ -1255,9 +1557,9 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
     },
     // Unread is what to notice: the accent
     unreadBullet: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
       backgroundColor: c.accentFill,
       marginRight: isRTL ? 0 : 8,
       marginLeft: isRTL ? 8 : 0,
@@ -1279,6 +1581,9 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
       ...TYPE.secondary,
       color: c.textSecondary,
     },
+    feedTitleRead: {
+      color: c.textSecondary,
+    },
     readPositionArticle: {
       opacity: 0.7,
       [`border${startSide}Width`]: 3,
@@ -1291,6 +1596,13 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
       lineHeight: 20,
       textAlign,
       writingDirection,
+    },
+    articleTitleUnread: {
+      fontFamily: FONT.bold,
+    },
+    articleTitleRead: {
+      fontFamily: FONT.medium,
+      color: c.textSecondary,
     },
     articleDescription: {
       ...TYPE.body,
@@ -1309,6 +1621,11 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
       height: 80,
       borderRadius: 12,
       backgroundColor: c.surface2,
+    },
+    // A read article's picture: black and white, a little faded
+    imageRead: {
+      filter: 'grayscale(1)',
+      opacity: 0.8,
     },
     placeholderImage: {
       justifyContent: 'center',

@@ -914,14 +914,18 @@ export async function readAutomaticBackup(entry) {
 /** Hands the widget the settings now in storage (it keeps its own copy) */
 export async function applyWidgetSettings(widgetBridge) {
   if (Platform.OS !== 'android' || !widgetBridge) return;
-  const [[, theme], [, opacity], [, showImages]] = await AsyncStorage.multiGet([
+  const [[, theme], [, opacity], [, showImages], [, slideSeconds], [, tallLayout]] = await AsyncStorage.multiGet([
     'widget_theme',
     'widget_opacity',
     'widget_show_images',
+    'widget_slide_seconds',
+    'widget_tall_layout',
   ]);
   try {
     widgetBridge.setWidgetTheme(theme || 'app');
     widgetBridge.setWidgetOpacity(Math.round((opacity ? parseInt(opacity, 10) : 100) * 2.55));
     if (widgetBridge.setWidgetShowImages) widgetBridge.setWidgetShowImages(showImages === null ? true : showImages === 'true');
+    if (widgetBridge.setWidgetSlideSeconds) widgetBridge.setWidgetSlideSeconds(slideSeconds ? parseInt(slideSeconds, 10) : 10);
+    if (widgetBridge.setWidgetTallLayout) widgetBridge.setWidgetTallLayout(tallLayout === 'article' ? 'article' : 'list');
   } catch (e) { /* the widget isn't there */ }
 }

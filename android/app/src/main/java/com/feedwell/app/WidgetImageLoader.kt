@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Handler
 import android.os.Looper
+import android.util.LruCache
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
@@ -29,6 +30,12 @@ object WidgetImageLoader {
     private const val MAX_REDIRECTS = 3
 
     private val executor = Executors.newSingleThreadExecutor()
+    // Pictures decoded lately, so a slide that comes round again, or the next
+    // one decoded ahead, needs no work from the disk
+    private val decoded = object : LruCache<String, Bitmap>(6 * 1024 * 1024) {
+        override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
+    }
+    private fun decodedKey(url: String, maxPx: Int, background: Int) = "$maxPx|$background|$url"
     private val inFlight: MutableSet<String> = Collections.synchronizedSet(HashSet())
     // URLs that failed this process lifetime — never retried in a loop.
     private val failed: MutableSet<String> = Collections.synchronizedSet(HashSet())
@@ -50,8 +57,18 @@ object WidgetImageLoader {
      */
     fun getCached(context: Context, url: String?, maxPx: Int, background: Int): Bitmap? {
         if (!isUsable(url)) return null
-        val file = fileFor(context, url!!)
-        return if (file.exists()) decode(file, maxPx, background) else null
+        val key = decodedKey(url!!, maxPx, background)
+        decoded.get(key)?.let { return it }
+        val file = fileFor(context, url)
+        if (!file.exists()) return null
+        return decode(file, maxPx, background)?.also { decoded.put(key, it) }
+    }
+
+    /** Decode a cached picture ahead, in the background, for the next slide */
+    fun warm(context: Context, url: String?, maxPx: Int, background: Int) {
+        if (!isUsable(url) || decoded.get(decodedKey(url!!, maxPx, background)) != null) return
+        val app = context.applicationContext
+        executor.execute { getCached(app, url, maxPx, background) }
     }
 
     /** Download if needed, then decode. Blocking — only call off the main thread. */
@@ -93,6 +110,7 @@ object WidgetImageLoader {
     }
 
     fun clear(context: Context) {
+        decoded.evictAll()
         executor.execute { dir(context).listFiles()?.forEach { it.delete() } }
     }
 

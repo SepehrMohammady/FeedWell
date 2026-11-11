@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { FONT } from '../theme/type';
 import { useTranslation } from '../context/LanguageContext';
 import { useReadLater } from '../context/ReadLaterContext';
-import { extractArticleContent, cleanHtmlContent } from '../utils/rssParser';
+import { withOfflineContent } from '../utils/saveForLater';
 import CustomAlert from './CustomAlert';
 
 export default function SaveButton({ article, size = 24, style, variant = 'default', label }) {
@@ -18,57 +18,9 @@ export default function SaveButton({ article, size = 24, style, variant = 'defau
   const isBookmarked = isInReadLater(article.id);
 
   const fetchFullContentForOffline = async (article) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      console.log('Starting download for offline reading:', article.title);
-      
-      // If article doesn't have a URL, just save what we have
-      if (!article.url) {
-        console.log('No URL available, saving existing content');
-        return {
-          ...article,
-          offlineContent: article.content || article.description || '',
-          offlineCached: true,
-          cachedAt: new Date().toISOString()
-        };
-      }
-
-      // Try to fetch full article content from the URL
-      console.log('Fetching full content from:', article.url);
-      const response = await fetch(article.url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const html = await response.text();
-      console.log('Content fetched, extracting article text...');
-      
-      // Extract and clean the article content
-      const fullContent = extractArticleContent(html);
-      const cleanedContent = cleanHtmlContent(fullContent);
-      
-      console.log('Content extracted and cleaned for offline storage');
-      
-      // Create enhanced article object with offline content
-      const enhancedArticle = {
-        ...article,
-        offlineContent: cleanedContent || article.content || article.description || '',
-        offlineHtmlContent: fullContent || article.htmlContent || '',
-        offlineCached: true,
-        cachedAt: new Date().toISOString()
-      };
-
-      return enhancedArticle;
-    } catch (error) {
-      console.log('Failed to fetch full content, saving article as-is:', error.message);
-      // If fetching fails, save the article with existing content
-      return {
-        ...article,
-        offlineContent: article.content || article.description || '',
-        offlineCached: false,
-        cachedAt: new Date().toISOString()
-      };
+      return await withOfflineContent(article);
     } finally {
       setIsLoading(false);
     }

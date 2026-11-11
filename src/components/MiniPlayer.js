@@ -15,6 +15,7 @@ import { useTheme, makeStyles } from '../context/ThemeContext';
 import { useTranslation } from '../context/LanguageContext';
 import { useAmbientSound, AMBIENT_SOUNDS } from '../context/AmbientSoundContext';
 import { useUi } from '../theme/ui';
+import { DragSheet, SheetDragArea } from './DragSheet';
 import { FONT, TYPE, RADIUS } from '../theme/type';
 
 export default function MiniPlayer() {
@@ -113,15 +114,25 @@ export default function MiniPlayer() {
       navigationBarTranslucent
       onRequestClose={() => setShowPlaylist(false)}
     >
+      {/* Closes with its X, a tap above it, a drag down on its top, or Back */}
       <View style={styles.playlistOverlay}>
-        <View style={[ui.sheet, styles.playlistContainer, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
-          <View style={ui.sheetHandle} />
-          <View style={styles.playlistHeader}>
-            <Text style={styles.playlistTitle}>{t('miniPlayer.playlistTitle')}</Text>
-            <TouchableOpacity onPress={() => setShowPlaylist(false)} style={styles.playlistClose}>
-              <Ionicons name="close" size={22} color={colors.text} />
-            </TouchableOpacity>
-          </View>
+        <DragSheet
+          onClose={() => setShowPlaylist(false)}
+          style={[ui.sheet, styles.playlistContainer, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}
+        >
+          <SheetDragArea>
+            <View style={ui.sheetHandle} />
+            <View style={styles.playlistHeader}>
+              <Text style={styles.playlistTitle}>{t('miniPlayer.playlistTitle')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowPlaylist(false)}
+                style={styles.playlistClose}
+                accessibilityLabel={t('common.close')}
+              >
+                <Ionicons name="close" size={22} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+          </SheetDragArea>
           <ScrollView style={styles.playlistScroll}>
             {AMBIENT_SOUNDS.map((sound) => {
               const isActive = currentSoundId === sound.id;
@@ -158,7 +169,7 @@ export default function MiniPlayer() {
               );
             })}
           </ScrollView>
-        </View>
+        </DragSheet>
       </View>
     </Modal>
 

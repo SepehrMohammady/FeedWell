@@ -24,6 +24,7 @@ import { useTranslation } from '../context/LanguageContext';
 import { FEED_REGIONS, getCuratedFeeds, CURATED_FEEDS } from '../data/curatedFeeds';
 import { formatLocalizedDate } from '../utils/formatDate';
 import CustomAlert from '../components/CustomAlert';
+import { DragSheet, SheetDragArea } from '../components/DragSheet';
 import { useTourTarget } from '../context/TourContext';
 
 export default function AddFeedScreen({ navigation }) {
@@ -586,19 +587,21 @@ export default function AddFeedScreen({ navigation }) {
         navigationBarTranslucent
         onRequestClose={() => setShowRegionPicker(false)}
       >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setShowRegionPicker(false)}
-          style={styles.sheetOverlay}
-        >
-          <View style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
-            <View style={ui.sheetHandle} />
-            <View style={styles.sheetHeader}>
-              <Text style={[ui.title, styles.flexText]}>{t('region.label')}</Text>
-              <TouchableOpacity onPress={() => setShowRegionPicker(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close" size={22} color={colors.text} />
-              </TouchableOpacity>
-            </View>
+        <View style={styles.sheetOverlay}>
+          <DragSheet onClose={() => setShowRegionPicker(false)} style={[ui.sheet, styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 12 }]}>
+            <SheetDragArea>
+              <View style={ui.sheetHandle} />
+              <View style={styles.sheetHeader}>
+                <Text style={[ui.title, styles.flexText]}>{t('region.label')}</Text>
+                <TouchableOpacity
+                  onPress={() => setShowRegionPicker(false)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityLabel={t('common.close')}
+                >
+                  <Ionicons name="close" size={22} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+            </SheetDragArea>
             <ScrollView>
               {FEED_REGIONS.map((r) => {
                 const active = selectedRegion === r.code;
@@ -616,8 +619,8 @@ export default function AddFeedScreen({ navigation }) {
                 );
               })}
             </ScrollView>
-          </View>
-        </TouchableOpacity>
+          </DragSheet>
+        </View>
       </Modal>
 
       <CustomAlert

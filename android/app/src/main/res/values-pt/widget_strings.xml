@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widget's line in the launcher's widget list -->
+<resources>
+    <string name="widget_description">Os seus artigos mais recentes, um a um ou em apresentação</string>
+</resources>

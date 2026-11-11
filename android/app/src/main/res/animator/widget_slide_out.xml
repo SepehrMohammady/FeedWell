@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The article that was showing stays put under the next one while that
+     fades in and loads, then goes once it is covered -->
+<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="alpha"
+    android:valueFrom="1"
+    android:valueTo="0"
+    android:valueType="floatType"
+    android:startOffset="900"
+    android:duration="1" />

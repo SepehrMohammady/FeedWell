@@ -34,6 +34,11 @@ import { tStatic } from '../i18n';
 import { formatLocalizedDate } from '../utils/formatDate';
 import { saleOn, saleTag, useToday } from '../services/sales';
 import { onOpenSettingsAt } from '../utils/settingsNavigation';
+import { WIDGET_SLIDE_SECONDS, DEFAULT_WIDGET_SLIDE_SECONDS, setWidgetSlideSeconds, setWidgetTallLayout } from '../utils/widgetService';
+import { SWIPE_ACTIONS, SWIPE_ACTION_INFO } from '../config/swipeActions';
+import { countedKey } from '../utils/plural';
+import { useFeed } from '../context/FeedContext';
+import { DragSheet, SheetDragArea } from '../components/DragSheet';
 import { useAmbientSound } from '../context/AmbientSoundContext';
 import { useTour, useTourTarget } from '../context/TourContext';
 import CustomAlert from '../components/CustomAlert';
@@ -96,6 +101,8 @@ export default function SettingsScreen({ navigation }) {
   const { theme, isDarkMode, themeMode, setThemeMode, paletteIndex, setPalette, accentIndex, setAccent, amoledBlack, toggleAmoledBlack } = useTheme();
   const { showImages, autoRefresh, showBookmarkIndicators, skipArticleView, showReadingPositionInFeeds, allowRotation, speechRate, readerHeaderActions, reduceMotion, readingReminder, updateShowImages, updateAutoRefresh, updateShowBookmarkIndicators, updateSkipArticleView, updateShowReadingPositionInFeeds, updateAllowRotation, updateSpeechRate, updateReaderHeaderActions, updateReduceMotion, updateReadingReminder, maxArticleAge, updateMaxArticleAge, autoScrollEnabled, autoScrollDelay, autoScrollSpeed, updateAutoScrollEnabled, updateAutoScrollDelay, updateAutoScrollSpeed, keepAwakeEnabled, updateKeepAwakeEnabled, autoTranslate, updateAutoTranslate } = useAppSettings();
   const { feedRegionUserSet, updateFeedRegion, translationTargetUserSet, markTranslationTargetUserSet, readingFont, updateReadingFont, motionCuesStyle, updateMotionCuesStyle } = useAppSettings();
+  const { widgetSource, widgetFeedUrl, updateWidgetSource, updateWidgetFeedUrl, dimReadArticles, updateDimReadArticles, swipeRightAction, swipeLeftAction, updateSwipeRightAction, updateSwipeLeftAction } = useAppSettings();
+  const { feeds } = useFeed();
   const { autoPlay, setAutoPlay, currentSound } = useAmbientSound();
   const { t, language, setLanguage, isRTL, formatNumber } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -179,6 +186,14 @@ export default function SettingsScreen({ navigation }) {
   const [showWidgetThemePicker, setShowWidgetThemePicker] = useState(false);
   const [widgetOpacity, setWidgetOpacity] = useState(100); // 0-100%
   const [widgetShowImages, setWidgetShowImages] = useState(true);
+  // The slideshow's seconds per article, and what a tall widget shows
+  const [widgetSlideSeconds, setWidgetSlideSecondsState] = useState(DEFAULT_WIDGET_SLIDE_SECONDS);
+  const [widgetTallLayout, setWidgetTallLayoutState] = useState('list'); // 'list' | 'article'
+  const [showWidgetSourcePicker, setShowWidgetSourcePicker] = useState(false);
+  const [showWidgetFeedPicker, setShowWidgetFeedPicker] = useState(false);
+  const [showWidgetSpeedPicker, setShowWidgetSpeedPicker] = useState(false);
+  // Which swipe's action is being picked: 'right', 'left' or null
+  const [swipePicker, setSwipePicker] = useState(null);
 
   // Load target language and translation mode on mount
   useEffect(() => {
@@ -188,6 +203,11 @@ export default function SettingsScreen({ navigation }) {
     AsyncStorage.getItem('widget_theme').then(v => { if (v) setWidgetTheme(v); });
     AsyncStorage.getItem('widget_opacity').then(v => { if (v) setWidgetOpacity(parseInt(v, 10)); });
     AsyncStorage.getItem('widget_show_images').then(v => { if (v !== null) setWidgetShowImages(v === 'true'); });
+    AsyncStorage.getItem('widget_slide_seconds').then(v => {
+      const seconds = v ? parseInt(v, 10) : NaN;
+      if (WIDGET_SLIDE_SECONDS.includes(seconds)) setWidgetSlideSecondsState(seconds);
+    });
+    AsyncStorage.getItem('widget_tall_layout').then(v => { if (v === 'article' || v === 'list') setWidgetTallLayoutState(v); });
   }, []);
 
   const handleChangeDefaultLang = async (langCode) => {
@@ -304,6 +324,27 @@ export default function SettingsScreen({ navigation }) {
       try { WidgetBridge.setWidgetShowImages(value); } catch (e) {}
     }
   };
+
+  const handleWidgetSlideSecondsChange = async (seconds) => {
+    setWidgetSlideSecondsState(seconds);
+    setShowWidgetSpeedPicker(false);
+    await AsyncStorage.setItem('widget_slide_seconds', String(seconds));
+    setWidgetSlideSeconds(seconds);
+  };
+
+  const handleWidgetTallLayoutChange = async (layout) => {
+    setWidgetTallLayoutState(layout);
+    await AsyncStorage.setItem('widget_tall_layout', layout);
+    setWidgetTallLayout(layout);
+  };
+
+  const widgetSourceLabel = widgetSource === 'unread' ? t('settings.widgetArticlesUnread')
+    : widgetSource === 'saved' ? t('settings.widgetArticlesSaved') : t('settings.widgetArticlesAll');
+  const widgetFeed = widgetFeedUrl ? feeds.find((feed) => feed.url === widgetFeedUrl) : null;
+  const widgetFeedLabel = widgetFeed ? (widgetFeed.title || widgetFeed.url) : t('settings.widgetFeedAll');
+  const slideSecondsLabel = (seconds) =>
+    t(countedKey('settings.widgetSlideSeconds', seconds, language), { count: formatNumber(seconds) });
+  const swipeActionTitle = (action) => t((SWIPE_ACTION_INFO[action] || SWIPE_ACTION_INFO.none).titleKey);
 
   const handleOpenModelManager = async () => {
     setShowModelManager(true);
@@ -762,9 +803,10 @@ export default function SettingsScreen({ navigation }) {
     </View>
   );
 
-  // A sheet's top: the handle, the title and a close button
+  // A sheet's top: the handle, the title and a close button. Dragging it down
+  // closes the sheet, as a tap above the sheet does (DragSheet).
   const renderSheetHeader = (title, onClose) => (
-    <>
+    <SheetDragArea>
       <View style={ui.sheetHandle} />
       <View style={styles.modalHeader}>
         <Text style={[ui.title, styles.flexText]}>{title}</Text>
@@ -776,7 +818,7 @@ export default function SettingsScreen({ navigation }) {
           <Ionicons name="close" size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
-    </>
+    </SheetDragArea>
   );
 
   // A choice in a picker sheet: an icon, the choice and a line about it, and
@@ -844,7 +886,7 @@ export default function SettingsScreen({ navigation }) {
       getDisplayName(targetLangCode),
       autoTranslate && t('settings.autoTranslate'),
     ]),
-    widget: join([widgetThemeLabel, t('settings.percent', { value: formatNumber(widgetOpacity) })]),
+    widget: join([widgetSourceLabel, widgetThemeLabel, t('settings.percent', { value: formatNumber(widgetOpacity) })]),
     data: autoBackup.enabled
       ? join([t('backup.autoBackup'), lastAutoBackup && formatBackupDate(lastAutoBackup.createdAt)])
       : join([t('settings.backupData'), t('settings.restoreData')]),
@@ -969,7 +1011,33 @@ export default function SettingsScreen({ navigation }) {
         description={t('settings.readingPositionInFeedsDesc')}
         rightElement={<ThemedSwitch value={showReadingPositionInFeeds} onValueChange={updateShowReadingPositionInFeeds} />}
       />
+      <SettingItem
+        title={t('settings.dimReadArticles')}
+        description={t('settings.dimReadArticlesDesc')}
+        rightElement={<ThemedSwitch value={dimReadArticles} onValueChange={updateDimReadArticles} />}
+      />
     </ListCard>
+  );
+
+  // What swiping an article in the Feeds list does, each way
+  const renderSwipes = () => (
+    <>
+      <SectionTitle title={t('settings.sectionSwipeActions')} />
+      <ListCard>
+        <SettingItem
+          title={t('settings.swipeRight')}
+          description={swipeActionTitle(swipeRightAction)}
+          onPress={() => setSwipePicker('right')}
+          rightElement={chevron}
+        />
+        <SettingItem
+          title={t('settings.swipeLeft')}
+          description={swipeActionTitle(swipeLeftAction)}
+          onPress={() => setSwipePicker('left')}
+          rightElement={chevron}
+        />
+      </ListCard>
+    </>
   );
 
   const renderReading = () => (
@@ -1124,6 +1192,39 @@ export default function SettingsScreen({ navigation }) {
         onPress={handleAddWidget}
         rightElement={<Ionicons name="add-circle-outline" size={22} color={colors.mainInk} />}
       />
+      <SettingItem
+        title={t('settings.widgetArticles')}
+        description={widgetSourceLabel}
+        onPress={() => setShowWidgetSourcePicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.widgetFeed')}
+        description={widgetFeedLabel}
+        onPress={() => setShowWidgetFeedPicker(true)}
+        rightElement={chevron}
+      />
+      <SettingItem
+        title={t('settings.widgetSlideshow')}
+        description={t('settings.widgetSlideshowDesc', { time: slideSecondsLabel(widgetSlideSeconds) })}
+        onPress={() => setShowWidgetSpeedPicker(true)}
+        rightElement={chevron}
+      />
+      {/* A widget taller than about four rows: a list, or one article at a time */}
+      <View style={styles.block}>
+        <Text style={ui.rowTitle}>{t('settings.widgetTall')}</Text>
+        <Text style={[ui.secondary, styles.hint]}>{t('settings.widgetTallHint')}</Text>
+        <Segmented
+          framed
+          style={styles.cuesChoice}
+          options={[
+            { value: 'list', label: t('settings.widgetTallList') },
+            { value: 'article', label: t('settings.widgetTallArticle') },
+          ]}
+          value={widgetTallLayout}
+          onChange={handleWidgetTallLayoutChange}
+        />
+      </View>
       <SettingItem
         title={t('settings.widgetTheme')}
         description={widgetThemeLabel}
@@ -1282,7 +1383,12 @@ export default function SettingsScreen({ navigation }) {
 
   const pages = {
     appearance: renderAppearance,
-    feeds: renderFeeds,
+    feeds: () => (
+      <>
+        {renderFeeds()}
+        {renderSwipes()}
+      </>
+    ),
     reading: renderReading,
     translation: renderTranslation,
     widget: renderWidget,
@@ -1321,7 +1427,13 @@ export default function SettingsScreen({ navigation }) {
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+          <DragSheet
+            onClose={() => {
+              setShowLangPicker(false);
+              setLangSearchQuery('');
+            }}
+            style={[ui.sheet, styles.modalContainer, sheetPadding]}
+          >
             {renderSheetHeader(t('settings.defaultTranslateLangTitle'), () => {
               setShowLangPicker(false);
               setLangSearchQuery('');
@@ -1364,7 +1476,7 @@ export default function SettingsScreen({ navigation }) {
               showsVerticalScrollIndicator={false}
               style={styles.langList}
             />
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1378,7 +1490,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowAppLangPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+          <DragSheet onClose={() => setShowAppLangPicker(false)} style={[ui.sheet, styles.modalContainer, sheetPadding]}>
             {renderSheetHeader(t('language.pickerTitle'), () => setShowAppLangPicker(false))}
 
             <FlatList
@@ -1400,7 +1512,7 @@ export default function SettingsScreen({ navigation }) {
               showsVerticalScrollIndicator={false}
               style={styles.langList}
             />
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1417,7 +1529,13 @@ export default function SettingsScreen({ navigation }) {
         }}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, sheetPadding]}>
+          <DragSheet
+            onClose={() => {
+              setShowModelManager(false);
+              setModelSearchQuery('');
+            }}
+            style={[ui.sheet, styles.modalContainer, sheetPadding]}
+          >
             {renderSheetHeader(t('settings.offlineModelsTitle'), () => {
               setShowModelManager(false);
               setModelSearchQuery('');
@@ -1498,7 +1616,7 @@ export default function SettingsScreen({ navigation }) {
                 }
               />
             )}
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1512,7 +1630,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowTranslationModePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+          <DragSheet onClose={() => setShowTranslationModePicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
             {renderSheetHeader(t('settings.translationMode'), () => setShowTranslationModePicker(false))}
 
             {[
@@ -1527,7 +1645,7 @@ export default function SettingsScreen({ navigation }) {
               selected: translationMode === option.mode,
               onPress: () => handleSelectTranslationMode(option.mode),
             }))}
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1541,7 +1659,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowArticleAgePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+          <DragSheet onClose={() => setShowArticleAgePicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
             {renderSheetHeader(t('settings.articleAgeFilter'), () => setShowArticleAgePicker(false))}
 
             <Text style={[ui.secondary, styles.modalDescription]}>
@@ -1558,7 +1676,7 @@ export default function SettingsScreen({ navigation }) {
                 setShowArticleAgePicker(false);
               },
             }))}
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1572,7 +1690,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowAutoScrollDelayPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+          <DragSheet onClose={() => setShowAutoScrollDelayPicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
             {renderSheetHeader(t('settings.autoScrollDelay'), () => setShowAutoScrollDelayPicker(false))}
 
             {[3, 5, 10, 15].map((seconds) => renderChoice({
@@ -1585,7 +1703,7 @@ export default function SettingsScreen({ navigation }) {
                 setShowAutoScrollDelayPicker(false);
               },
             }))}
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1599,7 +1717,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowFontPicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+          <DragSheet onClose={() => setShowFontPicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
             {renderSheetHeader(t('settings.readingFont'), () => setShowFontPicker(false))}
             <ScrollView>
               {/* Each font shows itself: its name and a preview in it */}
@@ -1620,7 +1738,7 @@ export default function SettingsScreen({ navigation }) {
                 },
               }))}
             </ScrollView>
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1634,7 +1752,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowWidgetThemePicker(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+          <DragSheet onClose={() => setShowWidgetThemePicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
             {renderSheetHeader(t('settings.widgetTheme'), () => setShowWidgetThemePicker(false))}
 
             {[
@@ -1649,7 +1767,131 @@ export default function SettingsScreen({ navigation }) {
               selected: widgetTheme === option.value,
               onPress: () => handleWidgetThemeChange(option.value),
             }))}
-          </View>
+          </DragSheet>
+        </View>
+      </Modal>
+
+      {/* What the widget shows: every article, the unread ones or the saved ones */}
+      <Modal
+        visible={showWidgetSourcePicker}
+        animationType="fade"
+        transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setShowWidgetSourcePicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <DragSheet onClose={() => setShowWidgetSourcePicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.widgetArticles'), () => setShowWidgetSourcePicker(false))}
+            {[
+              { value: 'all', label: t('settings.widgetArticlesAll'), desc: t('settings.widgetArticlesAllDesc'), icon: 'newspaper-outline' },
+              { value: 'unread', label: t('settings.widgetArticlesUnread'), desc: t('settings.widgetArticlesUnreadDesc'), icon: 'mail-unread-outline' },
+              { value: 'saved', label: t('settings.widgetArticlesSaved'), desc: t('settings.widgetArticlesSavedDesc'), icon: 'bookmark-outline' },
+            ].map((option) => renderChoice({
+              key: option.value,
+              icon: option.icon,
+              title: option.label,
+              description: option.desc,
+              selected: widgetSource === option.value,
+              onPress: () => {
+                updateWidgetSource(option.value);
+                setShowWidgetSourcePicker(false);
+              },
+            }))}
+          </DragSheet>
+        </View>
+      </Modal>
+
+      {/* Which feed the widget's articles come from: all of them, or one */}
+      <Modal
+        visible={showWidgetFeedPicker}
+        animationType="fade"
+        transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setShowWidgetFeedPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <DragSheet onClose={() => setShowWidgetFeedPicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+            {renderSheetHeader(t('settings.widgetFeed'), () => setShowWidgetFeedPicker(false))}
+            <ScrollView>
+              {renderChoice({
+                key: 'all',
+                icon: 'albums-outline',
+                title: t('settings.widgetFeedAll'),
+                selected: !widgetFeed,
+                onPress: () => {
+                  updateWidgetFeedUrl(null);
+                  setShowWidgetFeedPicker(false);
+                },
+              })}
+              {[...feeds]
+                .sort((a, b) => (a.title || a.url).localeCompare(b.title || b.url))
+                .map((feed) => renderChoice({
+                  key: feed.url,
+                  icon: feed.isHidden ? 'eye-off-outline' : 'newspaper-outline',
+                  title: feed.title || feed.url,
+                  numberOfLines: 1,
+                  selected: widgetFeed?.url === feed.url,
+                  onPress: () => {
+                    updateWidgetFeedUrl(feed.url);
+                    setShowWidgetFeedPicker(false);
+                  },
+                }))}
+            </ScrollView>
+          </DragSheet>
+        </View>
+      </Modal>
+
+      {/* How long each article stays when the widget's slideshow plays */}
+      <Modal
+        visible={showWidgetSpeedPicker}
+        animationType="fade"
+        transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setShowWidgetSpeedPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <DragSheet onClose={() => setShowWidgetSpeedPicker(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerShort, sheetPadding]}>
+            {renderSheetHeader(t('settings.widgetSlideshow'), () => setShowWidgetSpeedPicker(false))}
+            {WIDGET_SLIDE_SECONDS.map((seconds) => renderChoice({
+              key: seconds,
+              icon: 'timer-outline',
+              title: slideSecondsLabel(seconds),
+              selected: widgetSlideSeconds === seconds,
+              onPress: () => handleWidgetSlideSecondsChange(seconds),
+            }))}
+          </DragSheet>
+        </View>
+      </Modal>
+
+      {/* What a swipe right or a swipe left on an article does */}
+      <Modal
+        visible={swipePicker !== null}
+        animationType="fade"
+        transparent={true}
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setSwipePicker(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <DragSheet onClose={() => setSwipePicker(null)} style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+            {renderSheetHeader(swipePicker === 'left' ? t('settings.swipeLeft') : t('settings.swipeRight'), () => setSwipePicker(null))}
+            <ScrollView>
+              {SWIPE_ACTIONS.map((action) => renderChoice({
+                key: action,
+                icon: SWIPE_ACTION_INFO[action].icon,
+                title: t(SWIPE_ACTION_INFO[action].titleKey),
+                description: t(SWIPE_ACTION_INFO[action].descKey),
+                selected: (swipePicker === 'left' ? swipeLeftAction : swipeRightAction) === action,
+                onPress: () => {
+                  if (swipePicker === 'left') updateSwipeLeftAction(action); else updateSwipeRightAction(action);
+                  setSwipePicker(null);
+                },
+              }))}
+            </ScrollView>
+          </DragSheet>
         </View>
       </Modal>
 
@@ -1663,7 +1905,7 @@ export default function SettingsScreen({ navigation }) {
         onRequestClose={() => setShowRestoreSheet(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
+          <DragSheet onClose={() => setShowRestoreSheet(false)} style={[ui.sheet, styles.modalContainer, styles.modalContainerTall, sheetPadding]}>
             {renderSheetHeader(t('settings.restoreData'), () => setShowRestoreSheet(false))}
             <Text style={[ui.sectionTitle, styles.sheetSection]}>{t('backup.automaticBackups')}</Text>
             <ScrollView>
@@ -1683,7 +1925,7 @@ export default function SettingsScreen({ navigation }) {
                 onPress: pickBackupFile,
               })}
             </ScrollView>
-          </View>
+          </DragSheet>
         </View>
       </Modal>
 
