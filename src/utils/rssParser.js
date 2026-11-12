@@ -1,4 +1,5 @@
 import { parse } from 'react-native-rss-parser';
+import { decodeHtmlEntities } from './htmlEntities';
 
 // Feed dates arrive as raw strings in many formats. Hermes' Date parser is far
 // stricter than V8's, so a string that parses fine in a debugger can become
@@ -575,40 +576,10 @@ function generateStableId(item, url, index) {
   return baseId || `${url}_${index}_fallback`;
 }
 
-// Decode HTML entities
-export function decodeHtmlEntities(text) {
-  if (!text) return '';
-  
-  const entityMap = {
-    '&amp;': '&',
-    '&lt;': '<',
-    '&gt;': '>',
-    '&quot;': '"',
-    '&#39;': "'",
-    '&#8217;': "'",
-    '&#8216;': "'",
-    '&#8220;': '"',
-    '&#8221;': '"',
-    '&#8211;': '–',
-    '&#8212;': '—',
-    '&#8230;': '…',
-    '&nbsp;': ' ',
-    '&copy;': '©',
-    '&reg;': '®',
-    '&trade;': '™',
-    '&ldquo;': '"',
-    '&rdquo;': '"',
-    '&lsquo;': "'",
-    '&rsquo;': "'",
-    '&ndash;': '–',
-    '&mdash;': '—',
-    '&hellip;': '…'
-  };
-
-  return text.replace(/&[a-zA-Z0-9#]+;/g, (entity) => {
-    return entityMap[entity] || entity;
-  });
-}
+// Decode HTML entities: every numeric reference and the named ones of HTML 4
+// (utils/htmlEntities). It lived here as a short list, and is still exported
+// from here for the callers that import it from the parser.
+export { decodeHtmlEntities };
 
 // Clean HTML content by removing ads and unnecessary elements
 export function cleanHtmlContent(html) {
@@ -697,20 +668,10 @@ export function extractCleanText(html) {
   // Remove all remaining HTML tags
   text = text.replace(/<[^>]+>/g, '');
   
-  // Decode HTML entities
-  text = text.replace(/&amp;/g, '&');
-  text = text.replace(/&lt;/g, '<');
-  text = text.replace(/&gt;/g, '>');
-  text = text.replace(/&quot;/g, '"');
-  text = text.replace(/&#39;/g, "'");
-  text = text.replace(/&apos;/g, "'");
-  text = text.replace(/&nbsp;/g, ' ');
-  text = text.replace(/&#8217;/g, "'");
-  text = text.replace(/&#8220;/g, '"');
-  text = text.replace(/&#8221;/g, '"');
-  text = text.replace(/&#8211;/g, '-');
-  text = text.replace(/&#8212;/g, '—');
-  
+  // Decode HTML entities, all of them: a short list here left the others in
+  // the text as typed ("NGC &#160;4449")
+  text = decodeHtmlEntities(text);
+
   // Clean up problematic phrases and leftovers from media/ads
   const problemPhrases = [
     /\b(click here to|read more|advertisement|sponsored by|follow us|subscribe|newsletter)\b/gi,

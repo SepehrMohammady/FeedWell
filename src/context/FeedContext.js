@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeStorage } from '../utils/SafeStorage';
+import { withDecodedText } from '../utils/htmlEntities';
 
 const FeedContext = createContext();
 
@@ -271,7 +272,11 @@ export function FeedProvider({ children }) {
           console.log('Parsed feeds:', parsedFeeds);
           // Validate that we got an array
           if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
-            dispatch({ type: 'SET_FEEDS', payload: parsedFeeds });
+            // Feed names stored before 1.21.1 may still carry character
+            // codes ("Science &#038; Tech"): decoded here, and saved if any were
+            const feedsToShow = withDecodedText(parsedFeeds);
+            dispatch({ type: 'SET_FEEDS', payload: feedsToShow });
+            if (feedsToShow !== parsedFeeds) await saveFeeds(feedsToShow);
           } else {
             console.warn('Parsed feeds is not a valid array, skipping load');
           }
@@ -301,7 +306,13 @@ export function FeedProvider({ children }) {
           console.log('======================================');
           // Validate that we got an array
           if (Array.isArray(parsedArticles)) {
-            dispatch({ type: 'SET_ARTICLES', payload: parsedArticles });
+            // Articles stored before 1.21.1 may still carry character codes
+            // in their text ("NGC &#160;4449"), and a refresh keeps a stored
+            // article as it is: decoded here, and saved before the first
+            // refresh reads the storage again
+            const articlesToShow = withDecodedText(parsedArticles);
+            dispatch({ type: 'SET_ARTICLES', payload: articlesToShow });
+            if (articlesToShow !== parsedArticles) await saveArticles(articlesToShow);
           } else {
             console.warn('Parsed articles is not a valid array, skipping load');
           }
@@ -527,7 +538,9 @@ export function FeedProvider({ children }) {
       if (storedArticles) {
         const parsed = JSON.parse(storedArticles);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          existingArticles = parsed;
+          // Decoded again here in case the save at load didn't go through:
+          // the merge below keeps stored articles as they are
+          existingArticles = withDecodedText(parsed);
           console.log('Loaded articles from STORAGE:', existingArticles.length);
           console.log('Storage read count:', existingArticles.filter(a => a.isRead).length);
           console.log('Storage unread count:', existingArticles.filter(a => !a.isRead).length);

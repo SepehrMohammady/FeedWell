@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Mga linya sa pagitan ng mga artikulo",
   "whatsNew.linesFixBody": "Sa ilang telepono, nawawala ang ilan sa maninipis na linya sa pagitan ng mga artikulo sa Naka-save at Mga Feed. Lumalabas na ngayon ang lahat.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Mga ligaw na code sa text",
+  "whatsNew.codesFixBody": "May mga pamagat at paglalarawan na nagpakita ng mga piraso ng code kapalit ng espasyo, titik na may tuldik o simbolo. Normal na ang basa sa mga ito ngayon.",
 };

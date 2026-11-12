@@ -719,4 +719,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linhas entre os artigos",
   "whatsNew.linesFixBody": "Em alguns telemóveis faltavam algumas das linhas finas entre os artigos em Guardados e em Feeds. Agora veem-se todas.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Códigos perdidos no texto",
+  "whatsNew.codesFixBody": "Alguns títulos e descrições mostravam pedaços de código no lugar de um espaço, de uma letra acentuada ou de um símbolo. Agora leem-se normalmente.",
 };

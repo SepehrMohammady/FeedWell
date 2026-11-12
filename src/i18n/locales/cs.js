@@ -727,4 +727,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Čáry mezi články",
   "whatsNew.linesFixBody": "Na některých telefonech chyběly v Uložených a v Kanálech některé tenké čáry mezi články. Teď jsou vidět všechny.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Zatoulané kódy v textu",
+  "whatsNew.codesFixBody": "Některé titulky a popisy ukazovaly kousky kódu místo mezery, písmene s diakritikou nebo symbolu. Teď se čtou normálně.",
 };

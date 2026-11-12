@@ -709,4 +709,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Đường kẻ giữa các bài",
   "whatsNew.linesFixBody": "Trên một số điện thoại, vài đường kẻ mảnh giữa các bài không hiện trong Đã lưu và Nguồn cấp. Giờ tất cả đều hiện.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Mã lạc trong văn bản",
+  "whatsNew.codesFixBody": "Một số tiêu đề và mô tả hiện các đoạn mã thay cho dấu cách, chữ có dấu hoặc ký hiệu. Giờ chúng đã đọc được bình thường.",
 };

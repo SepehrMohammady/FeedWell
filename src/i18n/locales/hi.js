@@ -693,4 +693,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "लेखों के बीच की रेखाएँ",
   "whatsNew.linesFixBody": "कुछ फ़ोन पर सहेजे गए और फ़ीड्स में लेखों के बीच की कुछ पतली रेखाएँ नहीं दिखती थीं। अब सभी दिखती हैं।",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "टेक्स्ट में भटके हुए कोड",
+  "whatsNew.codesFixBody": "कुछ शीर्षकों और विवरणों में स्पेस, चिह्न वाले अक्षर या प्रतीक की जगह कोड के टुकड़े दिखते थे। अब वे सामान्य रूप से पढ़े जाते हैं।",
 };

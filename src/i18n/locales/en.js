@@ -720,4 +720,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   'whatsNew.linesFixTitle': 'Lines between articles',
   'whatsNew.linesFixBody': 'On some phones, a few of the thin lines between articles were missing in Saved and Feeds. They all show now.',
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  'whatsNew.codesFixTitle': 'Stray codes in text',
+  'whatsNew.codesFixBody': 'Some titles and descriptions showed bits of code in place of a space, an accented letter or a symbol. They read normally now.',
 };

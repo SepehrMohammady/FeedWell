@@ -709,4 +709,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "記事の間の線",
   "whatsNew.linesFixBody": "一部の端末で、保存済みとフィードの記事の間の細い線がところどころ表示されていませんでした。すべて表示されるようになりました。",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "テキストに残っていたコード",
+  "whatsNew.codesFixBody": "一部のタイトルや説明で、スペース、アクセント付きの文字、記号の代わりにコードの断片が表示されていました。正しく読めるようになりました。",
 };

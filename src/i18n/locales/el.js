@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Γραμμές ανάμεσα στα άρθρα",
   "whatsNew.linesFixBody": "Σε ορισμένα τηλέφωνα έλειπαν κάποιες από τις λεπτές γραμμές ανάμεσα στα άρθρα, στα Αποθηκευμένα και στις Ροές. Τώρα φαίνονται όλες.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Αδέσποτοι κωδικοί στο κείμενο",
+  "whatsNew.codesFixBody": "Ορισμένοι τίτλοι και περιγραφές έδειχναν κομμάτια κώδικα στη θέση ενός κενού, ενός τονισμένου γράμματος ή ενός συμβόλου. Τώρα διαβάζονται κανονικά.",
 };

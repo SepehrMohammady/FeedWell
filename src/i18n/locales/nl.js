@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Lijnen tussen artikelen",
   "whatsNew.linesFixBody": "Op sommige telefoons ontbraken enkele van de dunne lijnen tussen artikelen in Opgeslagen en Feeds. Nu zijn ze allemaal te zien.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Verdwaalde codes in tekst",
+  "whatsNew.codesFixBody": "Sommige titels en beschrijvingen toonden stukjes code in plaats van een spatie, een letter met accent of een symbool. Nu zijn ze gewoon leesbaar.",
 };

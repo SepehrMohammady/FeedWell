@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linjer mellan artiklar",
   "whatsNew.linesFixBody": "På vissa telefoner saknades några av de tunna linjerna mellan artiklarna i Sparade och Flöden. Nu syns alla.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Vilsna koder i texten",
+  "whatsNew.codesFixBody": "Vissa rubriker och beskrivningar visade kodsnuttar i stället för ett mellanslag, en bokstav med accent eller en symbol. Nu läses de som vanligt.",
 };

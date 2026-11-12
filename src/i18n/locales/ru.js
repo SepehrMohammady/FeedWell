@@ -729,4 +729,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Линии между статьями",
   "whatsNew.linesFixBody": "На некоторых телефонах в Сохранённых и в Лентах не было части тонких линий между статьями. Теперь видны все.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Лишние коды в тексте",
+  "whatsNew.codesFixBody": "В некоторых заголовках и описаниях вместо пробела, буквы с акцентом или символа показывались обрывки кода. Теперь они читаются нормально.",
 };

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { SafeStorage } from '../utils/SafeStorage';
+import { withDecodedText } from '../utils/htmlEntities';
 
 const ReadLaterContext = createContext();
 
@@ -108,7 +109,10 @@ export function ReadLaterProvider({ children }) {
           // Validate that we got an array
           if (Array.isArray(articles)) {
             console.log('Loaded read later articles from storage:', articles.length);
-            dispatch({ type: SET_READ_LATER_ARTICLES, payload: articles });
+            // Articles saved before 1.21.1 may still carry character codes in
+            // their text ("NGC &#160;4449"): decoded here, on every load, so
+            // the list is right whether or not this copy gets saved again.
+            dispatch({ type: SET_READ_LATER_ARTICLES, payload: withDecodedText(articles) });
           } else {
             console.warn('Stored read later data is not a valid array');
           }

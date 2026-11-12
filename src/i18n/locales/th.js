@@ -664,4 +664,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "เส้นคั่นระหว่างบทความ",
   "whatsNew.linesFixBody": "ในโทรศัพท์บางรุ่น เส้นบางๆ ระหว่างบทความบางเส้นไม่แสดงในที่บันทึกไว้และฟีด ตอนนี้แสดงครบทุกเส้นแล้ว",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "โค้ดหลงในข้อความ",
+  "whatsNew.codesFixBody": "ชื่อเรื่องและคำอธิบายบางรายการเคยแสดงเศษโค้ดแทนช่องว่าง ตัวอักษรที่มีเครื่องหมาย หรือสัญลักษณ์ ตอนนี้อ่านได้ตามปกติแล้ว",
 };

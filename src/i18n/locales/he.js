@@ -728,4 +728,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "קווים בין הכתבות",
   "whatsNew.linesFixBody": "בחלק מהטלפונים חסרו כמה מהקווים הדקים בין הכתבות בשמורים ובפידים. עכשיו כולם מופיעים.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "קודים תועים בטקסט",
+  "whatsNew.codesFixBody": "בחלק מהכותרות והתיאורים הופיעו קטעי קוד במקום רווח, אות עם סימן או סמל. עכשיו הם נקראים כרגיל.",
 };

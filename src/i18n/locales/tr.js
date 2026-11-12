@@ -673,4 +673,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Makaleler arasındaki çizgiler",
   "whatsNew.linesFixBody": "Bazı telefonlarda Kaydedilenler ve Akışlar'da makaleler arasındaki ince çizgilerin bir kısmı görünmüyordu. Artık hepsi görünüyor.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Metindeki başıboş kodlar",
+  "whatsNew.codesFixBody": "Bazı başlık ve açıklamalarda boşluk, aksanlı harf ya da simge yerine kod parçaları görünüyordu. Artık normal okunuyorlar.",
 };

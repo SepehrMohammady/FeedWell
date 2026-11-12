@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linjer mellem artikler",
   "whatsNew.linesFixBody": "På nogle telefoner manglede enkelte af de tynde linjer mellem artiklerne i Gemte og Feeds. Nu vises de alle.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Vildfarne koder i teksten",
+  "whatsNew.codesFixBody": "Nogle titler og beskrivelser viste stumper af kode i stedet for et mellemrum, et bogstav med accent eller et symbol. Nu læses de normalt.",
 };

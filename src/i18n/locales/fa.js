@@ -673,4 +673,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "خط‌های بین مقاله‌ها",
   "whatsNew.linesFixBody": "در بعضی گوشی‌ها، چند تا از خط‌های نازک بین مقاله‌ها در ذخیره‌شده و خوراک‌ها دیده نمی‌شد. حالا همه دیده می‌شوند.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "کدهای اضافه در متن",
+  "whatsNew.codesFixBody": "در بعضی عنوان‌ها و توضیح‌ها به‌جای فاصله، حرف علامت‌دار یا نماد، تکه‌ای کد دیده می‌شد. حالا درست خوانده می‌شوند.",
 };

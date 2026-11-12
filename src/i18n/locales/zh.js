@@ -664,4 +664,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "文章之间的分隔线",
   "whatsNew.linesFixBody": "在部分手机上，已保存和订阅源中文章之间的个别细线没有显示。现在全部都能显示了。",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "文字中的多余代码",
+  "whatsNew.codesFixBody": "部分标题和描述曾在空格、带重音的字母或符号的位置显示代码片段。现在已能正常阅读。",
 };

@@ -7,6 +7,7 @@ export const WHATS_NEW_RELEASES = [
     version: '1.21.1',
     items: [
       { icon: 'reorder-two', title: 'whatsNew.linesFixTitle', body: 'whatsNew.linesFixBody' },
+      { icon: 'code-slash', title: 'whatsNew.codesFixTitle', body: 'whatsNew.codesFixBody' },
     ],
   },
   {

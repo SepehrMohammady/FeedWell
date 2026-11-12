@@ -709,4 +709,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Garis di antara artikel",
   "whatsNew.linesFixBody": "Di beberapa ponsel, sebagian garis tipis di antara artikel tidak tampil di Tersimpan dan Feed. Sekarang semuanya tampil.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Kode nyasar di teks",
+  "whatsNew.codesFixBody": "Beberapa judul dan deskripsi menampilkan potongan kode di tempat spasi, huruf beraksen, atau simbol. Sekarang semuanya terbaca normal.",
 };

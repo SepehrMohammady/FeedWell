@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Mistari kati ya makala",
   "whatsNew.linesFixBody": "Kwenye baadhi ya simu, baadhi ya mistari myembamba kati ya makala haikuonekana kwenye Zilizohifadhiwa na Mipasho. Sasa yote inaonekana.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Misimbo iliyopotea kwenye maandishi",
+  "whatsNew.codesFixBody": "Baadhi ya vichwa na maelezo vilionyesha vipande vya msimbo badala ya nafasi, herufi yenye alama au ishara. Sasa vinasomeka kawaida.",
 };

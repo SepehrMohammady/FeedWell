@@ -748,4 +748,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "الخطوط بين المقالات",
   "whatsNew.linesFixBody": "في بعض الهواتف، كانت بعض الخطوط الرفيعة بين المقالات لا تظهر في المحفوظات والخلاصات. تظهر الآن كلها.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "رموز زائدة في النص",
+  "whatsNew.codesFixBody": "كانت بعض العناوين والأوصاف تعرض أجزاء من رموز برمجية بدل مسافة أو حرف خاص أو علامة. صارت الآن تُقرأ بشكل طبيعي.",
 };

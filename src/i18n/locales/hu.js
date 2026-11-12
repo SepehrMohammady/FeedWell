@@ -718,4 +718,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Vonalak a cikkek között",
   "whatsNew.linesFixBody": "Néhány telefonon a Mentett és a Hírforrások listájában hiányzott a cikkek közötti vékony vonalak egy része. Most mind látszik.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Kóbor kódok a szövegben",
+  "whatsNew.codesFixBody": "Néhány címben és leírásban kódrészletek jelentek meg egy szóköz, ékezetes betű vagy szimbólum helyén. Most már rendesen olvashatók.",
 };

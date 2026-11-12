@@ -727,4 +727,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Liniile dintre articole",
   "whatsNew.linesFixBody": "Pe unele telefoane lipseau câteva dintre liniile subțiri dintre articole în Salvate și în Fluxuri. Acum se văd toate.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "Coduri rătăcite în text",
+  "whatsNew.codesFixBody": "Unele titluri și descrieri arătau bucăți de cod în locul unui spațiu, al unei litere cu accent sau al unui simbol. Acum se citesc normal.",
 };

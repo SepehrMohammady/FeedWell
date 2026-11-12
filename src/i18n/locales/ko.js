@@ -709,4 +709,7 @@ export default {
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "기사 사이의 선",
   "whatsNew.linesFixBody": "일부 휴대폰에서 저장됨과 피드의 기사 사이 가는 선이 군데군데 보이지 않았습니다. 이제 모두 보입니다.",
+  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
+  "whatsNew.codesFixTitle": "글 속에 남아 있던 코드",
+  "whatsNew.codesFixBody": "일부 제목과 설명에 공백, 악센트 문자, 기호 대신 코드 조각이 보였습니다. 이제 제대로 읽힙니다.",
 };
