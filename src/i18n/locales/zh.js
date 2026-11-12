@@ -69,10 +69,6 @@ export default {
   "date.daysAgo": "{count}天前",
   "whatsNew.title": "新功能",
   "whatsNew.version": "版本 {version}",
-  "whatsNew.salesTitle": "优惠与感谢卡片",
-  "whatsNew.salesBody": "优惠期间，SeMo Lab 的更多应用会显示每个应用的折扣。每年有几天，会打开一次简短的感谢卡片。",
-  "whatsNew.datesTitle": "用你的语言显示日期",
-  "whatsNew.datesBody": "阅读器、已保存和主屏幕小组件会以 FeedWell 的语言显示日期和时间。在阿拉伯语中，数字使用阿拉伯-印度数字。",
   "whatsNew.takeTour": "开始导览",
   "addFeed.addButton": "添加订阅源",
   "addFeed.popularCategories": "热门分类",
@@ -665,4 +661,7 @@ export default {
   "whatsNew.filterTitle": "更精细的筛选",
   "whatsNew.filterBody": "订阅源页面的筛选现在可按订阅源和日期缩小列表，还能只显示已保存、有笔记、来自星标订阅源或有图片的文章。",
   "whatsNew.unreadBody": "未读文章以粗体标题和更大的圆点突出显示。已读文章则退居其次，显示黑白图片和较浅的文字。",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "文章之间的分隔线",
+  "whatsNew.linesFixBody": "在部分手机上，已保存和订阅源中文章之间的个别细线没有显示。现在全部都能显示了。",
 };

@@ -69,10 +69,6 @@ export default {
   "date.daysAgo": "{count} روز پیش",
   "whatsNew.title": "تازه‌ها",
   "whatsNew.version": "نسخه {version}",
-  "whatsNew.salesTitle": "تخفیف‌ها و کارت‌های تشکر",
-  "whatsNew.salesBody": "در زمان تخفیف، بخش برنامه‌های دیگر SeMo Lab تخفیف هر برنامه را نشان می‌دهد. در چند روز از سال، یک کارت کوتاه تشکر یک بار باز می‌شود.",
-  "whatsNew.datesTitle": "تاریخ‌ها به زبان شما",
-  "whatsNew.datesBody": "خوانشگر، ذخیره‌شده و ویجت صفحه اصلی تاریخ و ساعت را به زبان FeedWell نشان می‌دهند. در عربی، اعداد با ارقام عربی شرقی نوشته می‌شوند.",
   "whatsNew.takeTour": "شروع راهنما",
   "addFeed.addButton": "افزودن خوراک",
   "addFeed.popularCategories": "دسته‌بندی‌های محبوب",
@@ -674,4 +670,7 @@ export default {
   "whatsNew.filterTitle": "فیلتر دقیق‌تر",
   "whatsNew.filterBody": "فیلتر خوراک‌ها حالا فهرست را بر اساس خوراک و تاریخ محدود می‌کند، و می‌تواند فقط ذخیره‌شده‌ها، یادداشت‌دارها، خوراک‌های ستاره‌دار یا تصویردارها را نشان دهد.",
   "whatsNew.unreadBody": "مقاله‌های نخوانده با عنوان پررنگ و نقطه بزرگ‌تر دیده می‌شوند. خوانده‌شده‌ها با تصویر سیاه‌وسفید و متن روشن‌تر عقب‌تر می‌نشینند.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "خط‌های بین مقاله‌ها",
+  "whatsNew.linesFixBody": "در بعضی گوشی‌ها، چند تا از خط‌های نازک بین مقاله‌ها در ذخیره‌شده و خوراک‌ها دیده نمی‌شد. حالا همه دیده می‌شوند.",
 };

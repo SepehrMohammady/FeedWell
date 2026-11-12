@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Nyheter",
   "whatsNew.version": "Version {version}",
-  "whatsNew.salesTitle": "Rea och tackkort",
-  "whatsNew.salesBody": "Under en rea visar Mer från SeMo Lab varje apps rabatt. Några dagar om året öppnas ett kort tackkort en gång.",
-  "whatsNew.datesTitle": "Datum på ditt språk",
-  "whatsNew.datesBody": "Läsaren, Sparade och hemskärmswidgeten visar datum och tider på FeedWells språk. På arabiska skrivs tal med arabisk-indiska siffror.",
   "whatsNew.takeTour": "Ta rundturen",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Ett finare filter",
   "whatsNew.filterBody": "Filtret under Flöden begränsar nu listan efter flöde och datum, och kan visa bara sparade artiklar, artiklar med anteckningar, från stjärnmärkta flöden eller med bilder.",
   "whatsNew.unreadBody": "Olästa artiklar syns med fet rubrik och en större prick. Lästa artiklar hamnar i bakgrunden, med svartvita bilder och ljusare text.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linjer mellan artiklar",
+  "whatsNew.linesFixBody": "På vissa telefoner saknades några av de tunna linjerna mellan artiklarna i Sparade och Flöden. Nu syns alla.",
 };

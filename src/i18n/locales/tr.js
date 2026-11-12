@@ -69,10 +69,6 @@ export default {
   "date.daysAgo": "{count}g önce",
   "whatsNew.title": "Yenilikler",
   "whatsNew.version": "Sürüm {version}",
-  "whatsNew.salesTitle": "İndirimler ve teşekkür kartları",
-  "whatsNew.salesBody": "İndirim süresince SeMo Lab'den Daha Fazlası bölümü her uygulamanın indirimini gösterir. Yılın birkaç gününde kısa bir teşekkür kartı bir kez açılır.",
-  "whatsNew.datesTitle": "Tarihler sizin dilinizde",
-  "whatsNew.datesBody": "Okuyucu, Kaydedilenler ve Ana Ekran Widget'ı tarihleri ve saatleri FeedWell'in dilinde gösterir. Arapçada sayılar Arap-Hint rakamlarıyla yazılır.",
   "whatsNew.takeTour": "Turu başlat",
   "addFeed.addButton": "Akış Ekle",
   "addFeed.popularCategories": "Popüler Kategoriler",
@@ -674,4 +670,7 @@ export default {
   "whatsNew.filterTitle": "Daha ince bir filtre",
   "whatsNew.filterBody": "Akışlar'daki filtre artık listeyi akışa ve tarihe göre daraltıyor; yalnızca kaydedilen, notlu, yıldızlı akışlardan gelen ya da görselli makaleleri de gösterebiliyor.",
   "whatsNew.unreadBody": "Okunmamış makaleler kalın başlık ve daha büyük bir noktayla öne çıkar. Okunanlar siyah beyaz görseller ve daha açık yazıyla geri planda kalır.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Makaleler arasındaki çizgiler",
+  "whatsNew.linesFixBody": "Bazı telefonlarda Kaydedilenler ve Akışlar'da makaleler arasındaki ince çizgilerin bir kısmı görünmüyordu. Artık hepsi görünüyor.",
 };

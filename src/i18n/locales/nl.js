@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Wat is er nieuw",
   "whatsNew.version": "Versie {version}",
-  "whatsNew.salesTitle": "Kortingen en bedankkaarten",
-  "whatsNew.salesBody": "Tijdens een korting toont Meer van SeMo Lab de korting van elke app. Op een paar dagen per jaar opent eenmalig een korte bedankkaart.",
-  "whatsNew.datesTitle": "Datums in je eigen taal",
-  "whatsNew.datesBody": "De Lezer, Opgeslagen en de widget op het startscherm tonen datums en tijden in de taal van FeedWell. In het Arabisch worden getallen in Arabisch-Indische cijfers geschreven.",
   "whatsNew.takeTour": "Start de rondleiding",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Een fijner filter",
   "whatsNew.filterBody": "Het filter bij Feeds beperkt de lijst nu op feed en op datum, en kan alleen opgeslagen artikelen tonen, artikelen met notities, uit feeds met ster of met afbeeldingen.",
   "whatsNew.unreadBody": "Ongelezen artikelen vallen op met een vetgedrukte titel en een grotere stip. Gelezen artikelen treden terug, met zwart-witte afbeeldingen en lichtere tekst.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Lijnen tussen artikelen",
+  "whatsNew.linesFixBody": "Op sommige telefoons ontbraken enkele van de dunne lijnen tussen artikelen in Opgeslagen en Feeds. Nu zijn ze allemaal te zien.",
 };

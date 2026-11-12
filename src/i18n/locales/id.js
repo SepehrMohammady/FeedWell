@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Apa yang Baru",
   "whatsNew.version": "Versi {version}",
-  "whatsNew.salesTitle": "Diskon dan kartu terima kasih",
-  "whatsNew.salesBody": "Selama diskon, Lainnya dari SeMo Lab menampilkan potongan harga setiap aplikasi. Pada beberapa hari dalam setahun, kartu terima kasih singkat terbuka sekali.",
-  "whatsNew.datesTitle": "Tanggal dalam bahasa Anda",
-  "whatsNew.datesBody": "Pembaca, Tersimpan, dan widget layar utama menampilkan tanggal dan waktu dalam bahasa FeedWell. Dalam bahasa Arab, angka ditulis dengan angka Arab-India.",
   "whatsNew.takeTour": "Mulai tur",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -710,4 +706,7 @@ export default {
   "whatsNew.filterTitle": "Filter yang lebih rinci",
   "whatsNew.filterBody": "Filter di Feed kini mempersempit daftar menurut feed dan tanggal, dan bisa menampilkan hanya artikel tersimpan, yang punya catatan, dari feed berbintang, atau yang bergambar.",
   "whatsNew.unreadBody": "Artikel yang belum dibaca menonjol dengan judul tebal dan titik yang lebih besar. Yang sudah dibaca mundur ke belakang, dengan gambar hitam putih dan teks lebih terang.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Garis di antara artikel",
+  "whatsNew.linesFixBody": "Di beberapa ponsel, sebagian garis tipis di antara artikel tidak tampil di Tersimpan dan Feed. Sekarang semuanya tampil.",
 };

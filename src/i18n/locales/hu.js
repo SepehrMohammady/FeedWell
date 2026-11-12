@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Újdonságok",
   "whatsNew.version": "{version} verzió",
-  "whatsNew.salesTitle": "Akciók és köszönőkártyák",
-  "whatsNew.salesBody": "Akció idején a Továbbiak a SeMo Labtől rész mutatja az egyes alkalmazások kedvezményét. Az év néhány napján egyszer megnyílik egy rövid köszönőkártya.",
-  "whatsNew.datesTitle": "Dátumok a nyelveden",
-  "whatsNew.datesBody": "Az Olvasó, a Mentett és a kezdőképernyő-modul a FeedWell nyelvén mutatja a dátumokat és az időpontokat. Arabul a számok arab-indiai számjegyekkel jelennek meg.",
   "whatsNew.takeTour": "Bemutató indítása",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Pontosabb szűrő",
   "whatsNew.filterBody": "A Hírforrások szűrője most hírforrás és dátum szerint is szűkíti a listát, és mutathat csak mentett, jegyzetes, csillagos hírforrásból való vagy képes cikkeket.",
   "whatsNew.unreadBody": "Az olvasatlan cikkek félkövér címmel és nagyobb ponttal tűnnek ki. Az olvasottak háttérbe húzódnak, fekete-fehér képekkel és világosabb szöveggel.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Vonalak a cikkek között",
+  "whatsNew.linesFixBody": "Néhány telefonon a Mentett és a Hírforrások listájában hiányzott a cikkek közötti vékony vonalak egy része. Most mind látszik.",
 };

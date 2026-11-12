@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "新機能",
   "whatsNew.version": "バージョン {version}",
-  "whatsNew.salesTitle": "セールとお礼のカード",
-  "whatsNew.salesBody": "セール中は、SeMo Lab のほかのアプリに各アプリの割引が表示されます。一年のうち数日、短いお礼のカードが一度だけ開きます。",
-  "whatsNew.datesTitle": "あなたの言語で日付を表示",
-  "whatsNew.datesBody": "リーダー、保存済み、ホーム画面ウィジェットは、FeedWell の言語で日付と時刻を表示します。アラビア語では、数字をアラビア・インド数字で表示します。",
   "whatsNew.takeTour": "ツアーを見る",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -710,4 +706,7 @@ export default {
   "whatsNew.filterTitle": "より細かいフィルター",
   "whatsNew.filterBody": "フィードのフィルターで、フィードと日付でリストを絞り込めるようになりました。保存済み、メモあり、スター付きフィード、画像ありの記事だけを表示することもできます。",
   "whatsNew.unreadBody": "未読の記事は太字のタイトルと大きめの点で目立ちます。既読の記事は白黒の画像と薄い文字で控えめに表示されます。",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "記事の間の線",
+  "whatsNew.linesFixBody": "一部の端末で、保存済みとフィードの記事の間の細い線がところどころ表示されていませんでした。すべて表示されるようになりました。",
 };

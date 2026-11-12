@@ -83,10 +83,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "ما الجديد",
   "whatsNew.version": "الإصدار {version}",
-  "whatsNew.salesTitle": "التخفيضات وبطاقات الشكر",
-  "whatsNew.salesBody": "خلال فترة التخفيضات، يعرض قسم المزيد من SeMo Lab خصم كل تطبيق. وفي أيام قليلة من السنة، تظهر بطاقة شكر قصيرة مرة واحدة.",
-  "whatsNew.datesTitle": "التواريخ بلغتك",
-  "whatsNew.datesBody": "يعرض القارئ والمحفوظات وأداة الشاشة الرئيسية التواريخ والأوقات بلغة FeedWell. وفي العربية تُكتب الأرقام بالأرقام العربية المشرقية مثل ١٢٣.",
   "whatsNew.takeTour": "ابدأ الجولة",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -749,4 +745,7 @@ export default {
   "whatsNew.filterTitle": "تصفية أدق",
   "whatsNew.filterBody": "صارت التصفية في الخلاصات تضيّق القائمة حسب الخلاصة والتاريخ، ويمكنها أن تعرض فقط المقالات المحفوظة أو التي فيها ملاحظات أو التي من خلاصات مميزة بنجمة أو التي فيها صور.",
   "whatsNew.unreadBody": "تبرز المقالات غير المقروءة بعنوان عريض ونقطة أكبر. وتتراجع المقروءة بصور بالأبيض والأسود ونص أفتح.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "الخطوط بين المقالات",
+  "whatsNew.linesFixBody": "في بعض الهواتف، كانت بعض الخطوط الرفيعة بين المقالات لا تظهر في المحفوظات والخلاصات. تظهر الآن كلها.",
 };

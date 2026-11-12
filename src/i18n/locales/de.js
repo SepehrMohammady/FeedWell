@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Neuigkeiten",
   "whatsNew.version": "Version {version}",
-  "whatsNew.salesTitle": "Rabatte und Dankeskarten",
-  "whatsNew.salesBody": "Während eines Rabatts zeigt Mehr von SeMo Lab den Preisnachlass jeder App. An einigen Tagen im Jahr öffnet sich einmal eine kurze Dankeskarte.",
-  "whatsNew.datesTitle": "Datumsangaben in Ihrer Sprache",
-  "whatsNew.datesBody": "Der Reader, Gespeichert und das Startbildschirm-Widget zeigen Datum und Uhrzeit in der Sprache von FeedWell. Auf Arabisch erscheinen Zahlen in arabisch-indischen Ziffern.",
   "whatsNew.takeTour": "Rundgang starten",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Ein genauerer Filter",
   "whatsNew.filterBody": "Der Filter unter Feeds grenzt die Liste jetzt nach Feed und Datum ein und zeigt auf Wunsch nur gespeicherte Artikel, solche mit Notizen, aus Feeds mit Stern oder mit Bildern.",
   "whatsNew.unreadBody": "Ungelesene Artikel fallen mit fettem Titel und größerem Punkt auf. Gelesene treten zurück, mit schwarz-weißen Bildern und hellerer Schrift.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linien zwischen Artikeln",
+  "whatsNew.linesFixBody": "Auf manchen Geräten fehlten in Gespeichert und Feeds einige der dünnen Linien zwischen den Artikeln. Jetzt sind alle zu sehen.",
 };

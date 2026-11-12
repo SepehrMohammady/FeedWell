@@ -74,10 +74,6 @@ export default {
 
   "whatsNew.title": "Novedades",
   "whatsNew.version": "Versión {version}",
-  "whatsNew.salesTitle": "Ofertas y tarjetas de agradecimiento",
-  "whatsNew.salesBody": "Durante una oferta, Más de SeMo Lab muestra el descuento de cada app. Unos pocos días al año, se abre una vez una breve tarjeta de agradecimiento.",
-  "whatsNew.datesTitle": "Fechas en tu idioma",
-  "whatsNew.datesBody": "El Lector, Guardados y el widget de pantalla de inicio muestran fechas y horas en el idioma de FeedWell. En árabe, los números se escriben con cifras arábigo-índicas.",
   "whatsNew.takeTour": "Hacer el recorrido",
 
   "addFeed.addButton": "Añadir fuente",
@@ -695,4 +691,7 @@ export default {
   "whatsNew.filterTitle": "Un filtro más preciso",
   "whatsNew.filterBody": "El filtro de Fuentes ahora acota la lista por fuente y por fecha, y puede mostrar solo los artículos guardados, los que tienen notas, los de fuentes con estrella o los que tienen imágenes.",
   "whatsNew.unreadBody": "Los artículos sin leer destacan con un título en negrita y un punto más grande. Los leídos pasan a segundo plano, con imágenes en blanco y negro y texto más claro.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Líneas entre artículos",
+  "whatsNew.linesFixBody": "En algunos teléfonos faltaban algunas de las líneas finas entre artículos en Guardados y en Fuentes. Ahora se ven todas.",
 };

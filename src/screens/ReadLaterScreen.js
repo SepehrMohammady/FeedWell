@@ -139,12 +139,14 @@ export default function ReadLaterScreen({ navigation }) {
   );
 
   // The list is one card made of its rows: each on the surface, the first and
-  // last with the card's corners, hairlines between them
+  // last with the card's corners, hairlines between them. A row draws the
+  // hairline above itself (see styles.item for why it isn't under the row).
   const renderArticleItem = ({ item, index }) => {
     const isFirst = index === 0;
     const isLast = index === filteredAndSortedArticles.length - 1;
     return (
       <View style={[styles.item, isFirst && styles.itemFirst, isLast && styles.itemLast]}>
+        {!isFirst && <View style={styles.rowDivider} />}
         <TouchableOpacity
           style={styles.articleCard}
           onPress={() => handleArticlePress(item)}
@@ -201,7 +203,6 @@ export default function ReadLaterScreen({ navigation }) {
             )
           ) : null}
         </TouchableOpacity>
-        {!isLast && <View style={styles.rowDivider} />}
       </View>
     );
   };
@@ -439,7 +440,11 @@ const useStyles = makeStyles(({ colors: c }, isRTL) => {
     },
     // A row of the list's card. Rows overlap by a pixel: FlatList places each
     // row on the pixel grid apart from its height, which can leave a one-pixel
-    // gap between two rows where the page shows through.
+    // gap between two rows where the page shows through. The same rounding can
+    // put the next row's top on a hairline at this row's bottom edge, and the
+    // next row is drawn over this one, so that hairline disappears (every
+    // fourth line of this list on a 420 dpi screen). So the hairline between
+    // two rows is the lower row's first pixel, which nothing covers.
     item: {
       backgroundColor: c.surface,
       marginHorizontal: 16,

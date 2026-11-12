@@ -84,10 +84,6 @@ export default {
   // --- What's New popup ---
   'whatsNew.title': "What's New",
   'whatsNew.version': 'Version {version}',
-  'whatsNew.salesTitle': 'Sales and thank-you cards',
-  'whatsNew.salesBody': "During a sale, More from SeMo Lab shows each app's discount. On a few days of the year, a short thank-you card opens once.",
-  'whatsNew.datesTitle': 'Dates in your language',
-  'whatsNew.datesBody': "The reader, Saved and the home screen widget show dates and times in FeedWell's language. In Arabic, numbers are written in Arabic-Indic digits.",
   'whatsNew.takeTour': 'Take the tour',
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -721,4 +717,7 @@ export default {
   'whatsNew.filterTitle': 'A finer filter',
   'whatsNew.filterBody': 'The filter on Feeds now narrows the list by feed and by date, and to saved articles, ones with notes, starred feeds or pictures.',
   'whatsNew.unreadBody': 'Unread articles stand out with a bold title and a bigger dot. Read ones step back, with black and white pictures and lighter text.',
+  // 1.21.1: the lines between articles that went missing on some screens
+  'whatsNew.linesFixTitle': 'Lines between articles',
+  'whatsNew.linesFixBody': 'On some phones, a few of the thin lines between articles were missing in Saved and Feeds. They all show now.',
 };

@@ -83,10 +83,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Novidades",
   "whatsNew.version": "Versão {version}",
-  "whatsNew.salesTitle": "Promoções e cartões de agradecimento",
-  "whatsNew.salesBody": "Durante uma promoção, Mais da SeMo Lab mostra o desconto de cada app. Em alguns dias do ano, abre-se uma vez um breve cartão de agradecimento.",
-  "whatsNew.datesTitle": "Datas no seu idioma",
-  "whatsNew.datesBody": "O Leitor, os Guardados e o Widget do Ecrã Inicial mostram datas e horas no idioma do FeedWell. Em árabe, os números são escritos com algarismos árabes orientais.",
   "whatsNew.takeTour": "Fazer a visita",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -720,4 +716,7 @@ export default {
   "whatsNew.filterTitle": "Um filtro mais fino",
   "whatsNew.filterBody": "O filtro de Feeds limita agora a lista por feed e por data, e pode mostrar só os artigos guardados, os que têm notas, os de feeds com estrela ou os que têm imagens.",
   "whatsNew.unreadBody": "Os artigos não lidos destacam-se com o título a negrito e um ponto maior. Os lidos ficam em segundo plano, com imagens a preto e branco e texto mais claro.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linhas entre os artigos",
+  "whatsNew.linesFixBody": "Em alguns telemóveis faltavam algumas das linhas finas entre os artigos em Guardados e em Feeds. Agora veem-se todas.",
 };

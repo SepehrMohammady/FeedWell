@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "새로운 기능",
   "whatsNew.version": "버전 {version}",
-  "whatsNew.salesTitle": "할인과 감사 카드",
-  "whatsNew.salesBody": "할인 기간에는 SeMo Lab의 다른 앱에 각 앱의 할인율이 표시됩니다. 일 년 중 며칠은 짧은 감사 카드가 한 번 열립니다.",
-  "whatsNew.datesTitle": "사용하는 언어로 표시되는 날짜",
-  "whatsNew.datesBody": "리더, 저장됨, 홈 화면 위젯이 날짜와 시간을 FeedWell의 언어로 표시합니다. 아랍어에서는 숫자를 아랍-인도 숫자로 표시합니다.",
   "whatsNew.takeTour": "둘러보기 시작",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -710,4 +706,7 @@ export default {
   "whatsNew.filterTitle": "더 세밀한 필터",
   "whatsNew.filterBody": "이제 피드의 필터로 목록을 피드와 날짜로 좁힐 수 있고, 저장한 기사, 메모가 있는 기사, 별표한 피드의 기사, 이미지가 있는 기사만 볼 수도 있습니다.",
   "whatsNew.unreadBody": "읽지 않은 기사는 굵은 제목과 더 큰 점으로 눈에 띕니다. 읽은 기사는 흑백 이미지와 더 연한 글자로 한발 물러납니다.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "기사 사이의 선",
+  "whatsNew.linesFixBody": "일부 휴대폰에서 저장됨과 피드의 기사 사이 가는 선이 군데군데 보이지 않았습니다. 이제 모두 보입니다.",
 };

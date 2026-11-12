@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Anong Bago",
   "whatsNew.version": "Bersyon {version}",
-  "whatsNew.salesTitle": "Mga sale at thank-you card",
-  "whatsNew.salesBody": "Habang may sale, ipinapakita ng Iba pa mula sa SeMo Lab ang diskwento ng bawat app. Sa ilang araw ng taon, isang maikling thank-you card ang bumubukas nang isang beses.",
-  "whatsNew.datesTitle": "Mga petsa sa wika mo",
-  "whatsNew.datesBody": "Ipinapakita ng Reader, Naka-save at Widget sa Home Screen ang mga petsa at oras sa wika ng FeedWell. Sa Arabic, isinusulat ang mga numero sa Arabic-Indic na digit.",
   "whatsNew.takeTour": "Simulan ang tour",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Mas pinong filter",
   "whatsNew.filterBody": "Pinapakitid na ngayon ng filter sa Mga Feed ang listahan ayon sa feed at petsa, at kaya nitong ipakita lang ang mga naka-save na artikulo, ang may note, mula sa mga feed na may star o ang may larawan.",
   "whatsNew.unreadBody": "Tumitingkad ang mga hindi pa nababasang artikulo sa makapal na pamagat at mas malaking tuldok. Umaatras ang mga nabasa na, may black and white na larawan at mas mapusyaw na text.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Mga linya sa pagitan ng mga artikulo",
+  "whatsNew.linesFixBody": "Sa ilang telepono, nawawala ang ilan sa maninipis na linya sa pagitan ng mga artikulo sa Naka-save at Mga Feed. Lumalabas na ngayon ang lahat.",
 };

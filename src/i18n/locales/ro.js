@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Noutăți",
   "whatsNew.version": "Versiunea {version}",
-  "whatsNew.salesTitle": "Reduceri și carduri de mulțumire",
-  "whatsNew.salesBody": "În timpul unei reduceri, Mai multe de la SeMo Lab arată reducerea fiecărei aplicații. În câteva zile din an, un scurt card de mulțumire se deschide o singură dată.",
-  "whatsNew.datesTitle": "Datele în limba ta",
-  "whatsNew.datesBody": "Lectură, Salvate și widgetul de pe ecranul principal arată datele și orele în limba FeedWell. În arabă, numerele se scriu cu cifre arabo-indiene.",
   "whatsNew.takeTour": "Începe turul",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -728,4 +724,7 @@ export default {
   "whatsNew.filterTitle": "Un filtru mai fin",
   "whatsNew.filterBody": "Filtrul din Fluxuri restrânge acum lista după flux și după dată și poate arăta doar articolele salvate, cele cu notițe, din fluxuri cu stea sau cu imagini.",
   "whatsNew.unreadBody": "Articolele necitite ies în evidență cu titlul îngroșat și un punct mai mare. Cele citite trec în plan secund, cu imagini alb-negru și text mai deschis.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Liniile dintre articole",
+  "whatsNew.linesFixBody": "Pe unele telefoane lipseau câteva dintre liniile subțiri dintre articole în Salvate și în Fluxuri. Acum se văd toate.",
 };

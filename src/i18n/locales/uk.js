@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Що нового",
   "whatsNew.version": "Версія {version}",
-  "whatsNew.salesTitle": "Знижки й листівки з подякою",
-  "whatsNew.salesBody": "Під час знижок розділ Інші застосунки SeMo Lab показує знижку кожного застосунку. Кілька днів на рік один раз відкривається коротка листівка з подякою.",
-  "whatsNew.datesTitle": "Дати вашою мовою",
-  "whatsNew.datesBody": "Читач, Збережені та віджет на головному екрані показують дати й час мовою FeedWell. Арабською числа пишуться арабсько-індійськими цифрами.",
   "whatsNew.takeTour": "Переглянути огляд",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -730,4 +726,7 @@ export default {
   "whatsNew.filterTitle": "Точніший фільтр",
   "whatsNew.filterBody": "Фільтр у Стрічках тепер звужує список за стрічкою й датою і може показувати лише збережені статті, статті з нотатками, зі стрічок із зірочкою чи із зображеннями.",
   "whatsNew.unreadBody": "Непрочитані статті виділяються жирним заголовком і більшою крапкою. Прочитані відходять на другий план: чорно-білі зображення й світліший текст.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Лінії між статтями",
+  "whatsNew.linesFixBody": "На деяких телефонах у Збережених і в Стрічках бракувало частини тонких ліній між статтями. Тепер видно всі.",
 };

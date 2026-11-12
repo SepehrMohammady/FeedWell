@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Nyheder",
   "whatsNew.version": "Version {version}",
-  "whatsNew.salesTitle": "Udsalg og takkekort",
-  "whatsNew.salesBody": "Under et udsalg viser Mere fra SeMo Lab hver apps rabat. På nogle få dage om året åbner et kort takkekort én gang.",
-  "whatsNew.datesTitle": "Datoer på dit sprog",
-  "whatsNew.datesBody": "Læseren, Gemte og widgetten til startskærmen viser datoer og klokkeslæt på FeedWells sprog. På arabisk skrives tal med arabisk-indiske cifre.",
   "whatsNew.takeTour": "Tag rundvisningen",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Et finere filter",
   "whatsNew.filterBody": "Filteret under Feeds afgrænser nu listen efter feed og dato og kan vise kun gemte artikler, artikler med noter, fra feeds med stjerne eller med billeder.",
   "whatsNew.unreadBody": "Ulæste artikler træder frem med fed titel og en større prik. Læste artikler træder tilbage med sort-hvide billeder og lysere tekst.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linjer mellem artikler",
+  "whatsNew.linesFixBody": "På nogle telefoner manglede enkelte af de tynde linjer mellem artiklerne i Gemte og Feeds. Nu vises de alle.",
 };

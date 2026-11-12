@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Uutta",
   "whatsNew.version": "Versio {version}",
-  "whatsNew.salesTitle": "Alennukset ja kiitoskortit",
-  "whatsNew.salesBody": "Alennuksen aikana Lisää SeMo Labilta näyttää kunkin sovelluksen alennuksen. Muutamana päivänä vuodessa avautuu kerran lyhyt kiitoskortti.",
-  "whatsNew.datesTitle": "Päivämäärät omalla kielelläsi",
-  "whatsNew.datesBody": "Lukija, Tallennetut ja aloitusnäytön widgetti näyttävät päivämäärät ja kellonajat FeedWellin kielellä. Arabiaksi numerot kirjoitetaan arabialais-intialaisin numeroin.",
   "whatsNew.takeTour": "Aloita esittely",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Tarkempi suodatin",
   "whatsNew.filterBody": "Syötteiden suodatin rajaa nyt luettelon syötteen ja päivämäärän mukaan, ja voi näyttää vain tallennetut, muistiinpanolliset, tähdellä merkittyjen syötteiden tai kuvalliset artikkelit.",
   "whatsNew.unreadBody": "Lukemattomat artikkelit erottuvat lihavoidulla otsikolla ja isommalla pisteellä. Luetut jäävät taka-alalle mustavalkoisin kuvin ja vaaleammalla tekstillä.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Viivat artikkelien välissä",
+  "whatsNew.linesFixBody": "Joissakin puhelimissa osa artikkelien välisistä ohuista viivoista puuttui Tallennetuista ja Syötteistä. Nyt ne näkyvät kaikki.",
 };

@@ -83,10 +83,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "מה חדש",
   "whatsNew.version": "גרסה {version}",
-  "whatsNew.salesTitle": "מבצעים וכרטיסי תודה",
-  "whatsNew.salesBody": "בזמן מבצע, עוד מ-SeMo Lab מציג את ההנחה של כל אפליקציה. בכמה ימים בשנה נפתח פעם אחת כרטיס תודה קצר.",
-  "whatsNew.datesTitle": "תאריכים בשפה שלכם",
-  "whatsNew.datesBody": "הקורא, השמורים והווידג׳ט למסך הבית מציגים תאריכים ושעות בשפה של FeedWell. בערבית, המספרים נכתבים בספרות ערביות-הודיות.",
   "whatsNew.takeTour": "התחלת הסיור",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -729,4 +725,7 @@ export default {
   "whatsNew.filterTitle": "סינון מדויק יותר",
   "whatsNew.filterBody": "הסינון בפידים מצמצם עכשיו את הרשימה לפי פיד ותאריך, ויכול להציג רק כתבות שמורות, כתבות עם הערות, מפידים מסומנים בכוכב או עם תמונות.",
   "whatsNew.unreadBody": "כתבות שלא נקראו בולטות עם כותרת מודגשת ונקודה גדולה יותר. כתבות שנקראו נסוגות לאחור, עם תמונות בשחור-לבן וטקסט בהיר יותר.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "קווים בין הכתבות",
+  "whatsNew.linesFixBody": "בחלק מהטלפונים חסרו כמה מהקווים הדקים בין הכתבות בשמורים ובפידים. עכשיו כולם מופיעים.",
 };

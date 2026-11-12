@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Novinky",
   "whatsNew.version": "Verze {version}",
-  "whatsNew.salesTitle": "Slevy a děkovné karty",
-  "whatsNew.salesBody": "Během slevy ukazuje Další od SeMo Lab slevu každé aplikace. V několika dnech v roce se jednou otevře krátká děkovná karta.",
-  "whatsNew.datesTitle": "Data ve vašem jazyce",
-  "whatsNew.datesBody": "Čtečka, Uložené a widget na ploše ukazují data a časy v jazyce aplikace FeedWell. V arabštině se čísla píší arabsko-indickými číslicemi.",
   "whatsNew.takeTour": "Projít prohlídku",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -728,4 +724,7 @@ export default {
   "whatsNew.filterTitle": "Jemnější filtr",
   "whatsNew.filterBody": "Filtr v Kanálech teď zužuje seznam podle kanálu a data a umí zobrazit jen uložené články, články s poznámkami, z kanálů s hvězdičkou nebo s obrázky.",
   "whatsNew.unreadBody": "Nepřečtené články vyniknou tučným nadpisem a větší tečkou. Přečtené ustoupí do pozadí s černobílými obrázky a světlejším textem.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Čáry mezi články",
+  "whatsNew.linesFixBody": "Na některých telefonech chyběly v Uložených a v Kanálech některé tenké čáry mezi články. Teď jsou vidět všechny.",
 };

@@ -69,10 +69,6 @@ export default {
   "date.daysAgo": "{count} dni temu",
   "whatsNew.title": "Co nowego",
   "whatsNew.version": "Wersja {version}",
-  "whatsNew.salesTitle": "Promocje i kartki z podziękowaniem",
-  "whatsNew.salesBody": "W czasie promocji sekcja Więcej od SeMo Lab pokazuje rabat każdej aplikacji. W kilka dni w roku raz otwiera się krótka kartka z podziękowaniem.",
-  "whatsNew.datesTitle": "Daty w twoim języku",
-  "whatsNew.datesBody": "Czytnik, Zapisane i widżet na ekranie głównym pokazują daty i godziny w języku FeedWell. Po arabsku liczby zapisuje się cyframi arabsko-indyjskimi.",
   "whatsNew.takeTour": "Uruchom przewodnik",
   "addFeed.addButton": "Dodaj kanał",
   "addFeed.popularCategories": "Popularne kategorie",
@@ -685,4 +681,7 @@ export default {
   "whatsNew.filterTitle": "Dokładniejszy filtr",
   "whatsNew.filterBody": "Filtr w Kanałach zawęża teraz listę według kanału i daty i może pokazać tylko zapisane artykuły, te z notatkami, z kanałów z gwiazdką albo z obrazami.",
   "whatsNew.unreadBody": "Nieprzeczytane artykuły wyróżniają się pogrubionym tytułem i większą kropką. Przeczytane schodzą na dalszy plan, z czarno-białymi obrazami i jaśniejszym tekstem.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linie między artykułami",
+  "whatsNew.linesFixBody": "Na niektórych telefonach w Zapisanych i w Kanałach brakowało części cienkich linii między artykułami. Teraz widać wszystkie.",
 };

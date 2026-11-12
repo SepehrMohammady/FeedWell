@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Có gì mới",
   "whatsNew.version": "Phiên bản {version}",
-  "whatsNew.salesTitle": "Giảm giá và thiệp cảm ơn",
-  "whatsNew.salesBody": "Trong đợt giảm giá, Thêm từ SeMo Lab hiển thị mức giảm của từng ứng dụng. Vào một vài ngày trong năm, một tấm thiệp cảm ơn ngắn sẽ mở ra một lần.",
-  "whatsNew.datesTitle": "Ngày tháng theo ngôn ngữ của bạn",
-  "whatsNew.datesBody": "Trình đọc, Đã lưu và tiện ích màn hình chính hiển thị ngày giờ theo ngôn ngữ của FeedWell. Trong tiếng Ả Rập, số được viết bằng chữ số Ả Rập-Ấn Độ.",
   "whatsNew.takeTour": "Xem hướng dẫn",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -710,4 +706,7 @@ export default {
   "whatsNew.filterTitle": "Bộ lọc chi tiết hơn",
   "whatsNew.filterBody": "Bộ lọc ở Nguồn cấp giờ thu hẹp danh sách theo nguồn cấp và ngày, và có thể chỉ hiện bài đã lưu, bài có ghi chú, bài từ nguồn cấp gắn sao hoặc bài có hình ảnh.",
   "whatsNew.unreadBody": "Bài chưa đọc nổi bật với tiêu đề in đậm và chấm lớn hơn. Bài đã đọc lùi lại phía sau, với ảnh đen trắng và chữ nhạt hơn.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Đường kẻ giữa các bài",
+  "whatsNew.linesFixBody": "Trên một số điện thoại, vài đường kẻ mảnh giữa các bài không hiện trong Đã lưu và Nguồn cấp. Giờ tất cả đều hiện.",
 };

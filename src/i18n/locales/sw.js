@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Yaliyo Mapya",
   "whatsNew.version": "Toleo {version}",
-  "whatsNew.salesTitle": "Punguzo na kadi za shukrani",
-  "whatsNew.salesBody": "Wakati wa punguzo, Zaidi kutoka SeMo Lab inaonyesha punguzo la kila programu. Katika siku chache za mwaka, kadi fupi ya shukrani hufunguka mara moja.",
-  "whatsNew.datesTitle": "Tarehe kwa lugha yako",
-  "whatsNew.datesBody": "Kisomaji, Zilizohifadhiwa na Wijeti ya Skrini ya Mwanzo huonyesha tarehe na saa kwa lugha ya FeedWell. Kwa Kiarabu, namba huandikwa kwa tarakimu za Kiarabu-Kihindi.",
   "whatsNew.takeTour": "Anza ziara",
 
   // --- Add Feed (partial — region selector + headers; rest added during cleanup) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Kichujio sahihi zaidi",
   "whatsNew.filterBody": "Kichujio kwenye Mipasho sasa hupunguza orodha kwa mpasho na kwa tarehe, na kinaweza kuonyesha tu makala zilizohifadhiwa, zenye madokezo, kutoka kwenye mipasho yenye nyota au zenye picha.",
   "whatsNew.unreadBody": "Makala ambazo hujasoma huonekana kwa kichwa kinene na kitone kikubwa zaidi. Zilizosomwa hurudi nyuma, zikiwa na picha nyeusi na nyeupe na maandishi mepesi zaidi.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Mistari kati ya makala",
+  "whatsNew.linesFixBody": "Kwenye baadhi ya simu, baadhi ya mistari myembamba kati ya makala haikuonekana kwenye Zilizohifadhiwa na Mipasho. Sasa yote inaonekana.",
 };

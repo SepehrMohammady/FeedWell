@@ -74,10 +74,6 @@ export default {
 
   "whatsNew.title": "नया क्या है",
   "whatsNew.version": "संस्करण {version}",
-  "whatsNew.salesTitle": "सेल और धन्यवाद कार्ड",
-  "whatsNew.salesBody": "सेल के दौरान, SeMo Lab के और ऐप वाले हिस्से में हर ऐप की छूट दिखती है। साल के कुछ दिनों में, एक छोटा धन्यवाद कार्ड एक बार खुलता है।",
-  "whatsNew.datesTitle": "आपकी भाषा में तारीखें",
-  "whatsNew.datesBody": "रीडर, सहेजे गए और होम स्क्रीन विजेट तारीख और समय FeedWell की भाषा में दिखाते हैं। अरबी में संख्याएँ अरबी-भारतीय अंकों में लिखी जाती हैं।",
   "whatsNew.takeTour": "टूर शुरू करें",
 
   "addFeed.addButton": "फ़ीड जोड़ें",
@@ -694,4 +690,7 @@ export default {
   "whatsNew.filterTitle": "ज़्यादा बारीक फ़िल्टर",
   "whatsNew.filterBody": "फ़ीड्स का फ़िल्टर अब सूची को फ़ीड और तारीख से छोटा करता है, और सिर्फ़ सहेजे गए लेख, नोट्स वाले, तारांकित फ़ीड्स के या चित्रों वाले लेख दिखा सकता है।",
   "whatsNew.unreadBody": "अपठित लेख बोल्ड शीर्षक और बड़े बिंदु से अलग दिखते हैं। पढ़े हुए लेख श्वेत-श्याम चित्रों और हल्के टेक्स्ट के साथ पीछे रहते हैं।",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "लेखों के बीच की रेखाएँ",
+  "whatsNew.linesFixBody": "कुछ फ़ोन पर सहेजे गए और फ़ीड्स में लेखों के बीच की कुछ पतली रेखाएँ नहीं दिखती थीं। अब सभी दिखती हैं।",
 };

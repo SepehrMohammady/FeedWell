@@ -69,10 +69,6 @@ export default {
   "date.daysAgo": "{count} g fa",
   "whatsNew.title": "Novità",
   "whatsNew.version": "Versione {version}",
-  "whatsNew.salesTitle": "Sconti e biglietti di ringraziamento",
-  "whatsNew.salesBody": "Durante uno sconto, Altre app di SeMo Lab mostra lo sconto di ogni app. In alcuni giorni dell'anno si apre una volta un breve biglietto di ringraziamento.",
-  "whatsNew.datesTitle": "Le date nella tua lingua",
-  "whatsNew.datesBody": "Il Lettore, Salvati e il widget per la schermata Home mostrano date e orari nella lingua di FeedWell. In arabo i numeri si scrivono con le cifre arabo-indiane.",
   "whatsNew.takeTour": "Fai il tour",
   "addFeed.addButton": "Aggiungi feed",
   "addFeed.popularCategories": "Categorie popolari",
@@ -674,4 +670,7 @@ export default {
   "whatsNew.filterTitle": "Un filtro più preciso",
   "whatsNew.filterBody": "Il filtro di Feed ora restringe l'elenco per feed e per data, e può mostrare solo gli articoli salvati, quelli con appunti, quelli dei feed con stella o quelli con immagini.",
   "whatsNew.unreadBody": "Gli articoli da leggere risaltano con il titolo in grassetto e un punto più grande. Quelli letti passano in secondo piano, con immagini in bianco e nero e testo più chiaro.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Linee tra gli articoli",
+  "whatsNew.linesFixBody": "Su alcuni telefoni mancavano alcune delle linee sottili tra gli articoli in Salvati e in Feed. Ora si vedono tutte.",
 };

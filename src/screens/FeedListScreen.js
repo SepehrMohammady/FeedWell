@@ -671,6 +671,8 @@ export default function FeedListScreen({ navigation, route }) {
     const isLast = index === filteredAndSortedArticles.length - 1;
     // The reading position line sits between rows and is their divider; a
     // hairline takes its place when the line is off or articles are selected.
+    // The hairline is drawn above its row, not under the row before it (see
+    // styles.item).
     const showIndicator = showReadingPositionInFeeds && !selectionMode;
     // Read articles step back: a quieter row, lighter words and a black and
     // white picture (Settings, Feeds). Unread ones keep their color, with a
@@ -680,6 +682,7 @@ export default function FeedListScreen({ navigation, route }) {
 
     return (
       <View style={[styles.item, dimmed && { backgroundColor: readRow }, isFirst && styles.itemFirst, isLast && styles.itemLast]}>
+        {!showIndicator && !isFirst && <View style={styles.rowDivider} />}
         <SwipeRow
           enabled={!selectionMode}
           rightAction={swipeRightAction}
@@ -806,7 +809,6 @@ export default function FeedListScreen({ navigation, route }) {
           />
         )}
         </View>
-        {!showIndicator && !isLast && <View style={styles.rowDivider} />}
       </View>
     );
   };
@@ -1499,7 +1501,11 @@ const useFeedListStyles = makeStyles(({ colors: c }, isRTL) => {
     },
     // A row of the list's card. Rows overlap by a pixel: FlatList places each
     // row on the pixel grid apart from its height, which can leave a one-pixel
-    // gap between two rows where the page shows through.
+    // gap between two rows where the page shows through. The same rounding can
+    // put the next row's top on a hairline at this row's bottom edge, and the
+    // next row is drawn over this one, so that hairline disappears on some
+    // screens. So the hairline between two rows is the lower row's first
+    // pixel, which nothing covers.
     item: {
       backgroundColor: c.surface,
       marginHorizontal: 16,

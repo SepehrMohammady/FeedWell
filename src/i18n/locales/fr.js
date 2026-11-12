@@ -82,10 +82,6 @@ export default {
   // --- What's New popup ---
   "whatsNew.title": "Nouveautés",
   "whatsNew.version": "Version {version}",
-  "whatsNew.salesTitle": "Promotions et cartes de remerciement",
-  "whatsNew.salesBody": "Pendant une promotion, Plus d'apps SeMo Lab affiche la réduction de chaque appli. Quelques jours par an, une courte carte de remerciement s'ouvre une fois.",
-  "whatsNew.datesTitle": "Les dates dans votre langue",
-  "whatsNew.datesBody": "Le Lecteur, Enregistrés et le widget d'écran d'accueil affichent les dates et les heures dans la langue de FeedWell. En arabe, les nombres s'écrivent en chiffres arabes orientaux.",
   "whatsNew.takeTour": "Faire la visite",
 
   // --- Add Feed (partial — region selector + headers) ---
@@ -719,4 +715,7 @@ export default {
   "whatsNew.filterTitle": "Un filtre plus fin",
   "whatsNew.filterBody": "Le filtre de Flux restreint désormais la liste par flux et par date, et peut n'afficher que les articles enregistrés, ceux avec des notes, ceux des flux étoilés ou ceux avec images.",
   "whatsNew.unreadBody": "Les articles non lus ressortent avec un titre en gras et un point plus grand. Les articles lus s'effacent, avec des images en noir et blanc et un texte plus clair.",
+  // 1.21.1: the lines between articles that went missing on some screens
+  "whatsNew.linesFixTitle": "Lignes entre les articles",
+  "whatsNew.linesFixBody": "Sur certains téléphones, quelques fines lignes entre les articles manquaient dans Enregistrés et dans Flux. Elles s'affichent toutes désormais.",
 };
