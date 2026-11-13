@@ -7,9 +7,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "windows": "expo start --web",
-    "update-version": "node scripts/update-version.js",
-    "sync-version": "node scripts/update-version.js"
+    "windows": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
