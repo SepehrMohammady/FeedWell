@@ -124,7 +124,7 @@ export default function AppNavigator() {
         tabBarItemStyle: styles.tabItem,
         tabBarActiveTintColor: colors.tabBarActiveTint,
         tabBarInactiveTintColor: colors.tabBarInactiveTint,
-        // Labels under the icons on wide screens too (the Surface Duo).
+        // Labels under the icons on wide screens too (tablets and foldables).
         tabBarLabelPosition: 'below-icon',
         headerShown: false,
       })}
