@@ -15,18 +15,14 @@ export default {
   "common.success": "成功",
   "common.loading": "読み込み中...",
   "common.search": "検索",
-  "common.yes": "はい",
-  "common.no": "いいえ",
   "common.clearAll": "すべて消去",
   "common.later": "後で",
   "common.download": "ダウンロード",
   "common.gotIt": "わかりました",
-  "common.somethingWentWrong": "問題が発生しました",
 
   // --- Tab bar / navigation ---
   "tab.home": "ホーム",
   "tab.feeds": "フィード",
-  "tab.addFeed": "フィード追加",
   "tab.saved": "保存済み",
   "tab.settings": "設定",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "たった今",
-  "date.minutesAgo": "{count}分前",
   "date.hoursAgo": "{count}時間前",
   "date.daysAgo": "{count}日前",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "読書位置を消去",
   "feedList.clearReadingPositionConfirm": "読書位置のラインを削除してもよろしいですか？",
   "feedList.clearAction": "消去",
-  "feedList.filterArticlesTitle": "記事をフィルター",
-  "feedList.filterArticlesMessage": "表示する記事を選択してください。",
-  "feedList.filterAll": "すべて",
-  "feedList.filterAllCurrent": "すべて（現在）",
   "feedList.filterAllCount": "すべて（{count}）",
   "feedList.filterUnread": "未読（{count}）",
-  "feedList.filterUnreadCurrent": "未読（{count}）（現在）",
   "feedList.filterRead": "既読（{count}）",
-  "feedList.filterReadCurrent": "既読（{count}）（現在）",
   "feedList.welcomeTitle": "FeedWell へようこそ",
   "feedList.welcomeDescription": "広告なしの RSS リーダーです。最初のフィードを追加して、すっきりと集中できる記事を読み始めましょう。",
   "feedList.addFirstFeed": "最初のフィードを追加",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "未読",
   "feedList.removeConfirmTitle": "記事を削除",
   "feedList.removeConfirmMessage": "選択した記事（{count}件）を一覧から削除しますか？フィードを更新しても戻りません。保存済みのコピーは残ります。",
-  "feedList.showAllFeeds": "すべてのフィードを表示",
   "feedList.soundsLabel": "サウンド",
   "feedList.sortLabel": "並び替え",
   "feedList.readAllLabel": "すべて既読",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "ハイライトモード: 段落をタップしてハイライトの追加・解除ができます。",
 
   // --- Settings ---
-  "settings.sectionPreferences": "環境設定",
   "settings.sectionWidget": "ホーム画面ウィジェット",
   "settings.sectionAmbientSounds": "環境音",
   "settings.sectionReadAloud": "読み上げ",
   "settings.sectionTranslation": "翻訳",
-  "settings.sectionHelp": "ヘルプ",
   "settings.sectionData": "データ",
   "settings.sectionTesters": "テスター",
   "settings.sectionAbout": "アプリについて",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "自動スクロールの待ち時間",
   "settings.autoScrollDelayValue": "{count}秒",
   "settings.autoScrollSpeed": "自動スクロールの速度",
-  "settings.speedNormal": "標準",
   "settings.readingReminder": "読書リマインダー",
   "settings.readingReminderOnDesc": "しばらく読んでいないときに通知を受け取ります",
   "settings.readingReminderOffDesc": "読書リマインダーはありません",

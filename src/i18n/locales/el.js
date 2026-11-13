@@ -15,18 +15,14 @@ export default {
   "common.success": "Επιτυχία",
   "common.loading": "Φόρτωση...",
   "common.search": "Αναζήτηση",
-  "common.yes": "Ναι",
-  "common.no": "Όχι",
   "common.clearAll": "Καθαρισμός όλων",
   "common.later": "Αργότερα",
   "common.download": "Λήψη",
   "common.gotIt": "Το κατάλαβα",
-  "common.somethingWentWrong": "Κάτι πήγε στραβά",
 
   // --- Tab bar / navigation ---
   "tab.home": "Αρχική",
   "tab.feeds": "Ροές",
-  "tab.addFeed": "Προσθήκη ροής",
   "tab.saved": "Αποθηκευμένα",
   "tab.settings": "Ρυθμίσεις",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Μόλις τώρα",
-  "date.minutesAgo": "πριν {count} λ.",
   "date.hoursAgo": "πριν {count} ώ.",
   "date.daysAgo": "πριν {count} ημ.",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Καθαρισμός θέσης ανάγνωσης",
   "feedList.clearReadingPositionConfirm": "Σίγουρα θέλετε να αφαιρέσετε τη γραμμή θέσης ανάγνωσης;",
   "feedList.clearAction": "Καθαρισμός",
-  "feedList.filterArticlesTitle": "Φιλτράρισμα άρθρων",
-  "feedList.filterArticlesMessage": "Επιλέξτε ποια άρθρα θα εμφανίζονται.",
-  "feedList.filterAll": "Όλα",
-  "feedList.filterAllCurrent": "Όλα (τρέχον)",
   "feedList.filterAllCount": "Όλα ({count})",
   "feedList.filterUnread": "Μη αναγνωσμένα ({count})",
-  "feedList.filterUnreadCurrent": "Μη αναγνωσμένα ({count}) (τρέχον)",
   "feedList.filterRead": "Αναγνωσμένα ({count})",
-  "feedList.filterReadCurrent": "Αναγνωσμένα ({count}) (τρέχον)",
   "feedList.welcomeTitle": "Καλώς ήρθατε στο FeedWell",
   "feedList.welcomeDescription": "Το πρόγραμμα ανάγνωσης RSS χωρίς διαφημίσεις. Ξεκινήστε προσθέτοντας την πρώτη σας ροή για καθαρά άρθρα, χωρίς περισπασμούς.",
   "feedList.addFirstFeed": "Προσθέστε την πρώτη σας ροή",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Μη αναγνωσμένο",
   "feedList.removeConfirmTitle": "Αφαίρεση άρθρων",
   "feedList.removeConfirmMessage": "Να αφαιρεθούν τα επιλεγμένα άρθρα ({count}) από τη λίστα; Δεν θα επιστρέψουν όταν ανανεωθούν οι ροές σας. Τα αντίγραφα στα Αποθηκευμένα διατηρούνται.",
-  "feedList.showAllFeeds": "Εμφάνιση όλων των ροών",
   "feedList.soundsLabel": "Ήχοι",
   "feedList.sortLabel": "Ταξινόμηση",
   "feedList.readAllLabel": "Όλα αναγνωσμένα",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Λειτουργία επισήμανσης: πατήστε μια παράγραφο για να την επισημάνετε ή να αφαιρέσετε την επισήμανση.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Προτιμήσεις",
   "settings.sectionWidget": "Widget αρχικής οθόνης",
   "settings.sectionAmbientSounds": "Ήχοι περιβάλλοντος",
   "settings.sectionReadAloud": "Φωνητική ανάγνωση",
   "settings.sectionTranslation": "Μετάφραση",
-  "settings.sectionHelp": "Βοήθεια",
   "settings.sectionData": "Δεδομένα",
   "settings.sectionTesters": "Δοκιμαστές",
   "settings.sectionAbout": "Σχετικά",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Καθυστέρηση αυτόματης κύλισης",
   "settings.autoScrollDelayValue": "{count} δευτερόλεπτα",
   "settings.autoScrollSpeed": "Ταχύτητα αυτόματης κύλισης",
-  "settings.speedNormal": "Κανονική",
   "settings.readingReminder": "Υπενθύμιση ανάγνωσης",
   "settings.readingReminderOnDesc": "Λάβετε ειδοποίηση αν έχετε καιρό να διαβάσετε",
   "settings.readingReminderOffDesc": "Καμία υπενθύμιση ανάγνωσης",

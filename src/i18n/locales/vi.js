@@ -15,18 +15,14 @@ export default {
   "common.success": "Thành công",
   "common.loading": "Đang tải...",
   "common.search": "Tìm kiếm",
-  "common.yes": "Có",
-  "common.no": "Không",
   "common.clearAll": "Xóa tất cả",
   "common.later": "Để sau",
   "common.download": "Tải xuống",
   "common.gotIt": "Đã hiểu",
-  "common.somethingWentWrong": "Đã xảy ra lỗi",
 
   // --- Tab bar / navigation ---
   "tab.home": "Trang chủ",
   "tab.feeds": "Nguồn cấp",
-  "tab.addFeed": "Thêm nguồn cấp",
   "tab.saved": "Đã lưu",
   "tab.settings": "Cài đặt",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Vừa xong",
-  "date.minutesAgo": "{count} phút trước",
   "date.hoursAgo": "{count} giờ trước",
   "date.daysAgo": "{count} ngày trước",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Xóa vị trí đọc",
   "feedList.clearReadingPositionConfirm": "Bạn có chắc muốn xóa vạch đánh dấu vị trí đọc không?",
   "feedList.clearAction": "Xóa",
-  "feedList.filterArticlesTitle": "Lọc bài viết",
-  "feedList.filterArticlesMessage": "Chọn những bài viết muốn hiển thị.",
-  "feedList.filterAll": "Tất cả",
-  "feedList.filterAllCurrent": "Tất cả (Hiện tại)",
   "feedList.filterAllCount": "Tất cả ({count})",
   "feedList.filterUnread": "Chưa đọc ({count})",
-  "feedList.filterUnreadCurrent": "Chưa đọc ({count}) (Hiện tại)",
   "feedList.filterRead": "Đã đọc ({count})",
-  "feedList.filterReadCurrent": "Đã đọc ({count}) (Hiện tại)",
   "feedList.welcomeTitle": "Chào mừng đến với FeedWell",
   "feedList.welcomeDescription": "Trình đọc RSS không quảng cáo của bạn. Hãy thêm nguồn cấp đầu tiên để có những bài viết gọn gàng, không gây xao nhãng.",
   "feedList.addFirstFeed": "Thêm nguồn cấp đầu tiên",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Chưa đọc",
   "feedList.removeConfirmTitle": "Gỡ bài viết",
   "feedList.removeConfirmMessage": "Gỡ các bài viết đã chọn ({count}) khỏi danh sách? Chúng sẽ không quay lại khi nguồn cấp làm mới. Bản sao trong Đã lưu vẫn được giữ.",
-  "feedList.showAllFeeds": "Hiện tất cả nguồn cấp",
   "feedList.soundsLabel": "Âm thanh",
   "feedList.sortLabel": "Sắp xếp",
   "feedList.readAllLabel": "Tất cả đã đọc",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Chế độ tô sáng: chạm vào một đoạn để tô sáng hoặc bỏ tô sáng.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Tùy chọn",
   "settings.sectionWidget": "Tiện ích màn hình chính",
   "settings.sectionAmbientSounds": "Âm thanh nền",
   "settings.sectionReadAloud": "Đọc to",
   "settings.sectionTranslation": "Dịch thuật",
-  "settings.sectionHelp": "Trợ giúp",
   "settings.sectionData": "Dữ liệu",
   "settings.sectionTesters": "Người thử nghiệm",
   "settings.sectionAbout": "Giới thiệu",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Độ trễ tự động cuộn",
   "settings.autoScrollDelayValue": "{count} giây",
   "settings.autoScrollSpeed": "Tốc độ tự động cuộn",
-  "settings.speedNormal": "Bình thường",
   "settings.readingReminder": "Nhắc nhở đọc bài",
   "settings.readingReminderOnDesc": "Nhận thông báo nếu bạn đã lâu không đọc",
   "settings.readingReminderOffDesc": "Không có nhắc nhở đọc bài",

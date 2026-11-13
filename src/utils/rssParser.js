@@ -70,21 +70,6 @@ const AD_DOMAINS = [
   'adsystem.microsoft.com'
 ];
 
-const AD_PATTERNS = [
-  /advertisement/gi,
-  /sponsored/gi,
-  /promo/gi,
-  /ad-/gi,
-  /-ad/gi,
-  /banner/gi,
-  /popup/gi,
-  /tracking/gi,
-  /analytics/gi,
-  /adsense/gi,
-  /doubleclick/gi,
-  /googleadservices/gi
-];
-
 // v1.8.1: Normalize an extracted image URL.
 // - Decodes HTML entities (&amp; in query strings, etc.)
 // - Upgrades protocol-relative URLs (//host/x -> https://host/x)

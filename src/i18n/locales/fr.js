@@ -15,18 +15,14 @@ export default {
   "common.success": "Succès",
   "common.loading": "Chargement...",
   "common.search": "Rechercher",
-  "common.yes": "Oui",
-  "common.no": "Non",
   "common.clearAll": "Tout effacer",
   "common.later": "Plus tard",
   "common.download": "Télécharger",
   "common.gotIt": "Compris",
-  "common.somethingWentWrong": "Une erreur est survenue",
 
   // --- Tab bar / navigation ---
   "tab.home": "Accueil",
   "tab.feeds": "Flux",
-  "tab.addFeed": "Ajouter un flux",
   "tab.saved": "Enregistrés",
   "tab.settings": "Réglages",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "À l'instant",
-  "date.minutesAgo": "il y a {count} min",
   "date.hoursAgo": "il y a {count} h",
   "date.daysAgo": "il y a {count} j",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Effacer la position de lecture",
   "feedList.clearReadingPositionConfirm": "Voulez-vous vraiment supprimer la ligne de position de lecture ?",
   "feedList.clearAction": "Effacer",
-  "feedList.filterArticlesTitle": "Filtrer les articles",
-  "feedList.filterArticlesMessage": "Choisissez les articles à afficher.",
-  "feedList.filterAll": "Tous",
-  "feedList.filterAllCurrent": "Tous (actuel)",
   "feedList.filterAllCount": "Tous ({count})",
   "feedList.filterUnread": "Non lus ({count})",
-  "feedList.filterUnreadCurrent": "Non lus ({count}) (actuel)",
   "feedList.filterRead": "Lus ({count})",
-  "feedList.filterReadCurrent": "Lus ({count}) (actuel)",
   "feedList.welcomeTitle": "Bienvenue dans FeedWell",
   "feedList.welcomeDescription": "Votre lecteur RSS sans publicité. Commencez par ajouter votre premier flux pour profiter d'articles propres et sans distraction.",
   "feedList.addFirstFeed": "Ajouter votre premier flux",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Non lu",
   "feedList.removeConfirmTitle": "Retirer des articles",
   "feedList.removeConfirmMessage": "Retirer les articles sélectionnés ({count}) de la liste ? Ils ne reviendront pas à la prochaine actualisation de vos flux. Les copies dans Enregistrés sont conservées.",
-  "feedList.showAllFeeds": "Afficher tous les flux",
   "feedList.soundsLabel": "Sons",
   "feedList.sortLabel": "Trier",
   "feedList.readAllLabel": "Tout lu",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Mode surlignage : touchez un paragraphe pour le surligner ou retirer le surlignage.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Préférences",
   "settings.sectionWidget": "Widget d'écran d'accueil",
   "settings.sectionAmbientSounds": "Sons d'ambiance",
   "settings.sectionReadAloud": "Lecture à voix haute",
   "settings.sectionTranslation": "Traduction",
-  "settings.sectionHelp": "Aide",
   "settings.sectionData": "Données",
   "settings.sectionTesters": "Testeurs",
   "settings.sectionAbout": "À propos",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Délai du défilement automatique",
   "settings.autoScrollDelayValue": "{count} secondes",
   "settings.autoScrollSpeed": "Vitesse du défilement automatique",
-  "settings.speedNormal": "Normale",
   "settings.readingReminder": "Rappel de lecture",
   "settings.readingReminderOnDesc": "Recevez une notification si vous n'avez pas lu depuis un moment",
   "settings.readingReminderOffDesc": "Aucun rappel de lecture",

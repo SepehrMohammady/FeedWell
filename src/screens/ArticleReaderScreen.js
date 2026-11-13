@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import * as Speech from 'expo-speech';
 import {
   View,
@@ -48,7 +48,6 @@ import {
   loadTargetLanguage,
   saveTargetLanguage,
   loadTranslationMode,
-  getMLKitName,
   getDisplayName,
   AVAILABLE_LANGUAGES,
   TRANSLATION_MODES,

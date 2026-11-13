@@ -361,12 +361,6 @@ export async function getLanguageModelsStatus() {
 
 // --- Settings Persistence ---
 
-export function localCodeToMLKit(localCode) {
-  if (!localCode) return 'en';
-  if (localCode === 'rtl') return null;
-  return CODE_TO_MLKIT[localCode] ? localCode : null;
-}
-
 export async function saveTargetLanguage(langCode) {
   try { await AsyncStorage.setItem(TARGET_LANGUAGE_KEY, langCode); }
   catch (error) { console.error('Error saving target language:', error); }
@@ -404,10 +398,3 @@ export function getPopularLanguages() {
   const popularCodes = ['en', 'fa', 'ar', 'es', 'fr', 'de', 'zh', 'ja', 'ko', 'ru', 'pt', 'tr', 'hi', 'ur'];
   return AVAILABLE_LANGUAGES.filter(lang => popularCodes.includes(lang.code));
 }
-
-export default {
-  translateText, identifyLanguage, isModelDownloaded, downloadModel, deleteModel, getLanguageModelsStatus,
-  getMLKitName, getDisplayName, localCodeToMLKit, saveTargetLanguage, loadTargetLanguage,
-  saveTranslationMode, loadTranslationMode, getPopularLanguages,
-  AVAILABLE_LANGUAGES, TRANSLATION_MODES,
-};

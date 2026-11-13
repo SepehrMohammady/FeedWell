@@ -17,18 +17,14 @@ export default {
   'common.success': 'Success',
   'common.loading': 'Loading...',
   'common.search': 'Search',
-  'common.yes': 'Yes',
-  'common.no': 'No',
   'common.clearAll': 'Clear All',
   'common.later': 'Later',
   'common.download': 'Download',
   'common.gotIt': 'Got it',
-  'common.somethingWentWrong': 'Something went wrong',
 
   // --- Tab bar / navigation ---
   'tab.home': 'Home',
   'tab.feeds': 'Feeds',
-  'tab.addFeed': 'Add Feed',
   'tab.saved': 'Saved',
   'tab.settings': 'Settings',
 
@@ -77,7 +73,6 @@ export default {
 
   // --- Relative date / time ---
   'date.justNow': 'Just now',
-  'date.minutesAgo': '{count}m ago',
   'date.hoursAgo': '{count}h ago',
   'date.daysAgo': '{count}d ago',
 
@@ -148,15 +143,9 @@ export default {
   'feedList.clearReadingPositionTitle': 'Clear Reading Position',
   'feedList.clearReadingPositionConfirm': 'Are you sure you want to remove the reading position line?',
   'feedList.clearAction': 'Clear',
-  'feedList.filterArticlesTitle': 'Filter Articles',
-  'feedList.filterArticlesMessage': 'Choose which articles to show.',
-  'feedList.filterAll': 'All',
-  'feedList.filterAllCurrent': 'All (Current)',
   'feedList.filterAllCount': 'All ({count})',
   'feedList.filterUnread': 'Unread ({count})',
-  'feedList.filterUnreadCurrent': 'Unread ({count}) (Current)',
   'feedList.filterRead': 'Read ({count})',
-  'feedList.filterReadCurrent': 'Read ({count}) (Current)',
   'feedList.welcomeTitle': 'Welcome to FeedWell',
   'feedList.welcomeDescription': 'Your ad-free RSS reader. Start by adding your first feed to get clean, distraction-free articles.',
   'feedList.addFirstFeed': 'Add Your First Feed',
@@ -169,7 +158,6 @@ export default {
   'feedList.markUnreadLabel': 'Unread',
   'feedList.removeConfirmTitle': 'Remove Articles',
   'feedList.removeConfirmMessage': "Remove the selected articles ({count}) from the list? They won't come back when your feeds refresh. Copies in Saved are kept.",
-  'feedList.showAllFeeds': 'Show all feeds',
   'feedList.soundsLabel': 'Sounds',
   'feedList.sortLabel': 'Sort',
   'feedList.readAllLabel': 'Read All',
@@ -328,12 +316,10 @@ export default {
   'reader.highlightModeHint': 'Highlight mode: tap a paragraph to highlight or unhighlight it.',
 
   // --- Settings ---
-  'settings.sectionPreferences': 'Preferences',
   'settings.sectionWidget': 'Home Screen Widget',
   'settings.sectionAmbientSounds': 'Ambient Sounds',
   'settings.sectionReadAloud': 'Read Aloud',
   'settings.sectionTranslation': 'Translation',
-  'settings.sectionHelp': 'Help',
   'settings.sectionData': 'Data',
   'settings.sectionTesters': 'Testers',
   'settings.sectionAbout': 'About',
@@ -375,7 +361,6 @@ export default {
   'settings.autoScrollDelay': 'Auto-Scroll Delay',
   'settings.autoScrollDelayValue': '{count} seconds',
   'settings.autoScrollSpeed': 'Auto-Scroll Speed',
-  'settings.speedNormal': 'Normal',
   'settings.readingReminder': 'Reading Reminder',
   'settings.readingReminderOnDesc': "Get notified if you haven't read in a while",
   'settings.readingReminderOffDesc': 'No reading reminders',

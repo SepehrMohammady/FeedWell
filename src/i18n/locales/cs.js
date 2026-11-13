@@ -15,18 +15,14 @@ export default {
   "common.success": "Hotovo",
   "common.loading": "Načítání...",
   "common.search": "Hledat",
-  "common.yes": "Ano",
-  "common.no": "Ne",
   "common.clearAll": "Vymazat vše",
   "common.later": "Později",
   "common.download": "Stáhnout",
   "common.gotIt": "Rozumím",
-  "common.somethingWentWrong": "Něco se pokazilo",
 
   // --- Tab bar / navigation ---
   "tab.home": "Domů",
   "tab.feeds": "Kanály",
-  "tab.addFeed": "Přidat kanál",
   "tab.saved": "Uložené",
   "tab.settings": "Nastavení",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Právě teď",
-  "date.minutesAgo": "před {count} min",
   "date.hoursAgo": "před {count} h",
   "date.daysAgo": "před {count} d",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Zrušit pozici čtení",
   "feedList.clearReadingPositionConfirm": "Opravdu chcete odstranit čáru pozice čtení?",
   "feedList.clearAction": "Zrušit",
-  "feedList.filterArticlesTitle": "Filtrovat články",
-  "feedList.filterArticlesMessage": "Vyberte, které články zobrazit.",
-  "feedList.filterAll": "Vše",
-  "feedList.filterAllCurrent": "Vše (aktuální)",
   "feedList.filterAllCount": "Vše ({count})",
   "feedList.filterUnread": "Nepřečtené ({count})",
-  "feedList.filterUnreadCurrent": "Nepřečtené ({count}) (aktuální)",
   "feedList.filterRead": "Přečtené ({count})",
-  "feedList.filterReadCurrent": "Přečtené ({count}) (aktuální)",
   "feedList.welcomeTitle": "Vítejte ve FeedWellu",
   "feedList.welcomeDescription": "Vaše čtečka RSS bez reklam. Začněte přidáním prvního kanálu a získejte čisté články bez rozptylování.",
   "feedList.addFirstFeed": "Přidat první kanál",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Nepřečteno",
   "feedList.removeConfirmTitle": "Odebrat články",
   "feedList.removeConfirmMessage": "Odebrat vybrané články ({count}) ze seznamu? Při obnovení kanálů se už nevrátí. Kopie v Uložených zůstanou.",
-  "feedList.showAllFeeds": "Zobrazit všechny kanály",
   "feedList.soundsLabel": "Zvuky",
   "feedList.sortLabel": "Řadit",
   "feedList.readAllLabel": "Vše přečteno",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Režim zvýrazňování: klepnutím na odstavec ho zvýrazníte nebo zvýraznění zrušíte.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Předvolby",
   "settings.sectionWidget": "Widget na ploše",
   "settings.sectionAmbientSounds": "Zvuky prostředí",
   "settings.sectionReadAloud": "Předčítání",
   "settings.sectionTranslation": "Překlad",
-  "settings.sectionHelp": "Nápověda",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Testeři",
   "settings.sectionAbout": "O aplikaci",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Prodleva automatického posouvání",
   "settings.autoScrollDelayValue": "{count} sekund",
   "settings.autoScrollSpeed": "Rychlost automatického posouvání",
-  "settings.speedNormal": "Normální",
   "settings.readingReminder": "Připomenutí čtení",
   "settings.readingReminderOnDesc": "Dostat upozornění, když jste delší dobu nečetli",
   "settings.readingReminderOffDesc": "Žádná připomenutí čtení",

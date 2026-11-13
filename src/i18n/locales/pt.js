@@ -16,18 +16,14 @@ export default {
   "common.success": "Sucesso",
   "common.loading": "A carregar...",
   "common.search": "Pesquisar",
-  "common.yes": "Sim",
-  "common.no": "Não",
   "common.clearAll": "Limpar tudo",
   "common.later": "Mais tarde",
   "common.download": "Descarregar",
   "common.gotIt": "Entendi",
-  "common.somethingWentWrong": "Algo correu mal",
 
   // --- Tab bar / navigation ---
   "tab.home": "Início",
   "tab.feeds": "Feeds",
-  "tab.addFeed": "Adicionar Feed",
   "tab.saved": "Guardados",
   "tab.settings": "Definições",
 
@@ -76,7 +72,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Agora mesmo",
-  "date.minutesAgo": "há {count}m",
   "date.hoursAgo": "há {count}h",
   "date.daysAgo": "há {count}d",
 
@@ -147,15 +142,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Limpar Posição de Leitura",
   "feedList.clearReadingPositionConfirm": "Tem a certeza de que quer remover a linha da posição de leitura?",
   "feedList.clearAction": "Limpar",
-  "feedList.filterArticlesTitle": "Filtrar Artigos",
-  "feedList.filterArticlesMessage": "Escolha quais artigos mostrar.",
-  "feedList.filterAll": "Todos",
-  "feedList.filterAllCurrent": "Todos (Atual)",
   "feedList.filterAllCount": "Todos ({count})",
   "feedList.filterUnread": "Não lidos ({count})",
-  "feedList.filterUnreadCurrent": "Não lidos ({count}) (Atual)",
   "feedList.filterRead": "Lidos ({count})",
-  "feedList.filterReadCurrent": "Lidos ({count}) (Atual)",
   "feedList.welcomeTitle": "Bem-vindo ao FeedWell",
   "feedList.welcomeDescription": "O seu leitor RSS sem anúncios. Comece por adicionar o seu primeiro feed para obter artigos limpos e sem distrações.",
   "feedList.addFirstFeed": "Adicionar o Seu Primeiro Feed",
@@ -168,7 +157,6 @@ export default {
   "feedList.markUnreadLabel": "Não lido",
   "feedList.removeConfirmTitle": "Remover artigos",
   "feedList.removeConfirmMessage": "Remover os artigos selecionados ({count}) da lista? Não voltam quando os feeds forem atualizados. As cópias em Guardados mantêm-se.",
-  "feedList.showAllFeeds": "Mostrar todos os feeds",
   "feedList.soundsLabel": "Sons",
   "feedList.sortLabel": "Ordenar",
   "feedList.readAllLabel": "Ler Tudo",
@@ -327,12 +315,10 @@ export default {
   "reader.highlightModeHint": "Modo de destaque: toque num parágrafo para destacar ou remover o destaque.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Preferências",
   "settings.sectionWidget": "Widget do Ecrã Inicial",
   "settings.sectionAmbientSounds": "Sons Ambientes",
   "settings.sectionReadAloud": "Leitura em Voz Alta",
   "settings.sectionTranslation": "Tradução",
-  "settings.sectionHelp": "Ajuda",
   "settings.sectionData": "Dados",
   "settings.sectionTesters": "Testadores",
   "settings.sectionAbout": "Sobre",
@@ -377,7 +363,6 @@ export default {
   "settings.autoScrollDelay": "Atraso do Deslocamento Automático",
   "settings.autoScrollDelayValue": "{count} segundos",
   "settings.autoScrollSpeed": "Velocidade do Deslocamento Automático",
-  "settings.speedNormal": "Normal",
   "settings.articleAgeFilter": "Filtro de Antiguidade dos Artigos",
   "settings.articleAgeFilterNoLimitDesc": "Sem limite — mostrar todos os artigos",
   "settings.articleAgeFilterDesc": "Mostrar apenas artigos dos últimos {period}",

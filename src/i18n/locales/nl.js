@@ -15,18 +15,14 @@ export default {
   "common.success": "Gelukt",
   "common.loading": "Laden...",
   "common.search": "Zoeken",
-  "common.yes": "Ja",
-  "common.no": "Nee",
   "common.clearAll": "Alles wissen",
   "common.later": "Later",
   "common.download": "Downloaden",
   "common.gotIt": "Begrepen",
-  "common.somethingWentWrong": "Er is iets misgegaan",
 
   // --- Tab bar / navigation ---
   "tab.home": "Start",
   "tab.feeds": "Feeds",
-  "tab.addFeed": "Feed toevoegen",
   "tab.saved": "Opgeslagen",
   "tab.settings": "Instellingen",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Zojuist",
-  "date.minutesAgo": "{count} min geleden",
   "date.hoursAgo": "{count} u geleden",
   "date.daysAgo": "{count} d geleden",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Leespositie wissen",
   "feedList.clearReadingPositionConfirm": "Weet je zeker dat je de leespositielijn wilt verwijderen?",
   "feedList.clearAction": "Wissen",
-  "feedList.filterArticlesTitle": "Artikelen filteren",
-  "feedList.filterArticlesMessage": "Kies welke artikelen je wilt zien.",
-  "feedList.filterAll": "Alle",
-  "feedList.filterAllCurrent": "Alle (huidig)",
   "feedList.filterAllCount": "Alle ({count})",
   "feedList.filterUnread": "Ongelezen ({count})",
-  "feedList.filterUnreadCurrent": "Ongelezen ({count}) (huidig)",
   "feedList.filterRead": "Gelezen ({count})",
-  "feedList.filterReadCurrent": "Gelezen ({count}) (huidig)",
   "feedList.welcomeTitle": "Welkom bij FeedWell",
   "feedList.welcomeDescription": "Je reclamevrije RSS-lezer. Voeg je eerste feed toe voor overzichtelijke artikelen zonder afleiding.",
   "feedList.addFirstFeed": "Eerste feed toevoegen",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Ongelezen",
   "feedList.removeConfirmTitle": "Artikelen verwijderen",
   "feedList.removeConfirmMessage": "De geselecteerde artikelen ({count}) uit de lijst verwijderen? Ze komen niet terug als je feeds verversen. Kopieën in Opgeslagen blijven bewaard.",
-  "feedList.showAllFeeds": "Alle feeds tonen",
   "feedList.soundsLabel": "Geluiden",
   "feedList.sortLabel": "Sorteren",
   "feedList.readAllLabel": "Alles gelezen",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Markeermodus: tik op een alinea om deze te markeren of de markering te verwijderen.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Voorkeuren",
   "settings.sectionWidget": "Widget op het startscherm",
   "settings.sectionAmbientSounds": "Achtergrondgeluiden",
   "settings.sectionReadAloud": "Voorlezen",
   "settings.sectionTranslation": "Vertaling",
-  "settings.sectionHelp": "Help",
   "settings.sectionData": "Gegevens",
   "settings.sectionTesters": "Testers",
   "settings.sectionAbout": "Over",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Vertraging automatisch scrollen",
   "settings.autoScrollDelayValue": "{count} seconden",
   "settings.autoScrollSpeed": "Snelheid automatisch scrollen",
-  "settings.speedNormal": "Normaal",
   "settings.readingReminder": "Leesherinnering",
   "settings.readingReminderOnDesc": "Ontvang een melding als je een tijd niet hebt gelezen",
   "settings.readingReminderOffDesc": "Geen leesherinneringen",

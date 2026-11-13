@@ -33,7 +33,7 @@ import sv from './locales/sv';
 import da from './locales/da';
 import fi from './locales/fi';
 
-export { APP_LANGUAGES, SUPPORTED_LANGUAGES, RTL_LANGUAGES, getAppLanguage } from './appLanguages';
+export { RTL_LANGUAGES } from './appLanguages';
 
 export const MAPS = { en, fa, it, hi, tr, th, pl, es, zh, ar, pt, id, ru, ja, fr, de, vi, ko, uk, nl, tl, sw, ro, cs, el, hu, he, sv, da, fi };
 
@@ -48,8 +48,4 @@ export function tStatic(key, lang = 'en', vars) {
   const raw = (map && map[key] != null) ? map[key]
     : (MAPS.en[key] != null ? MAPS.en[key] : key);
   return interpolate(raw, vars);
-}
-
-export function getMap(lang) {
-  return MAPS[lang] || MAPS.en;
 }

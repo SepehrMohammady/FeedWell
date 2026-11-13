@@ -15,18 +15,14 @@ export default {
   "common.success": "Tagumpay",
   "common.loading": "Naglo-load...",
   "common.search": "Maghanap",
-  "common.yes": "Oo",
-  "common.no": "Hindi",
   "common.clearAll": "Burahin Lahat",
   "common.later": "Mamaya",
   "common.download": "I-download",
   "common.gotIt": "Naintindihan ko",
-  "common.somethingWentWrong": "May nangyaring problema",
 
   // --- Tab bar / navigation ---
   "tab.home": "Home",
   "tab.feeds": "Mga Feed",
-  "tab.addFeed": "Magdagdag ng Feed",
   "tab.saved": "Naka-save",
   "tab.settings": "Mga Setting",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Ngayon lang",
-  "date.minutesAgo": "{count} min ang nakalipas",
   "date.hoursAgo": "{count} oras ang nakalipas",
   "date.daysAgo": "{count} araw ang nakalipas",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Alisin ang Posisyon sa Pagbabasa",
   "feedList.clearReadingPositionConfirm": "Sigurado ka bang gusto mong alisin ang linya ng posisyon sa pagbabasa?",
   "feedList.clearAction": "Alisin",
-  "feedList.filterArticlesTitle": "I-filter ang mga Artikulo",
-  "feedList.filterArticlesMessage": "Piliin kung aling mga artikulo ang ipapakita.",
-  "feedList.filterAll": "Lahat",
-  "feedList.filterAllCurrent": "Lahat (Kasalukuyan)",
   "feedList.filterAllCount": "Lahat ({count})",
   "feedList.filterUnread": "Di-nabasa ({count})",
-  "feedList.filterUnreadCurrent": "Di-nabasa ({count}) (Kasalukuyan)",
   "feedList.filterRead": "Nabasa ({count})",
-  "feedList.filterReadCurrent": "Nabasa ({count}) (Kasalukuyan)",
   "feedList.welcomeTitle": "Maligayang pagdating sa FeedWell",
   "feedList.welcomeDescription": "Ang iyong RSS reader na walang ad. Magsimula sa pagdaragdag ng iyong unang feed para sa malilinis at walang abalang artikulo.",
   "feedList.addFirstFeed": "Idagdag ang Iyong Unang Feed",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Di-nabasa",
   "feedList.removeConfirmTitle": "Alisin ang mga Artikulo",
   "feedList.removeConfirmMessage": "Alisin sa listahan ang mga napiling artikulo ({count})? Hindi na sila babalik kapag nag-refresh ang iyong mga feed. Mananatili ang mga kopya sa Naka-save.",
-  "feedList.showAllFeeds": "Ipakita ang lahat ng feed",
   "feedList.soundsLabel": "Mga Tunog",
   "feedList.sortLabel": "Ayusin",
   "feedList.readAllLabel": "Nabasa Lahat",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Highlight mode: i-tap ang isang talata para i-highlight o alisin ang highlight.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Mga Kagustuhan",
   "settings.sectionWidget": "Widget sa Home Screen",
   "settings.sectionAmbientSounds": "Mga Ambient na Tunog",
   "settings.sectionReadAloud": "Basahin nang Malakas",
   "settings.sectionTranslation": "Pagsasalin",
-  "settings.sectionHelp": "Tulong",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Mga Tester",
   "settings.sectionAbout": "Tungkol Dito",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Delay ng Auto-Scroll",
   "settings.autoScrollDelayValue": "{count} segundo",
   "settings.autoScrollSpeed": "Bilis ng Auto-Scroll",
-  "settings.speedNormal": "Karaniwan",
   "settings.readingReminder": "Paalala sa Pagbabasa",
   "settings.readingReminderOnDesc": "Makatanggap ng abiso kapag matagal ka nang hindi nagbabasa",
   "settings.readingReminderOffDesc": "Walang paalala sa pagbabasa",

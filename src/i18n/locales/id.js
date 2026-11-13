@@ -15,18 +15,14 @@ export default {
   "common.success": "Berhasil",
   "common.loading": "Memuat...",
   "common.search": "Cari",
-  "common.yes": "Ya",
-  "common.no": "Tidak",
   "common.clearAll": "Hapus Semua",
   "common.later": "Nanti",
   "common.download": "Unduh",
   "common.gotIt": "Mengerti",
-  "common.somethingWentWrong": "Terjadi kesalahan",
 
   // --- Tab bar / navigation ---
   "tab.home": "Beranda",
   "tab.feeds": "Feed",
-  "tab.addFeed": "Tambah Feed",
   "tab.saved": "Tersimpan",
   "tab.settings": "Pengaturan",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Baru saja",
-  "date.minutesAgo": "{count} mnt lalu",
   "date.hoursAgo": "{count} jam lalu",
   "date.daysAgo": "{count} hari lalu",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Hapus Posisi Membaca",
   "feedList.clearReadingPositionConfirm": "Apakah Anda yakin ingin menghapus garis posisi membaca?",
   "feedList.clearAction": "Hapus",
-  "feedList.filterArticlesTitle": "Filter Artikel",
-  "feedList.filterArticlesMessage": "Pilih artikel mana yang akan ditampilkan.",
-  "feedList.filterAll": "Semua",
-  "feedList.filterAllCurrent": "Semua (Saat Ini)",
   "feedList.filterAllCount": "Semua ({count})",
   "feedList.filterUnread": "Belum Dibaca ({count})",
-  "feedList.filterUnreadCurrent": "Belum Dibaca ({count}) (Saat Ini)",
   "feedList.filterRead": "Sudah Dibaca ({count})",
-  "feedList.filterReadCurrent": "Sudah Dibaca ({count}) (Saat Ini)",
   "feedList.welcomeTitle": "Selamat Datang di FeedWell",
   "feedList.welcomeDescription": "Pembaca RSS bebas iklan Anda. Mulailah dengan menambahkan feed pertama Anda untuk mendapatkan artikel yang bersih dan bebas gangguan.",
   "feedList.addFirstFeed": "Tambahkan Feed Pertama Anda",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Belum Dibaca",
   "feedList.removeConfirmTitle": "Hapus Artikel",
   "feedList.removeConfirmMessage": "Hapus artikel yang dipilih ({count}) dari daftar? Artikel ini tidak akan kembali saat feed Anda diperbarui. Salinan di Tersimpan tetap ada.",
-  "feedList.showAllFeeds": "Tampilkan semua feed",
   "feedList.soundsLabel": "Suara",
   "feedList.sortLabel": "Urutkan",
   "feedList.readAllLabel": "Baca Semua",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Mode sorot: ketuk sebuah paragraf untuk menyorot atau menghapus sorotannya.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Preferensi",
   "settings.sectionWidget": "Widget Layar Utama",
   "settings.sectionAmbientSounds": "Suara Ambient",
   "settings.sectionReadAloud": "Baca Nyaring",
   "settings.sectionTranslation": "Terjemahan",
-  "settings.sectionHelp": "Bantuan",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Penguji",
   "settings.sectionAbout": "Tentang",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Jeda Gulir Otomatis",
   "settings.autoScrollDelayValue": "{count} detik",
   "settings.autoScrollSpeed": "Kecepatan Gulir Otomatis",
-  "settings.speedNormal": "Normal",
   "settings.readingReminder": "Pengingat Membaca",
   "settings.readingReminderOnDesc": "Dapatkan notifikasi jika Anda sudah lama tidak membaca",
   "settings.readingReminderOffDesc": "Tanpa pengingat membaca",

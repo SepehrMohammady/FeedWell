@@ -15,18 +15,14 @@ export default {
   "common.success": "Успішно",
   "common.loading": "Завантаження...",
   "common.search": "Пошук",
-  "common.yes": "Так",
-  "common.no": "Ні",
   "common.clearAll": "Очистити все",
   "common.later": "Пізніше",
   "common.download": "Завантажити",
   "common.gotIt": "Зрозуміло",
-  "common.somethingWentWrong": "Щось пішло не так",
 
   // --- Tab bar / navigation ---
   "tab.home": "Головна",
   "tab.feeds": "Стрічки",
-  "tab.addFeed": "Додати стрічку",
   "tab.saved": "Збережені",
   "tab.settings": "Налаштування",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Щойно",
-  "date.minutesAgo": "{count} хв тому",
   "date.hoursAgo": "{count} год тому",
   "date.daysAgo": "{count} дн тому",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Прибрати позицію читання",
   "feedList.clearReadingPositionConfirm": "Ви справді хочете прибрати лінію позиції читання?",
   "feedList.clearAction": "Прибрати",
-  "feedList.filterArticlesTitle": "Фільтр статей",
-  "feedList.filterArticlesMessage": "Виберіть, які статті показувати.",
-  "feedList.filterAll": "Усі",
-  "feedList.filterAllCurrent": "Усі (поточний)",
   "feedList.filterAllCount": "Усі ({count})",
   "feedList.filterUnread": "Непрочитані ({count})",
-  "feedList.filterUnreadCurrent": "Непрочитані ({count}) (поточний)",
   "feedList.filterRead": "Прочитані ({count})",
-  "feedList.filterReadCurrent": "Прочитані ({count}) (поточний)",
   "feedList.welcomeTitle": "Вітаємо у FeedWell",
   "feedList.welcomeDescription": "Ваш RSS-читач без реклами. Додайте першу стрічку, щоб отримувати чисті статті без відволікань.",
   "feedList.addFirstFeed": "Додати першу стрічку",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Непрочитані",
   "feedList.removeConfirmTitle": "Прибрати статті",
   "feedList.removeConfirmMessage": "Прибрати вибрані статті ({count}) зі списку? Вони не повернуться після оновлення стрічок. Копії в Збережених залишаться.",
-  "feedList.showAllFeeds": "Показати всі стрічки",
   "feedList.soundsLabel": "Звуки",
   "feedList.sortLabel": "Сортування",
   "feedList.readAllLabel": "Усе прочитано",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Режим виділення: торкніться абзацу, щоб виділити його або зняти виділення.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Параметри",
   "settings.sectionWidget": "Віджет на головному екрані",
   "settings.sectionAmbientSounds": "Фонові звуки",
   "settings.sectionReadAloud": "Читання вголос",
   "settings.sectionTranslation": "Переклад",
-  "settings.sectionHelp": "Довідка",
   "settings.sectionData": "Дані",
   "settings.sectionTesters": "Тестувальники",
   "settings.sectionAbout": "Про застосунок",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Затримка автопрокручування",
   "settings.autoScrollDelayValue": "{count} секунд",
   "settings.autoScrollSpeed": "Швидкість автопрокручування",
-  "settings.speedNormal": "Звичайна",
   "settings.readingReminder": "Нагадування про читання",
   "settings.readingReminderOnDesc": "Отримувати сповіщення, якщо ви давно не читали",
   "settings.readingReminderOffDesc": "Без нагадувань про читання",

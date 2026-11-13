@@ -4,10 +4,6 @@
 // Non-English feeds were live-verified (HTTP 200 + valid RSS/Atom, free/non-paywalled).
 // Farsi feeds are independent / international Persian outlets only (no IRI state media).
 
-export const CATEGORY_ORDER = [
-  'technology', 'news', 'sports', 'entertainment', 'gaming', 'business', 'science', 'lifestyle',
-];
-
 // Global first, then alphabetical by English language name (standard ordering).
 export const FEED_REGIONS = [
   { code: 'global', labelKey: 'region.global' },

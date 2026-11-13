@@ -98,5 +98,3 @@ export function useTranslation() {
   if (!ctx) throw new Error('useTranslation must be used within a LanguageProvider');
   return ctx;
 }
-
-export default LanguageContext;

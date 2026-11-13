@@ -4,8 +4,6 @@ import { digitsOf } from './digits';
 
 const { WidgetBridge } = NativeModules;
 
-// What the widget can show: every article, the unread ones, or the saved ones
-export const WIDGET_SOURCES = ['all', 'unread', 'saved'];
 // Seconds per article in the widget's slideshow; the widget has a layout for each
 export const WIDGET_SLIDE_SECONDS = [5, 10, 20, 30];
 export const DEFAULT_WIDGET_SLIDE_SECONDS = 10;

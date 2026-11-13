@@ -15,18 +15,14 @@ export default {
   "common.success": "Klart",
   "common.loading": "Laddar...",
   "common.search": "Sök",
-  "common.yes": "Ja",
-  "common.no": "Nej",
   "common.clearAll": "Rensa allt",
   "common.later": "Senare",
   "common.download": "Ladda ner",
   "common.gotIt": "Uppfattat",
-  "common.somethingWentWrong": "Något gick fel",
 
   // --- Tab bar / navigation ---
   "tab.home": "Hem",
   "tab.feeds": "Flöden",
-  "tab.addFeed": "Lägg till flöde",
   "tab.saved": "Sparade",
   "tab.settings": "Inställningar",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Just nu",
-  "date.minutesAgo": "för {count} min sedan",
   "date.hoursAgo": "för {count} tim sedan",
   "date.daysAgo": "för {count} d sedan",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Rensa läsposition",
   "feedList.clearReadingPositionConfirm": "Vill du ta bort linjen för läspositionen?",
   "feedList.clearAction": "Rensa",
-  "feedList.filterArticlesTitle": "Filtrera artiklar",
-  "feedList.filterArticlesMessage": "Välj vilka artiklar som ska visas.",
-  "feedList.filterAll": "Alla",
-  "feedList.filterAllCurrent": "Alla (nuvarande)",
   "feedList.filterAllCount": "Alla ({count})",
   "feedList.filterUnread": "Olästa ({count})",
-  "feedList.filterUnreadCurrent": "Olästa ({count}) (nuvarande)",
   "feedList.filterRead": "Lästa ({count})",
-  "feedList.filterReadCurrent": "Lästa ({count}) (nuvarande)",
   "feedList.welcomeTitle": "Välkommen till FeedWell",
   "feedList.welcomeDescription": "Din reklamfria RSS-läsare. Börja med att lägga till ditt första flöde för rena artiklar utan distraktioner.",
   "feedList.addFirstFeed": "Lägg till ditt första flöde",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Oläst",
   "feedList.removeConfirmTitle": "Ta bort artiklar",
   "feedList.removeConfirmMessage": "Vill du ta bort de valda artiklarna ({count}) från listan? De kommer inte tillbaka när dina flöden uppdateras. Kopior i Sparade finns kvar.",
-  "feedList.showAllFeeds": "Visa alla flöden",
   "feedList.soundsLabel": "Ljud",
   "feedList.sortLabel": "Sortera",
   "feedList.readAllLabel": "Läs alla",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Markeringsläge: tryck på ett stycke för att markera det eller ta bort markeringen.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Preferenser",
   "settings.sectionWidget": "Hemskärmswidget",
   "settings.sectionAmbientSounds": "Bakgrundsljud",
   "settings.sectionReadAloud": "Läs upp",
   "settings.sectionTranslation": "Översättning",
-  "settings.sectionHelp": "Hjälp",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Testare",
   "settings.sectionAbout": "Om",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Fördröjning för automatisk rullning",
   "settings.autoScrollDelayValue": "{count} sekunder",
   "settings.autoScrollSpeed": "Hastighet för automatisk rullning",
-  "settings.speedNormal": "Normal",
   "settings.readingReminder": "Läspåminnelse",
   "settings.readingReminderOnDesc": "Få en påminnelse om du inte har läst på ett tag",
   "settings.readingReminderOffDesc": "Inga läspåminnelser",

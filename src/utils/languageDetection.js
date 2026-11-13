@@ -1,20 +1,5 @@
 // Language detection and RTL support utilities
 
-// RTL language codes
-const RTL_LANGUAGES = [
-  'ar',   // Arabic
-  'fa',   // Persian/Farsi
-  'he',   // Hebrew
-  'ur',   // Urdu
-  'yi',   // Yiddish
-  'ku',   // Kurdish
-  'ps',   // Pashto
-  'sd',   // Sindhi
-  'dv',   // Divehi
-  'arc',  // Aramaic
-  'syc',  // Classical Syriac
-];
-
 // RTL Unicode ranges
 const RTL_UNICODE_RANGES = [
   [0x0590, 0x05FF], // Hebrew
@@ -34,22 +19,6 @@ const RTL_UNICODE_RANGES = [
 function isRTLCharacter(char) {
   const code = char.charCodeAt(0);
   return RTL_UNICODE_RANGES.some(([start, end]) => code >= start && code <= end);
-}
-
-/**
- * Detect if text contains RTL characters
- */
-function containsRTL(text) {
-  if (!text) return false;
-  
-  // Check for RTL characters in the text
-  for (let i = 0; i < text.length; i++) {
-    if (isRTLCharacter(text[i])) {
-      return true;
-    }
-  }
-  
-  return false;
 }
 
 /**
@@ -73,17 +42,6 @@ function getRTLPercentage(text) {
   }
   
   return letterCount > 0 ? (rtlCount / letterCount) * 100 : 0;
-}
-
-/**
- * Detect if text is primarily RTL
- */
-function isPrimaryRTL(text) {
-  if (!text) return false;
-  
-  const rtlPercentage = getRTLPercentage(text);
-  // Consider text RTL if more than 30% of letters are RTL
-  return rtlPercentage > 30;
 }
 
 // Non-RTL script Unicode ranges for language detection

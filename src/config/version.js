@@ -33,5 +33,3 @@ export const APP_VERSION = {
     };
   }
 };
-
-export default APP_VERSION;

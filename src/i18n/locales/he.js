@@ -16,18 +16,14 @@ export default {
   "common.success": "הצלחה",
   "common.loading": "בטעינה...",
   "common.search": "חיפוש",
-  "common.yes": "כן",
-  "common.no": "לא",
   "common.clearAll": "ניקוי הכול",
   "common.later": "אחר כך",
   "common.download": "הורדה",
   "common.gotIt": "הבנתי",
-  "common.somethingWentWrong": "משהו השתבש",
 
   // --- Tab bar / navigation ---
   "tab.home": "בית",
   "tab.feeds": "פידים",
-  "tab.addFeed": "הוספת פיד",
   "tab.saved": "שמורים",
   "tab.settings": "הגדרות",
 
@@ -76,7 +72,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "עכשיו",
-  "date.minutesAgo": "לפני {count} דק׳",
   "date.hoursAgo": "לפני {count} שע׳",
   "date.daysAgo": "לפני {count} ימים",
 
@@ -147,15 +142,9 @@ export default {
   "feedList.clearReadingPositionTitle": "ניקוי מיקום הקריאה",
   "feedList.clearReadingPositionConfirm": "להסיר את קו מיקום הקריאה?",
   "feedList.clearAction": "ניקוי",
-  "feedList.filterArticlesTitle": "סינון כתבות",
-  "feedList.filterArticlesMessage": "אילו כתבות להציג?",
-  "feedList.filterAll": "הכול",
-  "feedList.filterAllCurrent": "הכול (נוכחי)",
   "feedList.filterAllCount": "הכול ({count})",
   "feedList.filterUnread": "לא נקראו ({count})",
-  "feedList.filterUnreadCurrent": "לא נקראו ({count}) (נוכחי)",
   "feedList.filterRead": "נקראו ({count})",
-  "feedList.filterReadCurrent": "נקראו ({count}) (נוכחי)",
   "feedList.welcomeTitle": "ברוכים הבאים ל-FeedWell",
   "feedList.welcomeDescription": "קורא ה-RSS שלך, בלי פרסומות. אפשר להתחיל בהוספת הפיד הראשון ולקבל כתבות נקיות, בלי הסחות דעת.",
   "feedList.addFirstFeed": "הוספת הפיד הראשון",
@@ -168,7 +157,6 @@ export default {
   "feedList.markUnreadLabel": "לא נקרא",
   "feedList.removeConfirmTitle": "הסרת כתבות",
   "feedList.removeConfirmMessage": "להסיר את הכתבות שנבחרו ({count}) מהרשימה? הן לא יחזרו כשהפידים יתעדכנו. העותקים בשמורים נשארים.",
-  "feedList.showAllFeeds": "הצגת כל הפידים",
   "feedList.soundsLabel": "צלילים",
   "feedList.sortLabel": "מיון",
   "feedList.readAllLabel": "הכול נקרא",
@@ -327,12 +315,10 @@ export default {
   "reader.highlightModeHint": "מצב הדגשה: הקשה על פסקה מדגישה אותה או מבטלת את ההדגשה.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "העדפות",
   "settings.sectionWidget": "ווידג׳ט למסך הבית",
   "settings.sectionAmbientSounds": "צלילי רקע",
   "settings.sectionReadAloud": "הקראה",
   "settings.sectionTranslation": "תרגום",
-  "settings.sectionHelp": "עזרה",
   "settings.sectionData": "נתונים",
   "settings.sectionTesters": "בודקים",
   "settings.sectionAbout": "אודות",
@@ -374,7 +360,6 @@ export default {
   "settings.autoScrollDelay": "השהיית הגלילה האוטומטית",
   "settings.autoScrollDelayValue": "{count} שניות",
   "settings.autoScrollSpeed": "מהירות הגלילה האוטומטית",
-  "settings.speedNormal": "רגילה",
   "settings.readingReminder": "תזכורת קריאה",
   "settings.readingReminderOnDesc": "קבלת התראה אם לא קראת כבר זמן מה",
   "settings.readingReminderOffDesc": "אין תזכורות קריאה",

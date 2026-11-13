@@ -16,18 +16,14 @@ export default {
   "common.success": "نجاح",
   "common.loading": "جارٍ التحميل...",
   "common.search": "بحث",
-  "common.yes": "نعم",
-  "common.no": "لا",
   "common.clearAll": "مسح الكل",
   "common.later": "لاحقًا",
   "common.download": "تنزيل",
   "common.gotIt": "فهمت",
-  "common.somethingWentWrong": "حدث خطأ ما",
 
   // --- Tab bar / navigation ---
   "tab.home": "الرئيسية",
   "tab.feeds": "الخلاصات",
-  "tab.addFeed": "إضافة خلاصة",
   "tab.saved": "المحفوظات",
   "tab.settings": "الإعدادات",
 
@@ -76,7 +72,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "الآن",
-  "date.minutesAgo": "منذ {count} د",
   "date.hoursAgo": "منذ {count} س",
   "date.daysAgo": "منذ {count} ي",
 
@@ -147,15 +142,9 @@ export default {
   "feedList.clearReadingPositionTitle": "مسح موضع القراءة",
   "feedList.clearReadingPositionConfirm": "هل أنت متأكد من أنك تريد إزالة خط موضع القراءة؟",
   "feedList.clearAction": "مسح",
-  "feedList.filterArticlesTitle": "تصفية المقالات",
-  "feedList.filterArticlesMessage": "اختر المقالات التي تريد عرضها.",
-  "feedList.filterAll": "الكل",
-  "feedList.filterAllCurrent": "الكل (الحالي)",
   "feedList.filterAllCount": "الكل ({count})",
   "feedList.filterUnread": "غير مقروءة ({count})",
-  "feedList.filterUnreadCurrent": "غير مقروءة ({count}) (الحالي)",
   "feedList.filterRead": "مقروءة ({count})",
-  "feedList.filterReadCurrent": "مقروءة ({count}) (الحالي)",
   "feedList.welcomeTitle": "مرحبًا بك في FeedWell",
   "feedList.welcomeDescription": "قارئ RSS الخالي من الإعلانات. ابدأ بإضافة خلاصتك الأولى للحصول على مقالات نظيفة خالية من المشتتات.",
   "feedList.addFirstFeed": "أضف خلاصتك الأولى",
@@ -168,7 +157,6 @@ export default {
   "feedList.markUnreadLabel": "غير مقروء",
   "feedList.removeConfirmTitle": "إزالة المقالات",
   "feedList.removeConfirmMessage": "هل تريد إزالة المقالات المحددة ({count}) من القائمة؟ لن تعود عند تحديث خلاصاتك، وتبقى النسخ في المحفوظات.",
-  "feedList.showAllFeeds": "عرض كل الخلاصات",
   "feedList.soundsLabel": "الأصوات",
   "feedList.sortLabel": "ترتيب",
   "feedList.readAllLabel": "قراءة الكل",
@@ -327,12 +315,10 @@ export default {
   "reader.highlightModeHint": "وضع التمييز: انقر على فقرة لتمييزها أو إلغاء تمييزها.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "التفضيلات",
   "settings.sectionWidget": "أداة الشاشة الرئيسية",
   "settings.sectionAmbientSounds": "الأصوات المحيطة",
   "settings.sectionReadAloud": "القراءة بصوت عالٍ",
   "settings.sectionTranslation": "الترجمة",
-  "settings.sectionHelp": "المساعدة",
   "settings.sectionData": "البيانات",
   "settings.sectionTesters": "المختبِرون",
   "settings.sectionAbout": "حول التطبيق",
@@ -374,7 +360,6 @@ export default {
   "settings.autoScrollDelay": "مهلة التمرير التلقائي",
   "settings.autoScrollDelayValue": "{count} ثوانٍ",
   "settings.autoScrollSpeed": "سرعة التمرير التلقائي",
-  "settings.speedNormal": "عادية",
   "settings.readingReminder": "تذكير القراءة",
   "settings.readingReminderOnDesc": "احصل على إشعار إذا لم تقرأ منذ فترة",
   "settings.readingReminderOffDesc": "بدون تذكيرات قراءة",

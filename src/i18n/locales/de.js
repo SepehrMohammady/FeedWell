@@ -15,18 +15,14 @@ export default {
   "common.success": "Erfolg",
   "common.loading": "Wird geladen...",
   "common.search": "Suchen",
-  "common.yes": "Ja",
-  "common.no": "Nein",
   "common.clearAll": "Alle löschen",
   "common.later": "Später",
   "common.download": "Herunterladen",
   "common.gotIt": "Verstanden",
-  "common.somethingWentWrong": "Etwas ist schiefgelaufen",
 
   // --- Tab bar / navigation ---
   "tab.home": "Start",
   "tab.feeds": "Feeds",
-  "tab.addFeed": "Feed hinzufügen",
   "tab.saved": "Gespeichert",
   "tab.settings": "Einstellungen",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Gerade eben",
-  "date.minutesAgo": "vor {count} Min.",
   "date.hoursAgo": "vor {count} Std.",
   "date.daysAgo": "vor {count} Tg.",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Leseposition entfernen",
   "feedList.clearReadingPositionConfirm": "Möchten Sie die Lesepositionslinie wirklich entfernen?",
   "feedList.clearAction": "Entfernen",
-  "feedList.filterArticlesTitle": "Artikel filtern",
-  "feedList.filterArticlesMessage": "Wählen Sie, welche Artikel angezeigt werden sollen.",
-  "feedList.filterAll": "Alle",
-  "feedList.filterAllCurrent": "Alle (aktuell)",
   "feedList.filterAllCount": "Alle ({count})",
   "feedList.filterUnread": "Ungelesen ({count})",
-  "feedList.filterUnreadCurrent": "Ungelesen ({count}) (aktuell)",
   "feedList.filterRead": "Gelesen ({count})",
-  "feedList.filterReadCurrent": "Gelesen ({count}) (aktuell)",
   "feedList.welcomeTitle": "Willkommen bei FeedWell",
   "feedList.welcomeDescription": "Ihr werbefreier RSS-Reader. Fügen Sie Ihren ersten Feed hinzu und lesen Sie saubere Artikel ohne Ablenkung.",
   "feedList.addFirstFeed": "Ersten Feed hinzufügen",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Ungelesen",
   "feedList.removeConfirmTitle": "Artikel entfernen",
   "feedList.removeConfirmMessage": "Die ausgewählten Artikel ({count}) aus der Liste entfernen? Sie kommen beim Aktualisieren der Feeds nicht zurück. Kopien unter Gespeichert bleiben erhalten.",
-  "feedList.showAllFeeds": "Alle Feeds anzeigen",
   "feedList.soundsLabel": "Klänge",
   "feedList.sortLabel": "Sortieren",
   "feedList.readAllLabel": "Alle gelesen",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Markiermodus: Tippen Sie auf einen Absatz, um ihn zu markieren oder die Markierung aufzuheben.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Präferenzen",
   "settings.sectionWidget": "Startbildschirm-Widget",
   "settings.sectionAmbientSounds": "Umgebungsklänge",
   "settings.sectionReadAloud": "Vorlesen",
   "settings.sectionTranslation": "Übersetzung",
-  "settings.sectionHelp": "Hilfe",
   "settings.sectionData": "Daten",
   "settings.sectionTesters": "Tester",
   "settings.sectionAbout": "Über",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Auto-Scroll-Verzögerung",
   "settings.autoScrollDelayValue": "{count} Sekunden",
   "settings.autoScrollSpeed": "Auto-Scroll-Geschwindigkeit",
-  "settings.speedNormal": "Normal",
   "settings.readingReminder": "Leseerinnerung",
   "settings.readingReminderOnDesc": "Benachrichtigung erhalten, wenn Sie länger nicht gelesen haben",
   "settings.readingReminderOffDesc": "Keine Leseerinnerungen",

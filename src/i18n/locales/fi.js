@@ -15,18 +15,14 @@ export default {
   "common.success": "Onnistui",
   "common.loading": "Ladataan...",
   "common.search": "Hae",
-  "common.yes": "Kyllä",
-  "common.no": "Ei",
   "common.clearAll": "Tyhjennä kaikki",
   "common.later": "Myöhemmin",
   "common.download": "Lataa",
   "common.gotIt": "Selvä",
-  "common.somethingWentWrong": "Jokin meni vikaan",
 
   // --- Tab bar / navigation ---
   "tab.home": "Koti",
   "tab.feeds": "Syötteet",
-  "tab.addFeed": "Lisää syöte",
   "tab.saved": "Tallennetut",
   "tab.settings": "Asetukset",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Juuri nyt",
-  "date.minutesAgo": "{count} min sitten",
   "date.hoursAgo": "{count} t sitten",
   "date.daysAgo": "{count} pv sitten",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Poista lukukohta",
   "feedList.clearReadingPositionConfirm": "Haluatko varmasti poistaa lukukohdan viivan?",
   "feedList.clearAction": "Poista",
-  "feedList.filterArticlesTitle": "Suodata artikkeleita",
-  "feedList.filterArticlesMessage": "Valitse, mitkä artikkelit näytetään.",
-  "feedList.filterAll": "Kaikki",
-  "feedList.filterAllCurrent": "Kaikki (nykyinen)",
   "feedList.filterAllCount": "Kaikki ({count})",
   "feedList.filterUnread": "Lukemattomat ({count})",
-  "feedList.filterUnreadCurrent": "Lukemattomat ({count}) (nykyinen)",
   "feedList.filterRead": "Luetut ({count})",
-  "feedList.filterReadCurrent": "Luetut ({count}) (nykyinen)",
   "feedList.welcomeTitle": "Tervetuloa FeedWelliin",
   "feedList.welcomeDescription": "Mainokseton RSS-lukijasi. Aloita lisäämällä ensimmäinen syötteesi, niin saat siistejä artikkeleita ilman häiriötekijöitä.",
   "feedList.addFirstFeed": "Lisää ensimmäinen syötteesi",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Lukematon",
   "feedList.removeConfirmTitle": "Poista artikkelit",
   "feedList.removeConfirmMessage": "Poistetaanko valitut artikkelit ({count}) listalta? Ne eivät palaa, kun syötteet päivittyvät. Tallennettujen kopiot säilyvät.",
-  "feedList.showAllFeeds": "Näytä kaikki syötteet",
   "feedList.soundsLabel": "Äänet",
   "feedList.sortLabel": "Lajittele",
   "feedList.readAllLabel": "Kaikki luettu",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Korostustila: napauta kappaletta korostaaksesi sen tai poistaaksesi korostuksen.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Valinnat",
   "settings.sectionWidget": "Aloitusnäytön widgetti",
   "settings.sectionAmbientSounds": "Taustaäänet",
   "settings.sectionReadAloud": "Lue ääneen",
   "settings.sectionTranslation": "Käännös",
-  "settings.sectionHelp": "Ohje",
   "settings.sectionData": "Tiedot",
   "settings.sectionTesters": "Testaajat",
   "settings.sectionAbout": "Tietoja",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Automaattisen vierityksen viive",
   "settings.autoScrollDelayValue": "{count} sekuntia",
   "settings.autoScrollSpeed": "Automaattisen vierityksen nopeus",
-  "settings.speedNormal": "Normaali",
   "settings.readingReminder": "Lukumuistutus",
   "settings.readingReminderOnDesc": "Saat ilmoituksen, jos et ole lukenut vähään aikaan",
   "settings.readingReminderOffDesc": "Ei lukumuistutuksia",

@@ -111,5 +111,3 @@ export function formatRelativeDate(dateString, t, formatNumber = identity, langu
   }
   return formatLocalizedDate(dateString, language, formatNumber, { withTime: false });
 }
-
-export default formatRelativeDate;

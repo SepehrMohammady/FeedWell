@@ -15,18 +15,14 @@ export default {
   "common.success": "Успешно",
   "common.loading": "Загрузка...",
   "common.search": "Поиск",
-  "common.yes": "Да",
-  "common.no": "Нет",
   "common.clearAll": "Очистить всё",
   "common.later": "Позже",
   "common.download": "Скачать",
   "common.gotIt": "Понятно",
-  "common.somethingWentWrong": "Что-то пошло не так",
 
   // --- Tab bar / navigation ---
   "tab.home": "Главная",
   "tab.feeds": "Ленты",
-  "tab.addFeed": "Добавить ленту",
   "tab.saved": "Сохранённые",
   "tab.settings": "Настройки",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Только что",
-  "date.minutesAgo": "{count} мин назад",
   "date.hoursAgo": "{count} ч назад",
   "date.daysAgo": "{count} дн назад",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Сбросить позицию чтения",
   "feedList.clearReadingPositionConfirm": "Удалить отметку позиции чтения?",
   "feedList.clearAction": "Сбросить",
-  "feedList.filterArticlesTitle": "Фильтр статей",
-  "feedList.filterArticlesMessage": "Выберите, какие статьи показывать.",
-  "feedList.filterAll": "Все",
-  "feedList.filterAllCurrent": "Все (текущий)",
   "feedList.filterAllCount": "Все ({count})",
   "feedList.filterUnread": "Непрочитанные ({count})",
-  "feedList.filterUnreadCurrent": "Непрочитанные ({count}) (текущий)",
   "feedList.filterRead": "Прочитанные ({count})",
-  "feedList.filterReadCurrent": "Прочитанные ({count}) (текущий)",
   "feedList.welcomeTitle": "Добро пожаловать в FeedWell",
   "feedList.welcomeDescription": "Ваш RSS-ридер без рекламы. Добавьте первую ленту, чтобы читать чистые статьи без отвлекающих элементов.",
   "feedList.addFirstFeed": "Добавить первую ленту",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Не прочитано",
   "feedList.removeConfirmTitle": "Убрать статьи",
   "feedList.removeConfirmMessage": "Убрать выбранные статьи ({count}) из списка? Они не вернутся при обновлении лент. Копии в Сохранённых останутся.",
-  "feedList.showAllFeeds": "Показать все ленты",
   "feedList.soundsLabel": "Звуки",
   "feedList.sortLabel": "Сортировка",
   "feedList.readAllLabel": "Прочитать всё",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Режим выделения: нажмите на абзац, чтобы выделить его или снять выделение.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Предпочтения",
   "settings.sectionWidget": "Виджет на главном экране",
   "settings.sectionAmbientSounds": "Фоновые звуки",
   "settings.sectionReadAloud": "Чтение вслух",
   "settings.sectionTranslation": "Перевод",
-  "settings.sectionHelp": "Справка",
   "settings.sectionData": "Данные",
   "settings.sectionTesters": "Тестеры",
   "settings.sectionAbout": "О приложении",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Задержка автопрокрутки",
   "settings.autoScrollDelayValue": "{count} сек",
   "settings.autoScrollSpeed": "Скорость автопрокрутки",
-  "settings.speedNormal": "Обычная",
   "settings.readingReminder": "Напоминание о чтении",
   "settings.readingReminderOnDesc": "Получайте уведомление, если давно ничего не читали",
   "settings.readingReminderOffDesc": "Без напоминаний о чтении",

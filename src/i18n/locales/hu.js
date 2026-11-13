@@ -15,18 +15,14 @@ export default {
   "common.success": "Sikerült",
   "common.loading": "Betöltés...",
   "common.search": "Keresés",
-  "common.yes": "Igen",
-  "common.no": "Nem",
   "common.clearAll": "Összes törlése",
   "common.later": "Később",
   "common.download": "Letöltés",
   "common.gotIt": "Értem",
-  "common.somethingWentWrong": "Valami hiba történt",
 
   // --- Tab bar / navigation ---
   "tab.home": "Kezdőlap",
   "tab.feeds": "Hírforrások",
-  "tab.addFeed": "Forrás hozzáadása",
   "tab.saved": "Mentett",
   "tab.settings": "Beállítások",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Épp most",
-  "date.minutesAgo": "{count} perce",
   "date.hoursAgo": "{count} órája",
   "date.daysAgo": "{count} napja",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Olvasási pozíció törlése",
   "feedList.clearReadingPositionConfirm": "Biztosan eltávolítod az olvasási pozíció vonalát?",
   "feedList.clearAction": "Törlés",
-  "feedList.filterArticlesTitle": "Cikkek szűrése",
-  "feedList.filterArticlesMessage": "Válaszd ki, mely cikkek jelenjenek meg.",
-  "feedList.filterAll": "Összes",
-  "feedList.filterAllCurrent": "Összes (jelenlegi)",
   "feedList.filterAllCount": "Összes ({count})",
   "feedList.filterUnread": "Olvasatlan ({count})",
-  "feedList.filterUnreadCurrent": "Olvasatlan ({count}) (jelenlegi)",
   "feedList.filterRead": "Olvasott ({count})",
-  "feedList.filterReadCurrent": "Olvasott ({count}) (jelenlegi)",
   "feedList.welcomeTitle": "Üdvözlünk a FeedWellben",
   "feedList.welcomeDescription": "A reklámmentes RSS-olvasód. Kezdd az első forrás hozzáadásával, és olvass tiszta, zavaró elemektől mentes cikkeket.",
   "feedList.addFirstFeed": "Első forrás hozzáadása",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Olvasatlan",
   "feedList.removeConfirmTitle": "Cikkek eltávolítása",
   "feedList.removeConfirmMessage": "Eltávolítod a kijelölt cikkeket ({count}) a listából? A források frissítésekor nem térnek vissza. A Mentett részben lévő másolatok megmaradnak.",
-  "feedList.showAllFeeds": "Minden forrás mutatása",
   "feedList.soundsLabel": "Hangok",
   "feedList.sortLabel": "Rendezés",
   "feedList.readAllLabel": "Mind olvasott",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Kiemelés mód: koppints egy bekezdésre a kiemeléshez vagy a kiemelés megszüntetéséhez.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Beállítások",
   "settings.sectionWidget": "Kezdőképernyő-modul",
   "settings.sectionAmbientSounds": "Háttérhangok",
   "settings.sectionReadAloud": "Felolvasás",
   "settings.sectionTranslation": "Fordítás",
-  "settings.sectionHelp": "Súgó",
   "settings.sectionData": "Adatok",
   "settings.sectionTesters": "Tesztelők",
   "settings.sectionAbout": "Névjegy",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Automatikus görgetés késleltetése",
   "settings.autoScrollDelayValue": "{count} másodperc",
   "settings.autoScrollSpeed": "Automatikus görgetés sebessége",
-  "settings.speedNormal": "Normál",
   "settings.readingReminder": "Olvasási emlékeztető",
   "settings.readingReminderOnDesc": "Értesítés, ha egy ideje nem olvastál",
   "settings.readingReminderOffDesc": "Nincsenek olvasási emlékeztetők",

@@ -51,7 +51,6 @@ const WINDOWS_1252 = {
 };
 
 const REFERENCE = /&(#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});/g;
-const SURROGATE = /[\uD800-\uDFFF]/;
 
 // The character for a code point, as the lists show it: a non-breaking space
 // and a tab are plain spaces, a line feed stays, and what is no character

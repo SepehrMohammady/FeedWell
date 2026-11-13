@@ -15,18 +15,14 @@ export default {
   "common.success": "Succes",
   "common.loading": "Se încarcă...",
   "common.search": "Caută",
-  "common.yes": "Da",
-  "common.no": "Nu",
   "common.clearAll": "Șterge tot",
   "common.later": "Mai târziu",
   "common.download": "Descarcă",
   "common.gotIt": "Am înțeles",
-  "common.somethingWentWrong": "Ceva nu a mers bine",
 
   // --- Tab bar / navigation ---
   "tab.home": "Acasă",
   "tab.feeds": "Fluxuri",
-  "tab.addFeed": "Adaugă flux",
   "tab.saved": "Salvate",
   "tab.settings": "Setări",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Chiar acum",
-  "date.minutesAgo": "acum {count} min",
   "date.hoursAgo": "acum {count} h",
   "date.daysAgo": "acum {count} zile",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Șterge poziția de lectură",
   "feedList.clearReadingPositionConfirm": "Sigur vrei să elimini linia poziției de lectură?",
   "feedList.clearAction": "Șterge",
-  "feedList.filterArticlesTitle": "Filtrează articolele",
-  "feedList.filterArticlesMessage": "Alege ce articole să fie afișate.",
-  "feedList.filterAll": "Toate",
-  "feedList.filterAllCurrent": "Toate (curent)",
   "feedList.filterAllCount": "Toate ({count})",
   "feedList.filterUnread": "Necitite ({count})",
-  "feedList.filterUnreadCurrent": "Necitite ({count}) (curent)",
   "feedList.filterRead": "Citite ({count})",
-  "feedList.filterReadCurrent": "Citite ({count}) (curent)",
   "feedList.welcomeTitle": "Bine ai venit la FeedWell",
   "feedList.welcomeDescription": "Cititorul tău RSS fără reclame. Începe prin a adăuga primul flux, ca să ai articole curate, fără distrageri.",
   "feedList.addFirstFeed": "Adaugă primul tău flux",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Necitit",
   "feedList.removeConfirmTitle": "Elimină articole",
   "feedList.removeConfirmMessage": "Elimini articolele selectate ({count}) din listă? Nu revin când se actualizează fluxurile. Copiile din Salvate rămân.",
-  "feedList.showAllFeeds": "Arată toate fluxurile",
   "feedList.soundsLabel": "Sunete",
   "feedList.sortLabel": "Sortare",
   "feedList.readAllLabel": "Toate citite",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Mod evidențiere: atinge un paragraf ca să îl evidențiezi sau să anulezi evidențierea.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Preferințe",
   "settings.sectionWidget": "Widget pe ecranul principal",
   "settings.sectionAmbientSounds": "Sunete ambientale",
   "settings.sectionReadAloud": "Citire cu voce tare",
   "settings.sectionTranslation": "Traducere",
-  "settings.sectionHelp": "Ajutor",
   "settings.sectionData": "Date",
   "settings.sectionTesters": "Testeri",
   "settings.sectionAbout": "Despre",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Întârzierea derulării automate",
   "settings.autoScrollDelayValue": "{count} secunde",
   "settings.autoScrollSpeed": "Viteza derulării automate",
-  "settings.speedNormal": "Normală",
   "settings.readingReminder": "Memento pentru lectură",
   "settings.readingReminderOnDesc": "Primești o notificare dacă nu ai mai citit de ceva vreme",
   "settings.readingReminderOffDesc": "Fără memento-uri pentru lectură",

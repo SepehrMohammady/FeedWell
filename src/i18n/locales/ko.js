@@ -15,18 +15,14 @@ export default {
   "common.success": "성공",
   "common.loading": "불러오는 중...",
   "common.search": "검색",
-  "common.yes": "예",
-  "common.no": "아니요",
   "common.clearAll": "모두 지우기",
   "common.later": "나중에",
   "common.download": "다운로드",
   "common.gotIt": "알겠습니다",
-  "common.somethingWentWrong": "문제가 발생했습니다",
 
   // --- Tab bar / navigation ---
   "tab.home": "홈",
   "tab.feeds": "피드",
-  "tab.addFeed": "피드 추가",
   "tab.saved": "저장됨",
   "tab.settings": "설정",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "방금 전",
-  "date.minutesAgo": "{count}분 전",
   "date.hoursAgo": "{count}시간 전",
   "date.daysAgo": "{count}일 전",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "읽던 위치 지우기",
   "feedList.clearReadingPositionConfirm": "읽던 위치 표시선을 정말 삭제할까요?",
   "feedList.clearAction": "지우기",
-  "feedList.filterArticlesTitle": "기사 필터",
-  "feedList.filterArticlesMessage": "표시할 기사를 선택하세요.",
-  "feedList.filterAll": "전체",
-  "feedList.filterAllCurrent": "전체 (현재)",
   "feedList.filterAllCount": "전체 ({count})",
   "feedList.filterUnread": "읽지 않음 ({count})",
-  "feedList.filterUnreadCurrent": "읽지 않음 ({count}) (현재)",
   "feedList.filterRead": "읽음 ({count})",
-  "feedList.filterReadCurrent": "읽음 ({count}) (현재)",
   "feedList.welcomeTitle": "FeedWell에 오신 것을 환영합니다",
   "feedList.welcomeDescription": "광고 없는 RSS 리더입니다. 첫 피드를 추가하고 방해 없이 깔끔한 기사를 읽어 보세요.",
   "feedList.addFirstFeed": "첫 피드 추가하기",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "읽지 않음",
   "feedList.removeConfirmTitle": "기사 제거",
   "feedList.removeConfirmMessage": "선택한 기사({count}개)를 목록에서 제거할까요? 피드를 새로 고쳐도 다시 나타나지 않습니다. 저장됨의 사본은 유지됩니다.",
-  "feedList.showAllFeeds": "모든 피드 보기",
   "feedList.soundsLabel": "사운드",
   "feedList.sortLabel": "정렬",
   "feedList.readAllLabel": "모두 읽음",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "하이라이트 모드: 문단을 탭하면 하이라이트를 추가하거나 해제할 수 있습니다.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "환경설정",
   "settings.sectionWidget": "홈 화면 위젯",
   "settings.sectionAmbientSounds": "배경 사운드",
   "settings.sectionReadAloud": "읽어주기",
   "settings.sectionTranslation": "번역",
-  "settings.sectionHelp": "도움말",
   "settings.sectionData": "데이터",
   "settings.sectionTesters": "테스터",
   "settings.sectionAbout": "앱 정보",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "자동 스크롤 대기 시간",
   "settings.autoScrollDelayValue": "{count}초",
   "settings.autoScrollSpeed": "자동 스크롤 속도",
-  "settings.speedNormal": "보통",
   "settings.readingReminder": "독서 알림",
   "settings.readingReminderOnDesc": "한동안 읽지 않으면 알림을 받습니다",
   "settings.readingReminderOffDesc": "독서 알림을 받지 않습니다",

@@ -15,18 +15,14 @@ export default {
   "common.success": "Udført",
   "common.loading": "Indlæser...",
   "common.search": "Søg",
-  "common.yes": "Ja",
-  "common.no": "Nej",
   "common.clearAll": "Ryd alt",
   "common.later": "Senere",
   "common.download": "Download",
   "common.gotIt": "Forstået",
-  "common.somethingWentWrong": "Noget gik galt",
 
   // --- Tab bar / navigation ---
   "tab.home": "Hjem",
   "tab.feeds": "Feeds",
-  "tab.addFeed": "Tilføj feed",
   "tab.saved": "Gemte",
   "tab.settings": "Indstillinger",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Lige nu",
-  "date.minutesAgo": "for {count} min. siden",
   "date.hoursAgo": "for {count} t. siden",
   "date.daysAgo": "for {count} d. siden",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Ryd læseposition",
   "feedList.clearReadingPositionConfirm": "Vil du fjerne linjen for læsepositionen?",
   "feedList.clearAction": "Ryd",
-  "feedList.filterArticlesTitle": "Filtrér artikler",
-  "feedList.filterArticlesMessage": "Vælg, hvilke artikler der skal vises.",
-  "feedList.filterAll": "Alle",
-  "feedList.filterAllCurrent": "Alle (nuværende)",
   "feedList.filterAllCount": "Alle ({count})",
   "feedList.filterUnread": "Ulæste ({count})",
-  "feedList.filterUnreadCurrent": "Ulæste ({count}) (nuværende)",
   "feedList.filterRead": "Læste ({count})",
-  "feedList.filterReadCurrent": "Læste ({count}) (nuværende)",
   "feedList.welcomeTitle": "Velkommen til FeedWell",
   "feedList.welcomeDescription": "Din reklamefri RSS-læser. Start med at tilføje dit første feed, og få rene artikler uden forstyrrelser.",
   "feedList.addFirstFeed": "Tilføj dit første feed",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Ulæst",
   "feedList.removeConfirmTitle": "Fjern artikler",
   "feedList.removeConfirmMessage": "Vil du fjerne de valgte artikler ({count}) fra listen? De kommer ikke tilbage, når dine feeds opdateres. Kopier i Gemte bliver.",
-  "feedList.showAllFeeds": "Vis alle feeds",
   "feedList.soundsLabel": "Lyde",
   "feedList.sortLabel": "Sortér",
   "feedList.readAllLabel": "Alle læst",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Fremhævningstilstand: tryk på et afsnit for at fremhæve det eller fjerne fremhævningen.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Præferencer",
   "settings.sectionWidget": "Widget til startskærmen",
   "settings.sectionAmbientSounds": "Baggrundslyde",
   "settings.sectionReadAloud": "Læs højt",
   "settings.sectionTranslation": "Oversættelse",
-  "settings.sectionHelp": "Hjælp",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Testere",
   "settings.sectionAbout": "Om",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Forsinkelse for automatisk rulning",
   "settings.autoScrollDelayValue": "{count} sekunder",
   "settings.autoScrollSpeed": "Hastighed for automatisk rulning",
-  "settings.speedNormal": "Normal",
   "settings.readingReminder": "Læsepåmindelse",
   "settings.readingReminderOnDesc": "Få en påmindelse, hvis du ikke har læst i et stykke tid",
   "settings.readingReminderOffDesc": "Ingen læsepåmindelser",

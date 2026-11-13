@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Image, View, StyleSheet, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Image, View, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ArticleImage({ uri, style, resizeMode = 'cover', showPlaceholder = true }) {

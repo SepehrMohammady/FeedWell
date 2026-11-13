@@ -15,18 +15,14 @@ export default {
   "common.success": "Imefaulu",
   "common.loading": "Inapakia...",
   "common.search": "Tafuta",
-  "common.yes": "Ndiyo",
-  "common.no": "Hapana",
   "common.clearAll": "Futa Zote",
   "common.later": "Baadaye",
   "common.download": "Pakua",
   "common.gotIt": "Nimeelewa",
-  "common.somethingWentWrong": "Hitilafu fulani imetokea",
 
   // --- Tab bar / navigation ---
   "tab.home": "Mwanzo",
   "tab.feeds": "Mipasho",
-  "tab.addFeed": "Ongeza Mpasho",
   "tab.saved": "Zilizohifadhiwa",
   "tab.settings": "Mipangilio",
 
@@ -75,7 +71,6 @@ export default {
 
   // --- Relative date / time ---
   "date.justNow": "Sasa hivi",
-  "date.minutesAgo": "Dakika {count} zilizopita",
   "date.hoursAgo": "Saa {count} zilizopita",
   "date.daysAgo": "Siku {count} zilizopita",
 
@@ -146,15 +141,9 @@ export default {
   "feedList.clearReadingPositionTitle": "Ondoa Nafasi ya Kusoma",
   "feedList.clearReadingPositionConfirm": "Una uhakika unataka kuondoa mstari wa nafasi ya kusoma?",
   "feedList.clearAction": "Ondoa",
-  "feedList.filterArticlesTitle": "Chuja Makala",
-  "feedList.filterArticlesMessage": "Chagua makala zipi zionyeshwe.",
-  "feedList.filterAll": "Zote",
-  "feedList.filterAllCurrent": "Zote (Za sasa)",
   "feedList.filterAllCount": "Zote ({count})",
   "feedList.filterUnread": "Hazijasomwa ({count})",
-  "feedList.filterUnreadCurrent": "Hazijasomwa ({count}) (Za sasa)",
   "feedList.filterRead": "Zimesomwa ({count})",
-  "feedList.filterReadCurrent": "Zimesomwa ({count}) (Za sasa)",
   "feedList.welcomeTitle": "Karibu FeedWell",
   "feedList.welcomeDescription": "Kisomaji chako cha RSS kisicho na matangazo. Anza kwa kuongeza mpasho wako wa kwanza ili upate makala safi zisizo na usumbufu.",
   "feedList.addFirstFeed": "Ongeza Mpasho Wako wa Kwanza",
@@ -167,7 +156,6 @@ export default {
   "feedList.markUnreadLabel": "Hazijasomwa",
   "feedList.removeConfirmTitle": "Ondoa Makala",
   "feedList.removeConfirmMessage": "Ondoa makala ulizochagua ({count}) kwenye orodha? Hazitarudi mipasho yako ikisasishwa. Nakala zilizo kwenye Zilizohifadhiwa zinabaki.",
-  "feedList.showAllFeeds": "Onyesha mipasho yote",
   "feedList.soundsLabel": "Sauti",
   "feedList.sortLabel": "Panga",
   "feedList.readAllLabel": "Zote Zimesomwa",
@@ -326,12 +314,10 @@ export default {
   "reader.highlightModeHint": "Hali ya kuangazia: gusa aya ili kuiangazia au kuiondolea uangazi.",
 
   // --- Settings ---
-  "settings.sectionPreferences": "Mapendeleo",
   "settings.sectionWidget": "Wijeti ya Skrini ya Mwanzo",
   "settings.sectionAmbientSounds": "Sauti za Mazingira",
   "settings.sectionReadAloud": "Kusoma kwa Sauti",
   "settings.sectionTranslation": "Tafsiri",
-  "settings.sectionHelp": "Msaada",
   "settings.sectionData": "Data",
   "settings.sectionTesters": "Wajaribaji",
   "settings.sectionAbout": "Kuhusu",
@@ -373,7 +359,6 @@ export default {
   "settings.autoScrollDelay": "Ucheleweshaji wa Kusogeza",
   "settings.autoScrollDelayValue": "Sekunde {count}",
   "settings.autoScrollSpeed": "Kasi ya Kusogeza",
-  "settings.speedNormal": "Kawaida",
   "settings.readingReminder": "Kikumbusho cha Kusoma",
   "settings.readingReminderOnDesc": "Pata arifa iwapo hujasoma kwa muda",
   "settings.readingReminderOffDesc": "Hakuna vikumbusho vya kusoma",
