@@ -1,201 +1,89 @@
-<p align="center">
-  <img src="assets/icon.png" alt="FeedWell Logo" width="120" height="120" style="border-radius: 24px;" />
-</p>
+<div align="center">
 
-<h1 align="center">FeedWell</h1>
+<img src=".github/readme/icon.png" width="112" alt="FeedWell icon">
 
-<p align="center">
-  <strong>Ad-free RSS feed reader for Android, iOS & Windows</strong>
-</p>
+# FeedWell
 
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Windows-green?style=flat-square" alt="Platforms" />
-  <img src="https://img.shields.io/badge/license-MIT-orange?style=flat-square" alt="License" />
-</p>
+An RSS reader for Android, made for people who want to follow the sites they like without ads, an account or tracking.
 
-<p align="center">
-  <em>Read the web, minus the clutter.</em>
-</p>
+<a href="https://play.google.com/store/apps/details?id=com.feedwell.app"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="60" alt="Get it on Google Play"></a>
 
----
+[Website](https://semo-lab.com/feedwell/) · [Privacy policy](https://semo-lab.com/feedwell/privacy-policy/) · [Contact](https://semo-lab.com/#contact)
 
-## 💡 What is FeedWell?
-
-FeedWell is a **clean, private RSS reader** that blocks ads, removes trackers, and lets you focus on what matters — the content. Subscribe to any RSS or Atom feed and enjoy distraction-free reading.
-
-No accounts. No tracking. No ads. Everything stays on your device.
-
----
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 📰 Smart Feed Reader
-- Subscribe to any RSS / Atom feed
-- One-tap access to popular feeds (BBC, TechCrunch, Reuters, The Verge, and more)
-- Auto-refresh keeps articles up to date
-- Search articles across all feeds
-- Filter by read / unread status
-
-</td>
-<td width="50%">
-
-### 🚫 Built-in Ad Blocker
-- Strips ads, tracking scripts & promotional content from feeds
-- Removes tracking pixels and analytics
-- Blocks ad domains (Google Ads, Facebook, Taboola, etc.)
-- Clean HTML rendering preserves article structure
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 📖 Beautiful Reader
-- In-app article reader with clean typography
-- Translate articles — Google Translate (online) + ML Kit (offline)
-- Default translation language matches your device language
-- Read aloud (TTS) with adjustable speed
-- Reading position bookmark — save and restore your scroll position
-- RTL language support (Farsi, Arabic, Hebrew)
-- Selectable text for copying
-- Open in browser or read in-app
-
-</td>
-<td width="50%">
-
-### 🔖 Save for Later
-- Bookmark articles to read later
-- Search & sort saved articles
-- Sort by newest or oldest
-- Share articles with preview images
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🎵 Ambient Sounds
-- Background audio while reading — white noise, lo-fi beats, nature sounds, and more
-- Per-sound volume control
-- Auto-play on app launch (optional)
-- Access from the header icon or reader menu
-
-</td>
-<td width="50%">
-
-### 📱 Home Screen Widget
-- Scrollable article list or compact single-article view
-- Dark / Light theme — follows app theme or set independently
-- Quick-add shortcut from Settings
-- Change opacity from Settings
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🎨 Personalized Experience
-- Dark mode & light mode (follows device theme on first install)
-- Toggle article images on/off
-- Choose your theme accent color
-- Responsive layout for any screen size
-- Full backup & restore — export/import feeds, articles, saved items, and all settings
-
-</td>
-<td width="50%">
-
-### 🛡️ Privacy First
-- Zero data collection — all data stays on your device
-- No analytics — no tracking whatsoever
-- Local storage — feeds & articles stored securely
-- Reading reminder — gentle notification if you haven't read in a while
-- Open source — inspect every line of code
-
-</td>
-</tr>
-</table>
-
----
-
-## 📱 Supported Platforms
-
-| Platform | Status |
-|----------|--------|
-| 🤖 Android | ✅ Full support |
-| 🍎 iOS | ✅ Full support |
-| 🪟 Windows | ✅ Web-based |
-
----
-
-## 📥 Installation
-
-### Android
-Download the latest APK from [Releases](https://github.com/SepehrMohammady/FeedWell/releases) and install it directly on your device.
-
-### Build from Source
-```bash
-git clone https://github.com/SepehrMohammady/FeedWell.git
-cd FeedWell
-npm install
-```
-
-**Android APK:**
-```bash
-cd android
-.\gradlew assembleRelease
-# APK → android/app/build/outputs/apk/release/app-release.apk
-```
-
-**Development server:**
-```bash
-npm start
-```
-
----
-
-## 🗂️ Project Structure
-
-```
-FeedWell/
-├── src/
-│   ├── components/     # Reusable UI components
-│   ├── config/         # Version & app configuration
-│   ├── context/        # State management (feeds, themes, settings)
-│   ├── navigation/     # Tab & stack navigation
-│   ├── screens/        # App screens (Home, Feeds, Reader, Settings)
-│   └── utils/          # RSS parser, ad blocker, language detection
-├── assets/             # App icons & splash images
-├── scripts/            # Version management tools
-└── android/            # Native Android build files
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | React Native + Expo SDK 54 |
-| Navigation | React Navigation (Stack + Bottom Tabs) |
-| State | React Context API + useReducer |
-| Storage | AsyncStorage with SafeStorage wrapper |
-| RSS Parsing | react-native-rss-parser + custom ad-blocking |
-| Translation | Google Translate API + ML Kit on-device |
-| Build | Gradle (Android) / Expo (iOS & Web) |
-
----
-
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE) for details.
-
----
+</div>
 
 <p align="center">
-  <strong>FeedWell</strong> — Your feeds. Your way. No ads. No tracking.<br/>
-  Made with ❤️ by <a href="https://github.com/SepehrMohammady">Sepehr Mohammady</a>
+  <img src=".github/readme/screen-1.png" width="23%" alt="A NASA article in the reader, with ads and trackers removed">
+  <img src=".github/readme/screen-2.png" width="23%" alt="The same article translated into Spanish, in the dark theme">
+  <img src=".github/readme/screen-3.png" width="23%" alt="The ambient sounds list open over Saved Articles">
+  <img src=".github/readme/screen-4.png" width="23%" alt="Add Feed with hand-picked Italian feeds sorted by topic">
 </p>
+
+## About
+
+FeedWell follows the sites you choose through their RSS or Atom feeds and gathers their articles in one list. Before you read an article, it removes ads, tracking scripts and promotional blocks. There is no account to create, and your feeds, reading history and notes stay on your phone.
+
+## Features
+
+### Reading
+
+- Ad-free articles: ads, tracking scripts and promotional blocks are removed before you read.
+- Reader: articles open in a clean reader with a choice of fonts, including Atkinson Hyperlegible and the dyslexia-friendly OpenDyslexic.
+- Translation: translate an article online with Google Translate or offline with language models you download, or let Auto-Translate do it as articles open.
+- Read aloud: listen to an article with the phone's text-to-speech, at the speed you choose.
+- Highlights and notes: highlight passages in saved articles and keep notes on what you read.
+- Auto-scroll: the list and the reader scroll on their own after a pause, and a touch pauses them.
+- Ambient sounds: noise, nature, café and lo-fi sounds play in the background while you read.
+- Reduce Motion: fewer animations, and dots at the edges of the screen that move with the vehicle to ease motion sickness.
+
+### Feeds
+
+- Any feed: add an RSS or Atom feed, or paste a site's address and FeedWell finds its feed.
+- Local feeds: hand-picked feeds for every language the app speaks, sorted by topic.
+- Filter: narrow the list by read or unread, date, feed, saved articles, notes, starred feeds and pictures.
+- Swipe actions: swipe an article right or left to mark it read, save, share or remove it, with each side set in Settings.
+- Reading position: mark where you stopped in the list, and mark everything above it as read in one tap.
+- A tidy list: hide a feed without unsubscribing, and remove articles so a refresh doesn't bring them back.
+- Saved articles: keep an article with its full text to read later, also without a connection.
+
+### Home, widget and look
+
+- Customize Home: choose which sections Home shows and in what order.
+- Home screen widget: a list or one article at a time, with a play button that moves on to the next article by itself. It can show all, unread or saved articles, from every feed or from one.
+- Look: system, light or dark, a main color and an accent color, and AMOLED black.
+- Languages: the app speaks many languages, including right-to-left Arabic, Farsi and Hebrew, and dates and numbers follow the language you pick.
+
+### Your data
+
+- Backups: one file holds your feeds, articles, saved articles, notes and settings, and restores on another phone by replacing or merging. Automatic backups can go to a folder you choose.
+- Reading reminder: a notification scheduled on the phone if you haven't read for a while. You can turn it off.
+
+## Privacy
+
+Your feeds, articles, saved articles, notes and settings stay on your phone. FeedWell fetches feeds, articles and their images straight from the sites you follow. Translating online sends the article's text to Google Translate, and offline language models download from Google; in Offline only mode, translation happens on the phone. If a feed can't be reached while you add it, the app retries through public relay services. FeedWell has no account, no ads, no analytics and no tracking. The full text is in the [privacy policy](https://semo-lab.com/feedwell/privacy-policy/).
+
+## Download
+
+FeedWell is on [Google Play](https://play.google.com/store/apps/details?id=com.feedwell.app) for Android 7.0 and newer.
+
+## Built with
+
+React Native and Expo, React Navigation, react-native-rss-parser, Mozilla Readability with linkedom for article text, ML Kit for offline translation, Expo Speech for reading aloud, Expo AV for the ambient sounds, and AsyncStorage. The home screen widget and the motion cues are written in Kotlin.
+
+## Development
+
+1. Install Node.js, Java 17 and the Android SDK.
+2. `npm install`
+3. `npm run android` builds the app and starts it on a connected phone.
+4. `npx expo export --platform android` compiles the code; run it before every commit.
+5. Release builds are signed with a key that never enters this repository.
+
+## Contributing, conduct and security
+
+Bug reports and ideas are welcome: [CONTRIBUTING.md](CONTRIBUTING.md) says how. Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md). Please report security problems privately, as [SECURITY.md](SECURITY.md) explains.
+
+## License
+
+Copyright (c) 2025 Sepehr Mohammady. All rights reserved. See [LICENSE](LICENSE).
+
+FeedWell is one of the apps from [SeMo Lab](https://semo-lab.com/).
