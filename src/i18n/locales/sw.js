@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Futa vichujio",
   "feedFilter.noMatchTitle": "Hakuna makala zinazolingana",
   "feedFilter.noMatchBody": "Jaribu machaguo mengine, au futa vichujio.",
-  "whatsNew.slideshowTitle": "Onyesho la slaidi kwenye wijeti",
-  "whatsNew.slideshowBody": "Gusa cheza kwenye wijeti ya skrini ya mwanzo nayo itaenda yenyewe kwenye makala inayofuata. Kwenye Mipangilio, chagua kasi yake na makala inazoonyesha: zote, ambazo hujasoma au zilizohifadhiwa, kutoka kwenye mipasho yote au mmoja.",
-  "whatsNew.swipeBody": "Telezesha makala kulia au kushoto ili kuiwekea alama ya kusomwa, kuihifadhi, kuishiriki au kuiondoa. Chagua kila upande unachofanya kwenye Mipangilio, chini ya Mipasho.",
-  "whatsNew.filterTitle": "Kichujio sahihi zaidi",
-  "whatsNew.filterBody": "Kichujio kwenye Mipasho sasa hupunguza orodha kwa mpasho na kwa tarehe, na kinaweza kuonyesha tu makala zilizohifadhiwa, zenye madokezo, kutoka kwenye mipasho yenye nyota au zenye picha.",
-  "whatsNew.unreadBody": "Makala ambazo hujasoma huonekana kwa kichwa kinene na kitone kikubwa zaidi. Zilizosomwa hurudi nyuma, zikiwa na picha nyeusi na nyeupe na maandishi mepesi zaidi.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Mistari kati ya makala",
   "whatsNew.linesFixBody": "Kwenye baadhi ya simu, baadhi ya mistari myembamba kati ya makala haikuonekana kwenye Zilizohifadhiwa na Mipasho. Sasa yote inaonekana.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Misimbo iliyopotea kwenye maandishi",
   "whatsNew.codesFixBody": "Baadhi ya vichwa na maelezo vilionyesha vipande vya msimbo badala ya nafasi, herufi yenye alama au ishara. Sasa vinasomeka kawaida.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Kupata mpasho wa tovuti",
+  "whatsNew.findFeedBody": "Bandika anwani ya tovuti na sasa FeedWell hupata mpasho wake kwenye tovuti nyingi zaidi, kwa kusoma viungo vya mipasho ambavyo tovuti yenyewe inaonyesha.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Mipasho ambayo haikuonyeshwa upya",
+  "whatsNew.feedFixBody": "Baadhi ya mipasho yenye kosa dogo, kama miwili ya NASA, haikuwahi kuonyeshwa upya. Sasa inaonyeshwa upya.",
 };

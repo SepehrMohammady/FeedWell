@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Szűrők törlése",
   "feedFilter.noMatchTitle": "Nincs találat",
   "feedFilter.noMatchBody": "Próbálj más választást, vagy töröld a szűrőket.",
-  "whatsNew.slideshowTitle": "Diavetítés a modulban",
-  "whatsNew.slideshowBody": "Koppints a lejátszásra a kezdőképernyő-modulban, és magától lép a következő cikkre. A Beállításokban választhatod ki a sebességét, és hogy milyen cikkeket mutasson: mindet, az olvasatlanokat vagy a mentetteket, az összes hírforrásból vagy egyből.",
-  "whatsNew.swipeBody": "Húzz el egy cikket jobbra vagy balra, hogy olvasottnak jelöld, mentsd, megoszd vagy eltávolítsd. Hogy melyik irány mit csináljon, a Beállítások Hírforrások részében választhatod ki.",
-  "whatsNew.filterTitle": "Pontosabb szűrő",
-  "whatsNew.filterBody": "A Hírforrások szűrője most hírforrás és dátum szerint is szűkíti a listát, és mutathat csak mentett, jegyzetes, csillagos hírforrásból való vagy képes cikkeket.",
-  "whatsNew.unreadBody": "Az olvasatlan cikkek félkövér címmel és nagyobb ponttal tűnnek ki. Az olvasottak háttérbe húzódnak, fekete-fehér képekkel és világosabb szöveggel.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Vonalak a cikkek között",
   "whatsNew.linesFixBody": "Néhány telefonon a Mentett és a Hírforrások listájában hiányzott a cikkek közötti vékony vonalak egy része. Most mind látszik.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Kóbor kódok a szövegben",
   "whatsNew.codesFixBody": "Néhány címben és leírásban kódrészletek jelentek meg egy szóköz, ékezetes betű vagy szimbólum helyén. Most már rendesen olvashatók.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "A webhely forrásának megkeresése",
+  "whatsNew.findFeedBody": "Illessz be egy webhelycímet, és a FeedWell most sokkal több webhelyen megtalálja a forrását, mert elolvassa a webhely által megadott forráshivatkozásokat.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Források, amelyek nem frissültek",
+  "whatsNew.feedFixBody": "Néhány apró hibát tartalmazó forrás, például kettő a NASA-tól, sosem frissült. Most már frissül.",
 };

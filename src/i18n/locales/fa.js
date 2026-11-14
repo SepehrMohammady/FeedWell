@@ -649,16 +649,16 @@ export default {
   "feedFilter.clear": "پاک کردن فیلترها",
   "feedFilter.noMatchTitle": "هیچ مقاله‌ای پیدا نشد",
   "feedFilter.noMatchBody": "گزینه‌های دیگری را امتحان کنید، یا فیلترها را پاک کنید.",
-  "whatsNew.slideshowTitle": "نمایش خودکار در ویجت",
-  "whatsNew.slideshowBody": "در ویجت صفحه اصلی روی پخش بزنید تا خودش به مقاله بعدی برود. در تنظیمات، سرعتش را انتخاب کنید و اینکه چه مقاله‌هایی نشان دهد: همه، نخوانده یا ذخیره‌شده، از همه خوراک‌ها یا یکی.",
-  "whatsNew.swipeBody": "مقاله را به راست یا چپ بکشید تا خوانده‌شده علامت بخورد، ذخیره شود، به اشتراک گذاشته شود یا حذف شود. کار هر سمت را در تنظیمات، بخش خوراک‌ها انتخاب کنید.",
-  "whatsNew.filterTitle": "فیلتر دقیق‌تر",
-  "whatsNew.filterBody": "فیلتر خوراک‌ها حالا فهرست را بر اساس خوراک و تاریخ محدود می‌کند، و می‌تواند فقط ذخیره‌شده‌ها، یادداشت‌دارها، خوراک‌های ستاره‌دار یا تصویردارها را نشان دهد.",
-  "whatsNew.unreadBody": "مقاله‌های نخوانده با عنوان پررنگ و نقطه بزرگ‌تر دیده می‌شوند. خوانده‌شده‌ها با تصویر سیاه‌وسفید و متن روشن‌تر عقب‌تر می‌نشینند.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "خط‌های بین مقاله‌ها",
   "whatsNew.linesFixBody": "در بعضی گوشی‌ها، چند تا از خط‌های نازک بین مقاله‌ها در ذخیره‌شده و خوراک‌ها دیده نمی‌شد. حالا همه دیده می‌شوند.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "کدهای اضافه در متن",
   "whatsNew.codesFixBody": "در بعضی عنوان‌ها و توضیح‌ها به‌جای فاصله، حرف علامت‌دار یا نماد، تکه‌ای کد دیده می‌شد. حالا درست خوانده می‌شوند.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "پیدا کردن خوراک سایت",
+  "whatsNew.findFeedBody": "نشانی یک وب‌سایت را بچسبانید. FeedWell حالا با خواندن پیوندهای خوراکی که خود سایت معرفی می‌کند، خوراک آن را در سایت‌های خیلی بیشتری پیدا می‌کند.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "خوراک‌هایی که به‌روز نمی‌شدند",
+  "whatsNew.feedFixBody": "بعضی خوراک‌ها که خطای کوچکی داشتند، مثل دو خوراک از ناسا، هیچ‌وقت به‌روز نمی‌شدند. حالا به‌روز می‌شوند.",
 };

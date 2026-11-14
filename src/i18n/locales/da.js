@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Ryd filtre",
   "feedFilter.noMatchTitle": "Ingen artikler passer",
   "feedFilter.noMatchBody": "Prøv andre valg, eller ryd filtrene.",
-  "whatsNew.slideshowTitle": "Diasshow i widgetten",
-  "whatsNew.slideshowBody": "Tryk på afspil i widgetten til startskærmen, så går den selv videre til næste artikel. I Indstillinger vælger du tempoet, og hvilke artikler den viser: alle, ulæste eller gemte, fra alle feeds eller fra ét.",
-  "whatsNew.swipeBody": "Stryg en artikel til højre eller venstre for at markere den som læst, gemme, dele eller fjerne den. Vælg, hvad hver retning gør, i Indstillinger under Feeds.",
-  "whatsNew.filterTitle": "Et finere filter",
-  "whatsNew.filterBody": "Filteret under Feeds afgrænser nu listen efter feed og dato og kan vise kun gemte artikler, artikler med noter, fra feeds med stjerne eller med billeder.",
-  "whatsNew.unreadBody": "Ulæste artikler træder frem med fed titel og en større prik. Læste artikler træder tilbage med sort-hvide billeder og lysere tekst.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linjer mellem artikler",
   "whatsNew.linesFixBody": "På nogle telefoner manglede enkelte af de tynde linjer mellem artiklerne i Gemte og Feeds. Nu vises de alle.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Vildfarne koder i teksten",
   "whatsNew.codesFixBody": "Nogle titler og beskrivelser viste stumper af kode i stedet for et mellemrum, et bogstav med accent eller et symbol. Nu læses de normalt.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Find en sides feed",
+  "whatsNew.findFeedBody": "Indsæt en webadresse, og FeedWell finder nu feedet på mange flere sider ved at læse de feedlinks, siden selv angiver.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Feeds, der ikke blev opdateret",
+  "whatsNew.feedFixBody": "Nogle feeds med en lille fejl, som to fra NASA, blev aldrig opdateret. Det bliver de nu.",
 };

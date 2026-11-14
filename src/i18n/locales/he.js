@@ -704,16 +704,16 @@ export default {
   "feedFilter.clear": "ניקוי הסינון",
   "feedFilter.noMatchTitle": "אין כתבות מתאימות",
   "feedFilter.noMatchBody": "אפשר לבחור משהו אחר, או לנקות את הסינון.",
-  "whatsNew.slideshowTitle": "מצגת בווידג׳ט",
-  "whatsNew.slideshowBody": "הקשה על הפעלה בווידג׳ט למסך הבית מעבירה אותו לבד לכתבה הבאה. בהגדרות בוחרים את המהירות ואילו כתבות הוא מציג: הכול, שלא נקראו או שמורות, מכל הפידים או מפיד אחד.",
-  "whatsNew.swipeBody": "מחליקים כתבה ימינה או שמאלה כדי לסמן אותה כנקראה, לשמור, לשתף או להסיר אותה. מה כל כיוון עושה בוחרים בהגדרות, תחת פידים.",
-  "whatsNew.filterTitle": "סינון מדויק יותר",
-  "whatsNew.filterBody": "הסינון בפידים מצמצם עכשיו את הרשימה לפי פיד ותאריך, ויכול להציג רק כתבות שמורות, כתבות עם הערות, מפידים מסומנים בכוכב או עם תמונות.",
-  "whatsNew.unreadBody": "כתבות שלא נקראו בולטות עם כותרת מודגשת ונקודה גדולה יותר. כתבות שנקראו נסוגות לאחור, עם תמונות בשחור-לבן וטקסט בהיר יותר.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "קווים בין הכתבות",
   "whatsNew.linesFixBody": "בחלק מהטלפונים חסרו כמה מהקווים הדקים בין הכתבות בשמורים ובפידים. עכשיו כולם מופיעים.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "קודים תועים בטקסט",
   "whatsNew.codesFixBody": "בחלק מהכותרות והתיאורים הופיעו קטעי קוד במקום רווח, אות עם סימן או סמל. עכשיו הם נקראים כרגיל.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "מציאת הפיד של אתר",
+  "whatsNew.findFeedBody": "אפשר להדביק כתובת של אתר, ו-FeedWell מוצאת עכשיו את הפיד שלו בהרבה יותר אתרים, כי היא קוראת את קישורי הפיד שהאתר עצמו מציין.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "פידים שלא התעדכנו",
+  "whatsNew.feedFixBody": "חלק מהפידים עם שגיאה קטנה, כמו שניים של NASA, לא התעדכנו אף פעם. עכשיו הם מתעדכנים.",
 };

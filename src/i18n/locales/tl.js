@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "I-clear ang mga filter",
   "feedFilter.noMatchTitle": "Walang tugmang artikulo",
   "feedFilter.noMatchBody": "Sumubok ng ibang pagpipilian, o i-clear ang mga filter.",
-  "whatsNew.slideshowTitle": "Slideshow sa widget",
-  "whatsNew.slideshowBody": "I-tap ang play sa widget sa home screen at kusa itong lilipat sa susunod na artikulo. Sa Mga Setting, piliin ang bilis nito at kung aling mga artikulo ang ipapakita: lahat, hindi pa nababasa o naka-save, mula sa lahat ng feed o sa isa lang.",
-  "whatsNew.swipeBody": "I-swipe pakanan o pakaliwa ang isang artikulo para markahan itong nabasa, i-save, i-share o alisin. Piliin kung ano ang gagawin ng bawat direksyon sa Mga Setting, sa ilalim ng Mga Feed.",
-  "whatsNew.filterTitle": "Mas pinong filter",
-  "whatsNew.filterBody": "Pinapakitid na ngayon ng filter sa Mga Feed ang listahan ayon sa feed at petsa, at kaya nitong ipakita lang ang mga naka-save na artikulo, ang may note, mula sa mga feed na may star o ang may larawan.",
-  "whatsNew.unreadBody": "Tumitingkad ang mga hindi pa nababasang artikulo sa makapal na pamagat at mas malaking tuldok. Umaatras ang mga nabasa na, may black and white na larawan at mas mapusyaw na text.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Mga linya sa pagitan ng mga artikulo",
   "whatsNew.linesFixBody": "Sa ilang telepono, nawawala ang ilan sa maninipis na linya sa pagitan ng mga artikulo sa Naka-save at Mga Feed. Lumalabas na ngayon ang lahat.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Mga ligaw na code sa text",
   "whatsNew.codesFixBody": "May mga pamagat at paglalarawan na nagpakita ng mga piraso ng code kapalit ng espasyo, titik na may tuldik o simbolo. Normal na ang basa sa mga ito ngayon.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Paghahanap ng feed ng site",
+  "whatsNew.findFeedBody": "Mag-paste ng address ng website at mahahanap na ng FeedWell ang feed nito sa mas maraming site, dahil binabasa na nito ang mga link ng feed na inililista mismo ng site.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Mga feed na hindi nare-refresh",
+  "whatsNew.feedFixBody": "Hindi kailanman na-refresh ang ilang feed na may maliit na mali, gaya ng dalawa mula sa NASA. Nare-refresh na ang mga ito ngayon.",
 };

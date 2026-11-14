@@ -703,16 +703,16 @@ export default {
   "feedFilter.clear": "Vymazat filtry",
   "feedFilter.noMatchTitle": "Žádné odpovídající články",
   "feedFilter.noMatchBody": "Zkuste jiné volby, nebo filtry vymažte.",
-  "whatsNew.slideshowTitle": "Prezentace ve widgetu",
-  "whatsNew.slideshowBody": "Klepněte ve widgetu na ploše na přehrát a sám přejde na další článek. V Nastavení zvolte rychlost a které články zobrazí: všechny, nepřečtené nebo uložené, ze všech kanálů nebo z jednoho.",
-  "whatsNew.swipeBody": "Přejeďte článkem doprava nebo doleva a označte ho jako přečtený, uložte, sdílejte nebo odeberte. Co dělá který směr, zvolíte v Nastavení v části Kanály.",
-  "whatsNew.filterTitle": "Jemnější filtr",
-  "whatsNew.filterBody": "Filtr v Kanálech teď zužuje seznam podle kanálu a data a umí zobrazit jen uložené články, články s poznámkami, z kanálů s hvězdičkou nebo s obrázky.",
-  "whatsNew.unreadBody": "Nepřečtené články vyniknou tučným nadpisem a větší tečkou. Přečtené ustoupí do pozadí s černobílými obrázky a světlejším textem.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Čáry mezi články",
   "whatsNew.linesFixBody": "Na některých telefonech chyběly v Uložených a v Kanálech některé tenké čáry mezi články. Teď jsou vidět všechny.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Zatoulané kódy v textu",
   "whatsNew.codesFixBody": "Některé titulky a popisy ukazovaly kousky kódu místo mezery, písmene s diakritikou nebo symbolu. Teď se čtou normálně.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Hledání kanálu webu",
+  "whatsNew.findFeedBody": "Vložte adresu webu a FeedWell teď najde jeho kanál na mnohem více webech, protože čte odkazy na kanály, které web sám uvádí.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Kanály, které se neobnovovaly",
+  "whatsNew.feedFixBody": "Některé kanály s drobnou chybou, například dva od NASA, se nikdy neobnovily. Teď už ano.",
 };

@@ -99,23 +99,18 @@ export default function AddFeedScreen({ navigation }) {
       try {
         feedData = await parseRSSFeed(feedUrl, maxArticleAge);
       } catch (error) {
-        console.log('Regular parser failed, trying CORS proxy:', error.message);
+        console.log('Regular parser failed, trying discovery:', error?.message || error);
+        // The user most likely pasted a website address rather than a feed
+        // address: look up the site's feed the way a browser would. The public
+        // relays come last, only when that finds no other address.
+        let discovered = null;
+        setDiscovering(true);
         try {
-          feedData = await parseRSSFeedWithProxy(feedUrl);
-        } catch (proxyError) {
-          console.log('CORS proxy also failed, trying discovery:', proxyError.message);
-          // The user most likely pasted a website address rather than a feed
-          // address — look up the site's feed the way a browser would.
-          let discovered = null;
-          setDiscovering(true);
-          try {
-            discovered = await discoverFeedUrl(feedUrl);
-          } finally {
-            setDiscovering(false);
-          }
-          if (!discovered) {
-            throw new Error('Unable to access this feed. Please check the URL or try a different feed.');
-          }
+          discovered = await discoverFeedUrl(feedUrl);
+        } finally {
+          setDiscovering(false);
+        }
+        if (discovered && discovered !== feedUrl) {
           if (feeds.some(feed => feed.url === discovered)) {
             setAlertConfig({ visible: true, title: t('common.error'), message: t('addFeed.alreadyAdded'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
             return;
@@ -123,6 +118,13 @@ export default function AddFeedScreen({ navigation }) {
           console.log('Discovered feed for site:', feedUrl, '->', discovered);
           feedUrl = discovered;
           feedData = await parseRSSFeed(feedUrl, maxArticleAge);
+        } else {
+          try {
+            feedData = await parseRSSFeedWithProxy(feedUrl);
+          } catch (proxyError) {
+            console.log('The relays failed too:', proxyError.message);
+            throw new Error('Unable to access this feed. Please check the URL or try a different feed.');
+          }
         }
       }
       
@@ -159,16 +161,18 @@ export default function AddFeedScreen({ navigation }) {
     } catch (error) {
       console.error('Error adding feed:', error);
       
-      // More detailed error message
+      // More detailed error message. The feed library rejects with a plain
+      // string, not an Error, so read the reason either way.
+      const reason = String(error?.message || error || '');
       let errorMessage = t('addFeed.failedToAdd') + ' ';
 
-      if (error.message.includes('CORS') || error.message.includes('accessible')) {
+      if (reason.includes('CORS') || reason.includes('accessible')) {
         errorMessage += t('addFeed.errorTemporarilyUnavailable') + ' ';
-      } else if (error.message.includes('Network')) {
+      } else if (reason.includes('Network')) {
         errorMessage += t('addFeed.errorCheckConnection') + ' ';
-      } else if (error.message.includes('Failed to fetch')) {
+      } else if (reason.includes('Failed to fetch')) {
         errorMessage += t('addFeed.errorInvalidOrUnavailable') + ' ';
-      } else if (error.message.includes('Unable to access')) {
+      } else if (reason.includes('Unable to access')) {
         errorMessage += t('addFeed.unableToAccess');
       } else {
         errorMessage += t('addFeed.errorVerifyUrl');

@@ -640,16 +640,16 @@ export default {
   "feedFilter.clear": "ล้างตัวกรอง",
   "feedFilter.noMatchTitle": "ไม่มีบทความที่ตรงกัน",
   "feedFilter.noMatchBody": "ลองเลือกอย่างอื่น หรือล้างตัวกรอง",
-  "whatsNew.slideshowTitle": "สไลด์โชว์บนวิดเจ็ต",
-  "whatsNew.slideshowBody": "แตะเล่นบนวิดเจ็ตหน้าจอหลัก แล้ววิดเจ็ตจะไปยังบทความถัดไปเอง ในการตั้งค่า เลือกความเร็วและบทความที่จะแสดงได้ ทั้งหมด ยังไม่ได้อ่าน หรือที่บันทึกไว้ จากทุกฟีดหรือฟีดเดียว",
-  "whatsNew.swipeBody": "ปัดบทความไปทางขวาหรือซ้ายเพื่อทำเครื่องหมายว่าอ่านแล้ว บันทึก แชร์ หรือนำออก เลือกว่าแต่ละทางทำอะไรได้ในการตั้งค่า หัวข้อฟีด",
-  "whatsNew.filterTitle": "ตัวกรองที่ละเอียดขึ้น",
-  "whatsNew.filterBody": "ตัวกรองในฟีดตอนนี้กรองรายการตามฟีดและวันที่ได้ และแสดงเฉพาะบทความที่บันทึกไว้ ที่มีบันทึก จากฟีดที่ติดดาว หรือที่มีรูปภาพได้",
-  "whatsNew.unreadBody": "บทความที่ยังไม่ได้อ่านจะเด่นด้วยหัวข้อตัวหนาและจุดที่ใหญ่ขึ้น ส่วนบทความที่อ่านแล้วจะถอยไปด้านหลังด้วยรูปขาวดำและตัวอักษรที่จางลง",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "เส้นคั่นระหว่างบทความ",
   "whatsNew.linesFixBody": "ในโทรศัพท์บางรุ่น เส้นบางๆ ระหว่างบทความบางเส้นไม่แสดงในที่บันทึกไว้และฟีด ตอนนี้แสดงครบทุกเส้นแล้ว",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "โค้ดหลงในข้อความ",
   "whatsNew.codesFixBody": "ชื่อเรื่องและคำอธิบายบางรายการเคยแสดงเศษโค้ดแทนช่องว่าง ตัวอักษรที่มีเครื่องหมาย หรือสัญลักษณ์ ตอนนี้อ่านได้ตามปกติแล้ว",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "การค้นหาฟีดของเว็บไซต์",
+  "whatsNew.findFeedBody": "วางที่อยู่เว็บไซต์ แล้ว FeedWell จะหาฟีดเจอในเว็บไซต์มากขึ้นอีกมาก เพราะตอนนี้อ่านลิงก์ฟีดที่เว็บไซต์ระบุไว้เอง",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "ฟีดที่ไม่รีเฟรช",
+  "whatsNew.feedFixBody": "ฟีดบางรายการที่มีข้อผิดพลาดเล็กน้อย เช่น ฟีดสองรายการของ NASA ไม่เคยรีเฟรชเลย ตอนนี้รีเฟรชได้แล้ว",
 };

@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Rensa filter",
   "feedFilter.noMatchTitle": "Inga artiklar matchar",
   "feedFilter.noMatchBody": "Prova andra val, eller rensa filtren.",
-  "whatsNew.slideshowTitle": "Bildspel i widgeten",
-  "whatsNew.slideshowBody": "Tryck på spela i hemskärmswidgeten så går den själv vidare till nästa artikel. I Inställningar väljer du hastigheten och vilka artiklar den visar: alla, olästa eller sparade, från alla flöden eller från ett.",
-  "whatsNew.swipeBody": "Svep en artikel åt höger eller vänster för att markera den som läst, spara, dela eller ta bort den. Välj vad varje håll gör i Inställningar under Flöden.",
-  "whatsNew.filterTitle": "Ett finare filter",
-  "whatsNew.filterBody": "Filtret under Flöden begränsar nu listan efter flöde och datum, och kan visa bara sparade artiklar, artiklar med anteckningar, från stjärnmärkta flöden eller med bilder.",
-  "whatsNew.unreadBody": "Olästa artiklar syns med fet rubrik och en större prick. Lästa artiklar hamnar i bakgrunden, med svartvita bilder och ljusare text.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linjer mellan artiklar",
   "whatsNew.linesFixBody": "På vissa telefoner saknades några av de tunna linjerna mellan artiklarna i Sparade och Flöden. Nu syns alla.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Vilsna koder i texten",
   "whatsNew.codesFixBody": "Vissa rubriker och beskrivningar visade kodsnuttar i stället för ett mellanslag, en bokstav med accent eller en symbol. Nu läses de som vanligt.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Hitta en webbplats flöde",
+  "whatsNew.findFeedBody": "Klistra in en webbadress så hittar FeedWell nu flödet på många fler webbplatser, eftersom appen läser de flödeslänkar som webbplatsen själv anger.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Flöden som inte uppdaterades",
+  "whatsNew.feedFixBody": "Vissa flöden med ett litet fel, som två från NASA, uppdaterades aldrig. Nu gör de det.",
 };

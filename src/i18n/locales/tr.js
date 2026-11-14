@@ -649,16 +649,16 @@ export default {
   "feedFilter.clear": "Filtreleri temizle",
   "feedFilter.noMatchTitle": "Eşleşen makale yok",
   "feedFilter.noMatchBody": "Başka seçenekler dene ya da filtreleri temizle.",
-  "whatsNew.slideshowTitle": "Widget'ta slayt gösterisi",
-  "whatsNew.slideshowBody": "Ana ekran widget'ında oynat'a dokun, kendi kendine sonraki makaleye geçsin. Ayarlar'da hızını ve hangi makaleleri göstereceğini seç: tümü, okunmamışlar ya da kaydedilenler, tüm akışlardan ya da birinden.",
-  "whatsNew.swipeBody": "Bir makaleyi okundu olarak işaretlemek, kaydetmek, paylaşmak ya da kaldırmak için sağa veya sola kaydır. Her yönün ne yapacağını Ayarlar'da Akışlar bölümünden seç.",
-  "whatsNew.filterTitle": "Daha ince bir filtre",
-  "whatsNew.filterBody": "Akışlar'daki filtre artık listeyi akışa ve tarihe göre daraltıyor; yalnızca kaydedilen, notlu, yıldızlı akışlardan gelen ya da görselli makaleleri de gösterebiliyor.",
-  "whatsNew.unreadBody": "Okunmamış makaleler kalın başlık ve daha büyük bir noktayla öne çıkar. Okunanlar siyah beyaz görseller ve daha açık yazıyla geri planda kalır.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Makaleler arasındaki çizgiler",
   "whatsNew.linesFixBody": "Bazı telefonlarda Kaydedilenler ve Akışlar'da makaleler arasındaki ince çizgilerin bir kısmı görünmüyordu. Artık hepsi görünüyor.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Metindeki başıboş kodlar",
   "whatsNew.codesFixBody": "Bazı başlık ve açıklamalarda boşluk, aksanlı harf ya da simge yerine kod parçaları görünüyordu. Artık normal okunuyorlar.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Sitenin akışını bulma",
+  "whatsNew.findFeedBody": "Bir web sitesi adresi yapıştır. FeedWell artık sitenin kendi belirttiği akış bağlantılarını okuyarak çok daha fazla sitede akışı buluyor.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Yenilenmeyen akışlar",
+  "whatsNew.feedFixBody": "NASA'nın iki akışı gibi küçük bir hata içeren bazı akışlar hiç yenilenmiyordu. Artık yenileniyorlar.",
 };

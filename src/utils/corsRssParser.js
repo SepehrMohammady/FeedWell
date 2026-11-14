@@ -2,8 +2,7 @@
 // v1.8.1: image extraction is shared with rssParser.js so both parsers
 // resolve preview images identically (media:*, enclosure, itunes:image,
 // <img> in content/description with lazy-load/srcset/entity-decode support).
-import { parse } from 'react-native-rss-parser';
-import { normalizePublishedDate } from './rssParser';
+import { normalizePublishedDate, parseFeedXml } from './rssParser';
 import {
   decodeHtmlEntities,
   extractImageUrl,
@@ -54,7 +53,7 @@ export async function parseRSSFeedWithProxy(url) {
       }
 
       // Parse the RSS
-      const feed = await parse(responseText);
+      const feed = await parseFeedXml(responseText);
 
       // Extract media:* / enclosure / itunes / <img> URLs from the raw XML,
       // since the parser drops media-namespace elements (same as rssParser.js)

@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Filters wissen",
   "feedFilter.noMatchTitle": "Geen artikelen gevonden",
   "feedFilter.noMatchBody": "Probeer andere keuzes, of wis de filters.",
-  "whatsNew.slideshowTitle": "Diavoorstelling in de widget",
-  "whatsNew.slideshowBody": "Tik in de widget op het startscherm op afspelen en hij gaat vanzelf naar het volgende artikel. Kies in Instellingen de snelheid en welke artikelen hij toont: alle, ongelezen of opgeslagen, uit alle feeds of uit één.",
-  "whatsNew.swipeBody": "Veeg een artikel naar rechts of links om het als gelezen te markeren, op te slaan, te delen of te verwijderen. Kies in Instellingen onder Feeds wat elke kant doet.",
-  "whatsNew.filterTitle": "Een fijner filter",
-  "whatsNew.filterBody": "Het filter bij Feeds beperkt de lijst nu op feed en op datum, en kan alleen opgeslagen artikelen tonen, artikelen met notities, uit feeds met ster of met afbeeldingen.",
-  "whatsNew.unreadBody": "Ongelezen artikelen vallen op met een vetgedrukte titel en een grotere stip. Gelezen artikelen treden terug, met zwart-witte afbeeldingen en lichtere tekst.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Lijnen tussen artikelen",
   "whatsNew.linesFixBody": "Op sommige telefoons ontbraken enkele van de dunne lijnen tussen artikelen in Opgeslagen en Feeds. Nu zijn ze allemaal te zien.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Verdwaalde codes in tekst",
   "whatsNew.codesFixBody": "Sommige titels en beschrijvingen toonden stukjes code in plaats van een spatie, een letter met accent of een symbool. Nu zijn ze gewoon leesbaar.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "De feed van een site vinden",
+  "whatsNew.findFeedBody": "Plak een websiteadres en FeedWell vindt nu op veel meer sites de feed, doordat het de feedlinks leest die de site zelf opgeeft.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Feeds die niet vernieuwden",
+  "whatsNew.feedFixBody": "Sommige feeds met een kleine fout, zoals twee van NASA, werden nooit vernieuwd. Nu wel.",
 };

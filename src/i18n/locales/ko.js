@@ -685,16 +685,16 @@ export default {
   "feedFilter.clear": "필터 지우기",
   "feedFilter.noMatchTitle": "맞는 기사가 없습니다",
   "feedFilter.noMatchBody": "다른 항목을 고르거나 필터를 지우세요.",
-  "whatsNew.slideshowTitle": "위젯 슬라이드쇼",
-  "whatsNew.slideshowBody": "홈 화면 위젯에서 재생을 누르면 다음 기사로 저절로 넘어갑니다. 설정에서 속도와 보여 줄 기사를 고르세요. 모든 기사, 읽지 않은 기사, 저장한 기사 중에서, 모든 피드나 피드 하나에서 고를 수 있습니다.",
-  "whatsNew.swipeBody": "기사를 오른쪽이나 왼쪽으로 밀어 읽음으로 표시하거나, 저장, 공유, 제거하세요. 방향마다 할 일은 설정의 피드에서 고를 수 있습니다.",
-  "whatsNew.filterTitle": "더 세밀한 필터",
-  "whatsNew.filterBody": "이제 피드의 필터로 목록을 피드와 날짜로 좁힐 수 있고, 저장한 기사, 메모가 있는 기사, 별표한 피드의 기사, 이미지가 있는 기사만 볼 수도 있습니다.",
-  "whatsNew.unreadBody": "읽지 않은 기사는 굵은 제목과 더 큰 점으로 눈에 띕니다. 읽은 기사는 흑백 이미지와 더 연한 글자로 한발 물러납니다.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "기사 사이의 선",
   "whatsNew.linesFixBody": "일부 휴대폰에서 저장됨과 피드의 기사 사이 가는 선이 군데군데 보이지 않았습니다. 이제 모두 보입니다.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "글 속에 남아 있던 코드",
   "whatsNew.codesFixBody": "일부 제목과 설명에 공백, 악센트 문자, 기호 대신 코드 조각이 보였습니다. 이제 제대로 읽힙니다.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "사이트의 피드 찾기",
+  "whatsNew.findFeedBody": "웹사이트 주소를 붙여 넣으면 이제 FeedWell이 사이트가 직접 알려 주는 피드 링크를 읽어, 훨씬 많은 사이트에서 피드를 찾습니다.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "새로고침되지 않던 피드",
+  "whatsNew.feedFixBody": "NASA의 피드 두 개처럼 작은 오류가 있는 일부 피드는 새로고침되지 않았습니다. 이제는 새로고침됩니다.",
 };

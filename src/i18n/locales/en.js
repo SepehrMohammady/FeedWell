@@ -696,16 +696,16 @@ export default {
   'feedFilter.clear': 'Clear filters',
   'feedFilter.noMatchTitle': 'No articles match',
   'feedFilter.noMatchBody': 'Try other choices, or clear the filters.',
-  'whatsNew.slideshowTitle': 'Widget slideshow',
-  'whatsNew.slideshowBody': 'Tap play on the home screen widget and it moves on to the next article by itself. In Settings, pick its speed and which articles it shows: all, unread or saved, from every feed or from one.',
-  'whatsNew.swipeBody': 'Swipe an article right or left to mark it read, save it, share it or remove it. Choose what each way does in Settings, under Feeds.',
-  'whatsNew.filterTitle': 'A finer filter',
-  'whatsNew.filterBody': 'The filter on Feeds now narrows the list by feed and by date, and to saved articles, ones with notes, starred feeds or pictures.',
-  'whatsNew.unreadBody': 'Unread articles stand out with a bold title and a bigger dot. Read ones step back, with black and white pictures and lighter text.',
   // 1.21.1: the lines between articles that went missing on some screens
   'whatsNew.linesFixTitle': 'Lines between articles',
   'whatsNew.linesFixBody': 'On some phones, a few of the thin lines between articles were missing in Saved and Feeds. They all show now.',
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   'whatsNew.codesFixTitle': 'Stray codes in text',
   'whatsNew.codesFixBody': 'Some titles and descriptions showed bits of code in place of a space, an accented letter or a symbol. They read normally now.',
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  'whatsNew.findFeedTitle': 'Finding a site\'s feed',
+  'whatsNew.findFeedBody': 'Paste a website address and FeedWell now finds its feed on many more sites, by reading the feed links the site lists.',
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  'whatsNew.feedFixTitle': 'Feeds that didn\'t refresh',
+  'whatsNew.feedFixBody': 'Some feeds with a small error in them, such as two from NASA, never refreshed. They do now.',
 };

@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Tyhjennä suodattimet",
   "feedFilter.noMatchTitle": "Ei osuvia artikkeleita",
   "feedFilter.noMatchBody": "Kokeile muita valintoja tai tyhjennä suodattimet.",
-  "whatsNew.slideshowTitle": "Diaesitys widgetissä",
-  "whatsNew.slideshowBody": "Napauta aloitusnäytön widgetissä toistoa, niin se siirtyy itse seuraavaan artikkeliin. Valitse Asetuksista sen nopeus ja mitä artikkeleita se näyttää: kaikki, lukemattomat tai tallennetut, kaikista syötteistä tai yhdestä.",
-  "whatsNew.swipeBody": "Pyyhkäise artikkelia oikealle tai vasemmalle, niin voit merkitä sen luetuksi, tallentaa, jakaa tai poistaa sen. Valitse kummankin suunnan toiminto Asetusten Syötteet-kohdasta.",
-  "whatsNew.filterTitle": "Tarkempi suodatin",
-  "whatsNew.filterBody": "Syötteiden suodatin rajaa nyt luettelon syötteen ja päivämäärän mukaan, ja voi näyttää vain tallennetut, muistiinpanolliset, tähdellä merkittyjen syötteiden tai kuvalliset artikkelit.",
-  "whatsNew.unreadBody": "Lukemattomat artikkelit erottuvat lihavoidulla otsikolla ja isommalla pisteellä. Luetut jäävät taka-alalle mustavalkoisin kuvin ja vaaleammalla tekstillä.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Viivat artikkelien välissä",
   "whatsNew.linesFixBody": "Joissakin puhelimissa osa artikkelien välisistä ohuista viivoista puuttui Tallennetuista ja Syötteistä. Nyt ne näkyvät kaikki.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Harhailevat koodit tekstissä",
   "whatsNew.codesFixBody": "Joissakin otsikoissa ja kuvauksissa näkyi koodinpätkiä välilyönnin, aksenttimerkillisen kirjaimen tai symbolin paikalla. Nyt ne näkyvät oikein.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Sivuston syötteen löytäminen",
+  "whatsNew.findFeedBody": "Liitä verkkosivun osoite, niin FeedWell löytää nyt syötteen paljon useammalta sivustolta, koska se lukee sivuston itse ilmoittamat syötelinkit.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Syötteet, jotka eivät päivittyneet",
+  "whatsNew.feedFixBody": "Jotkin syötteet, joissa on pieni virhe, kuten kaksi NASAn syötettä, eivät koskaan päivittyneet. Nyt ne päivittyvät.",
 };

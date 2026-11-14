@@ -640,16 +640,16 @@ export default {
   "feedFilter.clear": "清除筛选",
   "feedFilter.noMatchTitle": "没有符合的文章",
   "feedFilter.noMatchBody": "试试其他选项，或清除筛选。",
-  "whatsNew.slideshowTitle": "小组件幻灯片",
-  "whatsNew.slideshowBody": "在主屏幕小组件上点按播放，它会自动切换到下一篇文章。可在设置中选择速度，以及显示哪些文章：全部、未读或已保存，来自所有订阅源或其中一个。",
-  "whatsNew.swipeBody": "向右或向左滑动文章，即可将其标为已读、保存、分享或移除。可在设置的订阅源部分选择每个方向的操作。",
-  "whatsNew.filterTitle": "更精细的筛选",
-  "whatsNew.filterBody": "订阅源页面的筛选现在可按订阅源和日期缩小列表，还能只显示已保存、有笔记、来自星标订阅源或有图片的文章。",
-  "whatsNew.unreadBody": "未读文章以粗体标题和更大的圆点突出显示。已读文章则退居其次，显示黑白图片和较浅的文字。",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "文章之间的分隔线",
   "whatsNew.linesFixBody": "在部分手机上，已保存和订阅源中文章之间的个别细线没有显示。现在全部都能显示了。",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "文字中的多余代码",
   "whatsNew.codesFixBody": "部分标题和描述曾在空格、带重音的字母或符号的位置显示代码片段。现在已能正常阅读。",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "查找网站的订阅源",
+  "whatsNew.findFeedBody": "粘贴网站地址后，FeedWell 现在会读取网站自己列出的订阅源链接，因此能在多得多的网站上找到订阅源。",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "无法刷新的订阅源",
+  "whatsNew.feedFixBody": "部分订阅源带有小错误，例如 NASA 的两个订阅源，以前从未刷新成功。现在可以了。",
 };

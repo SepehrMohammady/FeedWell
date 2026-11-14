@@ -685,16 +685,16 @@ export default {
   "feedFilter.clear": "Hapus filter",
   "feedFilter.noMatchTitle": "Tidak ada artikel yang cocok",
   "feedFilter.noMatchBody": "Coba pilihan lain, atau hapus filter.",
-  "whatsNew.slideshowTitle": "Tayangan slide di widget",
-  "whatsNew.slideshowBody": "Ketuk putar di widget layar utama dan widget akan berpindah sendiri ke artikel berikutnya. Di Pengaturan, pilih kecepatannya dan artikel yang ditampilkan: semua, belum dibaca, atau tersimpan, dari semua feed atau satu feed.",
-  "whatsNew.swipeBody": "Geser artikel ke kanan atau ke kiri untuk menandainya sudah dibaca, menyimpan, membagikan, atau menghapusnya. Pilih fungsi tiap arah di Pengaturan, bagian Feed.",
-  "whatsNew.filterTitle": "Filter yang lebih rinci",
-  "whatsNew.filterBody": "Filter di Feed kini mempersempit daftar menurut feed dan tanggal, dan bisa menampilkan hanya artikel tersimpan, yang punya catatan, dari feed berbintang, atau yang bergambar.",
-  "whatsNew.unreadBody": "Artikel yang belum dibaca menonjol dengan judul tebal dan titik yang lebih besar. Yang sudah dibaca mundur ke belakang, dengan gambar hitam putih dan teks lebih terang.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Garis di antara artikel",
   "whatsNew.linesFixBody": "Di beberapa ponsel, sebagian garis tipis di antara artikel tidak tampil di Tersimpan dan Feed. Sekarang semuanya tampil.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Kode nyasar di teks",
   "whatsNew.codesFixBody": "Beberapa judul dan deskripsi menampilkan potongan kode di tempat spasi, huruf beraksen, atau simbol. Sekarang semuanya terbaca normal.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Menemukan feed situs",
+  "whatsNew.findFeedBody": "Tempel alamat situs web dan FeedWell kini menemukan feed-nya di jauh lebih banyak situs, dengan membaca tautan feed yang dicantumkan situs itu sendiri.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Feed yang tidak bisa disegarkan",
+  "whatsNew.feedFixBody": "Beberapa feed dengan kesalahan kecil, seperti dua dari NASA, tidak pernah bisa disegarkan. Sekarang sudah bisa.",
 };

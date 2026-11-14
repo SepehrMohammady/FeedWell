@@ -76,6 +76,10 @@ const navigationThemeFor = (colors) => {
 };
 const navigationRef = createNavigationContainerRef();
 let pendingDeepLinkUrl = null;
+// The link the app was launched with (a widget article) is handled once per
+// process: a restore, Reset Settings or Clear All Data remounts AppContent,
+// and must not open that article again.
+let launchLinkHandled = false;
 
 // Cleans the saved navigation state before restoring it. Up to 1.18.1, Back
 // from an article stacked a second list on top of it (List > Article > List),
@@ -271,7 +275,10 @@ function AppContent() {
   // Handle deep links from widget
   useEffect(() => {
     // Handle initial URL (app was launched from widget)
-    Linking.getInitialURL().then(handleDeepLink);
+    if (!launchLinkHandled) {
+      launchLinkHandled = true;
+      Linking.getInitialURL().then(handleDeepLink);
+    }
     // Handle URLs when app is already open
     const linkSub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
     return () => linkSub.remove();

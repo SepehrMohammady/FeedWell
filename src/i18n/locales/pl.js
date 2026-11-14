@@ -660,16 +660,16 @@ export default {
   "feedFilter.clear": "Wyczyść filtry",
   "feedFilter.noMatchTitle": "Brak pasujących artykułów",
   "feedFilter.noMatchBody": "Wybierz coś innego albo wyczyść filtry.",
-  "whatsNew.slideshowTitle": "Pokaz w widżecie",
-  "whatsNew.slideshowBody": "Dotknij odtwarzania w widżecie na ekranie głównym, a sam przejdzie do następnego artykułu. W Ustawieniach wybierz tempo i to, jakie artykuły pokazuje: wszystkie, nieprzeczytane lub zapisane, ze wszystkich kanałów albo z jednego.",
-  "whatsNew.swipeBody": "Przesuń artykuł w prawo lub w lewo, aby oznaczyć go jako przeczytany, zapisać, udostępnić lub usunąć. Co robi każdy kierunek, wybierzesz w Ustawieniach w sekcji Kanały.",
-  "whatsNew.filterTitle": "Dokładniejszy filtr",
-  "whatsNew.filterBody": "Filtr w Kanałach zawęża teraz listę według kanału i daty i może pokazać tylko zapisane artykuły, te z notatkami, z kanałów z gwiazdką albo z obrazami.",
-  "whatsNew.unreadBody": "Nieprzeczytane artykuły wyróżniają się pogrubionym tytułem i większą kropką. Przeczytane schodzą na dalszy plan, z czarno-białymi obrazami i jaśniejszym tekstem.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linie między artykułami",
   "whatsNew.linesFixBody": "Na niektórych telefonach w Zapisanych i w Kanałach brakowało części cienkich linii między artykułami. Teraz widać wszystkie.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Zabłąkane kody w tekście",
   "whatsNew.codesFixBody": "Niektóre tytuły i opisy pokazywały fragmenty kodu zamiast spacji, litery z akcentem lub symbolu. Teraz czyta się je normalnie.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Znajdowanie kanału strony",
+  "whatsNew.findFeedBody": "Wklej adres strony, a FeedWell znajdzie teraz jej kanał na znacznie większej liczbie stron, bo odczytuje linki do kanałów, które podaje sama strona.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Kanały, które się nie odświeżały",
+  "whatsNew.feedFixBody": "Niektóre kanały z drobnym błędem, na przykład dwa od NASA, nigdy się nie odświeżały. Teraz już tak.",
 };

@@ -685,16 +685,16 @@ export default {
   "feedFilter.clear": "フィルターをクリア",
   "feedFilter.noMatchTitle": "一致する記事はありません",
   "feedFilter.noMatchBody": "ほかの条件を選ぶか、フィルターをクリアしてください。",
-  "whatsNew.slideshowTitle": "ウィジェットのスライドショー",
-  "whatsNew.slideshowBody": "ホーム画面ウィジェットで再生をタップすると、次の記事へ自動で進みます。設定で速さと表示する記事を選べます。すべて、未読、保存済みの中から、すべてのフィードまたは1つのフィードを選べます。",
-  "whatsNew.swipeBody": "記事を右か左にスワイプして、既読にする、保存する、共有する、削除することができます。それぞれの方向の動作は、設定の「フィード」で選べます。",
-  "whatsNew.filterTitle": "より細かいフィルター",
-  "whatsNew.filterBody": "フィードのフィルターで、フィードと日付でリストを絞り込めるようになりました。保存済み、メモあり、スター付きフィード、画像ありの記事だけを表示することもできます。",
-  "whatsNew.unreadBody": "未読の記事は太字のタイトルと大きめの点で目立ちます。既読の記事は白黒の画像と薄い文字で控えめに表示されます。",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "記事の間の線",
   "whatsNew.linesFixBody": "一部の端末で、保存済みとフィードの記事の間の細い線がところどころ表示されていませんでした。すべて表示されるようになりました。",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "テキストに残っていたコード",
   "whatsNew.codesFixBody": "一部のタイトルや説明で、スペース、アクセント付きの文字、記号の代わりにコードの断片が表示されていました。正しく読めるようになりました。",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "サイトのフィードを探す",
+  "whatsNew.findFeedBody": "サイトのアドレスを貼り付けると、FeedWell はサイト自身が示すフィードのリンクを読むようになり、ずっと多くのサイトでフィードを見つけられるようになりました。",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "更新されなかったフィード",
+  "whatsNew.feedFixBody": "NASA の 2 つのフィードなど、小さな誤りがある一部のフィードは一度も更新されませんでした。今は更新されます。",
 };

@@ -703,16 +703,16 @@ export default {
   "feedFilter.clear": "Șterge filtrele",
   "feedFilter.noMatchTitle": "Niciun articol nu se potrivește",
   "feedFilter.noMatchBody": "Încearcă alte opțiuni sau șterge filtrele.",
-  "whatsNew.slideshowTitle": "Prezentare în widget",
-  "whatsNew.slideshowBody": "Atinge redarea în widgetul de pe ecranul principal și trece singur la articolul următor. În Setări alegi viteza și ce articole arată: toate, necitite sau salvate, din toate fluxurile sau dintr-unul.",
-  "whatsNew.swipeBody": "Glisează un articol la dreapta sau la stânga ca să-l marchezi ca citit, să-l salvezi, să-l partajezi sau să-l elimini. Alegi ce face fiecare direcție în Setări, la Fluxuri.",
-  "whatsNew.filterTitle": "Un filtru mai fin",
-  "whatsNew.filterBody": "Filtrul din Fluxuri restrânge acum lista după flux și după dată și poate arăta doar articolele salvate, cele cu notițe, din fluxuri cu stea sau cu imagini.",
-  "whatsNew.unreadBody": "Articolele necitite ies în evidență cu titlul îngroșat și un punct mai mare. Cele citite trec în plan secund, cu imagini alb-negru și text mai deschis.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Liniile dintre articole",
   "whatsNew.linesFixBody": "Pe unele telefoane lipseau câteva dintre liniile subțiri dintre articole în Salvate și în Fluxuri. Acum se văd toate.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Coduri rătăcite în text",
   "whatsNew.codesFixBody": "Unele titluri și descrieri arătau bucăți de cod în locul unui spațiu, al unei litere cu accent sau al unui simbol. Acum se citesc normal.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Găsirea fluxului unui site",
+  "whatsNew.findFeedBody": "Lipește adresa unui site, iar FeedWell găsește acum fluxul pe mult mai multe site-uri, citind linkurile de flux pe care le indică site-ul însuși.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Fluxuri care nu se actualizau",
+  "whatsNew.feedFixBody": "Unele fluxuri cu o mică eroare, cum ar fi două de la NASA, nu se actualizau niciodată. Acum se actualizează.",
 };

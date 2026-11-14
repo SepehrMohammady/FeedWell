@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Effacer les filtres",
   "feedFilter.noMatchTitle": "Aucun article ne correspond",
   "feedFilter.noMatchBody": "Essayez d'autres choix, ou effacez les filtres.",
-  "whatsNew.slideshowTitle": "Diaporama du widget",
-  "whatsNew.slideshowBody": "Touchez lecture sur le widget d'écran d'accueil et il passe tout seul à l'article suivant. Dans Réglages, choisissez sa vitesse et les articles qu'il affiche : tous, non lus ou enregistrés, de tous les flux ou d'un seul.",
-  "whatsNew.swipeBody": "Balayez un article vers la droite ou la gauche pour le marquer comme lu, l'enregistrer, le partager ou le retirer. Choisissez l'effet de chaque sens dans Réglages, sous Flux.",
-  "whatsNew.filterTitle": "Un filtre plus fin",
-  "whatsNew.filterBody": "Le filtre de Flux restreint désormais la liste par flux et par date, et peut n'afficher que les articles enregistrés, ceux avec des notes, ceux des flux étoilés ou ceux avec images.",
-  "whatsNew.unreadBody": "Les articles non lus ressortent avec un titre en gras et un point plus grand. Les articles lus s'effacent, avec des images en noir et blanc et un texte plus clair.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Lignes entre les articles",
   "whatsNew.linesFixBody": "Sur certains téléphones, quelques fines lignes entre les articles manquaient dans Enregistrés et dans Flux. Elles s'affichent toutes désormais.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Codes égarés dans le texte",
   "whatsNew.codesFixBody": "Certains titres et descriptions affichaient des bouts de code à la place d'un espace, d'une lettre accentuée ou d'un symbole. Ils se lisent normalement désormais.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Trouver le flux d'un site",
+  "whatsNew.findFeedBody": "Collez l'adresse d'un site et FeedWell trouve désormais son flux sur bien plus de sites, en lisant les liens de flux que le site indique lui-même.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Des flux qui ne s'actualisaient pas",
+  "whatsNew.feedFixBody": "Certains flux comportant une petite erreur, comme deux flux de la NASA, ne s'actualisaient jamais. Ils s'actualisent désormais.",
 };

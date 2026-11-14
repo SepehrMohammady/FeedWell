@@ -649,16 +649,16 @@ export default {
   "feedFilter.clear": "Cancella i filtri",
   "feedFilter.noMatchTitle": "Nessun articolo corrisponde",
   "feedFilter.noMatchBody": "Prova altre scelte o cancella i filtri.",
-  "whatsNew.slideshowTitle": "Presentazione nel widget",
-  "whatsNew.slideshowBody": "Tocca play nel widget per la schermata Home e passerà da solo all'articolo successivo. In Impostazioni scegli la velocità e quali articoli mostra: tutti, da leggere o salvati, da tutti i feed o da uno solo.",
-  "whatsNew.swipeBody": "Scorri un articolo a destra o a sinistra per segnarlo come letto, salvarlo, condividerlo o rimuoverlo. Scegli cosa fa ogni direzione in Impostazioni, sotto Feed.",
-  "whatsNew.filterTitle": "Un filtro più preciso",
-  "whatsNew.filterBody": "Il filtro di Feed ora restringe l'elenco per feed e per data, e può mostrare solo gli articoli salvati, quelli con appunti, quelli dei feed con stella o quelli con immagini.",
-  "whatsNew.unreadBody": "Gli articoli da leggere risaltano con il titolo in grassetto e un punto più grande. Quelli letti passano in secondo piano, con immagini in bianco e nero e testo più chiaro.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linee tra gli articoli",
   "whatsNew.linesFixBody": "Su alcuni telefoni mancavano alcune delle linee sottili tra gli articoli in Salvati e in Feed. Ora si vedono tutte.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Codici vaganti nel testo",
   "whatsNew.codesFixBody": "Alcuni titoli e descrizioni mostravano pezzi di codice al posto di uno spazio, di una lettera accentata o di un simbolo. Ora si leggono normalmente.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Trovare il feed di un sito",
+  "whatsNew.findFeedBody": "Incolla l'indirizzo di un sito e FeedWell ora ne trova il feed su molti più siti, leggendo i link ai feed indicati dal sito stesso.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Feed che non si aggiornavano",
+  "whatsNew.feedFixBody": "Alcuni feed con un piccolo errore, come due della NASA, non si aggiornavano mai. Ora sì.",
 };

@@ -669,16 +669,16 @@ export default {
   "feedFilter.clear": "फ़िल्टर साफ़ करें",
   "feedFilter.noMatchTitle": "कोई लेख मेल नहीं खाता",
   "feedFilter.noMatchBody": "दूसरे विकल्प आज़माएँ, या फ़िल्टर साफ़ करें।",
-  "whatsNew.slideshowTitle": "विजेट स्लाइडशो",
-  "whatsNew.slideshowBody": "होम स्क्रीन विजेट पर चलाएँ टैप करें, और यह अपने आप अगले लेख पर जाता है। सेटिंग्स में इसकी गति चुनें और यह भी कि यह कौन-से लेख दिखाए: सभी, अपठित या सहेजे गए, सभी फ़ीड्स से या किसी एक से।",
-  "whatsNew.swipeBody": "किसी लेख को दाएँ या बाएँ स्वाइप करके उसे पढ़ा हुआ चिह्नित करें, सहेजें, साझा करें या हटाएँ। हर दिशा क्या करे, यह सेटिंग्स में फ़ीड्स के अंतर्गत चुनें।",
-  "whatsNew.filterTitle": "ज़्यादा बारीक फ़िल्टर",
-  "whatsNew.filterBody": "फ़ीड्स का फ़िल्टर अब सूची को फ़ीड और तारीख से छोटा करता है, और सिर्फ़ सहेजे गए लेख, नोट्स वाले, तारांकित फ़ीड्स के या चित्रों वाले लेख दिखा सकता है।",
-  "whatsNew.unreadBody": "अपठित लेख बोल्ड शीर्षक और बड़े बिंदु से अलग दिखते हैं। पढ़े हुए लेख श्वेत-श्याम चित्रों और हल्के टेक्स्ट के साथ पीछे रहते हैं।",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "लेखों के बीच की रेखाएँ",
   "whatsNew.linesFixBody": "कुछ फ़ोन पर सहेजे गए और फ़ीड्स में लेखों के बीच की कुछ पतली रेखाएँ नहीं दिखती थीं। अब सभी दिखती हैं।",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "टेक्स्ट में भटके हुए कोड",
   "whatsNew.codesFixBody": "कुछ शीर्षकों और विवरणों में स्पेस, चिह्न वाले अक्षर या प्रतीक की जगह कोड के टुकड़े दिखते थे। अब वे सामान्य रूप से पढ़े जाते हैं।",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "साइट का फ़ीड ढूँढ़ना",
+  "whatsNew.findFeedBody": "किसी वेबसाइट का पता पेस्ट करें, और FeedWell अब कहीं ज़्यादा साइटों पर उसका फ़ीड ढूँढ़ लेता है, क्योंकि वह साइट के अपने बताए फ़ीड लिंक पढ़ता है।",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "फ़ीड जो ताज़ा नहीं होते थे",
+  "whatsNew.feedFixBody": "छोटी-सी गड़बड़ी वाले कुछ फ़ीड, जैसे NASA के दो फ़ीड, कभी ताज़ा नहीं होते थे। अब होते हैं।",
 };

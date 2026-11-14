@@ -724,16 +724,16 @@ export default {
   "feedFilter.clear": "مسح عوامل التصفية",
   "feedFilter.noMatchTitle": "لا توجد مقالات مطابقة",
   "feedFilter.noMatchBody": "جرّب خيارات أخرى، أو امسح عوامل التصفية.",
-  "whatsNew.slideshowTitle": "عرض متتابع في الأداة",
-  "whatsNew.slideshowBody": "اضغط تشغيل في أداة الشاشة الرئيسية لتنتقل وحدها إلى المقالة التالية. اختر في الإعدادات سرعتها والمقالات التي تعرضها: كلها أو غير المقروءة أو المحفوظة، من كل الخلاصات أو من خلاصة واحدة.",
-  "whatsNew.swipeBody": "اسحب المقالة لليمين أو لليسار لتعليمها كمقروءة أو حفظها أو مشاركتها أو إزالتها. اختر ما يفعله كل اتجاه في الإعدادات، ضمن الخلاصات.",
-  "whatsNew.filterTitle": "تصفية أدق",
-  "whatsNew.filterBody": "صارت التصفية في الخلاصات تضيّق القائمة حسب الخلاصة والتاريخ، ويمكنها أن تعرض فقط المقالات المحفوظة أو التي فيها ملاحظات أو التي من خلاصات مميزة بنجمة أو التي فيها صور.",
-  "whatsNew.unreadBody": "تبرز المقالات غير المقروءة بعنوان عريض ونقطة أكبر. وتتراجع المقروءة بصور بالأبيض والأسود ونص أفتح.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "الخطوط بين المقالات",
   "whatsNew.linesFixBody": "في بعض الهواتف، كانت بعض الخطوط الرفيعة بين المقالات لا تظهر في المحفوظات والخلاصات. تظهر الآن كلها.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "رموز زائدة في النص",
   "whatsNew.codesFixBody": "كانت بعض العناوين والأوصاف تعرض أجزاء من رموز برمجية بدل مسافة أو حرف خاص أو علامة. صارت الآن تُقرأ بشكل طبيعي.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "العثور على خلاصة الموقع",
+  "whatsNew.findFeedBody": "الصق عنوان موقع، وسيجد FeedWell الآن خلاصته في مواقع أكثر بكثير، لأنه يقرأ روابط الخلاصات التي يذكرها الموقع نفسه.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "خلاصات تعذّر تحديثها",
+  "whatsNew.feedFixBody": "بعض الخلاصات التي فيها خطأ بسيط، مثل خلاصتين من ناسا، لم يكن تحديثها ينجح أبدًا. صار ينجح الآن.",
 };

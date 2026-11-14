@@ -685,16 +685,16 @@ export default {
   "feedFilter.clear": "Xóa bộ lọc",
   "feedFilter.noMatchTitle": "Không có bài nào khớp",
   "feedFilter.noMatchBody": "Hãy thử lựa chọn khác, hoặc xóa bộ lọc.",
-  "whatsNew.slideshowTitle": "Trình chiếu trên tiện ích",
-  "whatsNew.slideshowBody": "Nhấn phát trên tiện ích màn hình chính và tiện ích sẽ tự chuyển sang bài tiếp theo. Trong Cài đặt, hãy chọn tốc độ và những bài sẽ hiển thị: tất cả, chưa đọc hoặc đã lưu, từ mọi nguồn cấp hoặc một nguồn.",
-  "whatsNew.swipeBody": "Vuốt một bài sang phải hoặc trái để đánh dấu đã đọc, lưu, chia sẻ hoặc gỡ bài. Chọn việc mỗi hướng làm trong Cài đặt, mục Nguồn cấp.",
-  "whatsNew.filterTitle": "Bộ lọc chi tiết hơn",
-  "whatsNew.filterBody": "Bộ lọc ở Nguồn cấp giờ thu hẹp danh sách theo nguồn cấp và ngày, và có thể chỉ hiện bài đã lưu, bài có ghi chú, bài từ nguồn cấp gắn sao hoặc bài có hình ảnh.",
-  "whatsNew.unreadBody": "Bài chưa đọc nổi bật với tiêu đề in đậm và chấm lớn hơn. Bài đã đọc lùi lại phía sau, với ảnh đen trắng và chữ nhạt hơn.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Đường kẻ giữa các bài",
   "whatsNew.linesFixBody": "Trên một số điện thoại, vài đường kẻ mảnh giữa các bài không hiện trong Đã lưu và Nguồn cấp. Giờ tất cả đều hiện.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Mã lạc trong văn bản",
   "whatsNew.codesFixBody": "Một số tiêu đề và mô tả hiện các đoạn mã thay cho dấu cách, chữ có dấu hoặc ký hiệu. Giờ chúng đã đọc được bình thường.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Tìm nguồn cấp của trang",
+  "whatsNew.findFeedBody": "Dán địa chỉ một trang web và giờ FeedWell tìm được nguồn cấp ở nhiều trang hơn hẳn, nhờ đọc các liên kết nguồn cấp mà chính trang đó khai báo.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Nguồn cấp không làm mới được",
+  "whatsNew.feedFixBody": "Một số nguồn cấp có lỗi nhỏ, như hai nguồn của NASA, chưa bao giờ làm mới được. Giờ thì đã được.",
 };

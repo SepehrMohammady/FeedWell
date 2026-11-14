@@ -1,4 +1,7 @@
 import { parse } from 'react-native-rss-parser';
+import * as rssV2Reader from 'react-native-rss-parser/parsers/rssv2';
+import * as atomV1Reader from 'react-native-rss-parser/parsers/atomv1';
+import { DOMParser } from 'xmldom';
 import { decodeHtmlEntities } from './htmlEntities';
 
 // Feed dates arrive as raw strings in many formats. Hermes' Date parser is far
@@ -820,6 +823,45 @@ function isLowQualityContent(text) {
   return lowQualityIndicators.some(pattern => pattern.test(text.trim()));
 }
 
+// react-native-rss-parser gives up on a feed at the first remark of its XML
+// reader, even a warning the reader itself gets past: NASA's feeds lack a space
+// between two attributes ("attribute space is required") and never refreshed.
+// A feed the library refuses that way is read once more with the same reader
+// (xmldom) and the library's own RSS and Atom readers, passing over warnings
+// and errors; a fatal error, or no feed in the page, still fails it.
+function readFeedTolerantly(xml) {
+  let fatal = false;
+  const document = new DOMParser({
+    errorHandler: {
+      warning: () => {},
+      error: () => {},
+      fatalError: () => { fatal = true; },
+    },
+  }).parseFromString(xml, 'text/xml');
+  if (fatal || !document) return null;
+  if (document.getElementsByTagName('channel')[0] !== undefined) return rssV2Reader.parse(document);
+  if (document.getElementsByTagName('feed')[0] !== undefined) return atomV1Reader.parse(document);
+  return null;
+}
+
+export async function parseFeedXml(xml) {
+  try {
+    return await parse(xml);
+  } catch (strictError) {
+    // The library rejects with the XML reader's message, a string
+    if (typeof strictError !== 'string' || !strictError.startsWith('[xmldom')) throw strictError;
+    let feed = null;
+    try {
+      feed = readFeedTolerantly(xml);
+    } catch (e) {
+      // The library's message says more
+    }
+    if (!feed) throw strictError;
+    console.log('Feed read past XML slips:', strictError.split('\n')[0]);
+    return feed;
+  }
+}
+
 // Parse RSS feed and clean articles
 // maxArticleAge: max age in months (0 = no limit)
 export async function parseRSSFeed(url, maxArticleAge = 0) {
@@ -868,7 +910,7 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
           }
           
           // Successfully got content, parse it
-          const feed = await parse(responseText);
+          const feed = await parseFeedXml(responseText);
           
           // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
           // The parser doesn't handle media:content/media:thumbnail
@@ -958,8 +1000,8 @@ export async function parseRSSFeed(url, maxArticleAge = 0) {
       }
     }
     
-    const feed = await parse(responseText);
-    
+    const feed = await parseFeedXml(responseText);
+
     // CRITICAL FIX v1.0.28: Extract media URLs from raw XML
     // The parser doesn't handle media:content/media:thumbnail
     const media = extractMediaUrlsFromXml(responseText);
@@ -1219,13 +1261,16 @@ export async function discoverFeedUrl(siteUrl) {
   const candidates = [];
 
   // 2. <link rel="alternate" type="application/rss+xml" href="..."> in the HTML.
+  // (Until 1.21.2 these patterns had lost their backslashes, so no tag ever
+  // matched and only the conventional paths below were tried.)
   if (pageHtml) {
-    const linkTags = pageHtml.match(/<link[^>]*>/gi) || [];
+    const linkTags = pageHtml.match(/<link\b[^>]*>/gi) || [];
     for (const tag of linkTags) {
-      if (!/rels*=s*["']?[^"'>]*alternate/i.test(tag)) continue;
-      if (!/types*=s*["']?application/(rss|atom)+xml/i.test(tag)) continue;
-      const href = tag.match(/hrefs*=s*["']([^"']+)["']/i);
-      if (href && href[1]) candidates.push(href[1]);
+      if (!/\brel\s*=\s*["']?[^"'>]*\balternate\b/i.test(tag)) continue;
+      if (!/\btype\s*=\s*["']?application\/(rss|atom)\+xml/i.test(tag)) continue;
+      const href = tag.match(/\bhref\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s"'>]+))/i);
+      const link = href && decodeHtmlEntities(href[1] || href[2] || href[3]).trim();
+      if (link) candidates.push(link);
     }
   }
 

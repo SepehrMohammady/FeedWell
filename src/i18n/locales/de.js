@@ -694,16 +694,16 @@ export default {
   "feedFilter.clear": "Filter löschen",
   "feedFilter.noMatchTitle": "Keine passenden Artikel",
   "feedFilter.noMatchBody": "Wählen Sie etwas anderes oder löschen Sie die Filter.",
-  "whatsNew.slideshowTitle": "Diashow im Widget",
-  "whatsNew.slideshowBody": "Tippen Sie im Startbildschirm-Widget auf Abspielen, dann geht es von selbst zum nächsten Artikel weiter. In den Einstellungen wählen Sie das Tempo und welche Artikel es zeigt: alle, ungelesene oder gespeicherte, aus allen Feeds oder aus einem.",
-  "whatsNew.swipeBody": "Wischen Sie einen Artikel nach rechts oder links, um ihn als gelesen zu markieren, zu speichern, zu teilen oder zu entfernen. Was jede Richtung tut, legen Sie in den Einstellungen unter Feeds fest.",
-  "whatsNew.filterTitle": "Ein genauerer Filter",
-  "whatsNew.filterBody": "Der Filter unter Feeds grenzt die Liste jetzt nach Feed und Datum ein und zeigt auf Wunsch nur gespeicherte Artikel, solche mit Notizen, aus Feeds mit Stern oder mit Bildern.",
-  "whatsNew.unreadBody": "Ungelesene Artikel fallen mit fettem Titel und größerem Punkt auf. Gelesene treten zurück, mit schwarz-weißen Bildern und hellerer Schrift.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Linien zwischen Artikeln",
   "whatsNew.linesFixBody": "Auf manchen Geräten fehlten in Gespeichert und Feeds einige der dünnen Linien zwischen den Artikeln. Jetzt sind alle zu sehen.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Verirrte Codes im Text",
   "whatsNew.codesFixBody": "Manche Titel und Beschreibungen zeigten Codeschnipsel statt eines Leerzeichens, eines Buchstabens mit Akzent oder eines Symbols. Jetzt lesen sie sich normal.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Den Feed einer Website finden",
+  "whatsNew.findFeedBody": "Fügen Sie eine Website-Adresse ein, und FeedWell findet den Feed jetzt auf viel mehr Websites, weil es die Feed-Links liest, die die Website selbst angibt.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Feeds, die sich nicht aktualisierten",
+  "whatsNew.feedFixBody": "Manche Feeds mit einem kleinen Fehler, etwa zwei von der NASA, wurden nie aktualisiert. Jetzt klappt es.",
 };

@@ -670,16 +670,16 @@ export default {
   "feedFilter.clear": "Borrar filtros",
   "feedFilter.noMatchTitle": "Ningún artículo coincide",
   "feedFilter.noMatchBody": "Prueba otras opciones o borra los filtros.",
-  "whatsNew.slideshowTitle": "Presentación en el widget",
-  "whatsNew.slideshowBody": "Toca reproducir en el widget de pantalla de inicio y pasará solo al siguiente artículo. En Ajustes, elige su velocidad y qué artículos muestra: todos, sin leer o guardados, de todas las fuentes o de una.",
-  "whatsNew.swipeBody": "Desliza un artículo a la derecha o a la izquierda para marcarlo como leído, guardarlo, compartirlo o quitarlo. Elige qué hace cada lado en Ajustes, en Fuentes.",
-  "whatsNew.filterTitle": "Un filtro más preciso",
-  "whatsNew.filterBody": "El filtro de Fuentes ahora acota la lista por fuente y por fecha, y puede mostrar solo los artículos guardados, los que tienen notas, los de fuentes con estrella o los que tienen imágenes.",
-  "whatsNew.unreadBody": "Los artículos sin leer destacan con un título en negrita y un punto más grande. Los leídos pasan a segundo plano, con imágenes en blanco y negro y texto más claro.",
   // 1.21.1: the lines between articles that went missing on some screens
   "whatsNew.linesFixTitle": "Líneas entre artículos",
   "whatsNew.linesFixBody": "En algunos teléfonos faltaban algunas de las líneas finas entre artículos en Guardados y en Fuentes. Ahora se ven todas.",
   // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
   "whatsNew.codesFixTitle": "Códigos sueltos en el texto",
   "whatsNew.codesFixBody": "Algunos títulos y descripciones mostraban trozos de código en lugar de un espacio, una letra acentuada o un símbolo. Ahora se leen con normalidad.",
+  // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
+  "whatsNew.findFeedTitle": "Encontrar la fuente de un sitio",
+  "whatsNew.findFeedBody": "Pega la dirección de una web y FeedWell ahora encuentra su fuente en muchos más sitios, porque lee los enlaces a fuentes que indica el propio sitio.",
+  // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
+  "whatsNew.feedFixTitle": "Fuentes que no se actualizaban",
+  "whatsNew.feedFixBody": "Algunas fuentes con un pequeño error, como dos de la NASA, nunca se actualizaban. Ahora sí.",
 };
