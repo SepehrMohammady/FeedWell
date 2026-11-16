@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "インターネットなしで記事を翻訳できるように、{language}のオフライン翻訳モデルをダウンロードしますか？",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "読書の時間です！📖",
+  "notif.title": "読書の時間です",
   "notif.body": "毎日の読書の時間になりました。FeedWell を開いてフィードをチェックしましょう。",
   "notif.channelName": "読書リマインダー",
 
@@ -685,16 +685,19 @@ export default {
   "feedFilter.clear": "フィルターをクリア",
   "feedFilter.noMatchTitle": "一致する記事はありません",
   "feedFilter.noMatchBody": "ほかの条件を選ぶか、フィルターをクリアしてください。",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "記事の間の線",
-  "whatsNew.linesFixBody": "一部の端末で、保存済みとフィードの記事の間の細い線がところどころ表示されていませんでした。すべて表示されるようになりました。",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "テキストに残っていたコード",
-  "whatsNew.codesFixBody": "一部のタイトルや説明で、スペース、アクセント付きの文字、記号の代わりにコードの断片が表示されていました。正しく読めるようになりました。",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "サイトのフィードを探す",
   "whatsNew.findFeedBody": "サイトのアドレスを貼り付けると、FeedWell はサイト自身が示すフィードのリンクを読むようになり、ずっと多くのサイトでフィードを見つけられるようになりました。",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "更新されなかったフィード",
   "whatsNew.feedFixBody": "NASA の 2 つのフィードなど、小さな誤りがある一部のフィードは一度も更新されませんでした。今は更新されます。",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "短いアドレス",
+  "whatsNew.shortAddressBody": "サイトのアドレスは https:// を付けずに入力できます。npr.org のように入力すると、FeedWell が補います。",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Google のコードを削減",
+  "whatsNew.lessGoogleBody": "FeedWell が通知に使うコードには、Google のプッシュ通知の一部が含まれていました。FeedWell では一度も使っておらず、今回取り除きました。読書リマインダーはこれまでどおり動作します。",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "リマインダーは1回だけ",
+  "whatsNew.oneReminderBody": "読書リマインダーが2回届くことがありました。今は1回だけ届きます。",
 };

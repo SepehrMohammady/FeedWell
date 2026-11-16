@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "인터넷 없이도 기사를 번역할 수 있도록 {language} 오프라인 번역 모델을 다운로드할까요?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "읽을 시간이에요! 📖",
+  "notif.title": "읽을 시간이에요",
   "notif.body": "오늘의 독서 시간입니다. FeedWell을 열고 피드를 확인해 보세요.",
   "notif.channelName": "독서 알림",
 
@@ -685,16 +685,19 @@ export default {
   "feedFilter.clear": "필터 지우기",
   "feedFilter.noMatchTitle": "맞는 기사가 없습니다",
   "feedFilter.noMatchBody": "다른 항목을 고르거나 필터를 지우세요.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "기사 사이의 선",
-  "whatsNew.linesFixBody": "일부 휴대폰에서 저장됨과 피드의 기사 사이 가는 선이 군데군데 보이지 않았습니다. 이제 모두 보입니다.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "글 속에 남아 있던 코드",
-  "whatsNew.codesFixBody": "일부 제목과 설명에 공백, 악센트 문자, 기호 대신 코드 조각이 보였습니다. 이제 제대로 읽힙니다.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "사이트의 피드 찾기",
   "whatsNew.findFeedBody": "웹사이트 주소를 붙여 넣으면 이제 FeedWell이 사이트가 직접 알려 주는 피드 링크를 읽어, 훨씬 많은 사이트에서 피드를 찾습니다.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "새로고침되지 않던 피드",
   "whatsNew.feedFixBody": "NASA의 피드 두 개처럼 작은 오류가 있는 일부 피드는 새로고침되지 않았습니다. 이제는 새로고침됩니다.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "더 짧은 주소",
+  "whatsNew.shortAddressBody": "사이트 주소를 https:// 없이 npr.org처럼 입력해도 FeedWell이 알아서 붙여 줍니다.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Google 코드 줄이기",
+  "whatsNew.lessGoogleBody": "FeedWell이 알림에 쓰는 코드에는 Google 푸시 메시지의 일부가 함께 들어 있었습니다. FeedWell은 이를 한 번도 쓰지 않았고, 이제 모두 빠졌습니다. 독서 알림은 전과 같이 작동합니다.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "알림은 한 번만",
+  "whatsNew.oneReminderBody": "독서 알림이 두 번 올 때가 있었습니다. 이제는 한 번만 옵니다.",
 };

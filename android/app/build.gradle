@@ -201,6 +201,38 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // ML Kit's helper libraries stay at the versions FeedWell shipped up to
+    // 1.21.2. Firebase Cloud Messaging used to raise them; without it (below)
+    // they would fall back to the older minimums ML Kit declares.
+    constraints {
+        implementation("com.google.android.datatransport:transport-api:3.1.0")
+        implementation("com.google.android.datatransport:transport-runtime:3.1.9")
+        implementation("com.google.android.datatransport:transport-backend-cct:3.1.9")
+        implementation("com.google.firebase:firebase-components:18.0.0")
+        implementation("com.google.firebase:firebase-encoders:17.0.0")
+        implementation("com.google.firebase:firebase-encoders-json:18.0.0")
+    }
+}
+
+// expo-notifications brings Firebase Cloud Messaging for push messages, which
+// FeedWell never uses: it only schedules local reminders. Google Play's SDK
+// index counts firebase-installations as collecting device IDs, so the push
+// modules stay out of the app. ML Kit (offline translation and language
+// detection) needs firebase-components, the firebase-encoders, the
+// datatransport modules and Play services' base, basement and tasks, so those
+// stay in.
+configurations.all {
+    exclude group: 'com.google.firebase', module: 'firebase-messaging'
+    exclude group: 'com.google.firebase', module: 'firebase-installations'
+    exclude group: 'com.google.firebase', module: 'firebase-installations-interop'
+    exclude group: 'com.google.firebase', module: 'firebase-iid-interop'
+    exclude group: 'com.google.firebase', module: 'firebase-measurement-connector'
+    exclude group: 'com.google.firebase', module: 'firebase-datatransport'
+    exclude group: 'com.google.firebase', module: 'firebase-common'
+    exclude group: 'com.google.firebase', module: 'firebase-common-ktx'
+    exclude group: 'com.google.android.gms', module: 'play-services-cloud-messaging'
+    exclude group: 'com.google.android.gms', module: 'play-services-stats'
 }
 
 def stripExpoSensorsActivityRecognition = tasks.register("stripExpoSensorsActivityRecognition") {

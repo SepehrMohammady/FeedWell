@@ -4,17 +4,18 @@
 // locale (titles may reuse existing keys, such as the Settings row names).
 export const WHATS_NEW_RELEASES = [
   {
+    version: '1.21.3',
+    items: [
+      { icon: 'link', title: 'whatsNew.shortAddressTitle', body: 'whatsNew.shortAddressBody' },
+      { icon: 'shield-checkmark', title: 'whatsNew.lessGoogleTitle', body: 'whatsNew.lessGoogleBody' },
+      { icon: 'notifications', title: 'whatsNew.oneReminderTitle', body: 'whatsNew.oneReminderBody' },
+    ],
+  },
+  {
     version: '1.21.2',
     items: [
       { icon: 'search', title: 'whatsNew.findFeedTitle', body: 'whatsNew.findFeedBody' },
       { icon: 'refresh', title: 'whatsNew.feedFixTitle', body: 'whatsNew.feedFixBody' },
-    ],
-  },
-  {
-    version: '1.21.1',
-    items: [
-      { icon: 'reorder-two', title: 'whatsNew.linesFixTitle', body: 'whatsNew.linesFixBody' },
-      { icon: 'code-slash', title: 'whatsNew.codesFixTitle', body: 'whatsNew.codesFixBody' },
     ],
   },
 ];

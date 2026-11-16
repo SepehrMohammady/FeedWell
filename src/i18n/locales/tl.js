@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "I-download ang offline na translation model para sa {language} para makapagsalin ka ng mga artikulo nang walang internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Oras na para Magbasa! 📖",
+  "notif.title": "Oras na para magbasa",
   "notif.body": "Nandito na ang araw-araw mong oras ng pagbabasa. Buksan ang FeedWell at makahabol sa mga bago sa iyong mga feed.",
   "notif.channelName": "Paalala sa Pagbabasa",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "I-clear ang mga filter",
   "feedFilter.noMatchTitle": "Walang tugmang artikulo",
   "feedFilter.noMatchBody": "Sumubok ng ibang pagpipilian, o i-clear ang mga filter.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Mga linya sa pagitan ng mga artikulo",
-  "whatsNew.linesFixBody": "Sa ilang telepono, nawawala ang ilan sa maninipis na linya sa pagitan ng mga artikulo sa Naka-save at Mga Feed. Lumalabas na ngayon ang lahat.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Mga ligaw na code sa text",
-  "whatsNew.codesFixBody": "May mga pamagat at paglalarawan na nagpakita ng mga piraso ng code kapalit ng espasyo, titik na may tuldik o simbolo. Normal na ang basa sa mga ito ngayon.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Paghahanap ng feed ng site",
   "whatsNew.findFeedBody": "Mag-paste ng address ng website at mahahanap na ng FeedWell ang feed nito sa mas maraming site, dahil binabasa na nito ang mga link ng feed na inililista mismo ng site.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Mga feed na hindi nare-refresh",
   "whatsNew.feedFixBody": "Hindi kailanman na-refresh ang ilang feed na may maliit na mali, gaya ng dalawa mula sa NASA. Nare-refresh na ang mga ito ngayon.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Mas maiikling address",
+  "whatsNew.shortAddressBody": "I-type ang address ng site nang walang https://, gaya ng npr.org, at idadagdag ito ng FeedWell para sa iyo.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Mas kaunting code ng Google",
+  "whatsNew.lessGoogleBody": "May kasamang bahagi ng push messaging ng Google ang code na ginagamit ng FeedWell para sa mga notification. Hindi ito kailanman ginamit ng FeedWell, at tinanggal na ito ngayon. Gumagana pa rin ang Paalala sa Pagbabasa gaya ng dati.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Isang paalala lang",
+  "whatsNew.oneReminderBody": "Maaaring dumating nang dalawang beses ang Paalala sa Pagbabasa. Isang beses na lang ito darating ngayon.",
 };

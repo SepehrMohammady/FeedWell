@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Het offline vertaalmodel voor {language} downloaden zodat je artikelen zonder internet kunt vertalen?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Tijd om te lezen! 📖",
+  "notif.title": "Tijd om te lezen",
   "notif.body": "Je dagelijkse leesmoment is er weer. Open FeedWell en lees je feeds bij.",
   "notif.channelName": "Leesherinnering",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Filters wissen",
   "feedFilter.noMatchTitle": "Geen artikelen gevonden",
   "feedFilter.noMatchBody": "Probeer andere keuzes, of wis de filters.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Lijnen tussen artikelen",
-  "whatsNew.linesFixBody": "Op sommige telefoons ontbraken enkele van de dunne lijnen tussen artikelen in Opgeslagen en Feeds. Nu zijn ze allemaal te zien.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Verdwaalde codes in tekst",
-  "whatsNew.codesFixBody": "Sommige titels en beschrijvingen toonden stukjes code in plaats van een spatie, een letter met accent of een symbool. Nu zijn ze gewoon leesbaar.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "De feed van een site vinden",
   "whatsNew.findFeedBody": "Plak een websiteadres en FeedWell vindt nu op veel meer sites de feed, doordat het de feedlinks leest die de site zelf opgeeft.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Feeds die niet vernieuwden",
   "whatsNew.feedFixBody": "Sommige feeds met een kleine fout, zoals twee van NASA, werden nooit vernieuwd. Nu wel.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Kortere adressen",
+  "whatsNew.shortAddressBody": "Typ het adres van een site zonder https://, zoals npr.org, en FeedWell vult het voor je aan.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Minder code van Google",
+  "whatsNew.lessGoogleBody": "Met de code die FeedWell voor meldingen gebruikt, kwamen ook delen van Googles pushberichten mee. FeedWell gebruikte ze nooit en nu zijn ze weg. De leesherinnering werkt zoals eerst.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Eén herinnering tegelijk",
+  "whatsNew.oneReminderBody": "De leesherinnering kon twee keer binnenkomen. Nu komt hij één keer.",
 };

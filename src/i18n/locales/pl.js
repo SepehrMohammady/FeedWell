@@ -72,7 +72,7 @@ export default {
   "language.pickerTitle": "Wybierz język aplikacji",
   "language.offlineModelTitle": "Pobrać tłumaczenie offline?",
   "language.offlineModelBody": "Pobrać model tłumaczenia offline dla języka {language}, aby tłumaczyć artykuły bez internetu?",
-  "notif.title": "Czas na czytanie! 📖",
+  "notif.title": "Czas na czytanie",
   "notif.body": "Nadeszła pora Twojego codziennego czytania. Otwórz FeedWell i nadrób zaległości w kanałach.",
   "notif.channelName": "Przypomnienie o czytaniu",
   "home.refreshError": "Nie udało się odświeżyć kanałów. Sprawdź połączenie z internetem.",
@@ -660,16 +660,19 @@ export default {
   "feedFilter.clear": "Wyczyść filtry",
   "feedFilter.noMatchTitle": "Brak pasujących artykułów",
   "feedFilter.noMatchBody": "Wybierz coś innego albo wyczyść filtry.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Linie między artykułami",
-  "whatsNew.linesFixBody": "Na niektórych telefonach w Zapisanych i w Kanałach brakowało części cienkich linii między artykułami. Teraz widać wszystkie.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Zabłąkane kody w tekście",
-  "whatsNew.codesFixBody": "Niektóre tytuły i opisy pokazywały fragmenty kodu zamiast spacji, litery z akcentem lub symbolu. Teraz czyta się je normalnie.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Znajdowanie kanału strony",
   "whatsNew.findFeedBody": "Wklej adres strony, a FeedWell znajdzie teraz jej kanał na znacznie większej liczbie stron, bo odczytuje linki do kanałów, które podaje sama strona.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Kanały, które się nie odświeżały",
   "whatsNew.feedFixBody": "Niektóre kanały z drobnym błędem, na przykład dwa od NASA, nigdy się nie odświeżały. Teraz już tak.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Krótsze adresy",
+  "whatsNew.shortAddressBody": "Wpisz adres strony bez https://, na przykład npr.org, a FeedWell sam go uzupełni.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Mniej kodu Google",
+  "whatsNew.lessGoogleBody": "Razem z kodem, którego FeedWell używa do powiadomień, trafiły do aplikacji fragmenty usługi powiadomień push Google. FeedWell nigdy z nich nie korzystał, a teraz zostały usunięte. Przypomnienie o czytaniu działa jak wcześniej.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Jedno przypomnienie naraz",
+  "whatsNew.oneReminderBody": "Przypomnienie o czytaniu mogło przychodzić dwa razy. Teraz przychodzi raz.",
 };

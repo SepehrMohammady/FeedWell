@@ -93,7 +93,7 @@ export default {
   'language.offlineModelBody': 'Download the offline translation model for {language} so you can translate articles without internet?',
 
   // --- Notifications (shown outside React via tStatic) ---
-  'notif.title': 'Time to Read! 📖',
+  'notif.title': 'Time to read',
   'notif.body': 'Your daily reading time is here. Open FeedWell and catch up on your feeds.',
   'notif.channelName': 'Reading Reminder',
 
@@ -696,16 +696,19 @@ export default {
   'feedFilter.clear': 'Clear filters',
   'feedFilter.noMatchTitle': 'No articles match',
   'feedFilter.noMatchBody': 'Try other choices, or clear the filters.',
-  // 1.21.1: the lines between articles that went missing on some screens
-  'whatsNew.linesFixTitle': 'Lines between articles',
-  'whatsNew.linesFixBody': 'On some phones, a few of the thin lines between articles were missing in Saved and Feeds. They all show now.',
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  'whatsNew.codesFixTitle': 'Stray codes in text',
-  'whatsNew.codesFixBody': 'Some titles and descriptions showed bits of code in place of a space, an accented letter or a symbol. They read normally now.',
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   'whatsNew.findFeedTitle': 'Finding a site\'s feed',
   'whatsNew.findFeedBody': 'Paste a website address and FeedWell now finds its feed on many more sites, by reading the feed links the site lists.',
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   'whatsNew.feedFixTitle': 'Feeds that didn\'t refresh',
   'whatsNew.feedFixBody': 'Some feeds with a small error in them, such as two from NASA, never refreshed. They do now.',
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  'whatsNew.shortAddressTitle': 'Shorter addresses',
+  'whatsNew.shortAddressBody': 'Type a site\'s address without https://, such as npr.org, and FeedWell adds it for you.',
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  'whatsNew.lessGoogleTitle': 'Less Google code',
+  'whatsNew.lessGoogleBody': 'Parts of Google\'s push messaging came along with the code FeedWell uses for notifications. FeedWell never used them, and they are gone now. Reading reminders work as before.',
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  'whatsNew.oneReminderTitle': 'One reminder at a time',
+  'whatsNew.oneReminderBody': 'The reading reminder could arrive twice. Now it comes once.',
 };

@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Letöltöd a(z) {language} nyelvhez tartozó offline fordítási modellt, hogy internet nélkül is fordíthass cikkeket?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Itt az olvasás ideje! 📖",
+  "notif.title": "Itt az olvasás ideje",
   "notif.body": "Elérkezett a napi olvasás ideje. Nyisd meg a FeedWellt, és nézd át a forrásaidat.",
   "notif.channelName": "Olvasási emlékeztető",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Szűrők törlése",
   "feedFilter.noMatchTitle": "Nincs találat",
   "feedFilter.noMatchBody": "Próbálj más választást, vagy töröld a szűrőket.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Vonalak a cikkek között",
-  "whatsNew.linesFixBody": "Néhány telefonon a Mentett és a Hírforrások listájában hiányzott a cikkek közötti vékony vonalak egy része. Most mind látszik.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Kóbor kódok a szövegben",
-  "whatsNew.codesFixBody": "Néhány címben és leírásban kódrészletek jelentek meg egy szóköz, ékezetes betű vagy szimbólum helyén. Most már rendesen olvashatók.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "A webhely forrásának megkeresése",
   "whatsNew.findFeedBody": "Illessz be egy webhelycímet, és a FeedWell most sokkal több webhelyen megtalálja a forrását, mert elolvassa a webhely által megadott forráshivatkozásokat.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Források, amelyek nem frissültek",
   "whatsNew.feedFixBody": "Néhány apró hibát tartalmazó forrás, például kettő a NASA-tól, sosem frissült. Most már frissül.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Rövidebb címek",
+  "whatsNew.shortAddressBody": "Írd be egy webhely címét https:// nélkül, például npr.org, és a FeedWell kiegészíti helyetted.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Kevesebb Google-kód",
+  "whatsNew.lessGoogleBody": "A FeedWell értesítésekhez használt kódjával a Google push-üzeneteinek egyes részei is bekerültek. A FeedWell sosem használta őket, és most már nincsenek benne. Az olvasási emlékeztető ugyanúgy működik, mint eddig.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Egyszerre egy emlékeztető",
+  "whatsNew.oneReminderBody": "Az olvasási emlékeztető néha kétszer jött meg. Most már csak egyszer jön.",
 };

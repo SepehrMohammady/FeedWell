@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Vill du ladda ner offlinemodellen för {language} så att du kan översätta artiklar utan internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Dags att läsa! 📖",
+  "notif.title": "Dags att läsa",
   "notif.body": "Nu är det dags för din dagliga läsning. Öppna FeedWell och kom ikapp med dina flöden.",
   "notif.channelName": "Läspåminnelse",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Rensa filter",
   "feedFilter.noMatchTitle": "Inga artiklar matchar",
   "feedFilter.noMatchBody": "Prova andra val, eller rensa filtren.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Linjer mellan artiklar",
-  "whatsNew.linesFixBody": "På vissa telefoner saknades några av de tunna linjerna mellan artiklarna i Sparade och Flöden. Nu syns alla.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Vilsna koder i texten",
-  "whatsNew.codesFixBody": "Vissa rubriker och beskrivningar visade kodsnuttar i stället för ett mellanslag, en bokstav med accent eller en symbol. Nu läses de som vanligt.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Hitta en webbplats flöde",
   "whatsNew.findFeedBody": "Klistra in en webbadress så hittar FeedWell nu flödet på många fler webbplatser, eftersom appen läser de flödeslänkar som webbplatsen själv anger.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Flöden som inte uppdaterades",
   "whatsNew.feedFixBody": "Vissa flöden med ett litet fel, som två från NASA, uppdaterades aldrig. Nu gör de det.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Kortare adresser",
+  "whatsNew.shortAddressBody": "Skriv en webbplats adress utan https://, till exempel npr.org, så lägger FeedWell till det åt dig.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Mindre kod från Google",
+  "whatsNew.lessGoogleBody": "Med koden som FeedWell använder för aviseringar följde delar av Googles pushmeddelanden. FeedWell har aldrig använt dem, och nu är de borta. Läspåminnelsen fungerar som förut.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "En påminnelse i taget",
+  "whatsNew.oneReminderBody": "Läspåminnelsen kunde komma två gånger. Nu kommer den en gång.",
 };

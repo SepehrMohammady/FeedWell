@@ -72,7 +72,7 @@ export default {
   "language.pickerTitle": "เลือกภาษาของแอป",
   "language.offlineModelTitle": "ดาวน์โหลดการแปลแบบออฟไลน์หรือไม่?",
   "language.offlineModelBody": "ดาวน์โหลดโมเดลการแปลแบบออฟไลน์สำหรับ {language} เพื่อให้คุณแปลบทความได้โดยไม่ต้องใช้อินเทอร์เน็ตหรือไม่?",
-  "notif.title": "ถึงเวลาอ่านแล้ว! 📖",
+  "notif.title": "ถึงเวลาอ่านแล้ว",
   "notif.body": "ถึงเวลาอ่านประจำวันของคุณแล้ว เปิด FeedWell แล้วตามอ่านฟีดของคุณ",
   "notif.channelName": "การแจ้งเตือนการอ่าน",
   "home.refreshError": "ไม่สามารถรีเฟรชฟีดได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ",
@@ -640,16 +640,19 @@ export default {
   "feedFilter.clear": "ล้างตัวกรอง",
   "feedFilter.noMatchTitle": "ไม่มีบทความที่ตรงกัน",
   "feedFilter.noMatchBody": "ลองเลือกอย่างอื่น หรือล้างตัวกรอง",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "เส้นคั่นระหว่างบทความ",
-  "whatsNew.linesFixBody": "ในโทรศัพท์บางรุ่น เส้นบางๆ ระหว่างบทความบางเส้นไม่แสดงในที่บันทึกไว้และฟีด ตอนนี้แสดงครบทุกเส้นแล้ว",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "โค้ดหลงในข้อความ",
-  "whatsNew.codesFixBody": "ชื่อเรื่องและคำอธิบายบางรายการเคยแสดงเศษโค้ดแทนช่องว่าง ตัวอักษรที่มีเครื่องหมาย หรือสัญลักษณ์ ตอนนี้อ่านได้ตามปกติแล้ว",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "การค้นหาฟีดของเว็บไซต์",
   "whatsNew.findFeedBody": "วางที่อยู่เว็บไซต์ แล้ว FeedWell จะหาฟีดเจอในเว็บไซต์มากขึ้นอีกมาก เพราะตอนนี้อ่านลิงก์ฟีดที่เว็บไซต์ระบุไว้เอง",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "ฟีดที่ไม่รีเฟรช",
   "whatsNew.feedFixBody": "ฟีดบางรายการที่มีข้อผิดพลาดเล็กน้อย เช่น ฟีดสองรายการของ NASA ไม่เคยรีเฟรชเลย ตอนนี้รีเฟรชได้แล้ว",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "ที่อยู่ที่สั้นลง",
+  "whatsNew.shortAddressBody": "พิมพ์ที่อยู่เว็บไซต์โดยไม่ต้องมี https:// เช่น npr.org แล้ว FeedWell จะเติมให้เอง",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "โค้ดของ Google น้อยลง",
+  "whatsNew.lessGoogleBody": "โค้ดที่ FeedWell ใช้สำหรับการแจ้งเตือนมีส่วนหนึ่งของระบบข้อความพุชของ Google ติดมาด้วย FeedWell ไม่เคยใช้ส่วนนี้ และตอนนี้นำออกแล้ว การเตือนให้อ่านยังทำงานเหมือนเดิม",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "เตือนครั้งเดียว",
+  "whatsNew.oneReminderBody": "การเตือนให้อ่านเคยมาซ้ำสองครั้ง ตอนนี้มาเพียงครั้งเดียว",
 };

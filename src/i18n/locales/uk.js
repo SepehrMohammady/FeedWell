@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Завантажити офлайн-модель перекладу для мови {language}, щоб перекладати статті без інтернету?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Час читати! 📖",
+  "notif.title": "Час читати",
   "notif.body": "Настав ваш щоденний час для читання. Відкрийте FeedWell і перегляньте свої стрічки.",
   "notif.channelName": "Нагадування про читання",
 
@@ -705,16 +705,19 @@ export default {
   "feedFilter.clear": "Скинути фільтри",
   "feedFilter.noMatchTitle": "Немає відповідних статей",
   "feedFilter.noMatchBody": "Виберіть щось інше або скиньте фільтри.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Лінії між статтями",
-  "whatsNew.linesFixBody": "На деяких телефонах у Збережених і в Стрічках бракувало частини тонких ліній між статтями. Тепер видно всі.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Зайві коди в тексті",
-  "whatsNew.codesFixBody": "У деяких заголовках і описах замість пробілу, літери з акцентом чи символу показувалися уривки коду. Тепер вони читаються нормально.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Пошук стрічки сайту",
   "whatsNew.findFeedBody": "Вставте адресу сайту, і FeedWell тепер знайде його стрічку на значно більшій кількості сайтів: він читає посилання на стрічки, які вказує сам сайт.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Стрічки, що не оновлювалися",
   "whatsNew.feedFixBody": "Деякі стрічки з невеликою помилкою, як-от дві стрічки NASA, ніколи не оновлювалися. Тепер оновлюються.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Коротші адреси",
+  "whatsNew.shortAddressBody": "Вводьте адресу сайту без https://, наприклад npr.org, і FeedWell додасть його сам.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Менше коду Google",
+  "whatsNew.lessGoogleBody": "Разом із кодом, який FeedWell використовує для сповіщень, у застосунок потрапляли частини push-повідомлень Google. FeedWell ніколи ними не користувався, і тепер їх немає. Нагадування про читання працює як раніше.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Одне нагадування за раз",
+  "whatsNew.oneReminderBody": "Нагадування про читання могло прийти двічі. Тепер воно приходить один раз.",
 };

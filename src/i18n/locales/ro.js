@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Descarci modelul de traducere offline pentru {language}, ca să poți traduce articole fără internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "E timpul să citești! 📖",
+  "notif.title": "E timpul să citești",
   "notif.body": "A venit momentul tău zilnic de lectură. Deschide FeedWell și vezi noutățile din fluxurile tale.",
   "notif.channelName": "Memento pentru lectură",
 
@@ -703,16 +703,19 @@ export default {
   "feedFilter.clear": "Șterge filtrele",
   "feedFilter.noMatchTitle": "Niciun articol nu se potrivește",
   "feedFilter.noMatchBody": "Încearcă alte opțiuni sau șterge filtrele.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Liniile dintre articole",
-  "whatsNew.linesFixBody": "Pe unele telefoane lipseau câteva dintre liniile subțiri dintre articole în Salvate și în Fluxuri. Acum se văd toate.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Coduri rătăcite în text",
-  "whatsNew.codesFixBody": "Unele titluri și descrieri arătau bucăți de cod în locul unui spațiu, al unei litere cu accent sau al unui simbol. Acum se citesc normal.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Găsirea fluxului unui site",
   "whatsNew.findFeedBody": "Lipește adresa unui site, iar FeedWell găsește acum fluxul pe mult mai multe site-uri, citind linkurile de flux pe care le indică site-ul însuși.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Fluxuri care nu se actualizau",
   "whatsNew.feedFixBody": "Unele fluxuri cu o mică eroare, cum ar fi două de la NASA, nu se actualizau niciodată. Acum se actualizează.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Adrese mai scurte",
+  "whatsNew.shortAddressBody": "Scrie adresa unui site fără https://, de exemplu npr.org, iar FeedWell îl adaugă pentru tine.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Mai puțin cod de la Google",
+  "whatsNew.lessGoogleBody": "Odată cu codul pe care FeedWell îl folosește pentru notificări veneau și părți din mesageria push Google. FeedWell nu le-a folosit niciodată, iar acum au fost eliminate. Mementoul pentru lectură funcționează ca înainte.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Un singur memento",
+  "whatsNew.oneReminderBody": "Mementoul pentru lectură putea veni de două ori. Acum vine o singură dată.",
 };

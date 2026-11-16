@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Vil du downloade offlinemodellen til {language}, så du kan oversætte artikler uden internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Tid til at læse! 📖",
+  "notif.title": "Tid til at læse",
   "notif.body": "Det er tid til din daglige læsning. Åbn FeedWell og indhent dine feeds.",
   "notif.channelName": "Læsepåmindelse",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Ryd filtre",
   "feedFilter.noMatchTitle": "Ingen artikler passer",
   "feedFilter.noMatchBody": "Prøv andre valg, eller ryd filtrene.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Linjer mellem artikler",
-  "whatsNew.linesFixBody": "På nogle telefoner manglede enkelte af de tynde linjer mellem artiklerne i Gemte og Feeds. Nu vises de alle.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Vildfarne koder i teksten",
-  "whatsNew.codesFixBody": "Nogle titler og beskrivelser viste stumper af kode i stedet for et mellemrum, et bogstav med accent eller et symbol. Nu læses de normalt.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Find en sides feed",
   "whatsNew.findFeedBody": "Indsæt en webadresse, og FeedWell finder nu feedet på mange flere sider ved at læse de feedlinks, siden selv angiver.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Feeds, der ikke blev opdateret",
   "whatsNew.feedFixBody": "Nogle feeds med en lille fejl, som to fra NASA, blev aldrig opdateret. Det bliver de nu.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Kortere adresser",
+  "whatsNew.shortAddressBody": "Skriv en sides adresse uden https://, fx npr.org, så tilføjer FeedWell det for dig.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Mindre kode fra Google",
+  "whatsNew.lessGoogleBody": "Med den kode, FeedWell bruger til notifikationer, fulgte dele af Googles push-beskeder. FeedWell har aldrig brugt dem, og nu er de væk. Læsepåmindelsen virker som før.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Én påmindelse ad gangen",
+  "whatsNew.oneReminderBody": "Læsepåmindelsen kunne komme to gange. Nu kommer den én gang.",
 };

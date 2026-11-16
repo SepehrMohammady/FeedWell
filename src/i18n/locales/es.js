@@ -80,7 +80,7 @@ export default {
   "language.offlineModelTitle": "¿Descargar traducción sin conexión?",
   "language.offlineModelBody": "¿Descargar el modelo de traducción sin conexión para {language} y así traducir artículos sin internet?",
 
-  "notif.title": "¡Hora de leer! 📖",
+  "notif.title": "Hora de leer",
   "notif.body": "Ha llegado tu momento de lectura diaria. Abre FeedWell y ponte al día con tus fuentes.",
   "notif.channelName": "Recordatorio de lectura",
 
@@ -670,16 +670,19 @@ export default {
   "feedFilter.clear": "Borrar filtros",
   "feedFilter.noMatchTitle": "Ningún artículo coincide",
   "feedFilter.noMatchBody": "Prueba otras opciones o borra los filtros.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Líneas entre artículos",
-  "whatsNew.linesFixBody": "En algunos teléfonos faltaban algunas de las líneas finas entre artículos en Guardados y en Fuentes. Ahora se ven todas.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Códigos sueltos en el texto",
-  "whatsNew.codesFixBody": "Algunos títulos y descripciones mostraban trozos de código en lugar de un espacio, una letra acentuada o un símbolo. Ahora se leen con normalidad.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Encontrar la fuente de un sitio",
   "whatsNew.findFeedBody": "Pega la dirección de una web y FeedWell ahora encuentra su fuente en muchos más sitios, porque lee los enlaces a fuentes que indica el propio sitio.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Fuentes que no se actualizaban",
   "whatsNew.feedFixBody": "Algunas fuentes con un pequeño error, como dos de la NASA, nunca se actualizaban. Ahora sí.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Direcciones más cortas",
+  "whatsNew.shortAddressBody": "Escribe la dirección de una web sin https://, como npr.org, y FeedWell lo añade por ti.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Menos código de Google",
+  "whatsNew.lessGoogleBody": "Con el código que FeedWell usa para las notificaciones llegaban partes de los mensajes push de Google. FeedWell nunca los usó y ya no están. El recordatorio de lectura funciona como antes.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Un solo recordatorio",
+  "whatsNew.oneReminderBody": "El recordatorio de lectura podía llegar dos veces. Ahora llega una sola.",
 };

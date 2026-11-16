@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Pakua modeli ya tafsiri ya nje ya mtandao kwa {language} ili uweze kutafsiri makala bila intaneti?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Wakati wa Kusoma! 📖",
+  "notif.title": "Wakati wa kusoma",
   "notif.body": "Muda wako wa kusoma wa kila siku umewadia. Fungua FeedWell upitie mipasho yako.",
   "notif.channelName": "Kikumbusho cha Kusoma",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Futa vichujio",
   "feedFilter.noMatchTitle": "Hakuna makala zinazolingana",
   "feedFilter.noMatchBody": "Jaribu machaguo mengine, au futa vichujio.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Mistari kati ya makala",
-  "whatsNew.linesFixBody": "Kwenye baadhi ya simu, baadhi ya mistari myembamba kati ya makala haikuonekana kwenye Zilizohifadhiwa na Mipasho. Sasa yote inaonekana.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Misimbo iliyopotea kwenye maandishi",
-  "whatsNew.codesFixBody": "Baadhi ya vichwa na maelezo vilionyesha vipande vya msimbo badala ya nafasi, herufi yenye alama au ishara. Sasa vinasomeka kawaida.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Kupata mpasho wa tovuti",
   "whatsNew.findFeedBody": "Bandika anwani ya tovuti na sasa FeedWell hupata mpasho wake kwenye tovuti nyingi zaidi, kwa kusoma viungo vya mipasho ambavyo tovuti yenyewe inaonyesha.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Mipasho ambayo haikuonyeshwa upya",
   "whatsNew.feedFixBody": "Baadhi ya mipasho yenye kosa dogo, kama miwili ya NASA, haikuwahi kuonyeshwa upya. Sasa inaonyeshwa upya.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Anwani fupi zaidi",
+  "whatsNew.shortAddressBody": "Andika anwani ya tovuti bila https://, kama npr.org, na FeedWell itaiongeza kwa ajili yako.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Msimbo mdogo zaidi wa Google",
+  "whatsNew.lessGoogleBody": "Sehemu za huduma ya ujumbe wa push ya Google zilikuja pamoja na msimbo ambao FeedWell hutumia kwa arifa. FeedWell haikuwahi kuzitumia, na sasa zimeondolewa. Kikumbusho cha kusoma kinafanya kazi kama awali.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Kikumbusho kimoja tu",
+  "whatsNew.oneReminderBody": "Kikumbusho cha kusoma kingeweza kufika mara mbili. Sasa kinafika mara moja.",
 };

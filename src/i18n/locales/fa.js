@@ -72,7 +72,7 @@ export default {
   "language.pickerTitle": "انتخاب زبان برنامه",
   "language.offlineModelTitle": "دانلود ترجمه آفلاین؟",
   "language.offlineModelBody": "مدل ترجمه آفلاین برای {language} دانلود شود تا بتوانید مقاله‌ها را بدون اینترنت ترجمه کنید؟",
-  "notif.title": "وقت مطالعه! 📖",
+  "notif.title": "وقت مطالعه",
   "notif.body": "زمان مطالعه روزانه شما رسیده است. FeedWell را باز کنید و خوراک‌های خود را دنبال کنید.",
   "notif.channelName": "یادآور مطالعه",
   "home.refreshError": "به‌روزرسانی خوراک‌ها ناموفق بود. لطفاً اتصال اینترنت خود را بررسی کنید.",
@@ -649,16 +649,19 @@ export default {
   "feedFilter.clear": "پاک کردن فیلترها",
   "feedFilter.noMatchTitle": "هیچ مقاله‌ای پیدا نشد",
   "feedFilter.noMatchBody": "گزینه‌های دیگری را امتحان کنید، یا فیلترها را پاک کنید.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "خط‌های بین مقاله‌ها",
-  "whatsNew.linesFixBody": "در بعضی گوشی‌ها، چند تا از خط‌های نازک بین مقاله‌ها در ذخیره‌شده و خوراک‌ها دیده نمی‌شد. حالا همه دیده می‌شوند.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "کدهای اضافه در متن",
-  "whatsNew.codesFixBody": "در بعضی عنوان‌ها و توضیح‌ها به‌جای فاصله، حرف علامت‌دار یا نماد، تکه‌ای کد دیده می‌شد. حالا درست خوانده می‌شوند.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "پیدا کردن خوراک سایت",
   "whatsNew.findFeedBody": "نشانی یک وب‌سایت را بچسبانید. FeedWell حالا با خواندن پیوندهای خوراکی که خود سایت معرفی می‌کند، خوراک آن را در سایت‌های خیلی بیشتری پیدا می‌کند.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "خوراک‌هایی که به‌روز نمی‌شدند",
   "whatsNew.feedFixBody": "بعضی خوراک‌ها که خطای کوچکی داشتند، مثل دو خوراک از ناسا، هیچ‌وقت به‌روز نمی‌شدند. حالا به‌روز می‌شوند.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "نشانی‌های کوتاه‌تر",
+  "whatsNew.shortAddressBody": "نشانی سایت را بدون https:// بنویسید، مثل npr.org، و FeedWell خودش آن را اضافه می‌کند.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "کد کمتر از گوگل",
+  "whatsNew.lessGoogleBody": "همراه کدی که FeedWell برای اعلان‌ها به کار می‌برد، بخش‌هایی از سرویس پیام فوری گوگل هم آمده بود. FeedWell هرگز از آن‌ها استفاده نکرد و حالا حذف شده‌اند. یادآور مطالعه مثل قبل کار می‌کند.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "فقط یک یادآور",
+  "whatsNew.oneReminderBody": "یادآور مطالعه گاهی دو بار می‌آمد. حالا فقط یک بار می‌آید.",
 };

@@ -59,3 +59,7 @@
 # ML Kit translate (fast-mlkit-translate-text) — belt-and-braces on top of the
 # library's own consumer rules.
 -keep class com.google.mlkit.** { *; }
+
+# Firebase Cloud Messaging is left out of the build (android/app/build.gradle).
+# The unused push code in expo-notifications still names its classes.
+-dontwarn com.google.firebase.**

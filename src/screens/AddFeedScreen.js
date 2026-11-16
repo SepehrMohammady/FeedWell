@@ -17,7 +17,7 @@ import { useFeed } from '../context/FeedContext';
 import { useTheme, makeStyles } from '../context/ThemeContext';
 import { useUi, ListCard, SectionTitle } from '../theme/ui';
 import { FONT, TYPE, RADIUS } from '../theme/type';
-import { parseRSSFeed, isValidRSSUrl, discoverFeedUrl } from '../utils/rssParser';
+import { parseRSSFeed, isValidRSSUrl, discoverFeedUrl, withWebScheme } from '../utils/rssParser';
 import { parseRSSFeedWithProxy } from '../utils/corsRssParser';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -77,22 +77,24 @@ export default function AddFeedScreen({ navigation }) {
       return;
     }
 
-    if (!isValidRSSUrl(url.trim())) {
+    // "npr.org" and feed:// links are read as https addresses
+    const typed = withWebScheme(url);
+    if (!isValidRSSUrl(typed)) {
       setAlertConfig({ visible: true, title: t('common.error'), message: t('addFeed.enterValidUrl'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     // Check if feed already exists
-    if (feeds.some(feed => feed.url === url.trim())) {
+    if (feeds.some(feed => feed.url === typed)) {
       setAlertConfig({ visible: true, title: t('common.error'), message: t('addFeed.alreadyAdded'), icon: 'alert-circle-outline', buttons: [{ text: t('common.ok') }] });
       return;
     }
 
     setLoading(true);
     try {
-      console.log('Attempting to parse feed:', url.trim());
-      
-      let feedUrl = url.trim();
+      console.log('Attempting to parse feed:', typed);
+
+      let feedUrl = typed;
       let feedData;
 
       // Try the regular parser first

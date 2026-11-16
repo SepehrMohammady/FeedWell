@@ -80,7 +80,7 @@ export default {
   "language.offlineModelTitle": "ऑफ़लाइन अनुवाद डाउनलोड करें?",
   "language.offlineModelBody": "{language} के लिए ऑफ़लाइन अनुवाद मॉडल डाउनलोड करें ताकि आप बिना इंटरनेट के लेखों का अनुवाद कर सकें?",
 
-  "notif.title": "पढ़ने का समय! 📖",
+  "notif.title": "पढ़ने का समय",
   "notif.body": "आपका रोज़ का पढ़ने का समय आ गया है। FeedWell खोलें और अपने फ़ीड्स पर नज़र डालें।",
   "notif.channelName": "पढ़ने का अनुस्मारक",
 
@@ -669,16 +669,19 @@ export default {
   "feedFilter.clear": "फ़िल्टर साफ़ करें",
   "feedFilter.noMatchTitle": "कोई लेख मेल नहीं खाता",
   "feedFilter.noMatchBody": "दूसरे विकल्प आज़माएँ, या फ़िल्टर साफ़ करें।",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "लेखों के बीच की रेखाएँ",
-  "whatsNew.linesFixBody": "कुछ फ़ोन पर सहेजे गए और फ़ीड्स में लेखों के बीच की कुछ पतली रेखाएँ नहीं दिखती थीं। अब सभी दिखती हैं।",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "टेक्स्ट में भटके हुए कोड",
-  "whatsNew.codesFixBody": "कुछ शीर्षकों और विवरणों में स्पेस, चिह्न वाले अक्षर या प्रतीक की जगह कोड के टुकड़े दिखते थे। अब वे सामान्य रूप से पढ़े जाते हैं।",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "साइट का फ़ीड ढूँढ़ना",
   "whatsNew.findFeedBody": "किसी वेबसाइट का पता पेस्ट करें, और FeedWell अब कहीं ज़्यादा साइटों पर उसका फ़ीड ढूँढ़ लेता है, क्योंकि वह साइट के अपने बताए फ़ीड लिंक पढ़ता है।",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "फ़ीड जो ताज़ा नहीं होते थे",
   "whatsNew.feedFixBody": "छोटी-सी गड़बड़ी वाले कुछ फ़ीड, जैसे NASA के दो फ़ीड, कभी ताज़ा नहीं होते थे। अब होते हैं।",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "छोटे पते",
+  "whatsNew.shortAddressBody": "किसी साइट का पता https:// के बिना लिखें, जैसे npr.org, और FeedWell उसे अपने-आप जोड़ देता है।",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Google का कम कोड",
+  "whatsNew.lessGoogleBody": "FeedWell सूचनाओं के लिए जिस कोड का इस्तेमाल करता है, उसके साथ Google की पुश मैसेजिंग के कुछ हिस्से भी आए थे। FeedWell ने उनका कभी इस्तेमाल नहीं किया, और अब वे हटा दिए गए हैं। पढ़ने का अनुस्मारक पहले की तरह काम करता है।",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "एक बार में एक अनुस्मारक",
+  "whatsNew.oneReminderBody": "पढ़ने का अनुस्मारक कभी-कभी दो बार आता था। अब यह एक ही बार आता है।",
 };

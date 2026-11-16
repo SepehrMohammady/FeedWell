@@ -72,7 +72,7 @@ export default {
   "language.pickerTitle": "Uygulama Dilini Seçin",
   "language.offlineModelTitle": "Çevrimdışı çeviri indirilsin mi?",
   "language.offlineModelBody": "{language} için çevrimdışı çeviri modelini indirerek makaleleri internet olmadan çevirmek ister misiniz?",
-  "notif.title": "Okuma Zamanı! 📖",
+  "notif.title": "Okuma zamanı",
   "notif.body": "Günlük okuma zamanınız geldi. FeedWell'i açın ve akışlarınızı yakalayın.",
   "notif.channelName": "Okuma Hatırlatıcısı",
   "home.refreshError": "Akışlar yenilenemedi. Lütfen internet bağlantınızı kontrol edin.",
@@ -649,16 +649,19 @@ export default {
   "feedFilter.clear": "Filtreleri temizle",
   "feedFilter.noMatchTitle": "Eşleşen makale yok",
   "feedFilter.noMatchBody": "Başka seçenekler dene ya da filtreleri temizle.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Makaleler arasındaki çizgiler",
-  "whatsNew.linesFixBody": "Bazı telefonlarda Kaydedilenler ve Akışlar'da makaleler arasındaki ince çizgilerin bir kısmı görünmüyordu. Artık hepsi görünüyor.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Metindeki başıboş kodlar",
-  "whatsNew.codesFixBody": "Bazı başlık ve açıklamalarda boşluk, aksanlı harf ya da simge yerine kod parçaları görünüyordu. Artık normal okunuyorlar.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Sitenin akışını bulma",
   "whatsNew.findFeedBody": "Bir web sitesi adresi yapıştır. FeedWell artık sitenin kendi belirttiği akış bağlantılarını okuyarak çok daha fazla sitede akışı buluyor.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Yenilenmeyen akışlar",
   "whatsNew.feedFixBody": "NASA'nın iki akışı gibi küçük bir hata içeren bazı akışlar hiç yenilenmiyordu. Artık yenileniyorlar.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Daha kısa adresler",
+  "whatsNew.shortAddressBody": "Bir sitenin adresini https:// olmadan yaz, örneğin npr.org, FeedWell onu senin için ekler.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Daha az Google kodu",
+  "whatsNew.lessGoogleBody": "FeedWell'in bildirimler için kullandığı kodla birlikte Google'ın push mesajlaşmasının bazı parçaları da geliyordu. FeedWell bunları hiç kullanmadı ve artık kaldırıldılar. Okuma hatırlatıcısı eskisi gibi çalışıyor.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Tek bir hatırlatma",
+  "whatsNew.oneReminderBody": "Okuma hatırlatıcısı iki kez gelebiliyordu. Artık bir kez geliyor.",
 };

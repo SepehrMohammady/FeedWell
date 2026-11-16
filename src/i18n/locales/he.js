@@ -92,7 +92,7 @@ export default {
   "language.offlineModelBody": "להוריד את מודל התרגום האופליין עבור {language} כדי לתרגם כתבות בלי אינטרנט?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "זמן לקרוא! 📖",
+  "notif.title": "זמן לקרוא",
   "notif.body": "הגיע זמן הקריאה היומי. אפשר לפתוח את FeedWell ולהתעדכן בפידים.",
   "notif.channelName": "תזכורת קריאה",
 
@@ -704,16 +704,19 @@ export default {
   "feedFilter.clear": "ניקוי הסינון",
   "feedFilter.noMatchTitle": "אין כתבות מתאימות",
   "feedFilter.noMatchBody": "אפשר לבחור משהו אחר, או לנקות את הסינון.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "קווים בין הכתבות",
-  "whatsNew.linesFixBody": "בחלק מהטלפונים חסרו כמה מהקווים הדקים בין הכתבות בשמורים ובפידים. עכשיו כולם מופיעים.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "קודים תועים בטקסט",
-  "whatsNew.codesFixBody": "בחלק מהכותרות והתיאורים הופיעו קטעי קוד במקום רווח, אות עם סימן או סמל. עכשיו הם נקראים כרגיל.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "מציאת הפיד של אתר",
   "whatsNew.findFeedBody": "אפשר להדביק כתובת של אתר, ו-FeedWell מוצאת עכשיו את הפיד שלו בהרבה יותר אתרים, כי היא קוראת את קישורי הפיד שהאתר עצמו מציין.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "פידים שלא התעדכנו",
   "whatsNew.feedFixBody": "חלק מהפידים עם שגיאה קטנה, כמו שניים של NASA, לא התעדכנו אף פעם. עכשיו הם מתעדכנים.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "כתובות קצרות יותר",
+  "whatsNew.shortAddressBody": "אפשר להקליד כתובת של אתר בלי https://, למשל npr.org, ו-FeedWell תשלים אותה.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "פחות קוד של Google",
+  "whatsNew.lessGoogleBody": "יחד עם הקוד ש-FeedWell משתמשת בו להתראות הגיעו גם חלקים משירות הודעות הפוש של Google. FeedWell מעולם לא השתמשה בהם, ועכשיו הם הוסרו. תזכורת הקריאה עובדת כמו קודם.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "תזכורת אחת בכל פעם",
+  "whatsNew.oneReminderBody": "תזכורת הקריאה הייתה עלולה להגיע פעמיים. עכשיו היא מגיעה פעם אחת.",
 };

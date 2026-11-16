@@ -88,18 +88,18 @@ export const AVAILABLE_LANGUAGES = [
 // Quick lookup maps
 const CODE_TO_MLKIT = {};
 const CODE_TO_DISPLAY = {};
-const MLKIT_TO_CODE = {};
 AVAILABLE_LANGUAGES.forEach(lang => {
   CODE_TO_MLKIT[lang.code] = lang.mlKitName;
   CODE_TO_DISPLAY[lang.code] = lang.displayName;
-  MLKIT_TO_CODE[lang.mlKitName.toLowerCase()] = lang.code;
 });
 
 // Google's detector and Android's locale both still use a few pre-ISO-639
 // codes ('iw' for Hebrew, 'in' for Indonesian), and Google also returns
-// region-tagged codes like 'zh-CN'. Map them onto the codes this table uses,
-// or the same-language check compares 'iw' with 'he' and never matches.
-const LEGACY_LANGUAGE_CODES = { iw: 'he', in: 'id', ji: 'yi', jw: 'jv' };
+// region-tagged codes like 'zh-CN'. ML Kit's language identification names
+// Filipino 'fil' where this table says 'tl'. Map them onto the codes this
+// table uses, or the same-language check compares 'iw' with 'he' and never
+// matches.
+const LEGACY_LANGUAGE_CODES = { iw: 'he', in: 'id', ji: 'yi', jw: 'jv', fil: 'tl' };
 
 export function normalizeLanguageCode(code) {
   if (!code) return code;
@@ -313,12 +313,18 @@ export async function identifyLanguage(text, mode = TRANSLATION_MODES.AUTO) {
   }
   try {
     const sample = text.substring(0, 500);
-    const mlKitResult = await FastTranslator.identifyLanguage(sample);
-    console.log('ML Kit language identification:', mlKitResult);
-    const code = MLKIT_TO_CODE[mlKitResult?.toLowerCase()];
-    return code || null;
+    // fast-mlkit-translate-text calls it identify() (until 1.21.3 FeedWell asked
+    // for an identifyLanguage() that doesn't exist, so this never ran). It
+    // returns a BCP-47 tag such as "de" or "zh", or "zh-Latn" for romanized
+    // text, which the translation models can't read, and it rejects with "und"
+    // when it can't tell.
+    const tag = await FastTranslator.identify(sample);
+    console.log('ML Kit language identification:', tag);
+    if (!tag || /-latn$/i.test(tag)) return null;
+    const code = normalizeLanguageCode(tag);
+    return CODE_TO_MLKIT[code] ? code : null;
   } catch (error) {
-    console.error('ML Kit language identification failed:', error);
+    console.log('ML Kit language identification found no language:', error?.message || error);
     return null;
   }
 }

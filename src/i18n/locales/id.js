@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Unduh model terjemahan offline untuk {language} agar Anda dapat menerjemahkan artikel tanpa internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Waktunya Membaca! 📖",
+  "notif.title": "Waktunya membaca",
   "notif.body": "Waktu membaca harian Anda telah tiba. Buka FeedWell dan ikuti perkembangan feed Anda.",
   "notif.channelName": "Pengingat Membaca",
 
@@ -685,16 +685,19 @@ export default {
   "feedFilter.clear": "Hapus filter",
   "feedFilter.noMatchTitle": "Tidak ada artikel yang cocok",
   "feedFilter.noMatchBody": "Coba pilihan lain, atau hapus filter.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Garis di antara artikel",
-  "whatsNew.linesFixBody": "Di beberapa ponsel, sebagian garis tipis di antara artikel tidak tampil di Tersimpan dan Feed. Sekarang semuanya tampil.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Kode nyasar di teks",
-  "whatsNew.codesFixBody": "Beberapa judul dan deskripsi menampilkan potongan kode di tempat spasi, huruf beraksen, atau simbol. Sekarang semuanya terbaca normal.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Menemukan feed situs",
   "whatsNew.findFeedBody": "Tempel alamat situs web dan FeedWell kini menemukan feed-nya di jauh lebih banyak situs, dengan membaca tautan feed yang dicantumkan situs itu sendiri.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Feed yang tidak bisa disegarkan",
   "whatsNew.feedFixBody": "Beberapa feed dengan kesalahan kecil, seperti dua dari NASA, tidak pernah bisa disegarkan. Sekarang sudah bisa.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Alamat lebih pendek",
+  "whatsNew.shortAddressBody": "Ketik alamat situs tanpa https://, misalnya npr.org, dan FeedWell menambahkannya untuk Anda.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Lebih sedikit kode Google",
+  "whatsNew.lessGoogleBody": "Bagian dari layanan pesan push Google ikut terbawa bersama kode yang dipakai FeedWell untuk notifikasi. FeedWell tidak pernah memakainya, dan kini sudah dihapus. Pengingat membaca tetap berfungsi seperti sebelumnya.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Satu pengingat saja",
+  "whatsNew.oneReminderBody": "Pengingat membaca bisa muncul dua kali. Sekarang hanya muncul sekali.",
 };

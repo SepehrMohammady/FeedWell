@@ -8,6 +8,12 @@ import { APP_LANGUAGE_KEY, detectDeviceLanguage } from '../context/LanguageConte
 // 24 hours in seconds — remind user at the same time tomorrow
 const REMINDER_DELAY_SECONDS = 24 * 3600;
 
+// One identifier for the reminder: the app schedules it on start and again
+// each time it comes to the front, often twice within a moment, and with a
+// new identifier each time two reminders were left waiting and both arrived.
+// Scheduling under the same identifier replaces the one before.
+const REMINDER_ID = 'feedwell-reading-reminder';
+
 // Resolve the app language outside React (notifications run without context).
 async function resolveAppLanguage() {
   try {
@@ -64,6 +70,7 @@ export async function scheduleReminderNotification() {
 
     // Schedule new reminder
     await Notifications.scheduleNotificationAsync({
+      identifier: REMINDER_ID,
       content: {
         title: tStatic('notif.title', lang),
         body: tStatic('notif.body', lang),

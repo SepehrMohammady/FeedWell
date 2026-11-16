@@ -92,7 +92,7 @@ export default {
   "language.offlineModelBody": "هل تريد تنزيل نموذج الترجمة دون اتصال للغة {language} لتتمكن من ترجمة المقالات بدون إنترنت؟",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "حان وقت القراءة! 📖",
+  "notif.title": "حان وقت القراءة",
   "notif.body": "حان موعد قراءتك اليومية. افتح FeedWell وتابع خلاصاتك.",
   "notif.channelName": "تذكير القراءة",
 
@@ -724,16 +724,19 @@ export default {
   "feedFilter.clear": "مسح عوامل التصفية",
   "feedFilter.noMatchTitle": "لا توجد مقالات مطابقة",
   "feedFilter.noMatchBody": "جرّب خيارات أخرى، أو امسح عوامل التصفية.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "الخطوط بين المقالات",
-  "whatsNew.linesFixBody": "في بعض الهواتف، كانت بعض الخطوط الرفيعة بين المقالات لا تظهر في المحفوظات والخلاصات. تظهر الآن كلها.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "رموز زائدة في النص",
-  "whatsNew.codesFixBody": "كانت بعض العناوين والأوصاف تعرض أجزاء من رموز برمجية بدل مسافة أو حرف خاص أو علامة. صارت الآن تُقرأ بشكل طبيعي.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "العثور على خلاصة الموقع",
   "whatsNew.findFeedBody": "الصق عنوان موقع، وسيجد FeedWell الآن خلاصته في مواقع أكثر بكثير، لأنه يقرأ روابط الخلاصات التي يذكرها الموقع نفسه.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "خلاصات تعذّر تحديثها",
   "whatsNew.feedFixBody": "بعض الخلاصات التي فيها خطأ بسيط، مثل خلاصتين من ناسا، لم يكن تحديثها ينجح أبدًا. صار ينجح الآن.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "عناوين أقصر",
+  "whatsNew.shortAddressBody": "اكتب عنوان الموقع دون https://، مثل npr.org، وسيضيفه FeedWell لك.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "شيفرة أقل من Google",
+  "whatsNew.lessGoogleBody": "جاءت أجزاء من خدمة الإشعارات الفورية من Google مع الشيفرة التي يستخدمها FeedWell لعرض الإشعارات. لم يستخدمها FeedWell قط، وقد أُزيلت الآن. ويعمل تذكير القراءة كما كان.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "تذكير واحد فقط",
+  "whatsNew.oneReminderBody": "كان تذكير القراءة يصل أحيانًا مرتين. صار يصل مرة واحدة.",
 };

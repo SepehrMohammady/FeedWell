@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Tải gói dịch ngoại tuyến cho {language} để bạn có thể dịch bài viết mà không cần internet?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Đến giờ đọc rồi! 📖",
+  "notif.title": "Đến giờ đọc rồi",
   "notif.body": "Đã đến giờ đọc mỗi ngày của bạn. Mở FeedWell để xem những bài mới trong các nguồn cấp nhé.",
   "notif.channelName": "Nhắc nhở đọc bài",
 
@@ -685,16 +685,19 @@ export default {
   "feedFilter.clear": "Xóa bộ lọc",
   "feedFilter.noMatchTitle": "Không có bài nào khớp",
   "feedFilter.noMatchBody": "Hãy thử lựa chọn khác, hoặc xóa bộ lọc.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Đường kẻ giữa các bài",
-  "whatsNew.linesFixBody": "Trên một số điện thoại, vài đường kẻ mảnh giữa các bài không hiện trong Đã lưu và Nguồn cấp. Giờ tất cả đều hiện.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Mã lạc trong văn bản",
-  "whatsNew.codesFixBody": "Một số tiêu đề và mô tả hiện các đoạn mã thay cho dấu cách, chữ có dấu hoặc ký hiệu. Giờ chúng đã đọc được bình thường.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Tìm nguồn cấp của trang",
   "whatsNew.findFeedBody": "Dán địa chỉ một trang web và giờ FeedWell tìm được nguồn cấp ở nhiều trang hơn hẳn, nhờ đọc các liên kết nguồn cấp mà chính trang đó khai báo.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Nguồn cấp không làm mới được",
   "whatsNew.feedFixBody": "Một số nguồn cấp có lỗi nhỏ, như hai nguồn của NASA, chưa bao giờ làm mới được. Giờ thì đã được.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Địa chỉ ngắn hơn",
+  "whatsNew.shortAddressBody": "Nhập địa chỉ trang web mà không cần https://, như npr.org, FeedWell sẽ tự thêm vào.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Ít mã của Google hơn",
+  "whatsNew.lessGoogleBody": "Mã mà FeedWell dùng cho thông báo từng đi kèm một phần dịch vụ tin nhắn đẩy của Google. FeedWell chưa bao giờ dùng phần này, và giờ đã gỡ bỏ. Nhắc nhở đọc bài vẫn hoạt động như trước.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Mỗi lần một lời nhắc",
+  "whatsNew.oneReminderBody": "Nhắc nhở đọc bài có thể đến hai lần. Giờ chỉ đến một lần.",
 };

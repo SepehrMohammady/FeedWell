@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Να γίνει λήψη του μοντέλου μετάφρασης εκτός σύνδεσης για {language}, ώστε να μεταφράζετε άρθρα χωρίς internet;",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Ώρα για διάβασμα! 📖",
+  "notif.title": "Ώρα για διάβασμα",
   "notif.body": "Έφτασε η ώρα της καθημερινής σας ανάγνωσης. Ανοίξτε το FeedWell και δείτε τις ροές σας.",
   "notif.channelName": "Υπενθύμιση ανάγνωσης",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Απαλοιφή φίλτρων",
   "feedFilter.noMatchTitle": "Κανένα άρθρο δεν ταιριάζει",
   "feedFilter.noMatchBody": "Δοκιμάστε άλλες επιλογές ή καθαρίστε τα φίλτρα.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Γραμμές ανάμεσα στα άρθρα",
-  "whatsNew.linesFixBody": "Σε ορισμένα τηλέφωνα έλειπαν κάποιες από τις λεπτές γραμμές ανάμεσα στα άρθρα, στα Αποθηκευμένα και στις Ροές. Τώρα φαίνονται όλες.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Αδέσποτοι κωδικοί στο κείμενο",
-  "whatsNew.codesFixBody": "Ορισμένοι τίτλοι και περιγραφές έδειχναν κομμάτια κώδικα στη θέση ενός κενού, ενός τονισμένου γράμματος ή ενός συμβόλου. Τώρα διαβάζονται κανονικά.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Εύρεση της ροής ενός ιστότοπου",
   "whatsNew.findFeedBody": "Επικολλήστε τη διεύθυνση ενός ιστότοπου και το FeedWell βρίσκει πλέον τη ροή του σε πολύ περισσότερους ιστότοπους, διαβάζοντας τους συνδέσμους ροών που δηλώνει ο ίδιος ο ιστότοπος.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Ροές που δεν ανανεώνονταν",
   "whatsNew.feedFixBody": "Ορισμένες ροές με ένα μικρό σφάλμα, όπως δύο της NASA, δεν ανανεώνονταν ποτέ. Τώρα ανανεώνονται.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Συντομότερες διευθύνσεις",
+  "whatsNew.shortAddressBody": "Πληκτρολογήστε τη διεύθυνση ενός ιστότοπου χωρίς https://, όπως npr.org, και το FeedWell το προσθέτει για εσάς.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Λιγότερος κώδικας της Google",
+  "whatsNew.lessGoogleBody": "Μαζί με τον κώδικα που χρησιμοποιεί το FeedWell για τις ειδοποιήσεις ήρθαν και τμήματα των μηνυμάτων push της Google. Το FeedWell δεν τα χρησιμοποίησε ποτέ και τώρα αφαιρέθηκαν. Η υπενθύμιση ανάγνωσης λειτουργεί όπως πριν.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Μία υπενθύμιση τη φορά",
+  "whatsNew.oneReminderBody": "Η υπενθύμιση ανάγνωσης μπορούσε να έρθει δύο φορές. Τώρα έρχεται μία.",
 };

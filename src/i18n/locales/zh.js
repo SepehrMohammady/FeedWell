@@ -72,7 +72,7 @@ export default {
   "language.pickerTitle": "选择应用语言",
   "language.offlineModelTitle": "下载离线翻译？",
   "language.offlineModelBody": "下载 {language} 的离线翻译模型，以便您在没有网络的情况下翻译文章？",
-  "notif.title": "阅读时间到！📖",
+  "notif.title": "阅读时间到了",
   "notif.body": "您的每日阅读时间到了。打开 FeedWell 查看最新订阅内容吧。",
   "notif.channelName": "阅读提醒",
   "home.refreshError": "刷新订阅源失败。请检查您的网络连接。",
@@ -640,16 +640,19 @@ export default {
   "feedFilter.clear": "清除筛选",
   "feedFilter.noMatchTitle": "没有符合的文章",
   "feedFilter.noMatchBody": "试试其他选项，或清除筛选。",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "文章之间的分隔线",
-  "whatsNew.linesFixBody": "在部分手机上，已保存和订阅源中文章之间的个别细线没有显示。现在全部都能显示了。",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "文字中的多余代码",
-  "whatsNew.codesFixBody": "部分标题和描述曾在空格、带重音的字母或符号的位置显示代码片段。现在已能正常阅读。",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "查找网站的订阅源",
   "whatsNew.findFeedBody": "粘贴网站地址后，FeedWell 现在会读取网站自己列出的订阅源链接，因此能在多得多的网站上找到订阅源。",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "无法刷新的订阅源",
   "whatsNew.feedFixBody": "部分订阅源带有小错误，例如 NASA 的两个订阅源，以前从未刷新成功。现在可以了。",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "更短的地址",
+  "whatsNew.shortAddressBody": "输入网站地址时可以省略 https://，例如 npr.org，FeedWell 会自动补上。",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "更少的 Google 代码",
+  "whatsNew.lessGoogleBody": "FeedWell 用于通知的代码曾附带 Google 推送消息服务的部分组件。FeedWell 从未使用过它们，现在已经移除。阅读提醒照常工作。",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "提醒只来一次",
+  "whatsNew.oneReminderBody": "阅读提醒有时会收到两次。现在只会收到一次。",
 };

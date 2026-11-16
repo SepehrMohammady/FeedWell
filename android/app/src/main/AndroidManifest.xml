@@ -24,6 +24,9 @@
          icon, which Android masks into a blank silhouette in the status bar. -->
     <meta-data android:name="expo.modules.notifications.default_notification_icon" android:resource="@drawable/ic_notification"/>
     <meta-data android:name="expo.modules.notifications.default_notification_color" android:resource="@color/notification_accent"/>
+    <!-- expo-notifications' push service. FeedWell only schedules local reminders,
+         and the Firebase Cloud Messaging it runs on is left out of the build. -->
+    <service android:name="expo.modules.notifications.service.ExpoFirebaseMessagingService" tools:node="remove"/>
     <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>

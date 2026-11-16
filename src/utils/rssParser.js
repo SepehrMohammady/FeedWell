@@ -1296,6 +1296,19 @@ export async function discoverFeedUrl(siteUrl) {
   return null;
 }
 
+// An address typed without its scheme ("npr.org", "www.npr.org/feed") gets
+// https://, the way a browser's address bar reads it. Some sites link their
+// feeds as feed://example.com/rss or feed:https://example.com/rss; those are
+// read as the web addresses they stand for.
+export function withWebScheme(address) {
+  const typed = String(address || '').trim();
+  if (!typed) return typed;
+  if (/^feed:\/\//i.test(typed)) return `https://${typed.slice('feed://'.length)}`;
+  if (/^feed:https?:\/\//i.test(typed)) return typed.slice('feed:'.length);
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(typed)) return typed;
+  return `https://${typed.replace(/^\/+/, '')}`;
+}
+
 export function isValidRSSUrl(url) {
   try {
     const urlObj = new URL(url);

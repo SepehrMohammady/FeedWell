@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Ladataanko kielen {language} offline-käännösmalli, jotta voit kääntää artikkeleita ilman internetyhteyttä?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Lukuhetki! 📖",
+  "notif.title": "Lukuhetki",
   "notif.body": "Päivittäinen lukuhetkesi on täällä. Avaa FeedWell ja katso, mitä syötteissäsi on uutta.",
   "notif.channelName": "Lukumuistutus",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Tyhjennä suodattimet",
   "feedFilter.noMatchTitle": "Ei osuvia artikkeleita",
   "feedFilter.noMatchBody": "Kokeile muita valintoja tai tyhjennä suodattimet.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Viivat artikkelien välissä",
-  "whatsNew.linesFixBody": "Joissakin puhelimissa osa artikkelien välisistä ohuista viivoista puuttui Tallennetuista ja Syötteistä. Nyt ne näkyvät kaikki.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Harhailevat koodit tekstissä",
-  "whatsNew.codesFixBody": "Joissakin otsikoissa ja kuvauksissa näkyi koodinpätkiä välilyönnin, aksenttimerkillisen kirjaimen tai symbolin paikalla. Nyt ne näkyvät oikein.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Sivuston syötteen löytäminen",
   "whatsNew.findFeedBody": "Liitä verkkosivun osoite, niin FeedWell löytää nyt syötteen paljon useammalta sivustolta, koska se lukee sivuston itse ilmoittamat syötelinkit.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Syötteet, jotka eivät päivittyneet",
   "whatsNew.feedFixBody": "Jotkin syötteet, joissa on pieni virhe, kuten kaksi NASAn syötettä, eivät koskaan päivittyneet. Nyt ne päivittyvät.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Lyhyemmät osoitteet",
+  "whatsNew.shortAddressBody": "Kirjoita sivuston osoite ilman https://-alkua, esimerkiksi npr.org, niin FeedWell lisää sen puolestasi.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Vähemmän Googlen koodia",
+  "whatsNew.lessGoogleBody": "FeedWellin ilmoituksiin käyttämän koodin mukana tuli osia Googlen push-viesteistä. FeedWell ei koskaan käyttänyt niitä, ja nyt ne on poistettu. Lukumuistutus toimii kuten ennenkin.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Yksi muistutus kerrallaan",
+  "whatsNew.oneReminderBody": "Lukumuistutus saattoi tulla kahdesti. Nyt se tulee kerran.",
 };

@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Stáhnout offline překladový model pro jazyk {language}, abyste mohli překládat články bez internetu?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "Čas na čtení! 📖",
+  "notif.title": "Čas na čtení",
   "notif.body": "Je tu váš čas na čtení. Otevřete FeedWell a projděte si své kanály.",
   "notif.channelName": "Připomenutí čtení",
 
@@ -703,16 +703,19 @@ export default {
   "feedFilter.clear": "Vymazat filtry",
   "feedFilter.noMatchTitle": "Žádné odpovídající články",
   "feedFilter.noMatchBody": "Zkuste jiné volby, nebo filtry vymažte.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Čáry mezi články",
-  "whatsNew.linesFixBody": "Na některých telefonech chyběly v Uložených a v Kanálech některé tenké čáry mezi články. Teď jsou vidět všechny.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Zatoulané kódy v textu",
-  "whatsNew.codesFixBody": "Některé titulky a popisy ukazovaly kousky kódu místo mezery, písmene s diakritikou nebo symbolu. Teď se čtou normálně.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Hledání kanálu webu",
   "whatsNew.findFeedBody": "Vložte adresu webu a FeedWell teď najde jeho kanál na mnohem více webech, protože čte odkazy na kanály, které web sám uvádí.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Kanály, které se neobnovovaly",
   "whatsNew.feedFixBody": "Některé kanály s drobnou chybou, například dva od NASA, se nikdy neobnovily. Teď už ano.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Kratší adresy",
+  "whatsNew.shortAddressBody": "Napište adresu webu bez https://, například npr.org, a FeedWell ji doplní za vás.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Méně kódu od Googlu",
+  "whatsNew.lessGoogleBody": "S kódem, který FeedWell používá pro oznámení, přišly i části push zpráv od Googlu. FeedWell je nikdy nepoužíval a teď jsou pryč. Připomenutí čtení funguje jako dřív.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Jedno připomenutí",
+  "whatsNew.oneReminderBody": "Připomenutí čtení mohlo přijít dvakrát. Teď přijde jednou.",
 };

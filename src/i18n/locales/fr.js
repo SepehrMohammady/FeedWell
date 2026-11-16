@@ -91,7 +91,7 @@ export default {
   "language.offlineModelBody": "Télécharger le modèle de traduction hors ligne pour {language} afin de traduire les articles sans connexion Internet ?",
 
   // --- Notifications (shown outside React via tStatic) ---
-  "notif.title": "C'est l'heure de lire ! 📖",
+  "notif.title": "C'est l'heure de lire",
   "notif.body": "Votre moment de lecture quotidien est arrivé. Ouvrez FeedWell et rattrapez vos flux.",
   "notif.channelName": "Rappel de lecture",
 
@@ -694,16 +694,19 @@ export default {
   "feedFilter.clear": "Effacer les filtres",
   "feedFilter.noMatchTitle": "Aucun article ne correspond",
   "feedFilter.noMatchBody": "Essayez d'autres choix, ou effacez les filtres.",
-  // 1.21.1: the lines between articles that went missing on some screens
-  "whatsNew.linesFixTitle": "Lignes entre les articles",
-  "whatsNew.linesFixBody": "Sur certains téléphones, quelques fines lignes entre les articles manquaient dans Enregistrés et dans Flux. Elles s'affichent toutes désormais.",
-  // 1.21.1: character codes ("&#160;") the feed parser left in titles and descriptions
-  "whatsNew.codesFixTitle": "Codes égarés dans le texte",
-  "whatsNew.codesFixBody": "Certains titres et descriptions affichaient des bouts de code à la place d'un espace, d'une lettre accentuée ou d'un symbole. Ils se lisent normalement désormais.",
   // 1.21.2: a site's feed found from a pasted website address, through the feed links the page lists
   "whatsNew.findFeedTitle": "Trouver le flux d'un site",
   "whatsNew.findFeedBody": "Collez l'adresse d'un site et FeedWell trouve désormais son flux sur bien plus de sites, en lisant les liens de flux que le site indique lui-même.",
   // 1.21.2: feeds with small XML errors (two from NASA) that never refreshed
   "whatsNew.feedFixTitle": "Des flux qui ne s'actualisaient pas",
   "whatsNew.feedFixBody": "Certains flux comportant une petite erreur, comme deux flux de la NASA, ne s'actualisaient jamais. Ils s'actualisent désormais.",
+  // 1.21.3: an address typed without https:// (npr.org) gets it added
+  "whatsNew.shortAddressTitle": "Des adresses plus courtes",
+  "whatsNew.shortAddressBody": "Saisissez l'adresse d'un site sans https://, comme npr.org, et FeedWell l'ajoute pour vous.",
+  // 1.21.3: Firebase Cloud Messaging, which came with expo-notifications, left out of the build
+  "whatsNew.lessGoogleTitle": "Moins de code Google",
+  "whatsNew.lessGoogleBody": "Le code qu'utilise FeedWell pour les notifications apportait des éléments de la messagerie push de Google. FeedWell ne s'en est jamais servi, et ils sont désormais retirés. Le rappel de lecture fonctionne comme avant.",
+  // 1.21.3: the reading reminder was scheduled twice and could arrive twice
+  "whatsNew.oneReminderTitle": "Un seul rappel",
+  "whatsNew.oneReminderBody": "Le rappel de lecture pouvait arriver deux fois. Il n'arrive plus qu'une fois.",
 };
